@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AppScreen } from "../types";
 import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
   Bars3Icon as MenuIcon, 
   XMarkIcon as XIcon, 
@@ -32,7 +32,9 @@ import {
   FaceSmileIcon,
   BellIcon,
   HomeIcon,
-  UserIcon
+  UserIcon,
+  WifiIcon,
+  Battery50Icon
 } from "@heroicons/react/24/outline";
 
 interface MarketingPageProps {
@@ -41,41 +43,187 @@ interface MarketingPageProps {
   ethPrice: number;
 }
 
+const MobileAppMockup = () => (
+  <div className="p-6 md:p-8 space-y-6 h-full bg-white flex flex-col text-left">
+    {/* Status Bar */}
+    <div className="flex justify-between items-center text-[10px] font-bold text-gray-400 px-2">
+       <span>9:41</span>
+       <div className="flex items-center gap-1.5">
+          <WifiIcon className="w-3 h-3" />
+          <div className="w-5 h-2.5 border border-gray-300 rounded-[3px] p-[1px] relative">
+             <div className="h-full bg-[#0b0e14] w-[60%] rounded-[1px]"></div>
+             <div className="absolute -right-1 top-1/2 -translate-y-1/2 w-0.5 h-1 bg-gray-300 rounded-full"></div>
+          </div>
+       </div>
+    </div>
+
+    <div className="flex justify-between items-center text-[#0b0e14]">
+       <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-2xl bg-[#0b0e14] flex items-center justify-center text-white font-black text-xs">O</div>
+          <span className="text-[13px] font-black uppercase tracking-widest">Obey</span>
+       </div>
+       <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
+             <BellIcon className="w-4 h-4 text-gray-400" />
+          </div>
+          <CheckBadgeIcon className="w-6 h-6 text-primary" />
+       </div>
+    </div>
+
+    <div className="space-y-1 pt-2">
+       <p className="text-[9px] font-black uppercase text-gray-400 tracking-[0.2em]">Current Balance</p>
+       <div className="space-y-0.5">
+          <p className="text-4xl font-black font-space text-[#0b0e14] tracking-tighter leading-tight">$40,500.80</p>
+          <div className="flex items-center gap-2 text-emerald-500 font-bold text-[9px]">
+             <span className="px-1.5 py-0.5 bg-emerald-50 rounded-md">+2.4%</span>
+             <span className="uppercase tracking-widest opacity-70">Today's Profit</span>
+          </div>
+       </div>
+    </div>
+
+    {/* Action Grid */}
+    <div className="grid grid-cols-4 gap-3">
+       {[
+          { icon: BanknotesIcon, label: "Fund", color: "bg-blue-50 text-blue-600" },
+          { icon: SwapIcon, label: "Trade", color: "bg-indigo-50 text-indigo-600" },
+          { icon: ZapIcon, label: "VTU", color: "bg-amber-50 text-amber-600" },
+          { icon: GiftIcon, label: "Gifts", color: "bg-rose-50 text-rose-600" }
+       ].map((act, i) => (
+          <div key={i} className="space-y-2 text-center group cursor-pointer">
+             <div className={`w-11 h-11 rounded-[1.2rem] ${act.color} flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm`}>
+                <act.icon className="w-5 h-5" />
+             </div>
+             <p className="text-[8px] font-black uppercase tracking-tighter text-gray-500">{act.label}</p>
+          </div>
+       ))}
+    </div>
+
+    {/* Mini Chart Mockup */}
+    <div className="bg-gray-50 rounded-[2rem] p-5 space-y-4">
+       <div className="flex justify-between items-center">
+          <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Asset Performance</p>
+          <ChartBarIcon className="w-3.5 h-4 text-primary" />
+       </div>
+       <div className="h-16 w-full flex items-end gap-1.5">
+          {[0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 1, 0.7, 0.9].map((h, i) => (
+             <motion.div 
+               key={i} 
+               initial={{ height: 0 }}
+               whileInView={{ height: `${h * 100}%` }}
+               transition={{ delay: i * 0.1, duration: 0.5 }}
+               className="flex-grow bg-primary/20 rounded-t-lg" 
+             />
+          ))}
+       </div>
+    </div>
+
+    {/* Recent Transactions */}
+    <div className="space-y-4 flex-grow overflow-hidden">
+       <p className="text-[9px] font-black uppercase text-gray-400 tracking-widest">Recent Activity</p>
+       <div className="space-y-3">
+          {[
+             { label: "Amazon Card", sub: "Marketplace", val: "+$500.00", color: "text-emerald-500", icon: "A" },
+             { label: "BTC Purchase", sub: "Exchange", val: "-$1,200.00", color: "text-[#0b0e14]", icon: "B" }
+          ].map((tx, i) => (
+             <div key={i} className="flex items-center justify-between group">
+                <div className="flex items-center gap-3">
+                   <div className="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center font-black text-[10px] text-gray-400">{tx.icon}</div>
+                   <div>
+                      <p className="text-[9px] font-black uppercase text-[#0b0e14]">{tx.label}</p>
+                      <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">{tx.sub}</p>
+                   </div>
+                </div>
+                <p className={`text-[10px] font-black uppercase tracking-tighter ${tx.color}`}>{tx.val}</p>
+             </div>
+          ))}
+       </div>
+    </div>
+  </div>
+);
+
 export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: MarketingPageProps) {
   const [activeHeader, setActiveHeader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setActiveHeader(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    
+    const timer = setTimeout(() => setIsLoaded(true), 2400);
+    
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+    };
   }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.1,
-      },
+      transition: { staggerChildren: 0.15, delayChildren: 0.2 },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 40 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+      transition: { duration: 1, ease: [0.22, 1, 0.36, 1] },
     },
   };
+
+  const { scrollYProgress } = useScroll();
+  const phoneParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
     <div className="min-h-screen bg-white text-[#0b0e14] selection:bg-primary/10 selection:text-primary overflow-x-hidden font-inter">
       
+      <AnimatePresence>
+         {!isLoaded && (
+            <motion.div 
+               exit={{ opacity: 0, scale: 1.1 }}
+               transition={{ duration: 0.8, ease: "easeInOut" }}
+               className="fixed inset-0 z-[100] bg-[#0b0e14] flex flex-col items-center justify-center"
+            >
+               <div className="relative">
+                  <motion.div 
+                     initial={{ scale: 0.8, opacity: 0 }}
+                     animate={{ scale: 1, opacity: 1 }}
+                     className="w-24 h-24 bg-white rounded-[32px] flex items-center justify-center shadow-2xl mb-8"
+                  >
+                     <span className="text-[#0b0e14] font-black text-4xl uppercase">O</span>
+                  </motion.div>
+                  <motion.div 
+                     animate={{ rotate: 360 }}
+                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                     className="absolute -inset-4 border-2 border-white/10 border-t-yellow-400 rounded-[44px]"
+                  />
+               </div>
+               <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="space-y-2 text-center"
+               >
+                  <p className="text-white text-[10px] font-black uppercase tracking-[0.5em] ml-2">Synchronizing Nodes</p>
+                  <div className="w-48 h-1 bg-white/5 rounded-full overflow-hidden">
+                     <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 2, ease: "easeInOut" }}
+                        className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]"
+                     />
+                  </div>
+               </motion.div>
+            </motion.div>
+         )}
+      </AnimatePresence>
+
       {/* 1. SIGHT NAVIGATION */}
       <header
         className={`fixed top-0 w-full z-50 transition-all duration-500 h-20 md:h-24 flex items-center ${
@@ -166,65 +314,17 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             
             {/* Phone Mockup Section */}
             <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-90 md:scale-100">
-               <div className="relative w-[320px] md:w-[400px] aspect-[1/2] rounded-[3.5rem] border-[10px] border-[#0b0e14] bg-white shadow-[0_120px_100px_-50px_rgba(0,0,0,0.12)] overflow-hidden">
+               <motion.div 
+                  initial={{ rotateX: 20, rotateY: -10, y: 100, opacity: 0 }}
+                  animate={{ rotateX: 0, rotateY: 0, y: 0, opacity: 1 }}
+                  transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative w-[320px] md:w-[400px] aspect-[1/2] rounded-[3.5rem] border-[10px] border-[#0b0e14] bg-white shadow-[0_120px_100px_-50px_rgba(0,0,0,0.12)] overflow-hidden"
+               >
                   <div className="absolute top-0 inset-x-0 h-10 flex items-center justify-center z-10">
                      <div className="w-28 h-6 bg-[#0b0e14] rounded-b-3xl"></div>
                   </div>
-                  <div className="p-8 pt-16 space-y-8 h-full bg-white">
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-black">LO</div>
-                           <div>
-                              <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">Welcome back,</p>
-                              <p className="text-sm font-black uppercase">Luke Okagha</p>
-                           </div>
-                        </div>
-                        <BellIcon className="w-5 h-5 text-gray-400" />
-                     </div>
-                     
-                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                           <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Main Account</p>
-                           <ChevronRightIcon className="w-3 h-3 text-gray-400" />
-                        </div>
-                        <p className="text-4xl font-black font-space tracking-tight text-[#0b0e14]">$142,580.42</p>
-                     </div>
-
-                     <div className="grid grid-cols-2 gap-3">
-                        <button className="h-12 bg-[#0b0e14] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest active-press flex items-center justify-center gap-2 shadow-lg shadow-black/20">
-                           <SwapIcon className="w-4 h-4 rotate-90" /> Request
-                        </button>
-                        <button className="h-12 border border-gray-100 text-[#0b0e14] rounded-2xl font-black text-[10px] uppercase tracking-widest active-press flex items-center justify-center gap-2">
-                           <ArrowRightIcon className="w-4 h-4 -rotate-45" /> Send
-                        </button>
-                     </div>
-
-                     <div className="space-y-4 pt-4">
-                        <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Transaction</p>
-                        <div className="space-y-4">
-                           {[
-                              { label: "Transfer to Felix", val: "-$4,020.00", icon: "FA" },
-                              { label: "BTC Inflow", val: "+$1,300.00", icon: "W", color: "text-emerald-500" }
-                           ].map((tx, i) => (
-                             <div key={i} className="flex items-center justify-between group">
-                                <div className="flex items-center gap-3">
-                                   <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center font-black text-[10px] group-hover:bg-primary/5 transition-colors">{tx.icon}</div>
-                                   <p className="text-[11px] font-black uppercase tracking-tight">{tx.label}</p>
-                                </div>
-                                <p className={`text-[11px] font-black ${tx.color || "text-[#0b0e14]"}`}>{tx.val}</p>
-                             </div>
-                           ))}
-                        </div>
-                     </div>
-
-                     <div className="mt-auto pt-6 flex justify-around items-center border-t border-gray-50 opacity-40">
-                        <HomeIcon className="w-5 h-5" />
-                        <ChartBarIcon className="w-5 h-5" />
-                        <ActivityIcon className="w-5 h-5" />
-                        <UserIcon className="w-5 h-5" />
-                     </div>
-                  </div>
-               </div>
+                  <MobileAppMockup />
+               </motion.div>
 
                {/* Floating Feature Cards */}
                <motion.div 
@@ -277,7 +377,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             <motion.div 
               variants={containerVariants}
               initial="hidden"
-              animate="visible"
+              whileInView="visible"
+              viewport={{ once: true }}
               className="lg:w-1/2 space-y-14 text-center lg:text-left order-1 lg:order-2"
             >
               <motion.h1 
@@ -337,13 +438,23 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         {/* 3. FEATURE GRID (Feel the best experience) */}
         <section id="features" className="py-32 md:py-56 px-6 bg-white border-y border-gray-50">
            <div className="max-w-[1400px] mx-auto space-y-24">
-              <div className="text-center space-y-6">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-center space-y-6"
+              >
                  <h2 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight">Feel the best experience <br /> with our features</h2>
-              </div>
+              </motion.div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                  {/* Card Feature 1 */}
-                 <div className="p-14 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-12 group hover:bg-white hover:shadow-2xl transition-all duration-700 overflow-hidden relative">
+                 <motion.div 
+                  initial={{ opacity: 0, x: -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="p-14 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-12 group hover:bg-white hover:shadow-2xl transition-all duration-700 overflow-hidden relative"
+                 >
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><CreditCardIcon className="w-8 h-8" /></div>
                     <div className="space-y-6">
                        <h3 className="text-4xl font-black tracking-tighter">Custom and design your card, <br /> make it unique</h3>
@@ -358,10 +469,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                           </div>
                        </div>
                     </div>
-                 </div>
+                 </motion.div>
 
                  {/* Card Feature 2 */}
-                 <div className="p-14 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-12 group hover:bg-white hover:shadow-2xl transition-all duration-700 overflow-hidden relative">
+                 <motion.div 
+                  initial={{ opacity: 0, x: 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="p-14 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-12 group hover:bg-white hover:shadow-2xl transition-all duration-700 overflow-hidden relative"
+                 >
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><ActivityIcon className="w-8 h-8" /></div>
                     <div className="space-y-6">
                        <h3 className="text-4xl font-black tracking-tighter">Personalized your financial <br /> insights and goals</h3>
@@ -377,14 +493,24 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        </div>
                        <div className="h-24 w-full flex items-end gap-2">
                           {[0.3, 0.6, 0.4, 0.8, 0.5, 0.9, 0.7, 1].map((h, i) => (
-                            <div key={i} className="flex-grow bg-primary/10 rounded-t-xl" style={{ height: `${h * 100}%` }}></div>
+                            <motion.div 
+                              key={i} 
+                              initial={{ height: 0 }}
+                              whileInView={{ height: `${h * 100}%` }}
+                              className="flex-grow bg-primary/10 rounded-t-xl" 
+                            />
                           ))}
                        </div>
                     </div>
-                 </div>
+                 </motion.div>
 
                  {/* Feature 3 (Long Horizontal) */}
-                 <div className="lg:col-span-2 p-14 bg-gray-50 rounded-[4rem] border border-gray-100 flex flex-col lg:flex-row items-center gap-16 group hover:bg-white hover:shadow-2xl transition-all duration-700">
+                 <motion.div 
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="lg:col-span-2 p-14 bg-gray-50 rounded-[4rem] border border-gray-100 flex flex-col lg:flex-row items-center gap-16 group hover:bg-white hover:shadow-2xl transition-all duration-700"
+                 >
                     <div className="lg:w-1/2 space-y-10">
                        <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><CurrencyDollarIcon className="w-8 h-8" /></div>
                        <div className="space-y-6">
@@ -413,44 +539,21 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                           </div>
                        </div>
                     </div>
-                 </div>
-
-                 {/* Grid 3 - Currencies */}
-                 <div className="p-12 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-10 group hover:bg-white hover:shadow-2xl transition-all duration-700">
-                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><GlobeIcon className="w-8 h-8" /></div>
-                    <h3 className="text-4xl font-black tracking-tighter">Hold money in 30+ <br /> assets and nodes</h3>
-                    <div className="flex flex-wrap gap-4">
-                       {['USD', 'EUR', 'GBP', 'NGN', 'BTC', 'ETH', 'SOL', 'USDC', 'USDT'].map(c => (
-                         <div key={c} className="px-6 py-3 bg-white rounded-2xl border border-gray-100 font-black text-xs uppercase tracking-widest shadow-sm group-hover:border-primary/20 transition-all">{c}</div>
-                       ))}
-                    </div>
-                 </div>
-
-                 {/* Grid 4 - Subscriptions */}
-                 <div className="p-12 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-10 group hover:bg-white hover:shadow-2xl transition-all duration-700">
-                    <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><BriefcaseIcon className="w-8 h-8" /></div>
-                    <h3 className="text-4xl font-black tracking-tighter">Financial services you <br /> control in one place</h3>
-                    <div className="p-6 bg-white rounded-3xl shadow-sm border border-gray-50 flex items-center justify-between">
-                       <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-[#0b0e14] rounded-xl flex items-center justify-center text-white"><AppIcon className="w-6 h-6" /></div>
-                          <div>
-                             <p className="text-sm font-black uppercase">Airtime & Data</p>
-                             <p className="text-[10px] font-bold text-gray-400">Institutional VTU Node</p>
-                          </div>
-                       </div>
-                       <p className="text-lg font-black font-space">0% Fee</p>
-                    </div>
-                 </div>
+                 </motion.div>
               </div>
            </div>
         </section>
 
-        {/* 4. LOGO CLOUD (200+ Growing company) */}
+        {/* 4. LOGO CLOUD */}
         <section id="compliance" className="py-32 px-6 bg-white text-center space-y-20">
-           <div className="space-y-6">
+           <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            className="space-y-6"
+           >
               <h2 className="text-5xl font-black tracking-tighter">200+ The fastest growing <br /> company use OBEY</h2>
               <p className="text-gray-400 font-medium">Many companies have tried using OBEY and they trust <br /> the safety of their money.</p>
-           </div>
+           </motion.div>
            <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 grayscale opacity-30 group">
               {['Airbnb', 'Slack', 'Stripe', 'Airwallex', 'Spotify', 'Booking', 'Gusto', 'Coinbase'].map(c => (
                 <div key={c} className="h-12 flex items-center justify-center font-black text-2xl tracking-tighter hover:text-black transition-all cursor-pointer">{c}</div>
@@ -461,22 +564,36 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         {/* 5. JOIN TRUST SECTION */}
         <section id="institutional" className="py-32 md:py-56 px-6 bg-gray-50 overflow-hidden relative">
            <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-24">
-              <div className="lg:w-1/2">
-                 <div className="relative rounded-[4rem] overflow-hidden shadow-2xl border-[10px] border-white">
-                    <img 
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                className="lg:w-1/2"
+              >
+                 <div className="relative rounded-[4rem] overflow-hidden shadow-2xl border-[10px] border-white group">
+                    <motion.img 
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 1.5 }}
                       src="/illustractions character.jpg" 
                       alt="Success Character" 
                       className="w-full h-full object-cover" 
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0b0e14]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                  </div>
-              </div>
-              <div className="lg:w-1/2 space-y-12">
-                 <h2 className="text-6xl md:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14]">Join 15+ million people <br /> who already trust us <br /> with their money</h2>
-                 <p className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed italic">
+              </motion.div>
+              <motion.div 
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                className="lg:w-1/2 space-y-12"
+              >
+                 <motion.h2 variants={itemVariants} className="text-6xl md:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14]">Join 15+ million people <br /> who already trust us <br /> with their money</motion.h2>
+                 <motion.p variants={itemVariants} className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed italic">
                     "Overall, this app has been a life-changer for me. It has revolutionized the way I approach my finances, 
                     providing me with the tools, insights, and security I need to unlock my financial freedom."
-                 </p>
-                 <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+                 </motion.p>
+                 <motion.div variants={itemVariants} className="flex items-center justify-between pt-6 border-t border-gray-200">
                     <div>
                        <p className="text-2xl font-black text-[#0b0e14]">Ellena Putri</p>
                        <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest pt-1">Node Strategist</p>
@@ -485,15 +602,20 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        <button className="w-14 h-14 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all"><ArrowRightIcon className="w-6 h-6 rotate-180" /></button>
                        <button className="w-14 h-14 rounded-full bg-yellow-400 text-[#0b0e14] flex items-center justify-center shadow-lg active-press"><ArrowRightIcon className="w-6 h-6" /></button>
                     </div>
-                 </div>
-              </div>
+                 </motion.div>
+              </motion.div>
            </div>
         </section>
 
-        {/* 6. MOBILE APP SYNC (Finsy Style) */}
+        {/* 6. MOBILE APP SYNC */}
         <section className="py-32 md:py-56 px-6 bg-white overflow-hidden">
            <div className="max-w-[1400px] mx-auto text-center space-y-24">
-              <div className="space-y-8">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="space-y-8"
+              >
                  <h2 className="text-5xl md:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14]">Get the OBEY mobile app.</h2>
                  <p className="text-xl text-gray-400 font-medium max-w-xl mx-auto">With this platform, you can access your account anywhere, anytime for balance and so much more.</p>
                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -512,113 +634,62 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        </div>
                     </button>
                  </div>
-              </div>
+              </motion.div>
 
               <div className="relative flex justify-center pt-20">
                  <div className="flex -space-x-12 md:-space-x-32 justify-center items-end">
                     {/* Left Phone */}
-                    <div className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-gray-50 shadow-2xl scale-90 -rotate-[12deg] opacity-40 overflow-hidden hidden sm:block">
-                       <img src="/illustractions.jpg" className="w-full h-full object-cover" alt="App Preview 1" />
-                    </div>
+                    <motion.div 
+                       initial={{ x: -100, rotate: -25, opacity: 0 }}
+                       whileInView={{ x: 0, rotate: -12, opacity: 0.4 }}
+                       viewport={{ once: true }}
+                       transition={{ duration: 1.5, ease: "easeOut" }}
+                       className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block"
+                    >
+                       <MobileAppMockup />
+                    </motion.div>
 
-                    {/* Center Phone (The "Complete 3D UI") */}
-                    <div className="relative w-[300px] md:w-[420px] aspect-[1/2] rounded-[4rem] border-[12px] border-[#0b0e14] bg-white shadow-[0_80px_100px_-40px_rgba(0,0,0,0.3)] z-10 hover:scale-[1.02] transition-transform duration-1000 overflow-hidden">
-                       <div className="p-8 space-y-8 h-full bg-white flex flex-col text-left">
-                          {/* Status Bar */}
-                          <div className="flex justify-between items-center text-[10px] font-bold">
-                             <span>9:41</span>
-                             <div className="flex gap-1">
-                                <div className="w-4 h-2 bg-black rounded-sm"></div>
-                                <div className="w-2 h-2 bg-black rounded-full"></div>
-                             </div>
-                          </div>
-
-                          <div className="flex justify-between items-center text-[#0b0e14]">
-                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-2xl bg-[#0b0e14] flex items-center justify-center text-white font-black">O</div>
-                                <span className="text-sm font-black uppercase tracking-widest">Obey</span>
-                             </div>
-                             <CheckBadgeIcon className="w-6 h-6 text-primary" />
-                          </div>
-
-                          <div className="space-y-2 pt-4">
-                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Current Balance</p>
-                             <div className="space-y-1">
-                                <p className="text-5xl font-black font-space text-[#0b0e14] tracking-tighter">$40,500.80</p>
-                                <div className="flex items-center gap-2 text-emerald-500 font-bold text-[10px]">
-                                   <span className="px-1.5 py-0.5 bg-emerald-50 rounded-md">+2.4%</span>
-                                   <span>Today's Profit</span>
-                                </div>
-                             </div>
-                          </div>
-
-                          {/* Action Grid */}
-                          <div className="grid grid-cols-4 gap-4">
-                             {[
-                                { icon: BanknotesIcon, label: "Fund" },
-                                { icon: SwapIcon, label: "Trade" },
-                                { icon: ZapIcon, label: "VTU" },
-                                { icon: GiftIcon, label: "Gifts" }
-                             ].map((act, i) => (
-                                <div key={i} className="space-y-2 text-center">
-                                   <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#0b0e14] shadow-sm">
-                                      <act.icon className="w-5 h-5" />
-                                   </div>
-                                   <p className="text-[9px] font-black uppercase tracking-tighter">{act.label}</p>
-                                </div>
-                             ))}
-                          </div>
-
-                          {/* Mini Chart Mockup */}
-                          <div className="bg-gray-50 rounded-[2rem] p-6 space-y-4">
-                             <div className="flex justify-between items-center">
-                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Asset Performance</p>
-                                <ChartBarIcon className="w-4 h-4 text-primary" />
-                             </div>
-                             <div className="h-20 w-full flex items-end gap-1.5">
-                                {[0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 1, 0.7, 0.9].map((h, i) => (
-                                   <div key={i} className="flex-grow bg-primary/20 rounded-t-lg" style={{ height: `${h * 100}%` }}></div>
-                                ))}
-                             </div>
-                          </div>
-
-                          {/* Recent Transactions */}
-                          <div className="space-y-4 flex-grow">
-                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Recent Activity</p>
-                             <div className="space-y-4">
-                                {[
-                                   { label: "Amazon Card", sub: "Marketplace", val: "+$500.00" },
-                                   { label: "BTC Purchase", sub: "Exchange", val: "-$1,200.00" }
-                                ].map((tx, i) => (
-                                   <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-4 last:border-0">
-                                      <div className="flex items-center gap-3">
-                                         <div className="w-8 h-8 rounded-full bg-gray-100"></div>
-                                         <div>
-                                            <p className="text-[10px] font-black uppercase">{tx.label}</p>
-                                            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{tx.sub}</p>
-                                         </div>
-                                      </div>
-                                      <p className="text-[10px] font-black uppercase tracking-tighter">{tx.val}</p>
-                                   </div>
-                                ))}
-                             </div>
-                          </div>
-                       </div>
-                    </div>
+                    {/* Center Phone */}
+                    <motion.div 
+                       initial={{ y: 150, opacity: 0 }}
+                       whileInView={{ y: 0, opacity: 1 }}
+                       viewport={{ once: true }}
+                       transition={{ duration: 1, delay: 0.2 }}
+                       className="relative w-[300px] md:w-[420px] aspect-[1/2] rounded-[4rem] border-[12px] border-[#0b0e14] bg-white shadow-[0_80px_100px_-40px_rgba(0,0,0,0.3)] z-10 hover:scale-[1.02] transition-transform duration-1000 overflow-hidden"
+                    >
+                       <MobileAppMockup />
+                    </motion.div>
 
                     {/* Right Phone */}
-                    <div className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-gray-50 shadow-2xl scale-90 rotate-[12deg] opacity-40 overflow-hidden hidden sm:block">
-                       <img src="/illustrations.jpg" className="w-full h-full object-cover" alt="App Preview 2" />
-                    </div>
+                    <motion.div 
+                       initial={{ x: 100, rotate: 25, opacity: 0 }}
+                       whileInView={{ x: 0, rotate: 12, opacity: 0.4 }}
+                       viewport={{ once: true }}
+                       transition={{ duration: 1.5, ease: "easeOut" }}
+                       className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block"
+                    >
+                       <MobileAppMockup />
+                    </motion.div>
                  </div>
               </div>
 
-              <h3 className="text-5xl md:text-9xl font-black tracking-tighter text-[#0b0e14] pt-20">Save smart. Achieve more.</h3>
+              <motion.h3 
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                className="text-5xl md:text-9xl font-black tracking-tighter text-[#0b0e14] pt-20"
+              >
+                Save smart. Achieve more.
+              </motion.h3>
            </div>
         </section>
 
         <section className="px-6 pb-32">
-           <div className="max-w-[1400px] mx-auto bg-[#0b0e14] rounded-[4rem] p-12 md:p-24 text-white overflow-hidden relative group">
+           <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            className="max-w-[1400px] mx-auto bg-[#0b0e14] rounded-[4rem] p-12 md:p-24 text-white overflow-hidden relative group"
+           >
               <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[150px] -z-10 group-hover:scale-110 transition-transform duration-1000"></div>
               <div className="flex flex-col lg:flex-row items-center justify-between gap-16 relative z-10">
                  <div className="space-y-10 text-center lg:text-left">
@@ -631,7 +702,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <button className="bg-yellow-400 text-[#0b0e14] font-black uppercase tracking-widest text-sm px-10 py-5 rounded-2xl w-full md:w-auto hover:bg-white transition-all active-press shadow-2xl shadow-yellow-400/20">Subscribe</button>
                  </div>
               </div>
-           </div>
+           </motion.div>
         </section>
 
         <AboutUs />
