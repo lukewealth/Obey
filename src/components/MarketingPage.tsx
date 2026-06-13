@@ -178,7 +178,6 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
   };
 
   const { scrollYProgress } = useScroll();
-  const phoneParallax = useTransform(scrollYProgress, [0, 1], [0, -100]);
 
   return (
     <div className="min-h-screen bg-white text-[#0b0e14] selection:bg-primary/10 selection:text-primary overflow-x-hidden font-inter">
@@ -308,7 +307,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
       </AnimatePresence>
 
       <main>
-        {/* 2. HIGH-FIDELITY HERO (Pixel Perfect to Image) */}
+        {/* 2. HIGH-FIDELITY HERO */}
         <section className="relative pt-40 pb-20 md:pt-48 md:pb-40 px-6 overflow-hidden">
           <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-20">
             
@@ -435,7 +434,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
           </div>
         </section>
 
-        {/* 3. FEATURE GRID (Feel the best experience) */}
+        {/* 3. FEATURE GRID */}
         <section id="features" className="py-32 md:py-56 px-6 bg-white border-y border-gray-50">
            <div className="max-w-[1400px] mx-auto space-y-24">
               <motion.div 
@@ -491,7 +490,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                           </div>
                           <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white"><CheckBadgeIcon className="w-6 h-6" /></div>
                        </div>
-                       <div className="h-24 w-full flex items-end gap-2">
+                       <div className="h-24 w-full flex items-end gap-1.5">
                           {[0.3, 0.6, 0.4, 0.8, 0.5, 0.9, 0.7, 1].map((h, i) => (
                             <motion.div 
                               key={i} 
@@ -574,7 +573,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <motion.img 
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 1.5 }}
-                      src="/illustractions character.jpg" 
+                      src="/success_character.jpg" 
                       alt="Success Character" 
                       className="w-full h-full object-cover" 
                     />
@@ -638,10 +637,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
               <div className="relative flex justify-center pt-20">
                  <div className="flex -space-x-12 md:-space-x-32 justify-center items-end">
-                    {/* Left Phone */}
+                    {/* Left Phone: App Preview 1 */}
                     <motion.div 
                        initial={{ x: -100, rotate: -25, opacity: 0 }}
-                       whileInView={{ x: 0, rotate: -12, opacity: 0.4 }}
+                       whileInView={{ x: 0, rotate: -12, opacity: 1 }}
                        viewport={{ once: true }}
                        transition={{ duration: 1.5, ease: "easeOut" }}
                        className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block"
@@ -649,7 +648,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        <MobileAppMockup />
                     </motion.div>
 
-                    {/* Center Phone */}
+                    {/* Center Phone: Complete coded 3D UI */}
                     <motion.div 
                        initial={{ y: 150, opacity: 0 }}
                        whileInView={{ y: 0, opacity: 1 }}
@@ -660,10 +659,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        <MobileAppMockup />
                     </motion.div>
 
-                    {/* Right Phone */}
+                    {/* Right Phone: App Preview 2 */}
                     <motion.div 
                        initial={{ x: 100, rotate: 25, opacity: 0 }}
-                       whileInView={{ x: 0, rotate: 12, opacity: 0.4 }}
+                       whileInView={{ x: 0, rotate: 12, opacity: 1 }}
                        viewport={{ once: true }}
                        transition={{ duration: 1.5, ease: "easeOut" }}
                        className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block"
