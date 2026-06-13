@@ -104,138 +104,87 @@ export default function App() {
     }
   }, [transactions, currentUser]);
 
-  // Firebase Auth Listener
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
-      if (user) {
-        setCurrentUser(user);
-        
-        if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
-           setCurrentScreen(AppScreen.DASHBOARD);
-           notify("success", "Access Authorized (Firebase)", `Welcome back to the secure node, ${user.email}`);
-        }
-
-        const fetchProfile = async () => {
-          try {
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', user.uid).single();
-            if (error) throw error;
-            if (data) {
-              const updatedProfile: UserProfile = {
-                name: data.full_name,
-                email: data.email,
-                role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
-                phone: data.phone,
-                avatar: data.avatar_url || data.full_name[0],
-                kycStatus: data.kyc_status,
-                balance: data.balance,
-                promoCode: "OBEY-ELITE",
-                twoFactorEnabled: true
-              };
-              setProfile(updatedProfile);
-              localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
-            } else {
-              // Try MongoDB fallback
-              const fallback = await fetchUserFallback(user.uid);
-              if (fallback) {
-                setProfile(fallback);
-                localStorage.setItem("obey-profile-cache", JSON.stringify(fallback));
-              } else {
-                const newProfile: any = {
-                  id: user.uid,
-                  full_name: user.displayName || user.email?.split("@")[0],
-                  email: user.email,
-                  role: user.email === "contact@tricode.pro" ? "admin" : "user",
-                  avatar_url: user.photoURL || user.email?.[0].toUpperCase(),
-                  kyc_status: "Pending",
-                  balance: 142580.42
-                };
-                // We attempt to insert into Supabase if missing
-                await supabase.from('profiles').insert([newProfile]);
-                setProfile({
-                  name: newProfile.full_name,
-                  email: newProfile.email,
-                  role: newProfile.role,
-                  phone: "",
-                  avatar: newProfile.avatar_url,
-                  kycStatus: "Pending",
-                  balance: 142580.42,
-                  promoCode: "OBEY-ELITE",
-                  twoFactorEnabled: false
-                });
-              }
-            }
-          } catch (error) {
-            console.warn("⚠️ Firebase Profile Sync Warning");
-          }
-        };
-        fetchProfile();
-      }
-    });
-    return () => unsubscribe();
-  }, [currentScreen]);
-
-  // Supabase Auth Listener
+  // Auth Listener
   useEffect(() => {
     if (!supabase) return;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const handleProfileSync = async (user: any) => {
+      try {
+        const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id || user.uid).single();
+        
+        if (data) {
+          const updatedProfile: UserProfile = {
+            name: data.full_name,
+            email: data.email,
+            role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
+            phone: data.phone,
+            avatar: data.avatar_url || data.full_name?.[0] || user.email?.[0].toUpperCase(),
+            kycStatus: data.kyc_status,
+            balance: data.balance,
+            promoCode: "OBEY-ELITE",
+            twoFactorEnabled: true
+          };
+          setProfile(updatedProfile);
+          localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
+          return;
+        }
+
+        // If data is missing (not found), try fallback or create new
+        const fallback = await fetchUserFallback(user.id || user.uid);
+        if (fallback) {
+          setProfile(fallback);
+          localStorage.setItem("obey-profile-cache", JSON.stringify(fallback));
+          return;
+        }
+
+        const newProfile: any = {
+          id: user.id || user.uid,
+          full_name: user.displayName || user.user_metadata?.full_name || user.email?.split("@")[0],
+          email: user.email,
+          role: user.email === "contact@tricode.pro" ? "admin" : "user",
+          avatar_url: user.photoURL || user.user_metadata?.avatar_url || user.email?.[0].toUpperCase(),
+          kyc_status: "Pending",
+          balance: 142580.42
+        };
+
+        await supabase.from('profiles').upsert([newProfile]);
+        setProfile({
+          name: newProfile.full_name,
+          email: newProfile.email,
+          role: newProfile.role,
+          phone: "",
+          avatar: newProfile.avatar_url,
+          kycStatus: "Pending",
+          balance: 142580.42,
+          promoCode: "OBEY-ELITE",
+          twoFactorEnabled: false
+        });
+      } catch (error: any) {
+        console.warn("⚠️ Profile Sync Warning:", error.message);
+      }
+    };
+
+    const unsubscribeFirebase = onAuthStateChanged(firebaseAuth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
+           setCurrentScreen(AppScreen.DASHBOARD);
+           notify("success", "Access Authorized", `Welcome back, ${user.email}`);
+        }
+        await handleProfileSync(user);
+      }
+    });
+
+    const { data: { subscription: subSupabase } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         const user = session.user;
         setCurrentUser(user);
-        
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
-           notify("success", "Access Authorized", `Welcome back to the secure node, ${user.email}`);
+           notify("success", "Access Authorized", `Welcome back, ${user.email}`);
         }
-
-        const fetchProfile = async () => {
-          try {
-            const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-            if (error) throw error;
-            if (data) {
-              const updatedProfile: UserProfile = {
-                name: data.full_name,
-                email: data.email,
-                role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
-                phone: data.phone,
-                avatar: data.avatar_url || data.full_name[0],
-                kycStatus: data.kyc_status,
-                balance: data.balance,
-                promoCode: "OBEY-ELITE",
-                twoFactorEnabled: true
-              };
-              setProfile(updatedProfile);
-              localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
-            } else {
-              const newProfile: any = {
-                id: user.id,
-                full_name: user.user_metadata?.full_name || user.email?.split("@")[0],
-                email: user.email,
-                role: user.email === "contact@tricode.pro" ? "admin" : "user",
-                avatar_url: user.user_metadata?.avatar_url || user.email?.[0].toUpperCase(),
-                kyc_status: "Pending",
-                balance: 142580.42
-              };
-              await supabase.from('profiles').insert([newProfile]);
-              setProfile({
-                name: newProfile.full_name,
-                email: newProfile.email,
-                role: newProfile.role,
-                phone: "",
-                avatar: newProfile.avatar_url,
-                kycStatus: "Pending",
-                balance: 142580.42,
-                promoCode: "OBEY-ELITE",
-                twoFactorEnabled: false
-              });
-            }
-          } catch (error) {
-            console.warn("⚠️ Profile Sync Error");
-          }
-        };
-        fetchProfile();
+        await handleProfileSync(user);
       } else {
-        // Only clear if Firebase is also not logged in
         if (!firebaseAuth.currentUser) {
           setCurrentUser(null);
           if (currentScreen === AppScreen.DASHBOARD) {
@@ -246,7 +195,10 @@ export default function App() {
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      unsubscribeFirebase();
+      subSupabase.unsubscribe();
+    };
   }, [currentScreen]);
 
   const handleLogout = async () => {
