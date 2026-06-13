@@ -83,8 +83,8 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
           </div>
           <div className="flex gap-10 flex-wrap justify-center">
             <button onClick={() => onNavigate(AppScreen.AMLKYC)} className="hover:text-primary transition-colors uppercase">AML / KYC</button>
-            <button className="hover:text-primary transition-colors uppercase">Disclosures</button>
-            <button className="hover:text-primary transition-colors uppercase">System Status</button>
+            <button onClick={() => onNavigate(AppScreen.DISCLOSURES)} className="hover:text-primary transition-colors uppercase">Disclosures</button>
+            <button onClick={() => onNavigate(AppScreen.STATUS)} className="hover:text-primary transition-colors uppercase">System Status</button>
           </div>
         </div>
       </div>

@@ -96,9 +96,14 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
           </div>
 
           <nav className="hidden lg:flex items-center gap-10">
-            {["Products", "Company", "Features", "Pricing", "Support"].map((link) => (
-              <a key={link} href={`#${link.toLowerCase()}`} className="text-[13px] font-black uppercase tracking-[0.2em] text-[#0b0e14]/60 hover:text-[#0b0e14] transition-colors">
-                {link}
+            {[
+              { label: "Ecosystem", id: "#features" },
+              { label: "Security", id: "#about" },
+              { label: "Compliance", id: "#compliance" },
+              { label: "Institutional", id: "#institutional" }
+            ].map((link) => (
+              <a key={link.label} href={link.id} className="text-[13px] font-black uppercase tracking-[0.2em] text-[#0b0e14]/60 hover:text-[#0b0e14] transition-colors">
+                {link.label}
               </a>
             ))}
           </nav>
@@ -140,8 +145,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               <button onClick={() => setMobileMenuOpen(false)}><XIcon className="w-8 h-8" /></button>
             </div>
             <nav className="space-y-10 text-center">
-              {["Products", "Company", "Features", "Pricing"].map((link) => (
-                <a key={link} href="#" onClick={() => setMobileMenuOpen(false)} className="block text-5xl font-black tracking-tighter">
+              {["Ecosystem", "Security", "Institutional"].map((link) => (
+                <a key={link} href={`#${link.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)} className="block text-5xl font-black tracking-tighter">
                   {link}
                 </a>
               ))}
@@ -281,15 +286,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               >
                 Control your <br />
                 financial <br />
-                future easily
+                future with <span className="text-primary italic">OBEY.</span>
               </motion.h1>
 
               <motion.p 
                 variants={itemVariants}
                 className="text-xl md:text-2xl text-gray-500 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
               >
-                From easy money management, to financial goals and investments. 
-                Open your account in a flash.
+                Next-generation digital asset management and institutional liquidity infrastructure. 
+                Unified wallet, airtime/data recharge, crypto exchange, and gift card marketplace.
               </motion.p>
 
               <motion.div 
@@ -342,7 +347,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><CreditCardIcon className="w-8 h-8" /></div>
                     <div className="space-y-6">
                        <h3 className="text-4xl font-black tracking-tighter">Custom and design your card, <br /> make it unique</h3>
-                       <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-sm">Create a custom card that reflects your unique style and personality. Choose from colors and patterns.</p>
+                       <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-sm">Create a custom virtual card that reflects your unique style. Choose from colors and patterns with instant generation.</p>
                     </div>
                     <div className="relative pt-10 h-64">
                        <div className="absolute top-0 -right-20 w-[400px] aspect-[1.6/1] bg-[#0b0e14] rounded-[2.5rem] p-10 flex flex-col justify-between shadow-2xl rotate-[-10deg] group-hover:rotate-0 transition-transform duration-700">
@@ -360,7 +365,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><ActivityIcon className="w-8 h-8" /></div>
                     <div className="space-y-6">
                        <h3 className="text-4xl font-black tracking-tighter">Personalized your financial <br /> insights and goals</h3>
-                       <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-sm">Track your spending patterns, analyze income or expenses easily, and receive personalized recommendations.</p>
+                       <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-sm">Track your spending patterns across wallet, airtime, and crypto modules with automated reporting.</p>
                     </div>
                     <div className="relative bg-white rounded-[3rem] p-8 shadow-xl border border-gray-50 group-hover:scale-105 transition-transform duration-700">
                        <div className="flex justify-between items-end mb-8">
@@ -383,8 +388,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <div className="lg:w-1/2 space-y-10">
                        <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><CurrencyDollarIcon className="w-8 h-8" /></div>
                        <div className="space-y-6">
-                          <h3 className="text-4xl font-black tracking-tighter leading-tight text-[#0b0e14]">Free transfer anywhere <br /> around the world</h3>
-                          <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-md">Experience the freedom of hassle-free money transfers with our free platform administrator fee. Say goodbye to unnecessary fees.</p>
+                          <h3 className="text-4xl font-black tracking-tighter leading-tight text-[#0b0e14]">Institutional transfers anywhere <br /> around the world</h3>
+                          <p className="text-lg text-gray-400 font-medium leading-relaxed max-w-md">Experience the freedom of hassle-free money transfers with our institutional node mesh. Cross-border settlements in seconds.</p>
                        </div>
                     </div>
                     <div className="lg:w-1/2 w-full">
@@ -393,11 +398,11 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                              <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 rounded-2xl bg-[#0b0e14] flex items-center justify-center text-white"><BuildingLibraryIcon className="w-6 h-6" /></div>
                                 <div>
-                                   <p className="text-sm font-black uppercase">Bank transfer</p>
-                                   <p className="text-[10px] font-bold text-gray-400">Institutional Sync</p>
+                                   <p className="text-sm font-black uppercase">Institutional transfer</p>
+                                   <p className="text-[10px] font-bold text-gray-400">Sequential Ledger Sync</p>
                                 </div>
                              </div>
-                             <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full text-[10px] font-black text-primary uppercase tracking-widest">Free</div>
+                             <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full text-[10px] font-black text-primary uppercase tracking-widest">Active</div>
                           </div>
                           <div className="flex justify-between items-center">
                              <div className="space-y-1">
@@ -413,9 +418,9 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  {/* Grid 3 - Currencies */}
                  <div className="p-12 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-10 group hover:bg-white hover:shadow-2xl transition-all duration-700">
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><GlobeIcon className="w-8 h-8" /></div>
-                    <h3 className="text-4xl font-black tracking-tighter">Hold money in 30+ <br /> currencies</h3>
+                    <h3 className="text-4xl font-black tracking-tighter">Hold money in 30+ <br /> assets and nodes</h3>
                     <div className="flex flex-wrap gap-4">
-                       {['USD', 'EUR', 'GBP', 'NGN', 'BTC', 'ETH'].map(c => (
+                       {['USD', 'EUR', 'GBP', 'NGN', 'BTC', 'ETH', 'SOL', 'USDC', 'USDT'].map(c => (
                          <div key={c} className="px-6 py-3 bg-white rounded-2xl border border-gray-100 font-black text-xs uppercase tracking-widest shadow-sm group-hover:border-primary/20 transition-all">{c}</div>
                        ))}
                     </div>
@@ -424,16 +429,16 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  {/* Grid 4 - Subscriptions */}
                  <div className="p-12 bg-gray-50 rounded-[4rem] border border-gray-100 space-y-10 group hover:bg-white hover:shadow-2xl transition-all duration-700">
                     <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] group-hover:text-white transition-all"><BriefcaseIcon className="w-8 h-8" /></div>
-                    <h3 className="text-4xl font-black tracking-tighter">Subscriptions you <br /> control in one place</h3>
+                    <h3 className="text-4xl font-black tracking-tighter">Financial services you <br /> control in one place</h3>
                     <div className="p-6 bg-white rounded-3xl shadow-sm border border-gray-50 flex items-center justify-between">
                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 bg-[#0b0e14] rounded-xl flex items-center justify-center text-white"><FaceSmileIcon className="w-6 h-6" /></div>
+                          <div className="w-10 h-10 bg-[#0b0e14] rounded-xl flex items-center justify-center text-white"><AppIcon className="w-6 h-6" /></div>
                           <div>
-                             <p className="text-sm font-black uppercase">Figma Pro</p>
-                             <p className="text-[10px] font-bold text-gray-400">Monthly Node Sync</p>
+                             <p className="text-sm font-black uppercase">Airtime & Data</p>
+                             <p className="text-[10px] font-bold text-gray-400">Institutional VTU Node</p>
                           </div>
                        </div>
-                       <p className="text-lg font-black font-space">$12.00</p>
+                       <p className="text-lg font-black font-space">0% Fee</p>
                     </div>
                  </div>
               </div>
@@ -441,7 +446,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         </section>
 
         {/* 4. LOGO CLOUD (200+ Growing company) */}
-        <section className="py-32 px-6 bg-white text-center space-y-20">
+        <section id="compliance" className="py-32 px-6 bg-white text-center space-y-20">
            <div className="space-y-6">
               <h2 className="text-5xl font-black tracking-tighter">200+ The fastest growing <br /> company use OBEY</h2>
               <p className="text-gray-400 font-medium">Many companies have tried using OBEY and they trust <br /> the safety of their money.</p>
@@ -454,12 +459,12 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         </section>
 
         {/* 5. JOIN TRUST SECTION */}
-        <section className="py-32 md:py-56 px-6 bg-gray-50 overflow-hidden relative">
+        <section id="institutional" className="py-32 md:py-56 px-6 bg-gray-50 overflow-hidden relative">
            <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-24">
               <div className="lg:w-1/2">
                  <div className="relative rounded-[4rem] overflow-hidden shadow-2xl border-[10px] border-white">
                     <img 
-                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" 
+                      src="/illustractions character.jpg" 
                       alt="Success Character" 
                       className="w-full h-full object-cover" 
                     />
