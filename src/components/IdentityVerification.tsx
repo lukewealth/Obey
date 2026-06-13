@@ -116,7 +116,7 @@ export default function IdentityVerification({ onComplete }: IdentityVerificatio
               <div className="pt-4">
                 <div className="rounded-[28px] overflow-hidden border border-gray-100">
                   <img 
-                    src="https://lh3.googleusercontent.com/aida/AP1WRLutHcPnESDSgtsjZdmPdcJ8Hyel06r_xgaHB-pqd4GLpKIFHdNWm9kOWO8AJsw52-xFJzpZEoVR6HmaIrN1svxo-6z30hRNvB6PUuDxC-5UjQ8EwxMSC9veKQTo2-Pjv8EGvbjw8dbUq0zRfr1Kwu3wAIK2_MwzG11xPdPVmXOSXSaMoZkAinZqNlI-9NE9PZv7t9Ao1OiogtNjoGot3tXAoPNyLX57aiYJ40sOsy3SO0CFpnUYiTD84LNG" 
+                    src="/illustrations.jpg" 
                     alt="Security" 
                     className="w-full h-48 object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-700"
                   />

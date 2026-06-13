@@ -1,0 +1,22 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" fill="#F8FAFC"/>
+  <defs>
+    <linearGradient id="bg_grad" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E2E8F0"/>
+      <stop offset="1" stop-color="#F8FAFC"/>
+    </linearGradient>
+    <linearGradient id="obey_grad_hero" x1="440" y1="380" x2="720" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0057FF"/>
+      <stop offset="1" stop-color="#00C6FF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bg_grad)"/>
+  <g>
+    <rect x="350" y="150" width="500" height="500" rx="64" fill="white"/>
+    <rect x="400" y="200" width="400" height="200" rx="32" fill="white" fill-opacity="0.6"/>
+    <text x="440" y="260" fill="#64748B" font-family="Inter" font-size="14" font-weight="900">CURRENT RESERVES</text>
+    <text x="440" y="320" fill="#0F172A" font-family="Inter" font-size="48" font-weight="900">,458,010.55</text>
+    <circle cx="720" cy="250" r="12" fill="#10B981"/>
+    <path d="M440 550L480 500L520 530L560 460L600 490L640 420L680 450L720 380" stroke="#0057FF" stroke-width="8" stroke-linecap="round"/>
+  </g>
+</svg>

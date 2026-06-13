@@ -283,6 +283,9 @@ export default function App() {
                 >
                   <MenuIcon className="w-6 h-6" />
                 </button>
+                <div className="w-11 h-11 bg-[#0b0e14] flex items-center justify-center rounded-[10px] shadow-lg overflow-hidden">
+                  <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
+                </div>
                 <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
                 <button onClick={triggerDiagnostic} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>

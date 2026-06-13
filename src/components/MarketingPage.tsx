@@ -236,8 +236,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            <div className="w-9 h-9 bg-[#0b0e14] flex items-center justify-center rounded-[10px] group-hover:rotate-[10deg] transition-transform shadow-lg">
-              <span className="text-white font-black text-base uppercase">O</span>
+            <div className="w-9 h-9 bg-[#0b0e14] flex items-center justify-center rounded-[10px] group-hover:rotate-[10deg] transition-transform shadow-lg overflow-hidden">
+              <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
             </div>
             <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
           </div>
@@ -643,9 +643,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                        whileInView={{ x: 0, rotate: -12, opacity: 1 }}
                        viewport={{ once: true }}
                        transition={{ duration: 1.5, ease: "easeOut" }}
-                       className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block"
+                       className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-white shadow-2xl scale-90 overflow-hidden hidden sm:block group"
                     >
-                       <MobileAppMockup />
+                       <img src="/app_preview_1.jpg" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[3s]" alt="App Preview 1" />
+                       <div className="absolute inset-0 bg-[#0b0e14]/5"></div>
                     </motion.div>
 
                     {/* Center Phone: Complete coded 3D UI */}

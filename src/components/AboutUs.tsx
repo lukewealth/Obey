@@ -60,15 +60,15 @@ export default function AboutUs() {
               <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-2xl group-hover:bg-primary/10 transition-all duration-1000"></div>
               <div className="relative bg-white p-2 rounded-[3.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.05)] overflow-hidden border border-gray-100">
                 <img 
-                  src="/features_section.jpg" 
-                  alt="Security Vault" 
+                  src="/security_illustration.jpg" 
+                  alt="Institutional Security" 
                   className="w-full h-[550px] object-cover rounded-[3.2rem] group-hover:scale-105 transition-all duration-1000"
                 />
                 <div className="absolute bottom-10 left-10 right-10 bg-white/80 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white shadow-2xl">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Protection Level</p>
-                      <p className="text-xl font-black text-[#0b0e14]">Multi-Signature Custody</p>
+                      <p className="text-xl font-black text-[#0b0e14]">Military Grade Encryption</p>
                     </div>
                     <div className="w-14 h-14 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-lg">
                       <ShieldCheck size={28} />
