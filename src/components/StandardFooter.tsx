@@ -1,7 +1,12 @@
 import React from "react";
 import { Shield, Globe, Lock, ExternalLink } from "lucide-react";
+import { AppScreen } from "../types";
 
-export default function StandardFooter() {
+interface StandardFooterProps {
+  onNavigate: (screen: AppScreen) => void;
+}
+
+export default function StandardFooter({ onNavigate }: StandardFooterProps) {
   return (
     <footer className="bg-[#0b0e14] text-white pt-24 pb-12 px-8 overflow-hidden relative">
       {/* Background Decorative Element */}
@@ -38,20 +43,20 @@ export default function StandardFooter() {
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-12 sm:gap-16">
             <div className="space-y-8">
               <h5 className="text-[12px] font-black uppercase tracking-[0.3em] text-primary">Compliance</h5>
-              <ul className="space-y-5">
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-2">Privacy Policy <ExternalLink size={12} /></a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-2">Terms of Service <ExternalLink size={12} /></a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-2">User Data Agreement <ExternalLink size={12} /></a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors flex items-center gap-2">Global Access Policy <ExternalLink size={12} /></a></li>
+              <ul className="space-y-5 text-sm font-bold text-gray-400">
+                <li><button onClick={() => onNavigate(AppScreen.PRIVACY)} className="hover:text-white transition-colors flex items-center gap-2 text-left">Privacy Policy <ExternalLink size={12} /></button></li>
+                <li><button onClick={() => onNavigate(AppScreen.TERMS)} className="hover:text-white transition-colors flex items-center gap-2 text-left">Terms of Service <ExternalLink size={12} /></button></li>
+                <li><button onClick={() => onNavigate(AppScreen.USERDATA)} className="hover:text-white transition-colors flex items-center gap-2 text-left">User Data Agreement <ExternalLink size={12} /></button></li>
+                <li><button onClick={() => onNavigate(AppScreen.AMLKYC)} className="hover:text-white transition-colors flex items-center gap-2 text-left">AML / KYC Policy <ExternalLink size={12} /></button></li>
               </ul>
             </div>
             <div className="space-y-8">
               <h5 className="text-[12px] font-black uppercase tracking-[0.3em] text-primary">Protocol</h5>
-              <ul className="space-y-5">
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Private Nodes</a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Yield Aggregator</a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Escrow Smart Contracts</a></li>
-                <li><a href="#" className="text-sm font-bold text-gray-400 hover:text-white transition-colors">Developer SDK</a></li>
+              <ul className="space-y-5 text-sm font-bold text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Private Nodes</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Yield Aggregator</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Escrow Smart Contracts</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Developer SDK</a></li>
               </ul>
             </div>
             <div className="space-y-8 hidden sm:block">
@@ -71,15 +76,15 @@ export default function StandardFooter() {
         </div>
 
         <div className="pt-12 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[11px] font-black uppercase tracking-[0.2em] text-gray-500">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 text-center md:text-left flex-wrap justify-center md:justify-start">
              <p>© 2026 OBEY FINANCIAL TECHNOLOGIES.</p>
-             <div className="w-1.5 h-1.5 bg-gray-800 rounded-full"></div>
+             <div className="w-1.5 h-1.5 bg-gray-800 rounded-full hidden sm:block"></div>
              <p className="text-gray-300">POWERED BY TRICODE PRO LTD</p>
           </div>
-          <div className="flex gap-10">
-            <a href="#" className="hover:text-primary transition-colors">AML / KYC</a>
-            <a href="#" className="hover:text-primary transition-colors">Disclosures</a>
-            <a href="#" className="hover:text-primary transition-colors">System Status</a>
+          <div className="flex gap-10 flex-wrap justify-center">
+            <button onClick={() => onNavigate(AppScreen.AMLKYC)} className="hover:text-primary transition-colors uppercase">AML / KYC</button>
+            <button className="hover:text-primary transition-colors uppercase">Disclosures</button>
+            <button className="hover:text-primary transition-colors uppercase">System Status</button>
           </div>
         </div>
       </div>

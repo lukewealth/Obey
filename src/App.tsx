@@ -15,6 +15,7 @@ import TransactionSuccess from "./components/TransactionSuccess";
 import UserProfileSettings from "./components/UserProfileSettings";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
+import LegalContent from "./components/LegalContent";
 import { supabase } from "./supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -203,6 +204,14 @@ export default function App() {
           onNavigate={(screen) => setCurrentScreen(screen)} 
         />
       )}
+
+      {/* 2.5 LEGAL & COMPLIANCE SCREENS */}
+      {currentScreen === AppScreen.PRIVACY && <LegalContent slug="privacy" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.TERMS && <LegalContent slug="terms" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.AMLKYC && <LegalContent slug="amlkyc" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.USERDATA && <LegalContent slug="userdata" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.DISCLOSURES && <LegalContent slug="disclosures" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.STATUS && <LegalContent slug="status" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
 
       {/* 3. DASHBOARD CONSOLE */}
       {currentScreen === AppScreen.DASHBOARD && (

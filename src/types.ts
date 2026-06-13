@@ -3,7 +3,13 @@ export enum AppScreen {
   LOGIN = "LOGIN",
   REGISTER = "REGISTER",
   OTP = "OTP",
-  DASHBOARD = "DASHBOARD"
+  DASHBOARD = "DASHBOARD",
+  PRIVACY = "PRIVACY",
+  TERMS = "TERMS",
+  AMLKYC = "AMLKYC",
+  USERDATA = "USERDATA",
+  DISCLOSURES = "DISCLOSURES",
+  STATUS = "STATUS"
 }
 
 export enum AppTab {
