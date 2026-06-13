@@ -127,10 +127,10 @@ export default function App() {
 
       {/* 3. DASHBOARD CONSOLE */}
       {currentScreen === AppScreen.DASHBOARD && (
-        <div className="min-h-screen flex flex-col relative">
+        <div className="min-h-screen flex flex-col relative bg-white">
           
-          {/* Global Background Gradient */}
-          <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-bg-white)_0%,_var(--color-accent-blue)_50%,_var(--color-accent-yellow)_100%)] -z-20"></div>
+          {/* Global Background (Subtle) */}
+          <div className="fixed inset-0 bg-gray-50/50 -z-20"></div>
 
           {/* Top Bar Header */}
           <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-white/50 px-6 h-20 flex items-center justify-between">
