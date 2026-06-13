@@ -141,10 +141,21 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                         <p className="text-[9px] md:text-[11px] text-gray-400 font-black mt-1 uppercase tracking-widest">{tx.date}</p>
                       </div>
                       
-                      <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full shrink-0 ${
-                        tx.status === "Success" ? "bg-emerald-500" :
-                        tx.status === "Processing" ? "bg-amber-500 animate-pulse" : "bg-red-500"
-                      }`} title={tx.status}></span>
+                      <div className="shrink-0" title={tx.status}>
+                        {tx.status === "Success" ? (
+                          <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                            <CheckCircle2 size={18} className="md:w-5 md:h-5" />
+                          </div>
+                        ) : tx.status === "Processing" || tx.status === "Escrow" || tx.status === "Awaiting Audit" ? (
+                          <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center shadow-sm">
+                            <Clock size={18} className="md:w-5 md:h-5 animate-pulse" />
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 md:w-10 md:h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center shadow-sm">
+                            <X size={18} className="md:w-5 md:h-5" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 

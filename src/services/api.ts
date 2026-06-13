@@ -13,9 +13,9 @@ export const syncUserWithMongoDB = async (supabaseId: string, profile: UserProfi
       supabaseId,
       ...profile
     });
-    console.log('🔄 Profile synced with MongoDB Atlas');
+    console.log('[SYNC] Profile synced with MongoDB Atlas');
   } catch (error) {
-    console.warn('⚠️ MongoDB Sync Failed (User):', error);
+    console.warn('[SYNC_WARN] MongoDB Sync Failed (User):', error);
   }
 };
 
@@ -25,9 +25,9 @@ export const syncTransactionsWithMongoDB = async (userId: string, transactions: 
       userId,
       transactions
     });
-    console.log('🔄 Transactions synced with MongoDB Atlas');
+    console.log('[SYNC] Transactions synced with MongoDB Atlas');
   } catch (error) {
-    console.warn('⚠️ MongoDB Sync Failed (Transactions):', error);
+    console.warn('[SYNC_WARN] MongoDB Sync Failed (Transactions):', error);
   }
 };
 
@@ -36,7 +36,7 @@ export const fetchUserFallback = async (supabaseId: string): Promise<UserProfile
     const response = await api.get(`/sync/user/${supabaseId}`);
     return response.data;
   } catch (error) {
-    console.error('❌ Fallback Fetch Failed (User):', error);
+    console.error('[SYNC_ERROR] Fallback Fetch Failed (User):', error);
     return null;
   }
 };
@@ -46,7 +46,7 @@ export const fetchTransactionsFallback = async (userId: string): Promise<Transac
     const response = await api.get(`/sync/transactions/${userId}`);
     return response.data;
   } catch (error) {
-    console.error('❌ Fallback Fetch Failed (Transactions):', error);
+    console.error('[SYNC_ERROR] Fallback Fetch Failed (Transactions):', error);
     return [];
   }
 };

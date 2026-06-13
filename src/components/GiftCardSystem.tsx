@@ -6,7 +6,7 @@ import {
   HelpCircle, Shield, History, Tag, ChevronRight, Zap, 
   Star, Activity, ArrowRight, ShieldCheck, Upload, X, Check,
   RefreshCw, Loader2, Sparkles, AlertCircle, ShoppingCart, 
-  LayoutGrid, List, CheckCircle2, User, Globe
+  LayoutGrid, List, CheckCircle2, User, Globe, Play, Gamepad2, Package, Apple as AppleIcon
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -38,12 +38,12 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const assets: GiftCardAsset[] = [
-    { id: "1", name: "Apple", buyRate: 850, sellRate: 720, logo: "🍎", popularity: 98, trending: true },
-    { id: "2", name: "Amazon", buyRate: 820, sellRate: 690, logo: "📦", popularity: 95, trending: true },
-    { id: "3", name: "Google Play", buyRate: 840, sellRate: 710, logo: "🤖", popularity: 92, trending: false },
-    { id: "4", name: "Steam", buyRate: 860, sellRate: 740, logo: "🎮", popularity: 88, trending: true },
-    { id: "5", name: "Razer Gold", buyRate: 880, sellRate: 760, logo: "🐍", popularity: 85, trending: false }
+  const assets: (GiftCardAsset & { icon: any })[] = [
+    { id: "1", name: "Apple", buyRate: 850, sellRate: 720, logo: "Apple", icon: AppleIcon, popularity: 98, trending: true },
+    { id: "2", name: "Amazon", buyRate: 820, sellRate: 690, logo: "Amazon", icon: Package, popularity: 95, trending: true },
+    { id: "3", name: "Google Play", buyRate: 840, sellRate: 710, logo: "Google", icon: Play, popularity: 92, trending: false },
+    { id: "4", name: "Steam", buyRate: 860, sellRate: 740, logo: "Steam", icon: Gamepad2, popularity: 88, trending: true },
+    { id: "5", name: "Razer Gold", buyRate: 880, sellRate: 760, logo: "Razer", icon: Zap, popularity: 85, trending: false }
   ];
 
   const fetchMarketListings = async () => {
@@ -302,44 +302,48 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
                    <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-[32px]"></div>
                  ))
                ) : marketListings.length > 0 ? (
-                 marketListings.map((listing) => (
-                   <motion.div 
-                    key={listing.id}
-                    whileHover={{ y: -5 }}
-                    className="bg-white border border-gray-100 p-8 rounded-[35px] shadow-xl hover:shadow-2xl transition-all group relative overflow-hidden"
-                   >
-                     <div className="flex justify-between items-start mb-6">
-                        <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-3xl shadow-inner group-hover:bg-primary/5 transition-colors">
-                           {assets.find(a => a.name === listing.assetName)?.logo || "🎁"}
-                        </div>
-                        <div className="text-right">
-                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Face Value</p>
-                           <p className="text-2xl font-black text-gray-900">${listing.faceValue}</p>
-                        </div>
-                     </div>
+                 marketListings.map((listing) => {
+                   const asset = assets.find(a => a.name === listing.assetName);
+                   const AssetIcon = asset?.icon || Gift;
+                   return (
+                    <motion.div 
+                      key={listing.id}
+                      whileHover={{ y: -5 }}
+                      className="bg-white border border-gray-100 p-8 rounded-[35px] shadow-xl hover:shadow-2xl transition-all group relative overflow-hidden"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/5 transition-colors">
+                            <AssetIcon size={28} />
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Face Value</p>
+                            <p className="text-2xl font-black text-gray-900">${listing.faceValue}</p>
+                          </div>
+                      </div>
 
-                     <div className="space-y-4 mb-8">
-                        <h4 className="text-xl font-black text-gray-900 tracking-tight">{listing.assetName} Asset Node</h4>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg w-fit">
-                           <User size={12} className="text-gray-400" />
-                           <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[100px]">{listing.sellerName}</span>
-                        </div>
-                     </div>
+                      <div className="space-y-4 mb-8">
+                          <h4 className="text-xl font-black text-gray-900 tracking-tight">{listing.assetName} Asset Node</h4>
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg w-fit">
+                            <User size={12} className="text-gray-400" />
+                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[100px]">{listing.sellerName}</span>
+                          </div>
+                      </div>
 
-                     <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                        <div>
-                           <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Acquisition Cost</p>
-                           <p className="text-2xl font-black text-primary font-mono tracking-tighter">₦{listing.price.toLocaleString()}</p>
-                        </div>
-                        <button 
-                          onClick={() => handlePurchaseListing(listing.id)}
-                          className="h-14 px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all active-press shadow-lg shadow-primary/20"
-                        >
-                          Buy <ArrowRight size={14} />
-                        </button>
-                     </div>
-                   </motion.div>
-                 ))
+                      <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                          <div>
+                            <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Acquisition Cost</p>
+                            <p className="text-2xl font-black text-primary font-mono tracking-tighter">₦{listing.price.toLocaleString()}</p>
+                          </div>
+                          <button 
+                            onClick={() => handlePurchaseListing(listing.id)}
+                            className="h-14 px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all active-press shadow-lg shadow-primary/20"
+                          >
+                            Buy <ArrowRight size={14} />
+                          </button>
+                      </div>
+                    </motion.div>
+                   );
+                 })
                ) : (
                  <div className="col-span-full py-32 text-center space-y-4">
                     <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto">
@@ -473,8 +477,8 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
                     {asset.trending && (
                       <div className="absolute top-2 right-2 md:top-3 md:right-3 w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
                     )}
-                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[22px] flex items-center justify-center text-xl md:text-3xl transition-all shrink-0 ${selectedAsset === asset.name ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' : 'bg-gray-50 border border-gray-100'}`}>
-                      {asset.logo}
+                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[22px] flex items-center justify-center text-xl md:text-3xl transition-all shrink-0 ${selectedAsset === asset.name ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' : 'bg-gray-50 border border-gray-100 text-gray-400'}`}>
+                      <asset.icon size={32} />
                     </div>
                     <div className="text-center overflow-hidden w-full">
                        <p className="text-xs md:text-base font-black text-gray-900 tracking-tight truncate">{asset.name}</p>
@@ -558,7 +562,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
                     <span className="text-[9px] md:text-[11px] font-black text-primary uppercase">MIN: $10.00</span>
                   </div>
                   <div className="relative group">
-                    <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary group-focus-within:scale-125 transition-transform" size={24} className="md:w-7 md:h-7" />
+                    <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary group-focus-within:scale-125 transition-transform md:w-7 md:h-7" size={24} />
                     <input
                       type="number"
                       required
