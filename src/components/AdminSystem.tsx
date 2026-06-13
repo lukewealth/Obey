@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Users, DollarSign, Activity, AlertCircle, Check, X, 
   TrendingUp, RefreshCw, BarChart2, ShieldAlert, CheckCircle2, UserCheck, Settings,
-  Zap, Shield, Server, ArrowUpRight
+  Zap, Shield, Server, ArrowUpRight, ShoppingCart, Lock
 } from "lucide-react";
 
 interface AdminSystemProps {
@@ -20,6 +20,11 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
     { id: "usr_3", name: "Sarah Williams", email: "sarah.will@fintech.io", documentType: "National ID", fileAttached: "sarah_nid_card.jpg", phone: "+234 811 445 1022", date: "June 08, 2026", status: "Pending" }
   ]);
 
+  const [escrowTrades, setEscrowTrades] = useState([
+    { id: "esc_1", asset: "Amazon Card $500", seller: "GiftKing_24", amount: 725000, status: "Locked", security: "High" },
+    { id: "esc_2", asset: "0.05 BTC", seller: "CryptoWhale", amount: 4850000, status: "Awaiting Audit", security: "Critical" }
+  ]);
+
   const [activeStatus, setActiveStatus] = useState(metrics.systemStatus);
 
   const handleApproveQueueItem = (id: string) => {
@@ -29,6 +34,10 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
 
   const handleRejectQueueItem = (id: string) => {
     setKycQueue(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleReleaseEscrow = (id: string) => {
+    setEscrowTrades(prev => prev.filter(item => item.id !== id));
   };
 
   const changeStatus = (status: "OPERATIONAL" | "DEGRADED" | "MAINTENANCE") => {
@@ -229,6 +238,87 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
           </div>
         </motion.div>
       </div>
+
+      {/* Marketplace Escrow Admin Portal */}
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-[#0b0e14] text-white rounded-[40px] p-10 space-y-10 shadow-2xl relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20">
+           <motion.div 
+             initial={{ width: 0 }}
+             animate={{ width: "100%" }}
+             transition={{ duration: 2, repeat: Infinity }}
+             className="h-full bg-primary"
+           />
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+                  <Lock size={20} className="text-white" />
+               </div>
+               <h3 className="text-2xl font-black tracking-tighter">Marketplace Escrow</h3>
+            </div>
+            <p className="text-gray-500 font-medium max-w-xl text-sm">Release and audit global retail liquidity settlements from the decentralized escrow vault.</p>
+          </div>
+          <div className="flex gap-4">
+             <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl">
+                <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-1">Locked Value</p>
+                <p className="text-lg font-black font-space text-primary">₦5,575,000.00</p>
+             </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+          <AnimatePresence mode="popLayout">
+            {escrowTrades.map((trade) => (
+              <motion.div 
+                key={trade.id}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="p-8 bg-white/5 border border-white/10 rounded-[32px] flex flex-col justify-between gap-8 group hover:border-primary/50 transition-all"
+              >
+                <div className="flex justify-between items-start">
+                   <div className="space-y-1">
+                      <p className="text-xl font-black tracking-tight">{trade.asset}</p>
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Seller: {trade.seller}</p>
+                   </div>
+                   <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${trade.security === 'Critical' ? 'bg-red-500/20 text-red-500' : 'bg-primary/20 text-primary'}`}>
+                      {trade.security} Risk
+                   </div>
+                </div>
+
+                <div className="flex justify-between items-end">
+                   <div>
+                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Settlement</p>
+                      <p className="text-2xl font-black font-space">₦{trade.amount.toLocaleString()}</p>
+                   </div>
+                   <div className="flex gap-2">
+                      <button 
+                        onClick={() => handleReleaseEscrow(trade.id)}
+                        className="px-6 h-12 bg-white text-[#0b0e14] rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all active-press"
+                      >
+                         Release Fund
+                      </button>
+                   </div>
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        {escrowTrades.length === 0 && (
+           <div className="py-20 text-center space-y-4">
+              <CheckCircle2 size={48} className="text-emerald-500 mx-auto opacity-20" />
+              <p className="text-gray-500 font-black uppercase tracking-widest text-xs">All Marketplace Funds Released</p>
+           </div>
+        )}
+      </motion.div>
     </div>
   );
 }

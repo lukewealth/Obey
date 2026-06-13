@@ -9,15 +9,35 @@ import GiftCardSystem from "./components/GiftCardSystem";
 import CryptoSystem from "./components/CryptoSystem";
 import TransactionHistory from "./components/TransactionHistory";
 import AdminSystem from "./components/AdminSystem";
+import IdentityVerification from "./components/IdentityVerification";
+import OtpVerification from "./components/OtpVerification";
+import TransactionSuccess from "./components/TransactionSuccess";
 import UserProfileSettings from "./components/UserProfileSettings";
 import CookieConsent from "./components/CookieConsent";
+import StandardFooter from "./components/StandardFooter";
 import { supabase } from "./supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Home, Wallet, RefreshCw, Smartphone, User, Settings, Bell, 
-  Sparkles, Menu, X, LogOut, CheckCircle2, ShieldAlert, ChevronRight,
-  LayoutDashboard, Globe, ShieldCheck, Zap
-} from "lucide-react";
+  HomeIcon, 
+  WalletIcon, 
+  ArrowsRightLeftIcon as SwapIcon, 
+  DevicePhoneMobileIcon as AppIcon, 
+  UserIcon, 
+  Cog6ToothIcon as SettingsIcon, 
+  BellIcon, 
+  SparklesIcon, 
+  Bars3Icon as MenuIcon, 
+  XMarkIcon as XIcon, 
+  ArrowLeftOnRectangleIcon as LogOutIcon, 
+  CheckBadgeIcon as VerifiedIcon, 
+  ShieldExclamationIcon as ShieldAlert, 
+  ChevronRightIcon,
+  RectangleGroupIcon as DashboardIcon, 
+  GlobeAltIcon as GlobeIcon, 
+  ShieldCheckIcon as ShieldCheck, 
+  BoltIcon as ZapIcon,
+  ArrowPathIcon as RefreshIcon
+} from "@heroicons/react/24/outline";
 
 import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
 
@@ -164,7 +184,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen text-[#111827] font-sans antialiased selection:bg-primary/20 selection:text-primary relative">
+    <div className="min-h-screen text-[#0b0e14] font-sans antialiased selection:bg-primary/20 selection:text-primary relative bg-[#fcfcfd]">
       
       {/* 1. MARKETING SCREEN */}
       {currentScreen === AppScreen.MARKETING && (
@@ -186,34 +206,31 @@ export default function App() {
 
       {/* 3. DASHBOARD CONSOLE */}
       {currentScreen === AppScreen.DASHBOARD && (
-        <div className="min-h-screen flex flex-col relative bg-white">
+        <div className="min-h-screen flex flex-col relative bg-[#fcfcfd]">
           
-          {/* Global Background (Subtle) */}
-          <div className="fixed inset-0 bg-gray-50/50 -z-20"></div>
-
           {/* Top Bar Header */}
-          <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-white/50 px-6 h-20 flex items-center justify-between">
+          <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-gray-100 px-6 md:px-10 h-20 md:h-24 flex items-center justify-between">
             <div className="flex items-center gap-6">
               <button 
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden w-12 h-12 flex items-center justify-center text-gray-500 hover:text-primary hover:bg-white rounded-2xl transition-all active-press border border-transparent hover:border-gray-100"
+                className="lg:hidden w-11 h-11 flex items-center justify-center text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all"
               >
-                <Menu size={24} />
+                <MenuIcon className="w-6 h-6" />
               </button>
               <div className="flex items-center gap-3">
-                <span className="text-2xl font-black tracking-tighter text-primary">OBEY</span>
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-widest">
+                <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                  SUI NODE: {adminMetrics.systemStatus}
+                  Node: {adminMetrics.systemStatus}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-5">
-              <div className="hidden md:flex items-center gap-4 pr-6 border-r border-gray-100">
+            <div className="flex items-center gap-6">
+              <div className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100">
                 <div className="text-right">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Market Status</p>
-                  <p className="text-sm font-bold text-gray-900">Trading Open</p>
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Master Ledger</p>
+                  <p className="text-[13px] font-bold text-[#0b0e14]">Verified On-Chain</p>
                 </div>
               </div>
 
@@ -221,14 +238,14 @@ export default function App() {
                 onClick={() => setActiveTab(AppTab.PROFILE)}
                 className="flex items-center gap-3 pl-2 cursor-pointer group select-none"
               >
-                <div className="w-11 h-11 rounded-[18px] bg-gradient-to-tr from-primary to-secondary p-0.5 shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform">
-                  <div className="w-full h-full bg-white rounded-[16px] flex items-center justify-center font-black text-primary text-sm uppercase">
-                    {profile.avatar}
-                  </div>
+                <div className="w-11 h-11 rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-sm uppercase shadow-xl group-hover:scale-105 transition-transform">
+                  {profile.avatar}
                 </div>
                 <div className="hidden lg:block">
-                  <p className="text-sm font-black text-gray-900 group-hover:text-primary transition-colors">{profile.name}</p>
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tier 2 Verified</p>
+                  <p className="text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
+                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <VerifiedIcon className="w-3.5 h-3.5 text-primary" /> Tier 2 Secure
+                  </p>
                 </div>
               </div>
             </div>
@@ -236,212 +253,153 @@ export default function App() {
 
           <div className="flex-grow flex">
             
-            {/* Left Sidebar */}
-            <aside className="hidden lg:flex w-72 bg-white/40 backdrop-blur-2xl border-r border-white/50 p-8 flex-col justify-between">
+            {/* Left Sidebar: Sight Banking Style */}
+            <aside className="hidden lg:flex w-72 bg-white border-r border-gray-100 p-8 flex-col justify-between">
               <div className="space-y-10">
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] pl-4">Management</p>
-                  <nav className="space-y-1.5">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Liquidity</p>
+                  <nav className="space-y-1">
                     {[
-                      { tab: AppTab.HOME, label: "Console", icon: LayoutDashboard },
-                      { tab: AppTab.WALLET, label: "Treasury", icon: Wallet },
-                      { tab: AppTab.TRADE, label: "Exchange", icon: RefreshCw },
-                      { tab: AppTab.SERVICES, label: "Services", icon: Smartphone },
+                      { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
+                      { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
+                      { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
+                      { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                     ].map((item) => (
                       <button
                         key={item.label}
                         onClick={() => setActiveTab(item.tab)}
-                        className={`w-full sidebar-item gap-4 ${activeTab === item.tab ? "active" : ""}`}
+                        className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${
+                          activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"
+                        }`}
                       >
-                        <item.icon size={20} /> {item.label}
+                        <item.icon className="w-5 h-5" /> {item.label}
                       </button>
                     ))}
                   </nav>
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] pl-4">System</p>
-                  <nav className="space-y-1.5">
+                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Ecosystem</p>
+                  <nav className="space-y-1">
                     {[
-                      { tab: AppTab.PROFILE, label: "Settings", icon: User },
-                      { tab: AppTab.ADMIN, label: "Compliance", icon: ShieldCheck },
+                      { tab: AppTab.PROFILE, label: "Parameters", icon: SettingsIcon },
+                      ...(profile.email === "contact@tricode.pro" ? [{ tab: AppTab.ADMIN, label: "Compliance", icon: ShieldCheck }] : []),
                     ].map((item) => (
                       <button
                         key={item.label}
                         onClick={() => setActiveTab(item.tab)}
-                        className={`w-full sidebar-item gap-4 ${activeTab === item.tab ? "active" : ""}`}
+                        className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${
+                          activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"
+                        }`}
                       >
-                        <item.icon size={20} /> {item.label}
+                        <item.icon className="w-5 h-5" /> {item.label}
                       </button>
                     ))}
                   </nav>
                 </div>
               </div>
 
-              <div className="space-y-6">
-                <div className="p-6 bento-card bg-white/60 border-white/80 shadow-none">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-black text-gray-900 uppercase tracking-widest">Kyc Score</p>
-                    <span className="text-xs font-bold text-primary">85%</span>
-                  </div>
-                  <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary w-[85%] rounded-full"></div>
-                  </div>
-                  <p className="text-[10px] text-gray-400 font-medium mt-3 leading-relaxed">
-                    Complete institutional verification to unlock higher limits.
-                  </p>
+              <div className="pt-8 border-t border-gray-100">
+                <div className="p-6 bg-gray-50 rounded-[32px] border border-gray-100 space-y-4">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Security Health</p>
+                   <div className="flex items-center gap-3">
+                      <div className="flex-grow bg-gray-200 h-1.5 rounded-full overflow-hidden">
+                         <div className="bg-primary w-4/5 h-full"></div>
+                      </div>
+                      <span className="text-[10px] font-black">80%</span>
+                   </div>
                 </div>
-
-                <button
-                  onClick={handleLogout}
-                  className="w-full h-14 rounded-[22px] bg-white border border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center gap-3 text-gray-400 active-press shadow-sm"
-                >
-                  <LogOut size={18} /> Sign Out
-                </button>
               </div>
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-grow p-6 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12 scroll-smooth">
-              {activeTab === AppTab.HOME && (
-                <DashboardHome 
-                  profile={profile} 
-                  transactions={transactions} 
-                  onNavigateTab={setActiveTab}
-                  onSelectAction={(action) => {
-                    if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET);
-                    else setActiveTab(AppTab.SERVICES);
-                  }}
-                />
-              )}
+            <main className="flex-grow p-6 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
+              <AnimatePresence mode="wait">
+                 <motion.div
+                   key={activeTab}
+                   initial={{ opacity: 0, y: 10 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   exit={{ opacity: 0, y: -10 }}
+                   transition={{ duration: 0.3 }}
+                 >
+                    {activeTab === AppTab.HOME && (
+                      <DashboardHome 
+                        profile={profile} 
+                        transactions={transactions} 
+                        onNavigateTab={setActiveTab}
+                        onSelectAction={(action) => {
+                          if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET);
+                          else setActiveTab(AppTab.SERVICES);
+                        }}
+                      />
+                    )}
 
-              {activeTab === AppTab.WALLET && (
-                <WalletSystem 
-                  profile={profile} 
-                  transactions={transactions} 
-                  onFundWallet={() => {}}
-                  onWithdrawWallet={async () => true}
-                  onTransfer={async () => true}
-                />
-              )}
+                    {activeTab === AppTab.WALLET && (
+                      <WalletSystem 
+                        profile={profile} 
+                        transactions={transactions} 
+                        onFundWallet={() => {}}
+                        onWithdrawWallet={async () => true}
+                        onTransfer={async () => true}
+                      />
+                    )}
 
-              {activeTab === AppTab.TRADE && (
-                <CryptoSystem 
-                  profile={profile} 
-                  btcPrice={btcPrice} 
-                  ethPrice={ethPrice} 
-                  onTradeCompleted={() => {}} 
-                />
-              )}
+                    {activeTab === AppTab.TRADE && (
+                      <CryptoSystem 
+                        profile={profile} 
+                        btcPrice={btcPrice} 
+                        ethPrice={ethPrice} 
+                        onTradeCompleted={() => {}} 
+                      />
+                    )}
 
-              {activeTab === AppTab.SERVICES && (
-                <AirtimeModule 
-                  profile={profile} 
-                  onPurchase={async () => true} 
-                />
-              )}
+                    {activeTab === AppTab.SERVICES && (
+                      <AirtimeModule 
+                        profile={profile} 
+                        onPurchase={async () => true} 
+                      />
+                    )}
 
-              {activeTab === AppTab.PROFILE && (
-                <UserProfileSettings 
-                  profile={profile} 
-                  onUpdateProfile={() => {}} 
-                />
-              )}
+                    {activeTab === AppTab.PROFILE && (
+                      <UserProfileSettings 
+                        profile={profile} 
+                        onUpdateProfile={() => {}} 
+                      />
+                    )}
 
-              {activeTab === AppTab.ADMIN && (
-                <AdminSystem 
-                  metrics={adminMetrics} 
-                  profile={profile} 
-                  onApproveKyc={() => {}} 
-                  onUpdateSystemStatus={() => {}}
-                />
-              )}
+                    {activeTab === AppTab.ADMIN && (
+                      <AdminSystem 
+                        metrics={adminMetrics} 
+                        profile={profile} 
+                        onApproveKyc={() => {}} 
+                        onUpdateSystemStatus={() => {}}
+                      />
+                    )}
+                 </motion.div>
+              </AnimatePresence>
             </main>
           </div>
 
           {/* Mobile Bottom Navigation */}
-          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/70 backdrop-blur-2xl border-t border-white/50 px-6 py-4 flex justify-around items-center">
+          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-2xl border-t border-gray-100 px-6 py-5 flex justify-around items-center">
             {[
-              { tab: AppTab.HOME, label: "Home", icon: Home },
-              { tab: AppTab.WALLET, label: "Wallet", icon: Wallet },
-              { tab: AppTab.TRADE, label: "Trade", icon: RefreshCw },
-              { tab: AppTab.SERVICES, label: "Apps", icon: Smartphone },
+              { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
+              { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
+              { tab: AppTab.TRADE, label: "Trade", icon: RefreshIcon },
+              { tab: AppTab.SERVICES, label: "Apps", icon: AppIcon },
             ].map((item) => (
               <button 
                 key={item.label}
                 onClick={() => setActiveTab(item.tab)}
                 className={`flex flex-col items-center gap-1.5 transition-all ${
-                  activeTab === item.tab ? "text-primary scale-110" : "text-gray-400 hover:text-gray-600"
+                  activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400"
                 }`}
               >
-                <item.icon size={22} />
-                <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                <item.icon className="w-6 h-6" />
+                <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
               </button>
             ))}
           </nav>
-
-          {/* Mobile Drawer Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <div className="fixed inset-0 z-50 flex">
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setMobileMenuOpen(false)} 
-                  className="fixed inset-0 bg-black/20 backdrop-blur-sm"
-                ></motion.div>
-                
-                <motion.div 
-                  initial={{ x: "-100%" }}
-                  animate={{ x: 0 }}
-                  exit={{ x: "-100%" }}
-                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                  className="relative w-80 bg-white shadow-2xl p-10 flex flex-col justify-between h-full"
-                >
-                  <div className="space-y-12">
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-black text-primary tracking-tighter">OBEY</span>
-                      <button 
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl"
-                      >
-                        <X size={20} />
-                      </button>
-                    </div>
-
-                    <nav className="space-y-2">
-                      {[
-                        { tab: AppTab.HOME, label: "Console", icon: LayoutDashboard },
-                        { tab: AppTab.WALLET, label: "Treasury", icon: Wallet },
-                        { tab: AppTab.TRADE, label: "Exchange", icon: RefreshCw },
-                        { tab: AppTab.SERVICES, label: "Services", icon: Smartphone },
-                        { tab: AppTab.PROFILE, label: "Settings", icon: User },
-                        { tab: AppTab.ADMIN, label: "Compliance", icon: ShieldCheck },
-                      ].map((item) => (
-                        <button
-                          key={item.label}
-                          onClick={() => { setActiveTab(item.tab); setMobileMenuOpen(false); }}
-                          className={`w-full flex items-center gap-4 px-6 h-14 rounded-[20px] text-sm font-black transition-all ${
-                            activeTab === item.tab ? "bg-primary text-white shadow-lg shadow-primary/20" : "text-gray-400 hover:text-primary hover:bg-accent-blue"
-                          }`}
-                        >
-                          <item.icon size={20} /> {item.label}
-                        </button>
-                      ))}
-                    </nav>
-                  </div>
-
-                  <button
-                    onClick={handleLogout}
-                    className="w-full py-5 bg-red-50 text-red-500 rounded-[20px] text-xs font-black uppercase tracking-widest flex items-center justify-center gap-3 active-press"
-                  >
-                    <LogOut size={18} /> Exit Account
-                  </button>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
 
         </div>
       )}

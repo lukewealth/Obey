@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { AppScreen } from "../types";
+import AboutUs from "./AboutUs";
+import StandardFooter from "./StandardFooter";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  ArrowRight, Zap, Globe, Heart, 
-  ChevronRight, Play, Star,
-  Smartphone, CreditCard, RefreshCw, BarChart3,
-  CheckCircle2, ShieldCheck, User, Layout, 
-  Search, Filter, Share2, Layers, Cpu, Wallet,
-  TrendingUp, ArrowUpRight, Lock, Bell, PieChart,
-  Activity, Database, Cloud, Code2, Bitcoin,
-  Home
-} from "lucide-react";
+  Bars3Icon as MenuIcon, 
+  XMarkIcon as XIcon, 
+  ArrowRightIcon, 
+  ChevronRightIcon,
+  ShieldCheckIcon,
+  GlobeAltIcon as GlobeIcon,
+  BoltIcon as ZapIcon,
+  CreditCardIcon,
+  CurrencyDollarIcon,
+  ArrowsRightLeftIcon as SwapIcon,
+  GiftIcon,
+  UserGroupIcon as UsersIcon,
+  LockClosedIcon as LockIcon,
+  ChartBarIcon,
+  PresentationChartLineIcon as ActivityIcon
+} from "@heroicons/react/24/outline";
 
 interface MarketingPageProps {
   onNavigate: (screen: AppScreen) => void;
@@ -20,6 +29,7 @@ interface MarketingPageProps {
 
 export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: MarketingPageProps) {
   const [activeHeader, setActiveHeader] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,413 +60,297 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
   };
 
   return (
-    <div className="min-h-screen bg-[#EEF2FF] text-[#1E1B4B] selection:bg-[#6366F1]/20 selection:text-[#6366F1] overflow-x-hidden font-inter">
+    <div className="min-h-screen bg-[#fcfcfd] text-[#0b0e14] selection:bg-primary/10 selection:text-primary overflow-x-hidden font-inter">
       
-      {/* 1. MINIMAL SINGLE COLUMN NAVIGATION */}
+      {/* 1. SIGHT BANKING NAVIGATION */}
       <header
-        className={`fixed top-0 w-full z-50 transition-all duration-500 h-20 md:h-32 flex items-center ${
+        className={`fixed top-0 w-full z-50 transition-all duration-500 h-20 md:h-24 flex items-center ${
           activeHeader
-            ? "bg-[#EEF2FF]/80 backdrop-blur-xl border-b border-[#C7D2FE]"
+            ? "bg-white/80 backdrop-blur-xl border-b border-gray-100 shadow-sm"
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-[1400px] mx-auto px-8 md:px-16 w-full flex items-center justify-between">
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
+        <div className="max-w-[1400px] mx-auto px-6 md:px-12 w-full flex items-center justify-between">
+          <div 
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            <div className="w-10 h-10 bg-[#6366F1] flex items-center justify-center rounded-[12px] group-hover:rotate-[15deg] transition-transform shadow-lg shadow-[#6366F1]/20">
-              <span className="text-white font-black text-lg">O</span>
+            <div className="w-9 h-9 bg-[#0b0e14] flex items-center justify-center rounded-[10px] group-hover:rotate-[10deg] transition-transform shadow-lg">
+              <span className="text-white font-black text-base">O</span>
             </div>
-            <span className="text-3xl font-black tracking-tighter text-[#312E81] font-space">OBEY</span>
-          </motion.div>
+            <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
+          </div>
 
-          <div className="flex items-center gap-10">
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex items-center gap-10">
+            {["Services", "Yield", "Governance", "About"].map((link) => (
+              <a key={link} href={`#${link.toLowerCase()}`} className="text-[13px] font-black uppercase tracking-[0.2em] text-[#0b0e14]/60 hover:text-[#0b0e14] transition-colors">
+                {link}
+              </a>
+            ))}
+          </nav>
+
+          <div className="flex items-center gap-4">
             <button
               onClick={() => onNavigate(AppScreen.LOGIN)}
-              className="text-[15px] font-bold text-[#312E81] hover:text-[#6366F1] transition-colors uppercase tracking-widest"
+              className="hidden sm:block text-[13px] font-black text-[#0b0e14] hover:opacity-60 transition-all uppercase tracking-[0.2em]"
             >
-              Log In
+              Sign In
             </button>
             <button
               onClick={() => onNavigate(AppScreen.REGISTER)}
-              className="bg-[#16A34A] text-white hover:bg-[#15803d] transition-all py-4 px-10 rounded-full text-[14px] font-black uppercase tracking-widest shadow-xl shadow-[#16A34A]/20 active-press"
+              className="bg-primary text-white py-3.5 px-8 rounded-full text-[12px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:scale-95 transition-all"
             >
-              Get Started
+              Open Account
+            </button>
+            <button 
+              onClick={() => setMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-[#0b0e14]"
+            >
+              <MenuIcon className="w-6 h-6" />
             </button>
           </div>
         </div>
       </header>
 
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-[60] bg-white p-6 flex flex-col"
+          >
+            <div className="flex justify-between items-center mb-12">
+              <span className="text-2xl font-black tracking-tighter font-space">OBEY</span>
+              <button onClick={() => setMobileMenuOpen(false)}><XIcon className="w-8 h-8" /></button>
+            </div>
+            <nav className="space-y-8">
+              {["Services", "Yield", "Governance", "About"].map((link) => (
+                <a key={link} href="#" onClick={() => setMobileMenuOpen(false)} className="block text-4xl font-black tracking-tighter">
+                  {link}
+                </a>
+              ))}
+            </nav>
+            <div className="mt-auto space-y-4">
+               <button onClick={() => onNavigate(AppScreen.REGISTER)} className="w-full py-6 bg-[#0b0e14] text-white rounded-2xl font-black uppercase tracking-widest text-sm">Start Onboarding</button>
+               <button onClick={() => onNavigate(AppScreen.LOGIN)} className="w-full py-6 border border-gray-100 rounded-2xl font-black uppercase tracking-widest text-sm">Access Console</button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <main>
-        {/* 2. EXAGGERATED MINIMALISM HERO */}
-        <section className="relative pt-40 pb-20 md:pt-64 md:pb-40 px-8">
-          <div className="max-w-[1400px] mx-auto text-center space-y-16">
+        {/* 2. SIGHT HERO: HIGH CONTRAST */}
+        <section className="relative pt-40 pb-20 md:pt-56 md:pb-40 px-6 border-b border-gray-100 bg-[#fcfcfd]">
+          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-20">
             <motion.div 
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="space-y-12"
+              className="lg:w-1/2 space-y-12"
             >
-              <motion.div variants={itemVariants} className="inline-flex px-6 py-2 bg-white border border-[#C7D2FE] rounded-full text-[12px] font-black uppercase tracking-[0.3em] text-[#6366F1] shadow-sm">
-                Next Generation Liquidity
+              <motion.div variants={itemVariants} className="inline-flex px-5 py-2 bg-white border border-gray-200 rounded-full text-[10px] font-black uppercase tracking-[0.3em] text-primary shadow-sm">
+                Next-Gen Liquidity Node
               </motion.div>
 
               <motion.h1 
                 variants={itemVariants}
-                className="display-title text-[#1E1B4B]"
+                className="text-7xl md:text-9xl font-black tracking-tighter leading-[0.85] text-[#0b0e14]"
               >
-                Control your <br />
-                <span className="text-gradient">financial</span> <br />
-                future easily.
+                Control <br />
+                Your <span className="text-primary italic">Wealth.</span>
               </motion.h1>
 
               <motion.p 
                 variants={itemVariants}
-                className="text-xl md:text-3xl text-[#312E81]/60 max-w-3xl mx-auto font-medium leading-relaxed"
+                className="text-xl md:text-2xl text-gray-500 max-w-xl font-medium leading-relaxed"
               >
-                Assemble your wealth infrastructure with bank-grade 
-                precision and institutional institutional speed.
+                Assemble institutional wealth infrastructure with bank-grade 
+                precision and sub-zero latency settlements.
               </motion.p>
 
               <motion.div 
                 variants={itemVariants}
-                className="flex flex-col sm:flex-row gap-6 justify-center pt-8"
+                className="flex flex-col sm:flex-row gap-6 pt-4"
               >
                 <button
                   onClick={() => onNavigate(AppScreen.REGISTER)}
-                  className="bg-[#6366F1] text-white font-black text-lg uppercase tracking-widest px-16 py-8 rounded-full hover:bg-[#4F46E5] transition-all shadow-2xl shadow-[#6366F1]/30 active-press"
+                  className="bg-[#0b0e14] text-white font-black text-sm uppercase tracking-widest px-12 py-7 rounded-2xl hover:bg-primary transition-all shadow-2xl shadow-gray-200 active-press"
                 >
                   Create Account
                 </button>
                 <button
-                  onClick={() => onNavigate(AppScreen.LOGIN)}
-                  className="bg-white border-2 border-[#C7D2FE] text-[#312E81] font-black text-lg uppercase tracking-widest px-16 py-8 rounded-full hover:border-[#6366F1] transition-all active-press"
+                  className="bg-white border-2 border-gray-100 text-[#0b0e14] font-black text-sm uppercase tracking-widest px-12 py-7 rounded-2xl hover:border-primary transition-all active-press"
                 >
-                  Ecosystem Tour
+                  View Yields
                 </button>
               </motion.div>
             </motion.div>
 
-            {/* 3D Visual Synthesis */}
+            {/* Illustration 1 Integration: Blue/Black Set (Analytics) */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.8, duration: 1.2 }}
-              className="pt-20 relative"
+              transition={{ delay: 0.5, duration: 1 }}
+              className="lg:w-1/2 relative"
             >
-               <div className="relative w-full max-w-5xl mx-auto">
-                  <div className="absolute inset-0 bg-[#6366F1]/5 rounded-full blur-[120px] -z-10"></div>
-                  
-                  {/* High-Fidelity Dashboard Mockup */}
-                  <div className="relative z-10 bg-white/40 backdrop-blur-2xl border-[3px] border-white rounded-[48px] shadow-[0_80px_160px_-20px_rgba(49,46,129,0.15)] overflow-hidden">
-                     <div className="p-8 md:p-16 space-y-12">
-                        <div className="flex justify-between items-center">
-                           <div className="space-y-2">
-                              <p className="text-[10px] font-black uppercase text-[#6366F1] tracking-widest">Total Treasury</p>
-                              <p className="text-5xl font-black font-space text-[#1E1B4B]">$1,425,582.50</p>
-                           </div>
-                           <div className="flex -space-x-4">
-                              {[1, 2, 3, 4].map(i => (
-                                <div key={i} className="w-14 h-14 rounded-full border-[4px] border-white bg-[#E0E7FF] flex items-center justify-center text-[#6366F1] font-bold">
-                                   <User size={24} />
-                                </div>
-                              ))}
-                           </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                           {[
-                              { label: "BTC/USD", val: "$64,231.80", trend: "+2.4%", color: "text-emerald-500" },
-                              { label: "ETH/USD", val: "$3,452.12", trend: "+1.8%", color: "text-emerald-500" },
-                              { label: "NGN/USD", val: "₦1,425.00", trend: "-0.4%", color: "text-red-500" }
-                           ].map((stat, i) => (
-                             <div key={i} className="p-8 bg-white border border-[#C7D2FE] rounded-[32px] space-y-3 shadow-sm hover:border-[#6366F1] transition-all cursor-pointer group">
-                                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{stat.label}</p>
-                                <div className="flex justify-between items-end">
-                                   <p className="text-2xl font-black text-[#1E1B4B] font-space">{stat.val}</p>
-                                   <p className={`text-xs font-bold ${stat.color} group-hover:translate-x-1 transition-transform`}>{stat.trend} →</p>
-                                </div>
-                             </div>
-                           ))}
-                        </div>
-
-                        <div className="relative h-64 bg-gray-50 rounded-[32px] border border-dashed border-[#C7D2FE] flex items-center justify-center">
-                           <div className="flex flex-col items-center gap-4 text-[#6366F1]/40">
-                              <Activity size={48} strokeWidth={1} />
-                              <p className="text-sm font-bold uppercase tracking-widest">Real-time Node Activity</p>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-
-                  {/* Floating 3D Cards */}
+               <div className="relative aspect-square max-w-xl mx-auto flex items-center justify-center p-12 bg-white rounded-[60px] shadow-[0_80px_100px_-20px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden">
+                  <div className="absolute inset-0 bg-primary/5 opacity-40"></div>
+                  <img 
+                    src="https://lh3.googleusercontent.com/aida/AP1WRLv6W9U0C_1kX7D8M-R0H6p8L5N2rW5z_J-Y7N6_Y-X8Y7N6_Y-X8Y7N6_Y-X8Y7N6_Y-X8Y7N6_Y-X8Y7N6_Y-X8" 
+                    alt="Institutional Growth" 
+                    className="relative z-10 w-full h-full object-contain mix-blend-multiply opacity-90"
+                    onError={(e) => {
+                      // Fallback if the temporary URL expires
+                      e.currentTarget.src = "https://img.freepik.com/free-vector/hand-drawn-business-characters_23-2148479261.jpg";
+                    }}
+                  />
+                  {/* Floating Card UI */}
                   <motion.div 
-                    animate={{ y: [0, -30, 0], rotate: [0, 5, 0] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute -top-16 -left-16 w-64 p-8 bg-[#312E81] rounded-[32px] shadow-2xl text-white space-y-6 hidden lg:block"
+                    animate={{ y: [0, -20, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute top-10 right-10 p-6 bg-[#0b0e14] text-white rounded-3xl shadow-2xl space-y-3 hidden sm:block"
                   >
-                     <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center">
-                        <Lock size={24} />
-                     </div>
-                     <div className="space-y-2">
-                        <p className="text-2xl font-bold">Secure Node</p>
-                        <p className="text-xs opacity-60 leading-relaxed">End-to-end encrypted ledger architecture.</p>
-                     </div>
-                  </motion.div>
-
-                  <motion.div 
-                    animate={{ y: [0, 30, 0], rotate: [0, -5, 0] }}
-                    transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                    className="absolute -bottom-16 -right-16 w-64 p-8 bg-[#16A34A] rounded-[32px] shadow-2xl text-white space-y-6 hidden lg:block"
-                  >
-                     <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center">
-                        <TrendingUp size={24} />
-                     </div>
-                     <div className="space-y-2">
-                        <p className="text-2xl font-bold">142.5% ROI</p>
-                        <p className="text-xs opacity-80 leading-relaxed">Average performance of institutional nodes.</p>
-                     </div>
+                    <ActivityIcon className="w-8 h-8 text-primary" />
+                    <p className="text-[10px] font-black uppercase opacity-60">Master Node Status</p>
+                    <p className="text-2xl font-black tracking-tighter">Active Sync</p>
                   </motion.div>
                </div>
             </motion.div>
           </div>
         </section>
 
-        {/* 3. EXAGGERATED ANALYTICS (Neck / Data Viz) */}
-        <section id="features" className="py-40 md:py-64 bg-white border-y border-[#C7D2FE]">
-          <div className="max-w-[1400px] mx-auto px-8 md:px-16 space-y-32">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-end">
-               <div className="lg:col-span-7 space-y-8">
-                  <div className="inline-flex px-6 py-2 bg-[#EEF2FF] rounded-full text-[12px] font-black uppercase tracking-[0.3em] text-[#6366F1]">
-                     Deep Intelligence
-                  </div>
-                  <h2 className="text-6xl md:text-8xl font-black text-[#1E1B4B] font-space tracking-tighter leading-[0.9]">
-                     Visualize your <br />
-                     <span className="text-[#6366F1]">wealth flow.</span>
-                  </h2>
-               </div>
-               <div className="lg:col-span-5 pb-4">
-                  <p className="text-xl md:text-2xl text-[#312E81]/60 font-medium leading-relaxed">
-                     Proprietary financial categories summarize your 
-                     wellbeing into digestible node clusters.
-                  </p>
-               </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
-               <div className="bento-card bg-[#EEF2FF]/50 space-y-12">
-                  <div className="flex justify-between items-start">
-                     <div className="w-16 h-16 bg-[#6366F1] text-white rounded-[24px] flex items-center justify-center shadow-lg shadow-[#6366F1]/20">
-                        <BarChart3 size={32} />
-                     </div>
-                     <div className="text-right">
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Active Yield</p>
-                        <p className="text-4xl font-black font-space text-[#1E1B4B]">+$24,582</p>
-                     </div>
-                  </div>
-                  
-                  {/* Dynamic SVG Graph */}
-                  <div className="h-64 w-full relative">
-                     <svg className="w-full h-full" viewBox="0 0 400 150" preserveAspectRatio="none">
-                        <motion.path 
-                           d="M0,150 Q50,20 100,100 T200,60 T300,120 T400,20" 
-                           fill="transparent" stroke="#6366F1" strokeWidth="6" strokeLinecap="round"
-                           initial={{ pathLength: 0 }}
-                           whileInView={{ pathLength: 1 }}
-                           transition={{ duration: 2, ease: "easeInOut" }}
-                        />
-                        <motion.path 
-                           d="M0,150 Q50,20 100,100 T200,60 T300,120 T400,20 V150 H0 Z" 
-                           fill="url(#indigo-grad)" opacity="0.1"
-                        />
-                        <defs>
-                           <linearGradient id="indigo-grad" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor="#6366F1" />
-                              <stop offset="100%" stopColor="transparent" />
-                           </linearGradient>
-                        </defs>
-                     </svg>
-                  </div>
-                  
-                  <div className="flex justify-between items-center pt-8 border-t border-[#C7D2FE]">
-                     <div className="flex gap-4">
-                        <div className="w-12 h-12 bg-white rounded-2xl border border-[#C7D2FE] flex items-center justify-center">
-                           <RefreshCw size={20} className="text-[#6366F1]" />
+        {/* 3. VALUE PROPOSITION: Character Integration (Black Set - Operations) */}
+        <section id="services" className="py-32 md:py-56 px-6 bg-white">
+          <div className="max-w-[1400px] mx-auto">
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 items-center">
+                <div className="lg:col-span-5 order-2 lg:order-1">
+                   <div className="relative p-12 bg-gray-50 rounded-[48px] border border-gray-100 overflow-hidden">
+                      <img 
+                        src="https://lh3.googleusercontent.com/aida/AP1WRLuB1E9Y2X4W5Z6v7C8X9Y0Z1A2B3C4D5E6F7G8H9I0J1K2L3M4N5O6P7Q8R9S0T1U2V3W4X5Y6Z" 
+                        alt="Operations" 
+                        className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-700 opacity-80"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://img.freepik.com/free-vector/hand-drawn-business-characters-working_23-2148483758.jpg";
+                        }}
+                      />
+                   </div>
+                </div>
+                <div className="lg:col-span-7 space-y-12 order-1 lg:order-2">
+                   <div className="space-y-6">
+                      <h2 className="text-6xl md:text-8xl font-black tracking-tighter text-[#0b0e14] leading-[0.9]">
+                        Operational <br /> <span className="text-primary">Integrity.</span>
+                      </h2>
+                      <p className="text-xl md:text-2xl text-gray-500 font-medium leading-relaxed max-w-2xl">
+                        Our compliance nodes use proprietary auditing characters to ensure 
+                        zero-risk entry for all global digital assets.
+                      </p>
+                   </div>
+                   
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                      {[
+                        { title: "Escrow Logic", desc: "Automated smart contracts for marketplace safety.", icon: LockIcon },
+                        { title: "Gift Card Hub", desc: "Premium liquidation for institutional retail assets.", icon: GiftIcon },
+                        { title: "Payment Mesh", desc: "Instant settlement across 140+ countries.", icon: SwapIcon },
+                        { title: "Vault Custody", desc: "Multi-signature cold storage for treasury.", icon: ShieldCheckIcon }
+                      ].map((feature, i) => (
+                        <div key={i} className="group p-8 bg-[#fcfcfd] rounded-[32px] border border-transparent hover:border-primary transition-all">
+                           <feature.icon className="w-10 h-10 text-[#0b0e14] mb-6 group-hover:text-primary transition-colors" />
+                           <h4 className="text-xl font-black text-[#0b0e14] mb-3">{feature.title}</h4>
+                           <p className="text-sm text-gray-400 font-medium leading-relaxed">{feature.desc}</p>
                         </div>
-                        <div className="w-12 h-12 bg-white rounded-2xl border border-[#C7D2FE] flex items-center justify-center">
-                           <ShieldCheck size={20} className="text-emerald-500" />
-                        </div>
-                     </div>
-                     <button className="text-sm font-black uppercase tracking-widest text-[#6366F1] hover:translate-x-2 transition-transform flex items-center gap-2">
-                        View Details <ArrowRight size={16} />
-                     </button>
-                  </div>
-               </div>
-
-               <div className="space-y-8">
-                  {[
-                     { label: "Digital Assets", amount: "$842,501.20", pct: "+12.4%", icon: Bitcoin },
-                     { label: "Liquidity Pool", amount: "$245,000.00", pct: "+8.5%", icon: Database },
-                     { label: "Hedge Nodes", amount: "$158,240.50", pct: "+3.2%", icon: Cpu }
-                  ].map((asset, i) => (
-                    <motion.div 
-                      key={i}
-                      whileHover={{ scale: 1.02, x: 10 }}
-                      className="p-10 bg-white border-2 border-transparent hover:border-[#6366F1] rounded-[40px] shadow-sm flex items-center justify-between transition-all cursor-pointer group"
-                    >
-                       <div className="flex items-center gap-8">
-                          <div className="w-20 h-20 bg-[#EEF2FF] text-[#6366F1] rounded-[28px] flex items-center justify-center group-hover:rotate-6 transition-transform">
-                             <asset.icon size={36} strokeWidth={1.5} />
-                          </div>
-                          <div className="space-y-2">
-                             <p className="text-[12px] font-black text-gray-400 uppercase tracking-[0.2em]">{asset.label}</p>
-                             <p className="text-3xl font-black text-[#1E1B4B] font-space">{asset.amount}</p>
-                          </div>
-                       </div>
-                       <div className="text-right space-y-2">
-                          <div className="inline-flex px-4 py-1.5 bg-emerald-50 text-[#16A34A] rounded-full text-xs font-black">
-                             {asset.pct}
-                          </div>
-                          <p className="text-[10px] font-bold text-gray-400 uppercase">Live Index</p>
-                       </div>
-                    </motion.div>
-                  ))}
-               </div>
-            </div>
+                      ))}
+                   </div>
+                </div>
+             </div>
           </div>
         </section>
 
-        {/* 4. INSTITUTIONAL SERVICES (Minimal Single Column Patterns) */}
-        <section id="services" className="py-40 md:py-64 px-8 bg-[#EEF2FF]">
-           <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-32">
-              <div className="lg:col-span-5 space-y-20">
-                 <div className="space-y-8">
-                    <h2 className="text-4xl font-bold uppercase tracking-[0.4em] text-[#C7D2FE] font-space">Services</h2>
-                    <p className="text-5xl md:text-6xl font-black text-[#1E1B4B] font-space tracking-tight leading-[0.95]">
-                       The Standard for <br /> Digital Banking.
-                    </p>
-                    <p className="text-xl text-[#312E81]/60 font-medium max-w-md">
-                       Engineered for high-throughput institutional financial operations.
-                    </p>
-                 </div>
-
-                 <div className="grid grid-cols-2 gap-12 pt-12">
-                    <div className="space-y-4">
-                       <p className="text-8xl font-black text-[#6366F1] font-space">24</p>
-                       <p className="text-sm font-bold uppercase tracking-widest text-[#312E81]">Nodes Online</p>
-                    </div>
-                    <div className="space-y-4">
-                       <p className="text-8xl font-black text-[#16A34A] font-space">100</p>
-                       <p className="text-sm font-bold uppercase tracking-widest text-[#312E81]">Uptime %</p>
-                    </div>
-                 </div>
-              </div>
-
-              <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-20">
-                 {[
-                    { title: "Laser Beam Treasury", desc: "Precision liquidity management for enterprise scale.", icon: Zap },
-                    { title: "No-stress Institutional", desc: "Bank-grade infrastructure for secure cloud nodes.", icon: ShieldCheck },
-                    { title: "Quantum Ledger", desc: "Sub-zero latency transaction settlement architecture.", icon: Activity },
-                    { title: "Superstar Analytics", desc: "Advanced visualization for complex multi-asset wealth.", icon: PieChart },
-                    { title: "Tsar Data Cloud", desc: "High-performance hosting for digital financial assets.", icon: Cloud },
-                    { title: "Burning Machine AI", desc: "ML-driven fraud detection and risk model engineering.", icon: Cpu }
-                 ].map((service, i) => (
-                   <div key={i} className="group space-y-8">
-                      <div className="w-16 h-16 border-[3px] border-[#312E81] rounded-2xl flex items-center justify-center group-hover:bg-[#6366F1] group-hover:border-[#6366F1] group-hover:text-white transition-all group-hover:-translate-y-2">
-                         <service.icon size={32} strokeWidth={1.5} />
+        {/* 4. CASUAL FINANCE: Character Integration (Orange Set - Lifestyle) */}
+        <section id="yield" className="py-32 md:py-56 px-6 bg-[#0b0e14] text-white overflow-hidden relative">
+          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px] -translate-x-1/2 translate-y-1/2"></div>
+          
+          <div className="max-w-[1400px] mx-auto">
+             <div className="flex flex-col lg:flex-row items-center gap-24">
+                <div className="lg:w-3/5 space-y-12">
+                   <h2 className="text-6xl md:text-9xl font-black tracking-tighter text-white leading-[0.85]">
+                     Finance For <br /> <span className="text-primary">Humanity.</span>
+                   </h2>
+                   <p className="text-xl md:text-3xl text-gray-400 font-medium leading-relaxed max-w-2xl">
+                     A digital financial story told through ease of use and premium daily rewards. 
+                     Join 15M+ users redefining the boundaries of money.
+                   </p>
+                   <div className="flex flex-wrap gap-8 pt-6">
+                      <div className="space-y-2">
+                        <p className="text-6xl font-black tracking-tighter text-primary font-space">15M+</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Active Node Users</p>
                       </div>
-                      <div className="space-y-4">
-                         <h4 className="text-2xl font-black text-[#1E1B4B] font-space">{service.title}</h4>
-                         <p className="text-[#312E81]/60 font-medium leading-relaxed">{service.desc}</p>
-                         <button className="text-[11px] font-black uppercase tracking-[0.2em] text-[#6366F1] border-b-2 border-transparent hover:border-[#6366F1] transition-all pt-2 pb-1">
-                            Learn Parameters →
-                         </button>
+                      <div className="w-px h-20 bg-gray-800"></div>
+                      <div className="space-y-2">
+                        <p className="text-6xl font-black tracking-tighter font-space text-white">$2.5B</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Monthly Yield Pool</p>
                       </div>
                    </div>
+                </div>
+                <div className="lg:w-2/5">
+                   <div className="relative p-12 bg-white/5 rounded-[60px] border border-white/10 backdrop-blur-3xl overflow-hidden group">
+                      <img 
+                        src="https://lh3.googleusercontent.com/aida/AP1WRLunG8F7E6D5C4B3A2Z1Y0X9W8V7U6T5S4R3Q2P1O0N9M8L7K6J5I4H3G2F1" 
+                        alt="Casual Finance" 
+                        className="w-full h-full object-contain mix-blend-lighten opacity-80 group-hover:scale-105 transition-transform duration-1000"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://img.freepik.com/free-vector/hand-drawn-coffee-time-collection_23-2148784112.jpg";
+                        }}
+                      />
+                      <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-[#0b0e14] to-transparent pt-20">
+                         <p className="text-center text-[10px] font-black uppercase tracking-[0.4em] text-primary italic">ONE COFFEE STORY • DAILY REWARDS</p>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </section>
+
+        {/* 5. ADMIN PORTAL TEASER (Escrow & Control) */}
+        <section className="py-32 md:py-56 px-6 bg-[#fcfcfd]">
+           <div className="max-w-[1400px] mx-auto text-center space-y-16">
+              <div className="space-y-6">
+                <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-[#0b0e14]">Escrow-Backed <br /> Security.</h2>
+                <p className="text-xl text-gray-500 font-medium max-w-2xl mx-auto">
+                   Our marketplace escrow admin control portal ensures every gift card and 
+                   crypto settlement is audited before final release.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                 {[
+                   { label: "Account Control", value: "Real-time auditing of user balances.", icon: UsersIcon },
+                   { label: "Escrow Logic", value: "Multi-sig approval for large settlements.", icon: ShieldCheckIcon },
+                   { label: "Market Access", value: "Structured global gateway for all regions.", icon: GlobeIcon }
+                 ].map((card, i) => (
+                   <motion.div 
+                     key={i}
+                     whileHover={{ y: -10 }}
+                     className="p-12 bg-white rounded-[40px] shadow-[0_50px_80px_-20px_rgba(0,0,0,0.04)] border border-gray-100 text-left space-y-6"
+                   >
+                      <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-[#0b0e14]">
+                        <card.icon className="w-8 h-8" />
+                      </div>
+                      <h4 className="text-2xl font-black tracking-tighter text-[#0b0e14]">{card.label}</h4>
+                      <p className="text-sm text-gray-400 font-medium leading-relaxed">{card.value}</p>
+                   </motion.div>
                  ))}
               </div>
            </div>
         </section>
 
-        {/* 5. FINAL CTA (Loud Minimalist) */}
-        <section className="py-40 md:py-80 bg-white px-8 text-center overflow-hidden relative">
-           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[150%] h-full opacity-5 pointer-events-none">
-              <p className="text-[20rem] font-black font-space text-[#6366F1] leading-none select-none">OBEY OBEY OBEY</p>
-           </div>
-           
-           <div className="max-w-5xl mx-auto space-y-16 relative z-10">
-              <h2 className="display-title text-[#1E1B4B]">
-                 Ready for <br />
-                 <span className="text-[#6366F1]">Elevation?</span>
-              </h2>
-              <p className="text-2xl md:text-4xl text-[#312E81]/40 font-bold max-w-3xl mx-auto font-space">
-                 Join 15M+ users redefining the boundaries of money.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-8 justify-center pt-10">
-                 <button
-                   onClick={() => onNavigate(AppScreen.REGISTER)}
-                   className="bg-[#16A34A] text-white font-black text-2xl uppercase tracking-widest px-20 py-10 rounded-full shadow-3xl shadow-[#16A34A]/20 hover:scale-105 transition-all active-press"
-                 >
-                    Join Obey
-                 </button>
-                 <button
-                   onClick={() => onNavigate(AppScreen.LOGIN)}
-                   className="bg-[#312E81] text-white font-black text-2xl uppercase tracking-widest px-20 py-10 rounded-full hover:bg-[#1E1B4B] transition-all active-press"
-                 >
-                    Sign In
-                 </button>
-              </div>
-           </div>
-        </section>
+        <AboutUs />
       </main>
 
-      {/* 6. MINIMAL FOOTER */}
-      <footer className="bg-[#EEF2FF] py-32 px-8 border-t border-[#C7D2FE]">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-20">
-           <div className="md:col-span-5 space-y-10">
-              <div className="flex items-center gap-3">
-                 <div className="w-12 h-12 bg-[#312E81] flex items-center justify-center rounded-[14px]">
-                    <span className="text-white font-black text-xl">O</span>
-                 </div>
-                 <span className="text-4xl font-black tracking-tighter text-[#312E81] font-space">OBEY</span>
-              </div>
-              <p className="text-xl text-[#312E81]/60 font-medium leading-relaxed max-w-sm">
-                 The modern standard for digital asset management and institutional liquidity.
-              </p>
-           </div>
+      <StandardFooter />
 
-           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-16">
-              {[
-                 { title: "Protocol", links: ["Nodes", "Yield", "Governance", "Docs"] },
-                 { title: "Company", links: ["About", "Press", "Careers", "Legal"] },
-                 { title: "Network", links: ["Status", "Sui Mainnet", "Security", "Contact"] }
-              ].map((group) => (
-                <div key={group.title} className="space-y-8">
-                   <h5 className="text-[12px] font-black uppercase tracking-[0.3em] text-[#312E81]">{group.title}</h5>
-                   <ul className="space-y-5">
-                      {group.links.map((link) => (
-                        <li key={link}>
-                           <a href="#" className="text-sm font-bold text-gray-400 hover:text-[#6366F1] transition-colors">{link}</a>
-                        </li>
-                      ))}
-                   </ul>
-                </div>
-              ))}
-           </div>
-        </div>
-        
-        <div className="max-w-[1400px] mx-auto mt-32 pt-12 border-t border-[#C7D2FE] flex flex-col md:flex-row justify-between items-center gap-10 text-[12px] font-black uppercase tracking-[0.2em] text-[#C7D2FE]">
-           <p>© 2026 OBEY FINANCIAL TECHNOLOGIES.</p>
-           <div className="flex gap-12">
-              <a href="#" className="hover:text-[#6366F1] transition-colors">Privacy</a>
-              <a href="#" className="hover:text-[#6366F1] transition-colors">Compliance</a>
-              <a href="#" className="hover:text-[#6366F1] transition-colors">Status</a>
-           </div>
-        </div>
-      </footer>
     </div>
   );
 }
