@@ -29,6 +29,7 @@ export enum GiftCardTab {
 export interface UserProfile {
   name: string;
   email: string;
+  role: "user" | "admin";
   phone: string;
   avatar: string;
   kycStatus: "Unverified" | "Pending" | "Verified";

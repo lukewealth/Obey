@@ -7,12 +7,12 @@ const router = express.Router();
 // Sync user profile
 router.post('/user', async (req, res) => {
   try {
-    const { supabaseId, name, email, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled } = req.body;
+    const { supabaseId, name, email, role, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled } = req.body;
     
     const user = await User.findOneAndUpdate(
       { supabaseId },
       { 
-        name, email, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled,
+        name, email, role, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled,
         lastSync: new Date()
       },
       { upsert: true, new: true }

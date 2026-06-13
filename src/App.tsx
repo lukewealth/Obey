@@ -43,24 +43,21 @@ import {
 import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
 
 export default function App() {
-  // Global Navigation states
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.MARKETING);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Live Crypto price ticks
   const [btcPrice, setBtcPrice] = useState(64231.80);
   const [ethPrice, setEthPrice] = useState(3452.12);
 
-  // Auth User state
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // Compliance and Profile States
   const [profile, setProfile] = useState<UserProfile>(() => {
     const cached = localStorage.getItem("obey-profile-cache");
     return cached ? JSON.parse(cached) : {
       name: "Felix Anderson",
       email: "felix@obey.finance",
+      role: "user",
       phone: "+234 809 102 8824",
       avatar: "FA",
       kycStatus: "Verified",
@@ -70,10 +67,8 @@ export default function App() {
     };
   });
 
-  // Financial transactions ledger lines
   const [transactions, setTransactions] = useState<Transaction[]>([]);
 
-  // Ecosystem metric levels
   const [adminMetrics, setAdminMetrics] = useState<AdminMetrics>({
     totalUsers: 1420,
     totalVolume: 2458010.55,
@@ -82,7 +77,6 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
-  // Sync with MongoDB when profile or transactions change
   useEffect(() => {
     if (currentUser) {
       syncUserWithMongoDB(currentUser.id, profile);
@@ -95,7 +89,6 @@ export default function App() {
     }
   }, [transactions, currentUser]);
 
-  // Live Supabase connection check
   useEffect(() => {
     if (!supabase) return;
 
@@ -113,6 +106,7 @@ export default function App() {
               const updatedProfile: UserProfile = {
                 name: data.full_name,
                 email: data.email,
+                role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
                 phone: data.phone,
                 avatar: data.avatar_url || data.full_name[0],
                 kycStatus: data.kyc_status,
@@ -122,9 +116,33 @@ export default function App() {
               };
               setProfile(updatedProfile);
               localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
+            } else {
+              // Create profile if it doesn't exist (e.g., social login)
+              const newProfile: any = {
+                id: user.id,
+                full_name: user.user_metadata?.full_name || user.email?.split("@")[0],
+                email: user.email,
+                role: user.email === "contact@tricode.pro" ? "admin" : "user",
+                avatar_url: user.user_metadata?.avatar_url || user.email?.[0].toUpperCase(),
+                kyc_status: "Pending",
+                balance: 142580.42
+              };
+              await supabase.from('profiles').insert([newProfile]);
+              const formattedProfile: UserProfile = {
+                name: newProfile.full_name,
+                email: newProfile.email,
+                role: newProfile.role,
+                phone: "",
+                avatar: newProfile.avatar_url,
+                kycStatus: "Pending",
+                balance: 142580.42,
+                promoCode: "OBEY-ELITE",
+                twoFactorEnabled: false
+              };
+              setProfile(formattedProfile);
             }
           } catch (error) {
-            console.warn("⚠️ Supabase Fetch Error, trying MongoDB fallback...");
+            console.warn("⚠️ Profile Sync Error, trying MongoDB fallback...");
             const fallbackUser = await fetchUserFallback(user.id);
             if (fallbackUser) setProfile(fallbackUser);
           }
@@ -168,7 +186,6 @@ export default function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Global price variations
   useEffect(() => {
     const timer = setInterval(() => {
       setBtcPrice(prev => prev * (1 + (Math.random() * 0.1 - 0.05) / 100));
@@ -186,8 +203,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen text-[#0b0e14] font-sans antialiased selection:bg-primary/20 selection:text-primary relative bg-[#fcfcfd]">
-      
-      {/* 1. MARKETING SCREEN */}
       {currentScreen === AppScreen.MARKETING && (
         <MarketingPage 
           btcPrice={btcPrice} 
@@ -196,16 +211,19 @@ export default function App() {
         />
       )}
 
-      {/* 2. AUTHENTICATION SYSTEMS */}
       {(currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER || currentScreen === AppScreen.OTP) && (
         <AuthSystem 
           currentScreen={currentScreen} 
-          onSuccess={() => {}} 
+          onSuccess={(prof) => {
+            if (prof) {
+               setProfile(prev => ({ ...prev, ...prof } as UserProfile));
+               setCurrentScreen(AppScreen.DASHBOARD);
+            }
+          }} 
           onNavigate={(screen) => setCurrentScreen(screen)} 
         />
       )}
 
-      {/* 2.5 LEGAL & COMPLIANCE SCREENS */}
       {currentScreen === AppScreen.PRIVACY && <LegalContent slug="privacy" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.TERMS && <LegalContent slug="terms" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.AMLKYC && <LegalContent slug="amlkyc" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
@@ -213,17 +231,11 @@ export default function App() {
       {currentScreen === AppScreen.DISCLOSURES && <LegalContent slug="disclosures" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.STATUS && <LegalContent slug="status" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
 
-      {/* 3. DASHBOARD CONSOLE */}
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[#fcfcfd]">
-          
-          {/* Top Bar Header */}
           <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-gray-100 px-6 md:px-10 h-20 md:h-24 flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <button 
-                onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden w-11 h-11 flex items-center justify-center text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all"
-              >
+              <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden w-11 h-11 flex items-center justify-center text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all">
                 <MenuIcon className="w-6 h-6" />
               </button>
               <div className="flex items-center gap-3">
@@ -243,17 +255,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div 
-                onClick={() => setActiveTab(AppTab.PROFILE)}
-                className="flex items-center gap-3 pl-2 cursor-pointer group select-none"
-              >
+              <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-3 pl-2 cursor-pointer group select-none">
                 <div className="w-11 h-11 rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-sm uppercase shadow-xl group-hover:scale-105 transition-transform">
                   {profile.avatar}
                 </div>
                 <div className="hidden lg:block">
                   <p className="text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
                   <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <VerifiedIcon className="w-3.5 h-3.5 text-primary" /> Tier 2 Secure
+                    <VerifiedIcon className="w-3.5 h-3.5 text-primary" /> {profile.role === "admin" ? "Institutional Admin" : "Tier 2 Secure"}
                   </p>
                 </div>
               </div>
@@ -261,8 +270,6 @@ export default function App() {
           </header>
 
           <div className="flex-grow flex">
-            
-            {/* Left Sidebar: Sight Banking Style */}
             <aside className="hidden lg:flex w-72 bg-white border-r border-gray-100 p-8 flex-col justify-between">
               <div className="space-y-10">
                 <div className="space-y-4">
@@ -274,13 +281,7 @@ export default function App() {
                       { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
                       { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                     ].map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => setActiveTab(item.tab)}
-                        className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${
-                          activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"
-                        }`}
-                      >
+                      <button key={item.label} onClick={() => setActiveTab(item.tab)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
                         <item.icon className="w-5 h-5" /> {item.label}
                       </button>
                     ))}
@@ -290,106 +291,39 @@ export default function App() {
                 <div className="space-y-4">
                   <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Ecosystem</p>
                   <nav className="space-y-1">
-                    {[
-                      { tab: AppTab.PROFILE, label: "Parameters", icon: SettingsIcon },
-                      ...(profile.email === "contact@tricode.pro" ? [{ tab: AppTab.ADMIN, label: "Compliance", icon: ShieldCheck }] : []),
-                    ].map((item) => (
-                      <button
-                        key={item.label}
-                        onClick={() => setActiveTab(item.tab)}
-                        className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${
-                          activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"
-                        }`}
-                      >
-                        <item.icon className="w-5 h-5" /> {item.label}
+                    <button onClick={() => setActiveTab(AppTab.PROFILE)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.PROFILE ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
+                      <SettingsIcon className="w-5 h-5" /> Parameters
+                    </button>
+                    {profile.role === "admin" && (
+                      <button onClick={() => setActiveTab(AppTab.ADMIN)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
+                        <ShieldCheck className="w-5 h-5" /> Compliance
                       </button>
-                    ))}
+                    )}
                   </nav>
                 </div>
               </div>
 
               <div className="pt-8 border-t border-gray-100">
-                <div className="p-6 bg-gray-50 rounded-[32px] border border-gray-100 space-y-4">
-                   <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Security Health</p>
-                   <div className="flex items-center gap-3">
-                      <div className="flex-grow bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                         <div className="bg-primary w-4/5 h-full"></div>
-                      </div>
-                      <span className="text-[10px] font-black">80%</span>
-                   </div>
-                </div>
+                <button onClick={handleLogout} className="w-full h-14 rounded-[22px] bg-white border border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center gap-3 text-gray-400 active-press shadow-sm">
+                  <LogOutIcon className="w-5 h-5" /> Sign Out
+                </button>
               </div>
             </aside>
 
-            {/* Main Content Area */}
             <main className="flex-grow p-6 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
               <AnimatePresence mode="wait">
-                 <motion.div
-                   key={activeTab}
-                   initial={{ opacity: 0, y: 10 }}
-                   animate={{ opacity: 1, y: 0 }}
-                   exit={{ opacity: 0, y: -10 }}
-                   transition={{ duration: 0.3 }}
-                 >
-                    {activeTab === AppTab.HOME && (
-                      <DashboardHome 
-                        profile={profile} 
-                        transactions={transactions} 
-                        onNavigateTab={setActiveTab}
-                        onSelectAction={(action) => {
-                          if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET);
-                          else setActiveTab(AppTab.SERVICES);
-                        }}
-                      />
-                    )}
-
-                    {activeTab === AppTab.WALLET && (
-                      <WalletSystem 
-                        profile={profile} 
-                        transactions={transactions} 
-                        onFundWallet={() => {}}
-                        onWithdrawWallet={async () => true}
-                        onTransfer={async () => true}
-                      />
-                    )}
-
-                    {activeTab === AppTab.TRADE && (
-                      <CryptoSystem 
-                        profile={profile} 
-                        btcPrice={btcPrice} 
-                        ethPrice={ethPrice} 
-                        onTradeCompleted={() => {}} 
-                      />
-                    )}
-
-                    {activeTab === AppTab.SERVICES && (
-                      <AirtimeModule 
-                        profile={profile} 
-                        onPurchase={async () => true} 
-                      />
-                    )}
-
-                    {activeTab === AppTab.PROFILE && (
-                      <UserProfileSettings 
-                        profile={profile} 
-                        onUpdateProfile={() => {}} 
-                      />
-                    )}
-
-                    {activeTab === AppTab.ADMIN && (
-                      <AdminSystem 
-                        metrics={adminMetrics} 
-                        profile={profile} 
-                        onApproveKyc={() => {}} 
-                        onUpdateSystemStatus={() => {}}
-                      />
-                    )}
+                 <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+                    {activeTab === AppTab.HOME && <DashboardHome profile={profile} transactions={transactions} onNavigateTab={setActiveTab} onSelectAction={(action) => { if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET); else setActiveTab(AppTab.SERVICES); }} />}
+                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={transactions} onFundWallet={() => {}} onWithdrawWallet={async () => true} onTransfer={async () => true} />}
+                    {activeTab === AppTab.TRADE && <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={() => {}} />}
+                    {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async () => true} />}
+                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={() => {}} />}
+                    {activeTab === AppTab.ADMIN && profile.role === "admin" && <AdminSystem metrics={adminMetrics} profile={profile} onApproveKyc={() => {}} onUpdateSystemStatus={() => {}} />}
                  </motion.div>
               </AnimatePresence>
             </main>
           </div>
 
-          {/* Mobile Bottom Navigation */}
           <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-2xl border-t border-gray-100 px-6 py-5 flex justify-around items-center">
             {[
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
@@ -397,25 +331,15 @@ export default function App() {
               { tab: AppTab.TRADE, label: "Trade", icon: RefreshIcon },
               { tab: AppTab.SERVICES, label: "Apps", icon: AppIcon },
             ].map((item) => (
-              <button 
-                key={item.label}
-                onClick={() => setActiveTab(item.tab)}
-                className={`flex flex-col items-center gap-1.5 transition-all ${
-                  activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400"
-                }`}
-              >
+              <button key={item.label} onClick={() => setActiveTab(item.tab)} className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400"}`}>
                 <item.icon className="w-6 h-6" />
                 <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
               </button>
             ))}
           </nav>
-
         </div>
       )}
-
-      {/* 4. UTILITIES */}
       <CookieConsent />
-
     </div>
   );
 }
