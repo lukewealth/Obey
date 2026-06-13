@@ -499,31 +499,117 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <button className="h-14 px-8 bg-black text-white rounded-full flex items-center gap-4 hover:scale-105 transition-all shadow-xl active-press group">
                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" className="w-5 h-5 invert" />
-                       <span className="text-[12px] font-black uppercase tracking-widest">App Store</span>
+                       <div className="text-left">
+                          <p className="text-[8px] font-bold uppercase opacity-50 leading-none">Download on the</p>
+                          <p className="text-[12px] font-black uppercase tracking-widest leading-none">App Store</p>
+                       </div>
                     </button>
                     <button className="h-14 px-8 bg-black text-white rounded-full flex items-center gap-4 hover:scale-105 transition-all shadow-xl active-press group">
                        <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google" className="w-5 h-5" />
-                       <span className="text-[12px] font-black uppercase tracking-widest">Google Play</span>
+                       <div className="text-left">
+                          <p className="text-[8px] font-bold uppercase opacity-50 leading-none">Get it on</p>
+                          <p className="text-[12px] font-black uppercase tracking-widest leading-none">Google Play</p>
+                       </div>
                     </button>
                  </div>
               </div>
 
               <div className="relative flex justify-center pt-20">
                  <div className="flex -space-x-12 md:-space-x-32 justify-center items-end">
-                    <div className="relative w-[280px] md:w-[380px] aspect-[1/2] rounded-[3.5rem] border-[10px] border-[#0b0e14] bg-white shadow-2xl scale-90 -rotate-[10deg] opacity-40 hover:opacity-100 hover:scale-100 hover:rotate-0 transition-all duration-1000"></div>
-                    <div className="relative w-[280px] md:w-[420px] aspect-[1/2] rounded-[4rem] border-[12px] border-[#0b0e14] bg-white shadow-[0_80px_100px_-40px_rgba(0,0,0,0.3)] z-10 hover:scale-[1.02] transition-transform duration-1000">
-                       <div className="p-10 space-y-8">
-                          <div className="flex justify-between items-center text-[#0b0e14]">
-                             <span className="text-sm font-black uppercase tracking-widest">Obey</span>
-                             <CheckBadgeIcon className="w-8 h-8 text-primary" />
+                    {/* Left Phone */}
+                    <div className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-gray-50 shadow-2xl scale-90 -rotate-[12deg] opacity-40 overflow-hidden hidden sm:block">
+                       <img src="/illustractions.jpg" className="w-full h-full object-cover" alt="App Preview 1" />
+                    </div>
+
+                    {/* Center Phone (The "Complete 3D UI") */}
+                    <div className="relative w-[300px] md:w-[420px] aspect-[1/2] rounded-[4rem] border-[12px] border-[#0b0e14] bg-white shadow-[0_80px_100px_-40px_rgba(0,0,0,0.3)] z-10 hover:scale-[1.02] transition-transform duration-1000 overflow-hidden">
+                       <div className="p-8 space-y-8 h-full bg-white flex flex-col text-left">
+                          {/* Status Bar */}
+                          <div className="flex justify-between items-center text-[10px] font-bold">
+                             <span>9:41</span>
+                             <div className="flex gap-1">
+                                <div className="w-4 h-2 bg-black rounded-sm"></div>
+                                <div className="w-2 h-2 bg-black rounded-full"></div>
+                             </div>
                           </div>
-                          <div className="space-y-2 pt-10">
-                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Your balance</p>
-                             <p className="text-5xl font-black font-space">$40,500.80</p>
+
+                          <div className="flex justify-between items-center text-[#0b0e14]">
+                             <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-2xl bg-[#0b0e14] flex items-center justify-center text-white font-black">O</div>
+                                <span className="text-sm font-black uppercase tracking-widest">Obey</span>
+                             </div>
+                             <CheckBadgeIcon className="w-6 h-6 text-primary" />
+                          </div>
+
+                          <div className="space-y-2 pt-4">
+                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em]">Current Balance</p>
+                             <div className="space-y-1">
+                                <p className="text-5xl font-black font-space text-[#0b0e14] tracking-tighter">$40,500.80</p>
+                                <div className="flex items-center gap-2 text-emerald-500 font-bold text-[10px]">
+                                   <span className="px-1.5 py-0.5 bg-emerald-50 rounded-md">+2.4%</span>
+                                   <span>Today's Profit</span>
+                                </div>
+                             </div>
+                          </div>
+
+                          {/* Action Grid */}
+                          <div className="grid grid-cols-4 gap-4">
+                             {[
+                                { icon: BanknotesIcon, label: "Fund" },
+                                { icon: SwapIcon, label: "Trade" },
+                                { icon: ZapIcon, label: "VTU" },
+                                { icon: GiftIcon, label: "Gifts" }
+                             ].map((act, i) => (
+                                <div key={i} className="space-y-2 text-center">
+                                   <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-[#0b0e14] shadow-sm">
+                                      <act.icon className="w-5 h-5" />
+                                   </div>
+                                   <p className="text-[9px] font-black uppercase tracking-tighter">{act.label}</p>
+                                </div>
+                             ))}
+                          </div>
+
+                          {/* Mini Chart Mockup */}
+                          <div className="bg-gray-50 rounded-[2rem] p-6 space-y-4">
+                             <div className="flex justify-between items-center">
+                                <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Asset Performance</p>
+                                <ChartBarIcon className="w-4 h-4 text-primary" />
+                             </div>
+                             <div className="h-20 w-full flex items-end gap-1.5">
+                                {[0.4, 0.7, 0.5, 0.9, 0.6, 0.8, 1, 0.7, 0.9].map((h, i) => (
+                                   <div key={i} className="flex-grow bg-primary/20 rounded-t-lg" style={{ height: `${h * 100}%` }}></div>
+                                ))}
+                             </div>
+                          </div>
+
+                          {/* Recent Transactions */}
+                          <div className="space-y-4 flex-grow">
+                             <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest">Recent Activity</p>
+                             <div className="space-y-4">
+                                {[
+                                   { label: "Amazon Card", sub: "Marketplace", val: "+$500.00" },
+                                   { label: "BTC Purchase", sub: "Exchange", val: "-$1,200.00" }
+                                ].map((tx, i) => (
+                                   <div key={i} className="flex items-center justify-between border-b border-gray-50 pb-4 last:border-0">
+                                      <div className="flex items-center gap-3">
+                                         <div className="w-8 h-8 rounded-full bg-gray-100"></div>
+                                         <div>
+                                            <p className="text-[10px] font-black uppercase">{tx.label}</p>
+                                            <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{tx.sub}</p>
+                                         </div>
+                                      </div>
+                                      <p className="text-[10px] font-black uppercase tracking-tighter">{tx.val}</p>
+                                   </div>
+                                ))}
+                             </div>
                           </div>
                        </div>
                     </div>
-                    <div className="relative w-[280px] md:w-[380px] aspect-[1/2] rounded-[3.5rem] border-[10px] border-[#0b0e14] bg-white shadow-2xl scale-90 rotate-[10deg] opacity-40 hover:opacity-100 hover:scale-100 hover:rotate-0 transition-all duration-1000"></div>
+
+                    {/* Right Phone */}
+                    <div className="relative w-[240px] md:w-[340px] aspect-[1/2] rounded-[3rem] border-[8px] border-[#0b0e14] bg-gray-50 shadow-2xl scale-90 rotate-[12deg] opacity-40 overflow-hidden hidden sm:block">
+                       <img src="/illustrations.jpg" className="w-full h-full object-cover" alt="App Preview 2" />
+                    </div>
                  </div>
               </div>
 
