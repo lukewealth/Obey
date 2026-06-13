@@ -48,7 +48,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   return (
     <NotificationContext.Provider value={{ notify, remove }}>
       {children}
-      <div className="fixed bottom-10 right-10 z-[1000] flex flex-col gap-4 w-full max-w-sm pointer-events-none">
+      <div className="fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[1000] flex flex-col gap-3 md:gap-4 w-[calc(100%-3rem)] md:w-full max-w-sm pointer-events-none">
         <AnimatePresence mode="popLayout">
           {notifications.map((n) => (
             <motion.div
@@ -75,42 +75,42 @@ const NotificationItem: React.FC<{ notification: Notification; onClose: () => vo
     success: {
       bg: "bg-emerald-50",
       border: "border-emerald-100",
-      icon: <CheckCircle2 size={20} className="text-emerald-500" />,
+      icon: <CheckCircle2 size={18} className="text-emerald-500 md:w-5 md:h-5" />,
       text: "text-emerald-900",
       sub: "text-emerald-600/70"
     },
     error: {
       bg: "bg-red-50",
       border: "border-red-100",
-      icon: <XCircle size={20} className="text-red-500" />,
+      icon: <XCircle size={18} className="text-red-500 md:w-5 md:h-5" />,
       text: "text-red-900",
       sub: "text-red-600/70"
     },
     warning: {
       bg: "bg-amber-50",
       border: "border-amber-100",
-      icon: <AlertCircle size={20} className="text-amber-500" />,
+      icon: <AlertCircle size={18} className="text-amber-500 md:w-5 md:h-5" />,
       text: "text-amber-900",
       sub: "text-amber-600/70"
     },
     info: {
       bg: "bg-blue-50",
       border: "border-blue-100",
-      icon: <Info size={20} className="text-blue-500" />,
+      icon: <Info size={18} className="text-blue-500 md:w-5 md:h-5" />,
       text: "text-blue-900",
       sub: "text-blue-600/70"
     },
     log: {
       bg: "bg-[#0b0e14]",
       border: "border-white/10",
-      icon: <Terminal size={20} className="text-primary" />,
+      icon: <Terminal size={18} className="text-primary md:w-5 md:h-5" />,
       text: "text-white",
-      sub: "text-gray-500 font-mono text-[10px]"
+      sub: "text-gray-500 font-mono text-[9px] md:text-[10px]"
     },
     security: {
       bg: "bg-primary/5",
       border: "border-primary/20",
-      icon: <ShieldCheck size={20} className="text-primary" />,
+      icon: <ShieldCheck size={18} className="text-primary md:w-5 md:h-5" />,
       text: "text-[#0b0e14]",
       sub: "text-primary/60"
     }
@@ -119,19 +119,19 @@ const NotificationItem: React.FC<{ notification: Notification; onClose: () => vo
   const currentStyle = styles[type];
 
   return (
-    <div className={`${currentStyle.bg} ${currentStyle.border} border backdrop-blur-xl p-5 rounded-[2rem] shadow-2xl flex items-start gap-4 relative overflow-hidden group`}>
+    <div className={`${currentStyle.bg} ${currentStyle.border} border backdrop-blur-xl p-4 md:p-5 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-start gap-3 md:gap-4 relative overflow-hidden group`}>
       <div className="shrink-0 pt-0.5">
         {currentStyle.icon}
       </div>
-      <div className="flex-grow space-y-1">
-        <h4 className={`text-sm font-black uppercase tracking-widest ${currentStyle.text}`}>{title}</h4>
-        <p className={`text-xs font-medium leading-relaxed ${currentStyle.sub}`}>{message}</p>
+      <div className="flex-grow space-y-0.5 md:space-y-1 overflow-hidden">
+        <h4 className={`text-[11px] md:text-sm font-black uppercase tracking-widest ${currentStyle.text} truncate`}>{title}</h4>
+        <p className={`text-[10px] md:text-xs font-medium leading-relaxed ${currentStyle.sub}`}>{message}</p>
       </div>
       <button 
         onClick={onClose}
         className="shrink-0 p-1 text-gray-400 hover:text-gray-900 transition-colors"
       >
-        <X size={16} />
+        <X size={14} className="md:w-4 md:h-4" />
       </button>
 
       {/* Progress Bar for non-log notifications */}

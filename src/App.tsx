@@ -42,7 +42,7 @@ import {
   ArrowPathIcon as RefreshIcon
 } from "@heroicons/react/24/outline";
 
-import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
+import { useUserProfile, useTransactions } from "./services/queries";
 import { auth as firebaseAuth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -53,6 +53,49 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
+  // Auth state
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  // --- React Query Hybrid Hooks (Full-Stack Caching) ---
+  const { 
+    data: cachedProfile, 
+    syncProfile, 
+    isLoading: profileLoading 
+  } = useUserProfile(currentUser?.id || currentUser?.uid);
+
+  const { 
+    data: cachedTransactions = [], 
+    syncTransactions, 
+    isLoading: txLoading 
+  } = useTransactions(currentUser?.id || currentUser?.uid);
+
+  // Local state for profile (initialized with ELITE defaults, settled by cache)
+  const [profile, setProfile] = useState<UserProfile>(() => ({
+    name: "Felix Anderson",
+    email: "felix@obey.finance",
+    role: "user",
+    phone: "+234 809 102 8824",
+    avatar: "FA",
+    kycStatus: "Verified",
+    balance: 142580.42,
+    promoCode: "OBEY-ELITE",
+    twoFactorEnabled: true
+  }));
+
+  // Update local profile when cache settles from hybrid DB
+  useEffect(() => {
+    if (cachedProfile) {
+      setProfile(cachedProfile);
+    }
+  }, [cachedProfile]);
+
+  // Sync to MongoDB effect
+  useEffect(() => {
+    if (currentUser && profile) {
+      syncProfile({ id: currentUser.id || currentUser.uid, profile });
+    }
+  }, [profile, currentUser, syncProfile]);
+
   // System Alert State
   const [systemAlert, setSystemAlert] = useState({
     isOpen: false,
@@ -65,25 +108,6 @@ export default function App() {
   const [btcPrice, setBtcPrice] = useState(64231.80);
   const [ethPrice, setEthPrice] = useState(3452.12);
 
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
-  const [profile, setProfile] = useState<UserProfile>(() => {
-    const cached = localStorage.getItem("obey-profile-cache");
-    return cached ? JSON.parse(cached) : {
-      name: "Felix Anderson",
-      email: "felix@obey.finance",
-      role: "user",
-      phone: "+234 809 102 8824",
-      avatar: "FA",
-      kycStatus: "Verified",
-      balance: 142580.42,
-      promoCode: "OBEY-ELITE",
-      twoFactorEnabled: true
-    };
-  });
-
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
   const [adminMetrics, setAdminMetrics] = useState<AdminMetrics>({
     totalUsers: 1420,
     totalVolume: 2458010.55,
@@ -92,87 +116,17 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
-  // Sync with MongoDB
-  useEffect(() => {
-    if (currentUser) {
-      syncUserWithMongoDB(currentUser.id || currentUser.uid, profile);
-    }
-  }, [profile, currentUser]);
-
-  useEffect(() => {
-    if (currentUser && transactions.length > 0) {
-      syncTransactionsWithMongoDB(currentUser.id || currentUser.uid, transactions);
-    }
-  }, [transactions, currentUser]);
-
-  // Auth Listener
+  // Auth Listeners (Hybrid Firebase/Supabase)
   useEffect(() => {
     if (!supabase) return;
-
-    const handleProfileSync = async (user: any) => {
-      try {
-        const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id || user.uid).single();
-        
-        if (data) {
-          const updatedProfile: UserProfile = {
-            name: data.full_name,
-            email: data.email,
-            role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
-            phone: data.phone,
-            avatar: data.avatar_url || data.full_name?.[0] || user.email?.[0].toUpperCase(),
-            kycStatus: data.kyc_status,
-            balance: data.balance,
-            promoCode: "OBEY-ELITE",
-            twoFactorEnabled: true
-          };
-          setProfile(updatedProfile);
-          localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
-          return;
-        }
-
-        // If data is missing (not found), try fallback or create new
-        const fallback = await fetchUserFallback(user.id || user.uid);
-        if (fallback) {
-          setProfile(fallback);
-          localStorage.setItem("obey-profile-cache", JSON.stringify(fallback));
-          return;
-        }
-
-        const newProfile: any = {
-          id: user.id || user.uid,
-          full_name: user.displayName || user.user_metadata?.full_name || user.email?.split("@")[0],
-          email: user.email,
-          role: user.email === "contact@tricode.pro" ? "admin" : "user",
-          avatar_url: user.photoURL || user.user_metadata?.avatar_url || user.email?.[0].toUpperCase(),
-          kyc_status: "Pending",
-          balance: 142580.42
-        };
-
-        await supabase.from('profiles').upsert([newProfile]);
-        setProfile({
-          name: newProfile.full_name,
-          email: newProfile.email,
-          role: newProfile.role,
-          phone: "",
-          avatar: newProfile.avatar_url,
-          kycStatus: "Pending",
-          balance: 142580.42,
-          promoCode: "OBEY-ELITE",
-          twoFactorEnabled: false
-        });
-      } catch (error: any) {
-        console.warn("⚠️ Profile Sync Warning:", error.message);
-      }
-    };
 
     const unsubscribeFirebase = onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
         setCurrentUser(user);
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
-           notify("success", "Access Authorized", `Welcome back, ${user.email}`);
+           notify("success", "Access Authorized", `Welcome back to the OBEY node.`);
         }
-        await handleProfileSync(user);
       }
     });
 
@@ -182,16 +136,14 @@ export default function App() {
         setCurrentUser(user);
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
-           notify("success", "Access Authorized", `Welcome back, ${user.email}`);
+           notify("success", "Access Authorized", `Sequential ledger sync active.`);
         }
-        await handleProfileSync(user);
       } else {
         if (!firebaseAuth.currentUser) {
           setCurrentUser(null);
           if (currentScreen === AppScreen.DASHBOARD) {
              setCurrentScreen(AppScreen.MARKETING);
           }
-          localStorage.removeItem("obey-profile-cache");
         }
       }
     });
@@ -200,14 +152,14 @@ export default function App() {
       unsubscribeFirebase();
       subSupabase.unsubscribe();
     };
-  }, [currentScreen]);
+  }, [currentScreen, notify]);
 
   const handleLogout = async () => {
     await Promise.all([
       supabase.auth.signOut(),
       firebaseAuth.signOut()
     ]);
-    notify("info", "Session Terminated", "Your institutional access has been securely revoked.");
+    notify("info", "Session Terminated", "Institutional access securely revoked.");
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
     setMobileMenuOpen(false);
@@ -283,7 +235,7 @@ export default function App() {
                 >
                   <MenuIcon className="w-6 h-6" />
                 </button>
-                <div className="w-9 h-9 md:w-11 md:h-11 bg-[#0b0e14] flex items-center justify-center rounded-[8px] md:rounded-[10px] shadow-lg overflow-hidden">
+                <div className="w-9 h-9 md:w-11 md:h-11 bg-[#0b0e14] flex items-center justify-center rounded-[8px] md:rounded-[10px] shadow-lg overflow-hidden shrink-0">
                   <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
                 </div>
                 <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
@@ -303,7 +255,7 @@ export default function App() {
               </div>
 
               <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-2 md:gap-3 pl-2 cursor-pointer group select-none">
-                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform shrink-0">
                   {profile.avatar}
                 </div>
                 <div className="hidden sm:block">
@@ -378,15 +330,29 @@ export default function App() {
               </div>
             </aside>
 
-            <main className="flex-grow p-6 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
+            <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                    {activeTab === AppTab.HOME && <DashboardHome profile={profile} transactions={transactions} onNavigateTab={setActiveTab} onSelectAction={(action) => { if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET); else setActiveTab(AppTab.SERVICES); }} />}
-                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={transactions} onFundWallet={() => {}} onWithdrawWallet={async () => true} onTransfer={async () => true} />}
+                    {activeTab === AppTab.HOME && <DashboardHome profile={profile} transactions={cachedTransactions} onNavigateTab={setActiveTab} onSelectAction={(action) => { if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET); else setActiveTab(AppTab.SERVICES); }} />}
+                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={() => {}} onWithdrawWallet={async () => true} onTransfer={async () => true} />}
                     {activeTab === AppTab.TRADE && <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={() => {}} />}
                     {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async () => true} />}
-                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={() => {}} />}
-                    {activeTab === AppTab.ADMIN && profile.role === "admin" && <AdminSystem metrics={adminMetrics} profile={profile} onApproveKyc={() => {}} onUpdateSystemStatus={() => {}} />}
+                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={(p) => setProfile(prev => ({ ...prev, ...p }))} />}
+                    {activeTab === AppTab.ADMIN && profile.role === "admin" && (
+                      <AdminSystem 
+                        metrics={adminMetrics} 
+                        profile={profile} 
+                        onApproveKyc={() => {
+                          notify("success", "Compliance Verified", "Identity node has been authorized and synced.");
+                          // Invalidate cache to reflect new status
+                          setProfile(prev => ({ ...prev, kycStatus: "Verified" }));
+                        }} 
+                        onUpdateSystemStatus={(status) => {
+                          setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
+                          notify("info", "System State Changed", `Master node status set to ${status}`);
+                        }} 
+                      />
+                    )}
                  </motion.div>
               </AnimatePresence>
             </main>
