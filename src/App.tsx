@@ -10,12 +10,16 @@ import CryptoSystem from "./components/CryptoSystem";
 import TransactionHistory from "./components/TransactionHistory";
 import AdminSystem from "./components/AdminSystem";
 import UserProfileSettings from "./components/UserProfileSettings";
+import CookieConsent from "./components/CookieConsent";
 import { supabase } from "./supabase";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Home, Wallet, RefreshCw, Smartphone, User, Settings, Bell, 
   Sparkles, Menu, X, LogOut, CheckCircle2, ShieldAlert, ChevronRight,
   LayoutDashboard, Globe, ShieldCheck, Zap
 } from "lucide-react";
+
+import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
 
 export default function App() {
   // Global Navigation states
@@ -31,15 +35,18 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Compliance and Profile States
-  const [profile, setProfile] = useState<UserProfile>({
-    name: "Felix Anderson",
-    email: "felix@obey.finance",
-    phone: "+234 809 102 8824",
-    avatar: "FA",
-    kycStatus: "Verified",
-    balance: 142580.42,
-    promoCode: "OBEY-ELITE",
-    twoFactorEnabled: true
+  const [profile, setProfile] = useState<UserProfile>(() => {
+    const cached = localStorage.getItem("obey-profile-cache");
+    return cached ? JSON.parse(cached) : {
+      name: "Felix Anderson",
+      email: "felix@obey.finance",
+      phone: "+234 809 102 8824",
+      avatar: "FA",
+      kycStatus: "Verified",
+      balance: 142580.42,
+      promoCode: "OBEY-ELITE",
+      twoFactorEnabled: true
+    };
   });
 
   // Financial transactions ledger lines
@@ -54,6 +61,19 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
+  // Sync with MongoDB when profile or transactions change
+  useEffect(() => {
+    if (currentUser) {
+      syncUserWithMongoDB(currentUser.id, profile);
+    }
+  }, [profile, currentUser]);
+
+  useEffect(() => {
+    if (currentUser && transactions.length > 0) {
+      syncTransactionsWithMongoDB(currentUser.id, transactions);
+    }
+  }, [transactions, currentUser]);
+
   // Live Supabase connection check
   useEffect(() => {
     if (!supabase) return;
@@ -65,23 +85,62 @@ export default function App() {
         setCurrentScreen(AppScreen.DASHBOARD);
 
         const fetchProfile = async () => {
-          const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-          if (data) {
-            setProfile(prev => ({
-              ...prev,
-              name: data.full_name,
-              email: data.email,
-              phone: data.phone,
-              avatar: data.avatar_url || data.full_name[0],
-              kycStatus: data.kyc_status,
-              balance: data.balance,
-            }));
+          try {
+            const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+            if (error) throw error;
+            if (data) {
+              const updatedProfile: UserProfile = {
+                name: data.full_name,
+                email: data.email,
+                phone: data.phone,
+                avatar: data.avatar_url || data.full_name[0],
+                kycStatus: data.kyc_status,
+                balance: data.balance,
+                promoCode: "OBEY-ELITE",
+                twoFactorEnabled: true
+              };
+              setProfile(updatedProfile);
+              localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
+            }
+          } catch (error) {
+            console.warn("⚠️ Supabase Fetch Error, trying MongoDB fallback...");
+            const fallbackUser = await fetchUserFallback(user.id);
+            if (fallbackUser) setProfile(fallbackUser);
           }
         };
         fetchProfile();
+
+        const fetchTransactions = async () => {
+          try {
+            const { data, error } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+            if (error) throw error;
+            if (data && data.length > 0) {
+              setTransactions(data.map((tx: any) => ({
+                id: tx.id,
+                title: tx.title,
+                category: tx.category,
+                type: tx.type,
+                amount: tx.amount,
+                fee: tx.fee || 0,
+                date: new Date(tx.created_at).toLocaleDateString(),
+                time: new Date(tx.created_at).toLocaleTimeString(),
+                status: tx.status
+              })));
+            } else {
+              const fallbackTxs = await fetchTransactionsFallback(user.id);
+              if (fallbackTxs.length > 0) setTransactions(fallbackTxs);
+            }
+          } catch (error) {
+            const fallbackTxs = await fetchTransactionsFallback(user.id);
+            if (fallbackTxs.length > 0) setTransactions(fallbackTxs);
+          }
+        };
+        fetchTransactions();
+
       } else {
         setCurrentUser(null);
         setCurrentScreen(AppScreen.MARKETING);
+        localStorage.removeItem("obey-profile-cache");
       }
     });
 
@@ -386,6 +445,9 @@ export default function App() {
 
         </div>
       )}
+
+      {/* 4. UTILITIES */}
+      <CookieConsent />
 
     </div>
   );

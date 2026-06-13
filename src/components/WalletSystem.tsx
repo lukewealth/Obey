@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Copy, Check, DollarSign, ArrowDownLeft, ArrowUpRight, Send, 
   HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
-  CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star
+  CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp
 } from "lucide-react";
 
 interface WalletSystemProps {

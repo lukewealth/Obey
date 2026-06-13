@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ArrowDownLeft, Check, RefreshCw, DollarSign, 
   TrendingUp, TrendingDown, Coins, HelpCircle, ShieldAlert, Award,
-  ChevronRight, BarChart3, Search, Zap, Star, Activity, ArrowRight
+  ChevronRight, BarChart3, Search, Zap, Star, Activity, ArrowRight, ShieldCheck
 } from "lucide-react";
 
 interface CryptoSystemProps {

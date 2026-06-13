@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { UserProfile, Transaction } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
+import { z } from "zod";
 import { 
   Smartphone, Wifi, Check, RefreshCw, ChevronRight, 
   AlertTriangle, ShieldCheck, Download, Zap, Search,
-  ArrowRight, Landmark, CreditCard, Star, Activity
+  ArrowRight, Landmark, CreditCard, Star, Activity, DollarSign
 } from "lucide-react";
+
+const rechargeSchema = z.object({
+  phone: z.string().length(10, "Phone number must be exactly 10 digits"),
+  amount: z.string().refine((val) => !isNaN(parseFloat(val)) && parseFloat(val) > 0, {
+    message: "Amount must be a positive magnitude",
+  }),
+});
 
 interface AirtimeModuleProps {
   profile: UserProfile;
@@ -33,6 +41,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const [selectedProvider, setSelectedProvider] = useState<string>("mtn");
   const [phoneNo, setPhoneNo] = useState("");
   const [amount, setAmount] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [selectedDataPlan, setSelectedDataPlan] = useState<string>("");
   const [showCheckout, setShowCheckout] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -68,9 +77,29 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
 
   const handleOpenCheckout = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneNo || phoneNo.length < 10) return;
-    if (activeSegment === "airtime" && (!amount || parseFloat(amount) <= 0)) return;
-    if (activeSegment === "data" && !selectedDataPlan) return;
+    setErrors({});
+    
+    if (activeSegment === "airtime") {
+      const result = rechargeSchema.safeParse({ phone: phoneNo, amount });
+      if (!result.success) {
+        const fieldErrors: Record<string, string> = {};
+        result.error.issues.forEach((issue) => {
+          fieldErrors[issue.path[0] as string] = issue.message;
+        });
+        setErrors(fieldErrors);
+        return;
+      }
+    } else {
+      if (!phoneNo || phoneNo.length !== 10) {
+        setErrors({ phone: "Invalid node identifier" });
+        return;
+      }
+      if (!selectedDataPlan) {
+        alert("Please select a data plan");
+        return;
+      }
+    }
+    
     setShowCheckout(true);
   };
 

@@ -1,7 +1,15 @@
 import express, { Request, Response } from 'express';
+import { z } from 'zod';
 import * as interswitch from '../services/interswitch';
 
 const router = express.Router();
+
+const rechargeSchema = z.object({
+  paymentCode: z.string().min(1, 'Payment code is required'),
+  customerId: z.string().min(10, 'Invalid customer identifier'),
+  amount: z.number().positive('Amount must be greater than zero'),
+  requestReference: z.string().min(1, 'Reference is required')
+});
 
 // Get Billers (Telcos)
 router.get('/billers', async (req: Request, res: Response) => {
@@ -27,11 +35,16 @@ router.get('/payment-items/:serviceId', async (req: Request, res: Response) => {
 // Process Recharge
 router.post('/recharge', async (req: Request, res: Response) => {
   try {
-    const { paymentCode, customerId, amount, requestReference } = req.body;
+    const validation = rechargeSchema.safeParse(req.body);
     
-    if (!paymentCode || !customerId || !amount || !requestReference) {
-      return res.status(400).json({ error: 'Missing required parameters' });
+    if (!validation.success) {
+      return res.status(400).json({ 
+        error: 'Validation failed', 
+        details: validation.error.flatten().fieldErrors 
+      });
     }
+
+    const { paymentCode, customerId, amount, requestReference } = validation.data;
 
     const data = await interswitch.processRecharge({
       paymentCode,
@@ -42,7 +55,8 @@ router.post('/recharge', async (req: Request, res: Response) => {
 
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to process recharge' });
+    console.error('Recharge Error:', error);
+    res.status(500).json({ error: 'Internal system error processing request' });
   }
 });
 
