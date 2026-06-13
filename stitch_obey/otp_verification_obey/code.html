@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OBEY Fintech | Secure Verification</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .otp-input:focus {
+            box-shadow: 0 0 0 2px rgba(0, 87, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#004ee7",
+                        "on-secondary-container": "#004d66",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#6dd2ff",
+                        "on-surface-variant": "#434656",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-container": "#e5e8ff",
+                        "on-tertiary-fixed-variant": "#00522c",
+                        "tertiary-container": "#007943",
+                        "surface-dim": "#cbdbf5",
+                        "inverse-primary": "#b6c4ff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "surface": "#f8f9ff",
+                        "secondary-container": "#00c4fd",
+                        "error": "#ba1a1a",
+                        "tertiary": "#005e33",
+                        "outline-variant": "#c3c5d9",
+                        "surface-container-low": "#eff4ff",
+                        "primary": "#0043c8",
+                        "secondary-fixed": "#bfe9ff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#51df8e",
+                        "on-tertiary-container": "#98ffba",
+                        "on-primary-fixed": "#001550",
+                        "on-background": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#0057ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-surface": "#0b1c30",
+                        "primary-fixed": "#dce1ff",
+                        "on-tertiary-fixed": "#00210e",
+                        "surface-container": "#e5eeff",
+                        "tertiary-fixed": "#70fda7",
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "secondary": "#006685",
+                        "on-primary-fixed-variant": "#003ab2",
+                        "on-secondary-fixed-variant": "#004d65",
+                        "on-secondary": "#ffffff",
+                        "inverse-surface": "#213145",
+                        "on-secondary-fixed": "#001f2a",
+                        "outline": "#737688"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "3xl": "64px",
+                        "container-margin-mobile": "16px",
+                        "xl": "32px",
+                        "container-margin-desktop": "40px",
+                        "gutter": "24px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "2xl": "48px",
+                        "xs": "4px",
+                        "base": "4px",
+                        "sm": "8px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col items-center justify-center relative overflow-hidden">
+<!-- Background Decoration -->
+<div class="absolute inset-0 pointer-events-none z-0">
+<div class="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]"></div>
+<div class="absolute top-[60%] -right-[5%] w-[30%] h-[30%] bg-secondary/5 rounded-full blur-[100px]"></div>
+</div>
+<!-- Main Content Shell -->
+<main class="w-full max-w-lg px-container-margin-mobile z-10">
+<!-- Brand Header (Static Shell Requirement - Simplified for Transactional) -->
+<div class="mb-xl text-center">
+<h1 class="font-bold text-headline-lg text-primary tracking-tight mb-sm">OBEY Fintech</h1>
+<p class="font-body-md text-on-surface-variant max-w-xs mx-auto">Please enter the 6-digit security code sent to your registered device.</p>
+</div>
+<!-- Verification Card -->
+<section class="bg-surface-container-lowest rounded-xl p-lg shadow-[0px_12px_32px_-4px_rgba(0,0,0,0.08)] border border-outline-variant/30 relative overflow-hidden group">
+<!-- Subtle Progress Bar for Timer -->
+<div class="absolute top-0 left-0 h-1 bg-primary-container transition-all duration-1000 ease-linear" id="timer-progress" style="width: 100%"></div>
+<div class="flex flex-col gap-lg items-center pt-md">
+<!-- OTP Input Container -->
+<div class="flex gap-sm sm:gap-md" id="otp-container">
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="0" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="1" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="2" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="3" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="4" inputmode="numeric" maxlength="1" type="text"/>
+<input class="otp-input w-12 h-14 sm:w-16 sm:h-20 text-center font-bold text-headline-md rounded-lg bg-surface-container-low border-none focus:ring-2 focus:ring-primary-container transition-all duration-200 outline-none" data-index="5" inputmode="numeric" maxlength="1" type="text"/>
+</div>
+<!-- Footer Actions -->
+<div class="w-full flex flex-col items-center gap-md pt-md">
+<button class="w-full h-[56px] bg-primary text-on-primary font-label-md text-label-md rounded-lg flex items-center justify-center gap-sm hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20" id="verify-btn">
+                        Verify Securely
+                        <span class="material-symbols-outlined text-[20px]">shield_lock</span>
+</button>
+<div class="flex items-center justify-between w-full text-label-sm font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span id="countdown">Expiring in 01:59</span>
+</div>
+<button class="text-primary hover:underline disabled:text-outline-variant disabled:no-underline font-semibold" disabled="" id="resend-btn">
+                            Resend Code
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Security Badge -->
+<div class="mt-xl flex flex-col items-center gap-sm opacity-60">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-label-sm">encrypted</span>
+<span class="font-label-sm text-label-sm">256-bit AES Encryption</span>
+</div>
+<p class="text-label-sm text-on-surface-variant text-center px-lg">OBEY Fintech uses institutional-grade security to ensure your transactions remain private and secure.</p>
+</div>
+</main>
+<!-- Success Feedback Overlay (Hidden by Default) -->
+<div class="fixed inset-0 bg-surface/80 backdrop-blur-md z-50 hidden flex flex-col items-center justify-center text-center p-xl" id="success-overlay">
+<div class="w-24 h-24 bg-tertiary-fixed-dim rounded-full flex items-center justify-center mb-lg animate-bounce">
+<span class="material-symbols-outlined text-[48px] text-on-tertiary-fixed">check_circle</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-sm">Identity Verified</h2>
+<p class="font-body-md text-on-surface-variant">Your transaction is being authorized. Redirecting...</p>
+</div>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('.otp-input');
+            const verifyBtn = document.getElementById('verify-btn');
+            const countdownEl = document.getElementById('countdown');
+            const resendBtn = document.getElementById('resend-btn');
+            const timerProgress = document.getElementById('timer-progress');
+            const successOverlay = document.getElementById('success-overlay');
+
+            // 1. Focus handling logic
+            inputs.forEach((input, index) => {
+                input.addEventListener('keyup', (e) => {
+                    const val = e.target.value;
+                    if (val && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                    if (e.key === 'Backspace' && index > 0 && !val) {
+                        inputs[index - 1].focus();
+                    }
+                    checkCompletion();
+                });
+
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const data = e.clipboardData.getData('text').slice(0, 6).split('');
+                    data.forEach((char, i) => {
+                        if (inputs[i]) inputs[i].value = char;
+                    });
+                    inputs[Math.min(data.length, 5)].focus();
+                    checkCompletion();
+                });
+            });
+
+            function checkCompletion() {
+                const isComplete = Array.from(inputs).every(input => input.value.length === 1);
+                verifyBtn.style.opacity = isComplete ? '1' : '0.6';
+            }
+
+            // 2. Countdown Timer Logic
+            let timeLeft = 119; // 2 minutes
+            const totalTime = 119;
+            const timer = setInterval(() => {
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    resendBtn.disabled = false;
+                    countdownEl.textContent = 'Code expired';
+                    countdownEl.classList.add('text-error');
+                } else {
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    countdownEl.textContent = `Expiring in ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    
+                    // Progress bar mapping
+                    const percentage = (timeLeft / totalTime) * 100;
+                    timerProgress.style.width = `${percentage}%`;
+                    
+                    timeLeft--;
+                }
+            }, 1000);
+
+            // 3. Action interactions
+            verifyBtn.addEventListener('click', () => {
+                const code = Array.from(inputs).map(i => i.value).join('');
+                if (code.length === 6) {
+                    verifyBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Authorizing...';
+                    verifyBtn.disabled = true;
+                    
+                    setTimeout(() => {
+                        successOverlay.classList.remove('hidden');
+                    }, 1500);
+                }
+            });
+
+            resendBtn.addEventListener('click', () => {
+                location.reload(); // Simple simulation of a fresh flow
+            });
+
+            // Initial focus
+            inputs[0].focus();
+            checkCompletion();
+        });
+    </script>
+</body></html>

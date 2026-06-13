@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Information related to the user personal profile and compliance credentials.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Legal name of the user." },
+        "email": { "type": "string", "format": "email", "description": "Verified registry email address." },
+        "phone": { "type": "string", "description": "Contact telephone number." },
+        "avatar": { "type": "string", "description": "Calculated graphic initials representation." },
+        "kycStatus": { 
+          "type": "string", 
+          "enum": ["Unverified", "Pending", "Verified"],
+          "description": "Compliance clearing gate status."
+        },
+        "balance": { "type": "number", "description": "Durable wallet ledger liquid balance." },
+        "promoCode": { "type": "string", "description": "Affiliated promotional signup id." },
+        "twoFactorEnabled": { "type": "boolean", "description": "Dynamic sign-in security enforcement flag." }
+      },
+      "required": ["name", "email", "phone", "avatar", "kycStatus", "balance", "twoFactorEnabled"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Dynamic ledger flow of standard card, crypto, transfer, airtime, or utility exchanges.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Audit reference order index." },
+        "title": { "type": "string", "description": "Descriptive record heading." },
+        "category": { 
+          "type": "string", 
+          "enum": ["Electronics", "Transfer", "Dining", "Travel", "Food", "Crypto", "Airtime", "Data", "GiftCard"]
+        },
+        "type": { "type": "string", "enum": ["Debit", "Credit"] },
+        "amount": { "type": "number" },
+        "fee": { "type": "number" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["Success", "Processing", "Failed"] },
+        "recipientWallet": { "type": "string" },
+        "network": { "type": "string" },
+        "brand": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "type", "amount", "fee", "date", "time", "status"]
+    },
+    "SystemMetrics": {
+      "title": "SystemMetrics",
+      "description": "Platform aggregate trading parameters and obedience clearance status.",
+      "type": "object",
+      "properties": {
+        "totalUsers": { "type": "number" },
+        "totalVolume": { "type": "number" },
+        "monthlyRevenue": { "type": "number" },
+        "pendingKycCount": { "type": "number" },
+        "systemStatus": { "type": "string", "enum": ["OPERATIONAL", "DEGRADED", "MAINTENANCE"] }
+      },
+      "required": ["totalUsers", "totalVolume", "monthlyRevenue", "pendingKycCount", "systemStatus"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Secure compliance-linked personal profiles."
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Private sub-collection tracking each user's financial exchanges."
+    },
+    "/system/metrics": {
+      "schema": "SystemMetrics",
+      "description": "Central administration metrics document."
+    }
+  }
+}

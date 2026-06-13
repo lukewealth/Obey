@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Transaction History - OBEY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001550",
+                    "on-primary-container": "#e5e8ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-tint": "#004ee7",
+                    "on-secondary-fixed": "#001f2a",
+                    "secondary-container": "#00c4fd",
+                    "on-tertiary-fixed-variant": "#00522c",
+                    "surface-container-highest": "#d3e4fe",
+                    "tertiary": "#005e33",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#98ffba",
+                    "outline-variant": "#c3c5d9",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#0b1c30",
+                    "surface": "#f8f9ff",
+                    "on-primary-fixed-variant": "#003ab2",
+                    "on-surface": "#0b1c30",
+                    "primary-fixed": "#dce1ff",
+                    "on-secondary-container": "#004d66",
+                    "inverse-surface": "#213145",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "surface-container": "#e5eeff",
+                    "secondary": "#006685",
+                    "primary": "#0043c8",
+                    "background": "#f8f9ff",
+                    "tertiary-fixed-dim": "#51df8e",
+                    "secondary-fixed": "#bfe9ff",
+                    "primary-container": "#0057ff",
+                    "inverse-primary": "#b6c4ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-primary": "#ffffff",
+                    "outline": "#737688",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "tertiary-fixed": "#70fda7",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#00210e",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#f8f9ff",
+                    "tertiary-container": "#007943",
+                    "surface-dim": "#cbdbf5",
+                    "secondary-fixed-dim": "#6dd2ff",
+                    "on-surface-variant": "#434656",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed-variant": "#004d65"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "24px",
+                    "container-margin-desktop": "40px",
+                    "2xl": "48px",
+                    "3xl": "64px",
+                    "gutter": "24px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "xs": "4px",
+                    "container-margin-mobile": "16px",
+                    "md": "16px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .transaction-row { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .transaction-row.expanded { background-color: #f1f5f9; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_12px_32px_-4px_rgba(0,0,0,0.08)]">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvUnw7p4RdqAUns8tIUUSBnSuuHxiN0flAuybqLBQ8oEtOWso4qN7U0suxUZxDapfnu34A101gb1fbWm6APYuWOIhiSzNrtCPde0rX-U3WZcmF0wukjoBhRCig0eUlSgZjYNUz41f8jNCcpR43H7c8DBJKnpo37nkiXXe1KFXEPcrHgW3_9atpLphe9_7b5qqXkvIi6DYD-dENCX5xNGkStCmsYCrL1j--q6MoNt4d6JetbNKvS4wr_8LRT"/>
+</div>
+<h1 class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">OBEY</h1>
+</div>
+<button class="p-2 rounded-full hover:bg-primary/5 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-primary" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-gutter max-w-2xl mx-auto min-h-screen">
+<!-- Search & Filters -->
+<section class="mb-lg space-y-md">
+<div class="flex gap-3">
+<div class="relative flex-1 group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-primary transition-colors" data-icon="search">search</span>
+<input class="w-full h-12 pl-12 pr-4 bg-surface-container-low border-transparent border focus:border-primary focus:ring-0 rounded-xl font-body-md text-body-md transition-all" placeholder="Search transactions..." type="text"/>
+</div>
+<button class="flex items-center gap-2 h-12 px-5 bg-white border border-outline-variant rounded-xl font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined" data-icon="tune">tune</span>
+                    Filters
+                </button>
+</div>
+<!-- Quick Chips for Filters -->
+<div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2">
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-primary text-on-primary font-label-sm text-label-sm">All Time</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:border-primary">Payments</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:border-primary">Transfers</button>
+<button class="whitespace-nowrap px-4 py-1.5 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-sm text-label-sm hover:border-primary">Fees</button>
+</div>
+</section>
+<!-- Transaction List Grouped by Date -->
+<div class="space-y-lg">
+<!-- Group: Today -->
+<div>
+<h3 class="font-label-sm text-label-sm uppercase tracking-widest text-outline mb-md px-1">Today</h3>
+<div class="bg-white rounded-2xl overflow-hidden border border-outline-variant/50 shadow-[0px_4px_16px_-4px_rgba(0,0,0,0.04)]">
+<!-- Item 1 -->
+<div class="transaction-group" onclick="toggleExpand(this)">
+<div class="flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<div class="w-12 h-12 rounded-xl bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="wifi_tethering">wifi_tethering</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Data Subscription</p>
+<p class="font-label-sm text-label-sm text-outline">10:24 AM • Wallet</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-error">- $15.00</p>
+<p class="font-label-sm text-label-sm text-tertiary">Success</p>
+</div>
+</div>
+<div class="expandable-content h-0 overflow-hidden bg-surface-container-lowest/50 border-t border-outline-variant/30 transition-all duration-300">
+<div class="p-md flex gap-3">
+<button class="flex-1 h-10 rounded-lg bg-white border border-outline-variant font-label-sm text-label-sm text-on-surface hover:bg-surface transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span> Receipt
+                                </button>
+<button class="flex-1 h-10 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="replay">replay</span> Repeat
+                                </button>
+</div>
+</div>
+</div>
+<div class="h-[1px] mx-md bg-outline-variant/30"></div>
+<!-- Item 2 -->
+<div class="transaction-group" onclick="toggleExpand(this)">
+<div class="flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Wallet Funding</p>
+<p class="font-label-sm text-label-sm text-outline">08:15 AM • Bank Transfer</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-tertiary">+ $1,250.00</p>
+<p class="font-label-sm text-label-sm text-tertiary">Success</p>
+</div>
+</div>
+<div class="expandable-content h-0 overflow-hidden bg-surface-container-lowest/50 border-t border-outline-variant/30 transition-all duration-300">
+<div class="p-md flex gap-3">
+<button class="flex-1 h-10 rounded-lg bg-white border border-outline-variant font-label-sm text-label-sm text-on-surface hover:bg-surface transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span> Receipt
+                                </button>
+<button class="flex-1 h-10 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="replay">replay</span> Repeat
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Group: Yesterday -->
+<div>
+<h3 class="font-label-sm text-label-sm uppercase tracking-widest text-outline mb-md px-1">Yesterday</h3>
+<div class="bg-white rounded-2xl overflow-hidden border border-outline-variant/50 shadow-[0px_4px_16px_-4px_rgba(0,0,0,0.04)]">
+<!-- Item 3 -->
+<div class="transaction-group" onclick="toggleExpand(this)">
+<div class="flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<div class="w-12 h-12 rounded-xl bg-on-surface/5 flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Amazon.com</p>
+<p class="font-label-sm text-label-sm text-outline">04:30 PM • Card ending 4492</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-on-surface-variant">- $89.99</p>
+<p class="font-label-sm text-label-sm text-error">Failed</p>
+</div>
+</div>
+<div class="expandable-content h-0 overflow-hidden bg-surface-container-lowest/50 border-t border-outline-variant/30 transition-all duration-300">
+<div class="p-md flex flex-col gap-2">
+<p class="text-error font-label-sm text-label-sm px-1">Reason: Insufficient balance in linked account.</p>
+<div class="flex gap-3 mt-1">
+<button class="flex-1 h-10 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="refresh">refresh</span> Retry Payment
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<div class="h-[1px] mx-md bg-outline-variant/30"></div>
+<!-- Item 4 -->
+<div class="transaction-group" onclick="toggleExpand(this)">
+<div class="flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer select-none">
+<div class="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div class="flex-1">
+<p class="font-label-md text-label-md text-on-surface">Utility Bill</p>
+<p class="font-label-sm text-label-sm text-outline">09:10 AM • Direct Debit</p>
+</div>
+<div class="text-right">
+<p class="font-label-md text-label-md text-error">- $124.50</p>
+<p class="font-label-sm text-label-sm text-tertiary">Success</p>
+</div>
+</div>
+<div class="expandable-content h-0 overflow-hidden bg-surface-container-lowest/50 border-t border-outline-variant/30 transition-all duration-300">
+<div class="p-md flex gap-3">
+<button class="flex-1 h-10 rounded-lg bg-white border border-outline-variant font-label-sm text-label-sm text-on-surface hover:bg-surface transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="download">download</span> Receipt
+                                </button>
+<button class="flex-1 h-10 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm hover:opacity-90 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="replay">replay</span> Repeat
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty State Suggestion for more dates -->
+<div class="flex flex-col items-center py-2xl opacity-40">
+<span class="material-symbols-outlined text-4xl mb-sm" data-icon="history">history</span>
+<p class="font-label-sm text-label-sm">End of history for March 2024</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface/70 backdrop-blur-xl flex justify-around items-center px-4 py-3 pb-safe shadow-[0px_-8px_24px_-4px_rgba(0,0,0,0.06)] rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1.5 active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="account_balance_wallet" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Wallet</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="grid_view">grid_view</span>
+<span class="font-label-sm text-label-sm">Services</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="swap_horiz">swap_horiz</span>
+<span class="font-label-sm text-label-sm">Trade</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<script>
+        function toggleExpand(element) {
+            // Find the content div
+            const content = element.querySelector('.expandable-content');
+            const isOpen = content.style.height !== '0px' && content.style.height !== '';
+
+            // Close all others first (optional accordion behavior)
+            document.querySelectorAll('.expandable-content').forEach(el => {
+                el.style.height = '0px';
+                el.parentElement.classList.remove('bg-surface-container-low');
+            });
+
+            if (!isOpen) {
+                // Measure the actual content height
+                content.style.height = content.scrollHeight + 'px';
+                element.classList.add('bg-surface-container-low');
+            } else {
+                content.style.height = '0px';
+                element.classList.remove('bg-surface-container-low');
+            }
+        }
+    </script>
+</body></html>

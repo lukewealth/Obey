@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Buy Data - OBEY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001550",
+                        "on-primary-container": "#e5e8ff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-tint": "#004ee7",
+                        "on-secondary-fixed": "#001f2a",
+                        "secondary-container": "#00c4fd",
+                        "on-tertiary-fixed-variant": "#00522c",
+                        "surface-container-highest": "#d3e4fe",
+                        "tertiary": "#005e33",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#98ffba",
+                        "outline-variant": "#c3c5d9",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "on-background": "#0b1c30",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#003ab2",
+                        "on-surface": "#0b1c30",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-container": "#004d66",
+                        "inverse-surface": "#213145",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#d3e4fe",
+                        "surface-container": "#e5eeff",
+                        "secondary": "#006685",
+                        "primary": "#0043c8",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed-dim": "#51df8e",
+                        "secondary-fixed": "#bfe9ff",
+                        "primary-container": "#0057ff",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-container-high": "#dce9ff",
+                        "on-primary": "#ffffff",
+                        "outline": "#737688",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "tertiary-fixed": "#70fda7",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-fixed": "#00210e",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary-container": "#007943",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-fixed-dim": "#6dd2ff",
+                        "on-surface-variant": "#434656",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#004d65"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "container-margin-desktop": "40px",
+                        "2xl": "48px",
+                        "3xl": "64px",
+                        "gutter": "24px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "container-margin-mobile": "16px",
+                        "md": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .network-selected {
+            border: 2px solid #0057ff;
+            background-color: #eff4ff;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d3e4fe;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_12px_32px_-4px_rgba(0,0,0,0.08)]">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary p-2 active:scale-95 duration-200">arrow_back</button>
+<span class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">OBEY</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtYo_o05rtKT5-KKM4NlBPjpRUSN75YvpGBCqhgirVcypeSSt1g9xEVW4rgPVt5RhxiTfPPwseA3VMQAJA39iQlB38SGNemuTBmeBBw6-98OouLFR_e7zz4hgZGY2fAtpq9vtIjpignL7rOStgv2YM3qycQo_TNY9dlD3mao-tcG-q8UMEk_7p0o-pQVoa4F2H0n9xKVGcK9zQkEHM_QhCTQggDyeZwE471tgfs89n6gwSuZic_KtaUH_7l"/>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</div>
+</div>
+</header>
+<main class="pt-24 px-4 md:px-gutter max-w-7xl mx-auto">
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Input & Selection -->
+<div class="lg:col-span-7 space-y-8">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background mb-2">Buy Data Bundle</h1>
+<p class="text-on-surface-variant font-body-md">Stay connected with institutional-grade network speed.</p>
+</div>
+<!-- 1. Network Selection -->
+<div class="space-y-4">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Select Network</label>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+<!-- Network Card 1 -->
+<button class="network-btn group flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-outline-variant hover:border-primary transition-all duration-200" onclick="selectNetwork(this)">
+<div class="w-12 h-12 rounded-full bg-yellow-400 flex items-center justify-center mb-2 shadow-sm">
+<span class="font-bold text-black text-xs">MTN</span>
+</div>
+<span class="font-label-sm text-label-sm">MTN</span>
+</button>
+<!-- Network Card 2 -->
+<button class="network-btn group flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-outline-variant hover:border-primary transition-all duration-200" onclick="selectNetwork(this)">
+<div class="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center mb-2 shadow-sm">
+<span class="font-bold text-white text-xs">Airtel</span>
+</div>
+<span class="font-label-sm text-label-sm">Airtel</span>
+</button>
+<!-- Network Card 3 -->
+<button class="network-btn group flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-outline-variant hover:border-primary transition-all duration-200" onclick="selectNetwork(this)">
+<div class="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center mb-2 shadow-sm">
+<span class="font-bold text-white text-xs">Glo</span>
+</div>
+<span class="font-label-sm text-label-sm">Glo</span>
+</button>
+<!-- Network Card 4 -->
+<button class="network-btn group flex flex-col items-center justify-center p-4 rounded-xl bg-white border border-outline-variant hover:border-primary transition-all duration-200" onclick="selectNetwork(this)">
+<div class="w-12 h-12 rounded-full bg-green-400 flex items-center justify-center mb-2 shadow-sm">
+<span class="font-bold text-white text-[10px]">9mobile</span>
+</div>
+<span class="font-label-sm text-label-sm">9mobile</span>
+</button>
+</div>
+</div>
+<!-- 2. Phone Number Input -->
+<div class="space-y-4">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Recipient Details</label>
+<div class="relative group">
+<input class="w-full h-14 pl-4 pr-12 rounded-xl bg-[#F1F5F9] border-transparent focus:border-primary focus:ring-0 transition-all font-body-md" placeholder="Enter Phone Number" type="tel"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-primary hover:bg-primary/5 p-2 rounded-full">
+<span class="material-symbols-outlined">contact_page</span>
+</button>
+</div>
+<div class="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm active:scale-95 transition-transform">My Number</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">Dad (MTN)</button>
+<button class="whitespace-nowrap px-4 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">Work Sim</button>
+</div>
+</div>
+<!-- 3. Data Plan Selection -->
+<div class="space-y-4">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Choose Data Plan</label>
+<div class="space-y-3">
+<!-- Category: Monthly -->
+<div class="rounded-2xl border border-outline-variant overflow-hidden bg-white shadow-sm transition-all duration-300">
+<button class="w-full flex justify-between items-center px-6 py-4 bg-primary/5 hover:bg-primary/10" onclick="toggleAccordion('monthly')">
+<span class="font-label-md text-label-md text-primary uppercase">Monthly Plans</span>
+<span class="material-symbols-outlined transition-transform" id="monthly-icon">expand_more</span>
+</button>
+<div class="p-4 space-y-3" id="monthly-content">
+<button class="plan-card w-full flex justify-between items-center p-4 rounded-xl border border-outline-variant hover:border-primary transition-all" onclick="selectPlan(this, '5GB', '₦1,200')">
+<div class="text-left">
+<p class="font-headline-md text-headline-md">5GB</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Valid for 30 Days</p>
+</div>
+<span class="font-headline-md text-headline-md text-primary">₦1,200</span>
+</button>
+<button class="plan-card w-full flex justify-between items-center p-4 rounded-xl border border-outline-variant hover:border-primary transition-all" onclick="selectPlan(this, '12GB', '₦3,500')">
+<div class="text-left">
+<p class="font-headline-md text-headline-md">12GB</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Valid for 30 Days</p>
+</div>
+<span class="font-headline-md text-headline-md text-primary">₦3,500</span>
+</button>
+</div>
+</div>
+<!-- Category: Weekly -->
+<div class="rounded-2xl border border-outline-variant overflow-hidden bg-white shadow-sm transition-all duration-300">
+<button class="w-full flex justify-between items-center px-6 py-4 bg-primary/5 hover:bg-primary/10" onclick="toggleAccordion('weekly')">
+<span class="font-label-md text-label-md text-primary uppercase">Weekly Plans</span>
+<span class="material-symbols-outlined transition-transform" id="weekly-icon">expand_more</span>
+</button>
+<div class="hidden p-4 space-y-3" id="weekly-content">
+<button class="plan-card w-full flex justify-between items-center p-4 rounded-xl border border-outline-variant hover:border-primary transition-all" onclick="selectPlan(this, '1.5GB', '₦500')">
+<div class="text-left">
+<p class="font-headline-md text-headline-md">1.5GB</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Valid for 7 Days</p>
+</div>
+<span class="font-headline-md text-headline-md text-primary">₦500</span>
+</button>
+</div>
+</div>
+<!-- Category: Daily -->
+<div class="rounded-2xl border border-outline-variant overflow-hidden bg-white shadow-sm transition-all duration-300">
+<button class="w-full flex justify-between items-center px-6 py-4 bg-primary/5 hover:bg-primary/10" onclick="toggleAccordion('daily')">
+<span class="font-label-md text-label-md text-primary uppercase">Daily Plans</span>
+<span class="material-symbols-outlined transition-transform" id="daily-icon">expand_more</span>
+</button>
+<div class="hidden p-4 space-y-3" id="daily-content">
+<button class="plan-card w-full flex justify-between items-center p-4 rounded-xl border border-outline-variant hover:border-primary transition-all" onclick="selectPlan(this, '200MB', '₦100')">
+<div class="text-left">
+<p class="font-headline-md text-headline-md">200MB</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Valid for 24 Hours</p>
+</div>
+<span class="font-headline-md text-headline-md text-primary">₦100</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Summary Card -->
+<div class="lg:col-span-5 relative">
+<div class="sticky top-24 space-y-6">
+<div class="bg-inverse-surface rounded-3xl p-lg text-white shadow-2xl overflow-hidden relative">
+<div class="absolute -top-10 -right-10 w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full"></div>
+<h2 class="font-headline-md text-headline-md mb-8">Review Transaction</h2>
+<div class="space-y-6">
+<div class="flex justify-between items-center pb-4 border-b border-white/10">
+<span class="text-white/60 font-label-md text-label-md">Network</span>
+<span class="font-label-md text-label-md text-secondary-container" id="summary-network">MTN</span>
+</div>
+<div class="flex justify-between items-center pb-4 border-b border-white/10">
+<span class="text-white/60 font-label-md text-label-md">Data Plan</span>
+<span class="font-label-md text-label-md" id="summary-plan">5GB (Monthly)</span>
+</div>
+<div class="flex justify-between items-center pb-4 border-b border-white/10">
+<span class="text-white/60 font-label-md text-label-md">Number</span>
+<span class="font-label-md text-label-md" id="summary-number">0803 123 4567</span>
+</div>
+<div class="pt-4 flex justify-between items-end">
+<div>
+<p class="text-white/60 font-label-sm text-label-sm uppercase mb-1">Total Amount</p>
+<p class="font-display-lg text-display-lg text-secondary-container" id="summary-total">₦1,200</p>
+</div>
+<div class="bg-white/10 p-3 rounded-2xl glass-card border border-white/5">
+<span class="material-symbols-outlined text-white">receipt_long</span>
+</div>
+</div>
+</div>
+<button class="w-full mt-10 h-16 bg-primary-container text-white font-headline-md text-headline-md rounded-2xl hover:brightness-110 active:scale-95 transition-all shadow-lg flex items-center justify-center gap-3">
+                            Review &amp; Pay
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<div class="p-6 rounded-3xl bg-surface-container-low border border-outline-variant flex items-start gap-4">
+<div class="p-2 rounded-full bg-tertiary-fixed-dim/30 text-tertiary">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Secure Financial SaaS</p>
+<p class="text-label-sm text-label-sm text-on-surface-variant mt-1">Transaction encrypted with OBEY bank-grade security protocols.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_-8px_24px_-4px_rgba(0,0,0,0.06)] rounded-t-xl">
+<div class="flex justify-around items-center px-4 py-3 pb-safe max-w-lg mx-auto">
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-3 py-1.5" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-3 py-1.5" href="#">
+<span class="material-symbols-outlined mb-1">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Wallet</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">grid_view</span>
+<span class="font-label-sm text-label-sm">Services</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-3 py-1.5" href="#">
+<span class="material-symbols-outlined mb-1">swap_horiz</span>
+<span class="font-label-sm text-label-sm">Trade</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:text-primary transition-all px-3 py-1.5" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</div>
+</nav>
+<script>
+        function toggleAccordion(id) {
+            const content = document.getElementById(`${id}-content`);
+            const icon = document.getElementById(`${id}-icon`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function selectNetwork(btn) {
+            document.querySelectorAll('.network-btn').forEach(b => b.classList.remove('network-selected'));
+            btn.classList.add('network-selected');
+            document.getElementById('summary-network').innerText = btn.querySelector('.font-label-sm').innerText;
+        }
+
+        function selectPlan(btn, plan, price) {
+            document.querySelectorAll('.plan-card').forEach(b => {
+                b.classList.remove('border-primary', 'bg-primary/5');
+            });
+            btn.classList.add('border-primary', 'bg-primary/5');
+            
+            document.getElementById('summary-plan').innerText = plan;
+            document.getElementById('summary-total').innerText = price;
+        }
+    </script>
+</body></html>

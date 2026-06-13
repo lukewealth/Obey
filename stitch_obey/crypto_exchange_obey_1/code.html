@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OBEY | Crypto Exchange</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#f6ba92",
+                        "on-primary-fixed": "#141545",
+                        "on-tertiary-fixed-variant": "#663d1e",
+                        "surface-container": "#f0edf2",
+                        "outline": "#777680",
+                        "secondary": "#0040df",
+                        "on-tertiary-container": "#b07d59",
+                        "surface-tint": "#585a8d",
+                        "surface-container-low": "#f6f2f7",
+                        "on-background": "#1c1b1f",
+                        "primary-fixed-dim": "#c1c1fc",
+                        "tertiary": "#150600",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-secondary-container": "#efefff",
+                        "tertiary-container": "#381800",
+                        "inverse-primary": "#c1c1fc",
+                        "on-surface": "#1c1b1f",
+                        "secondary-fixed": "#dde1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e5e1e6",
+                        "on-tertiary-fixed": "#301400",
+                        "surface-container-high": "#eae7ec",
+                        "surface": "#fcf8fd",
+                        "surface-bright": "#fcf8fd",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c8c5d0",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#46464f",
+                        "background": "#fcf8fd",
+                        "primary": "#020135",
+                        "on-primary-container": "#8384ba",
+                        "inverse-surface": "#313034",
+                        "on-secondary-fixed": "#001355",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "on-primary-fixed-variant": "#404273",
+                        "inverse-on-surface": "#f3eff4",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dcd9de",
+                        "secondary-container": "#2d5bff",
+                        "surface-container-highest": "#e5e1e6",
+                        "primary-container": "#1a1b4b",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "primary-fixed": "#e1e0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "gutter-mobile": "12px",
+                        "container-padding-mobile": "16px",
+                        "container-padding-desktop": "32px",
+                        "gutter-desktop": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "title-md": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #fcf8fd; color: #1c1b1f; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-header { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .active-tab-indicator { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .crypto-card-hover:hover { border-color: #0040df; background-color: #f6f2f7; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex items-center justify-between px-container-padding-mobile h-16 w-full">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvw6NtNdEEqbuukyEzNuvmes5yPY3dTvtKby5dUJR4CEtZJcBe9KcNttpQ-PMYsSz1QIlWwl6anDkJ4pQtfNqVNsTGG_BmNbXWmWH-JECtbP_84YV3oVvjMWd4OSfZuz7bLPXxjwUbuf2OPfkx8EbXoJznivObKW6jQ8hlZByuun__MR7_iHt46nyJ7hbW0QWAMvCfyGcXyj7040t3CQFxLsEuu_ibI5wtc0DRm9VLMDC8nAZUD2n3K7ONH"/>
+</div>
+<h1 class="font-display-lg text-display-lg font-bold tracking-tighter text-primary">OBEY</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-primary">search</span>
+</button>
+</div>
+</header>
+<main class="max-w-[1440px] mx-auto px-container-padding-mobile md:px-container-padding-desktop py-stack-lg grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop">
+<!-- Left Column: Chart & Asset Selection -->
+<div class="lg:col-span-8 flex flex-col gap-gutter-desktop">
+<!-- Interactive Price Chart Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 overflow-hidden">
+<div class="p-stack-md flex justify-between items-end border-b border-outline-variant/20">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="font-label-caps text-label-caps text-on-surface-variant">BTC / USD</span>
+<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[10px] font-bold">+2.45%</span>
+</div>
+<h2 class="font-display-lg text-[32px] leading-tight font-bold text-primary">$64,231.80</h2>
+</div>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-label-caps font-bold text-primary border border-primary rounded hover:bg-primary/5 transition-colors">1H</button>
+<button class="px-3 py-1 text-label-caps font-bold text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1D</button>
+<button class="px-3 py-1 text-label-caps font-bold text-on-surface-variant hover:bg-surface-container-high rounded transition-colors">1W</button>
+</div>
+</div>
+<div class="h-64 relative w-full bg-surface-container-low/30">
+<!-- Placeholder for the interactive chart. Using a stylized SVG line to represent data -->
+<svg class="w-full h-full px-4" preserveaspectratio="none" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0040df" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#0040df" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 Q100,140 200,160 T400,100 T600,120 T800,40 T1000,60" fill="none" stroke="#0040df" stroke-linecap="round" stroke-width="3"></path>
+<path d="M0,150 Q100,140 200,160 T400,100 T600,120 T800,40 T1000,60 V200 H0 Z" fill="url(#chartGradient)"></path>
+<circle cx="800" cy="40" fill="#0040df" r="4"></circle>
+</svg>
+<!-- Floating Indicator -->
+<div class="absolute top-10 left-[80%] -translate-x-1/2 bg-primary text-on-primary text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none">
+                        $68,402.12
+                    </div>
+</div>
+</section>
+<!-- Asset Selection Grid -->
+<section>
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-title-md text-title-md text-primary">Market Overview</h3>
+<button class="text-secondary font-label-caps hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- BTC -->
+<div class="crypto-card-hover bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#F7931A]/10 flex items-center justify-center">
+<img alt="Bitcoin" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AP1WRLtQX4Re1UqJOmuVtfkGUuZbhgFvHuuJg7pP-6jLm-a04jfLZ8_3tgQwcpYVh54NWS0fdhdMrE8j_YagcGKYQiTMBEskztdyQKEapuuYWRh7iIwu12yKkD7qyF4_sAiZqjlcKsFQmmeSUvemKQPF5jHB0Iw9ZP92dhMcBkoBuPgXixCzy258-3BVdYMEKzJ23Z-nmOyHblsibPQoJYTbIo04mmIFkGck5SynLTiSAyIVYL_78cFZLqdrnIM9"/>
+</div>
+<div>
+<p class="font-title-md text-body-lg font-bold">Bitcoin</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">BTC</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-data-mono text-body-lg">$64,231.80</p>
+<p class="text-[12px] text-emerald-600 font-bold">+2.45%</p>
+</div>
+</div>
+<!-- ETH -->
+<div class="crypto-card-hover bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#627EEA]/10 flex items-center justify-center">
+<img alt="Ethereum" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AP1WRLv86tzl3ybYfwpjl-tcWiBCWGzQ4-JY5HVPDxwxFKw1gH7XyQMV3VS2vEWVqwBw_YA6kc-t0r5HiJEoM86nwo_Ji_YyMY8xNP_XExkrAlsXd4KyedqZW-HIWkqHQQ_ARw5XESs4iEwYf1jNKZvJIGiEW-RT-kNyFPg4o8Xq4Y07P6-Fq8fv8P7KJzLUMiAOSlHoWx1wzR0_0G-6vPJnBIqmIGHp0leLNiuCmlMr4LxgZiyU2oOxg5ss8_Eq"/>
+</div>
+<div>
+<p class="font-title-md text-body-lg font-bold">Ethereum</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">ETH</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-data-mono text-body-lg">$3,452.12</p>
+<p class="text-[12px] text-error font-bold">-0.82%</p>
+</div>
+</div>
+<!-- SOL -->
+<div class="crypto-card-hover bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#14F195]/10 flex items-center justify-center">
+<img alt="Solana" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AP1WRLu5AnKynkygtidOAFJmz-f7-GjKSNfWQx3pjZ3wtsW-LPxVHbZS_LPW0UZoJ2j4DYUKhMc1DbJZSbItA1NCy0RnolAJebPsPuEdy3V0IHjV9PRr73SLBmdXITm8UKU4zwkJPCh1n9riXhHlfX-lvVdFnOkBk1iVW6IzTwvrkNcHO5qCBUd2_PIWW4zbqLsl5Eydc1-KREQuoZfzaJw4nyo8QrrWTqVhyj1IEUlxehlPaLhyV03EV9RKRRg"/>
+</div>
+<div>
+<p class="font-title-md text-body-lg font-bold">Solana</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">SOL</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-data-mono text-body-lg">$142.65</p>
+<p class="text-[12px] text-emerald-600 font-bold">+5.12%</p>
+</div>
+</div>
+<!-- USDT -->
+<div class="crypto-card-hover bg-surface-container-lowest border border-outline-variant/30 p-stack-md rounded-xl flex items-center justify-between cursor-pointer transition-all active:scale-98 border-secondary/40">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-[#26A17B]/10 flex items-center justify-center">
+<img alt="Tether" class="w-6 h-6" src="https://lh3.googleusercontent.com/aida/AP1WRLuCFSWFfAhFPnM4xx0MsST_GwqeUcS1VMFEoXeefUMXgtzzyalJ-jr8KIzkeIhaq0M_pv0hQNUi6izk3JetCFiNfbmeuQQkr3Zk6gkxA0UFuPqH3BIg07OgOm-MpdlVXPwekZ-x1nq2R-H8aYiYe_Rp3FlagAkZrenBjYIRsEUVtLvJCXcoM81HDL2MgkB4bX0P9EMGZV4lSc1nBUMqcJC_Q813bDk0UcOtwe0wyh4uwAw1vdw6bNHWnhRi"/>
+</div>
+<div>
+<p class="font-title-md text-body-lg font-bold">Tether</p>
+<p class="font-label-caps text-[10px] text-on-surface-variant">USDT</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-data-mono text-body-lg">$1.00</p>
+<p class="text-[12px] text-on-surface-variant font-bold">0.00%</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Trade Terminal -->
+<div class="lg:col-span-4">
+<div class="sticky top-20 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-xl overflow-hidden">
+<!-- Buy/Sell Toggle -->
+<div class="p-unit bg-surface-container flex rounded-t-2xl m-stack-md">
+<button class="flex-1 py-3 font-label-caps text-label-caps rounded-lg bg-surface-container-lowest text-primary shadow-sm transition-all duration-200">BUY</button>
+<button class="flex-1 py-3 font-label-caps text-label-caps text-on-surface-variant hover:text-primary transition-all duration-200">SELL</button>
+</div>
+<div class="p-stack-md space-y-stack-md">
+<!-- Asset Input -->
+<div class="space-y-stack-sm">
+<label class="font-body-sm font-bold text-on-surface-variant block">I want to pay</label>
+<div class="relative group">
+<input class="w-full bg-surface-container-lowest border border-outline-variant rounded-xl px-4 py-5 text-display-lg font-data-mono focus:ring-2 focus:ring-secondary/20 focus:border-secondary outline-none transition-all placeholder:text-outline-variant" placeholder="0.00" type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+<button class="text-secondary font-label-caps text-[10px] bg-secondary-container/20 px-2 py-1 rounded hover:bg-secondary-container/40 transition-colors">MAX</button>
+<span class="font-title-md text-primary">USD</span>
+</div>
+</div>
+</div>
+<!-- Swap Icon -->
+<div class="flex justify-center -my-3 relative z-10">
+<button class="w-10 h-10 rounded-full bg-surface-container-lowest border border-outline-variant flex items-center justify-center hover:bg-surface-container transition-transform active:rotate-180 duration-500 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant">swap_vert</span>
+</button>
+</div>
+<!-- Receive Asset Input -->
+<div class="space-y-stack-sm">
+<label class="font-body-sm font-bold text-on-surface-variant block">I will receive</label>
+<div class="flex items-center gap-stack-md bg-surface-container-low p-4 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded-lg border border-outline-variant shadow-sm cursor-pointer hover:bg-white transition-colors">
+<img alt="BTC" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida/AP1WRLtI99Jvujd7IX77esWHXFClgLojONl4O_NtB3Q7CtRmR0rDFr5XPl4TLyHVVDGHeyX19jaBjnD7GVg2x__7hr-wbDgITByBCaPUsfWfkgUUhrl36bcgAvxypqZSIXxWVFEEy3iJRnsS_CFQXXz7I0HUvWq43xFAtW3NOVW83LrgMUoasLxhfEb9FvRptFvSppEZ3X7zxX_j8l23B5uQnRl0qA8ghFHVugVLGXF_R4FLgeQXJZpCkPMDPnM"/>
+<span class="font-label-caps font-bold">BTC</span>
+<span class="material-symbols-outlined text-[16px]">expand_more</span>
+</div>
+<div class="flex-1 text-right">
+<p class="font-data-mono text-title-md">0.0000</p>
+<p class="text-[10px] text-on-surface-variant">≈ $0.00</p>
+</div>
+</div>
+</div>
+<!-- Payment Method -->
+<div class="space-y-stack-sm pt-2">
+<label class="font-body-sm font-bold text-on-surface-variant block">Payment Method</label>
+<div class="flex flex-col gap-2">
+<button class="flex items-center justify-between p-4 rounded-xl border border-secondary bg-secondary-container/5 hover:bg-secondary-container/10 transition-colors text-left">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">account_balance</span>
+<div>
+<p class="font-label-caps text-[12px] font-bold text-primary">Bank Transfer</p>
+<p class="text-[10px] text-on-surface-variant">No fee • 1-2 mins</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary text-[20px]">check_circle</span>
+</button>
+<button class="flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:border-secondary transition-colors text-left">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant">credit_card</span>
+<div>
+<p class="font-label-caps text-[12px] font-bold text-on-surface">Credit / Debit Card</p>
+<p class="text-[10px] text-on-surface-variant">2.5% fee • Instant</p>
+</div>
+</div>
+</button>
+</div>
+</div>
+<!-- Quote Details -->
+<div class="bg-surface-container-low/50 p-stack-md rounded-xl space-y-2">
+<div class="flex justify-between items-center text-[12px]">
+<span class="text-on-surface-variant">Exchange Rate</span>
+<span class="font-data-mono text-on-surface">1 BTC = $64,231.80</span>
+</div>
+<div class="flex justify-between items-center text-[12px]">
+<span class="text-on-surface-variant">Transaction Fee</span>
+<span class="font-data-mono text-on-surface">$0.00</span>
+</div>
+<div class="flex justify-between items-center pt-2 border-t border-outline-variant/20">
+<span class="font-bold text-primary">Total to receive</span>
+<span class="font-data-mono font-bold text-secondary">0.0000 BTC</span>
+</div>
+</div>
+<!-- Buy Button -->
+<button class="w-full bg-secondary py-5 rounded-xl text-on-secondary font-label-caps tracking-widest font-bold shadow-lg shadow-secondary/20 hover:bg-[#0035bd] transition-all active:scale-[0.98] transform flex items-center justify-center gap-2">
+                        BUY NOW
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.04)] h-20 pb-safe px-unit flex justify-around items-center">
+<a class="flex flex-col items-center justify-center gap-1 text-secondary font-bold active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-caps text-[10px]">Wallet</span>
+</a>
+<div class="relative -top-4">
+<button class="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-white shadow-xl shadow-secondary/40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[32px]">currency_exchange</span>
+</button>
+</div>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">show_chart</span>
+<span class="font-label-caps text-[10px]">Market</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant hover:bg-surface-container-high transition-all active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-[10px]">Profile</span>
+</a>
+</nav>
+<!-- Background Decoration -->
+<div class="fixed top-0 right-0 -z-10 opacity-20 pointer-events-none">
+<svg fill="none" height="600" viewbox="0 0 600 600" width="600" xmlns="http://www.w3.org/2000/svg">
+<circle cx="450" cy="150" fill="url(#paint0_radial_123)" r="150"></circle>
+<defs>
+<radialgradient cx="0" cy="0" gradienttransform="translate(450 150) rotate(90) scale(150)" gradientunits="userSpaceOnUse" id="paint0_radial_123" r="1">
+<stop stop-color="#0040df" stop-opacity="0.6"></stop>
+<stop offset="1" stop-color="#fcf8fd" stop-opacity="0"></stop>
+</radialgradient>
+</defs>
+</svg>
+</div>
+<script>
+        // Micro-interaction for the trade toggle
+        const toggleButtons = document.querySelectorAll('[class*="flex-1 py-3 font-label-caps"]');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                toggleButtons.forEach(b => {
+                    b.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                btn.classList.remove('text-on-surface-variant');
+                
+                // Logic to swap colors of the main action button based on context
+                const mainBtn = document.querySelector('button[class*="bg-secondary py-5"]');
+                if (btn.innerText === 'SELL') {
+                    mainBtn.classList.remove('bg-secondary');
+                    mainBtn.classList.add('bg-error');
+                    mainBtn.innerHTML = `SELL NOW <span class="material-symbols-outlined text-[18px]">arrow_forward</span>`;
+                } else {
+                    mainBtn.classList.add('bg-secondary');
+                    mainBtn.classList.remove('bg-error');
+                    mainBtn.innerHTML = `BUY NOW <span class="material-symbols-outlined text-[18px]">arrow_forward</span>`;
+                }
+            });
+        });
+
+        // Simple Input Interaction
+        const inputField = document.querySelector('input[type="text"]');
+        inputField.addEventListener('input', (e) => {
+            // Placeholder logic to update the conversion
+            const val = parseFloat(e.target.value) || 0;
+            const btcVal = (val / 64231.80).toFixed(6);
+            document.querySelector('.font-data-mono.text-title-md').innerText = btcVal;
+            document.querySelector('.text-secondary.font-data-mono.font-bold').innerText = btcVal + ' BTC';
+        });
+    </script>
+</body></html>

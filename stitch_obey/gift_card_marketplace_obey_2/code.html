@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OBEY | Premium Gift Card Marketplace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed-dim": "#f6ba92",
+                    "on-primary-fixed": "#141545",
+                    "on-tertiary-fixed-variant": "#663d1e",
+                    "surface-container": "#f0edf2",
+                    "outline": "#777680",
+                    "secondary": "#0040df",
+                    "on-tertiary-container": "#b07d59",
+                    "surface-tint": "#585a8d",
+                    "surface-container-low": "#f6f2f7",
+                    "on-background": "#1c1b1f",
+                    "primary-fixed-dim": "#c1c1fc",
+                    "tertiary": "#150600",
+                    "tertiary-fixed": "#ffdcc6",
+                    "on-secondary-container": "#efefff",
+                    "tertiary-container": "#381800",
+                    "inverse-primary": "#c1c1fc",
+                    "on-surface": "#1c1b1f",
+                    "secondary-fixed": "#dde1ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e5e1e6",
+                    "on-tertiary-fixed": "#301400",
+                    "surface-container-high": "#eae7ec",
+                    "surface": "#fcf8fd",
+                    "surface-bright": "#fcf8fd",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c8c5d0",
+                    "on-error": "#ffffff",
+                    "on-surface-variant": "#46464f",
+                    "background": "#fcf8fd",
+                    "primary": "#020135",
+                    "on-primary-container": "#8384ba",
+                    "inverse-surface": "#313034",
+                    "on-secondary-fixed": "#001355",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed-variant": "#0035bd",
+                    "on-primary-fixed-variant": "#404273",
+                    "inverse-on-surface": "#f3eff4",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#dcd9de",
+                    "secondary-container": "#2d5bff",
+                    "surface-container-highest": "#e5e1e6",
+                    "primary-container": "#1a1b4b",
+                    "secondary-fixed-dim": "#b8c3ff",
+                    "primary-fixed": "#e1e0ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "stack-sm": "8px",
+                    "gutter-mobile": "12px",
+                    "container-padding-mobile": "16px",
+                    "container-padding-desktop": "32px",
+                    "gutter-desktop": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "data-mono": ["JetBrains Mono"],
+                    "title-md": ["Inter"],
+                    "label-caps": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .active-tab-indicator {
+            view-transition-name: active-tab;
+        }
+        .glass-header {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scale-on-click:active {
+            transform: scale(0.96);
+            transition: transform 0.1s ease;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen pb-24 md:pb-0">
+<!-- Top App Bar -->
+<header class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20 flex items-center justify-between px-container-padding-mobile h-16 w-full">
+<div class="flex items-center gap-stack-md">
+<span class="font-display-lg text-display-lg font-bold tracking-tighter text-primary dark:text-primary-fixed">OBEY</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-primary dark:text-primary-fixed font-bold text-label-caps font-label-caps" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary transition-colors text-label-caps font-label-caps" href="#">Wallet</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary transition-colors text-label-caps font-label-caps" href="#">Trade</a>
+<a class="text-on-surface-variant dark:text-outline hover:text-primary transition-colors text-label-caps font-label-caps" href="#">Profile</a>
+</nav>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Profile" data-alt="A professional high-quality headshot of a modern executive in a soft-lit studio setting. The lighting is bright and clean, matching a professional fintech application aesthetic. The background is a neutral, soft grey, emphasizing the clarity and trust required for a premium digital financial service. The subject is smiling warmly, conveying reliability and expertise." src="https://lh3.googleusercontent.com/aida/AP1WRLvj6zkjospapQ56RQoSyML90nzERiujKMnOoNzBM3fYEcDKJJ16UOSVzlHhB1tEePbYGjGM2exfuQABOo6HRykbNrlsm-bpmbB39zZe8TDOlr41qs3CWhJuJUA-vVf5YhMCywvseFft7t57eMcfRiZPsLfUXVpm0U_VByAG3cscQR4OLxBlmhXHlS62L6rMmUytfds7lmkfyhvLuzmZsyV434DpaJ9OcnIcm_zQsDpZ8XwdWimgzUo8-qb8"/>
+</div>
+</div>
+<div class="flex md:hidden items-center gap-stack-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Profile" data-alt="Close up profile photo for a user account in a sleek mobile interface. High-key lighting with a clean white and soft indigo color palette. Professional photography style, sharp focus, vibrant and clear skin tones against a minimal background." src="https://lh3.googleusercontent.com/aida/AP1WRLugrK_lIqfGL763tJARdC-TxNfRAMFCRT49KCYoIhwyyXyYuNq_1h6z6o2AlghwIpUIi16LC-HQKWsHZ0tnOFC_z3Tu_Y4KhdoEySmhUk3hrmE5i8IaRFHheFnim_6lohBNYwVkC928fxoVEZCi2KcblST7fjVHhpdg9ZKD8PlMwx1e_pjrL8BxUBOqOdMSdAQo1WQcKOFmKXPQx1ElTKtK48PKRZGLsHCL1ybmGeksdTTqST3ytrwsrBLx"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-container-padding-mobile md:px-container-padding-desktop py-stack-lg">
+<!-- Marketplace Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter-desktop items-start">
+<!-- Left Column: Search & Tabs & Brands -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<div class="flex flex-col gap-stack-md">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary">Marketplace</h1>
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline group-focus-within:text-secondary transition-colors">search</span>
+<input class="w-full h-14 pl-12 pr-4 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-secondary/30 focus:border-secondary outline-none transition-all font-body-lg text-body-lg" placeholder="Search for brands (e.g. Apple, Amazon)" type="text"/>
+</div>
+</div>
+<!-- Buy/Sell Switcher -->
+<div class="p-1 bg-surface-container rounded-xl inline-flex w-full md:w-auto">
+<button class="flex-1 md:w-40 py-3 rounded-lg text-label-caps font-label-caps transition-all bg-white text-primary shadow-sm font-bold" id="buyTab" onclick="switchTab('buy')">Buy</button>
+<button class="flex-1 md:w-40 py-3 rounded-lg text-label-caps font-label-caps transition-all text-on-surface-variant hover:text-primary" id="sellTab" onclick="switchTab('sell')">Sell</button>
+</div>
+<!-- Featured Brands Bento Grid -->
+<div>
+<div class="flex justify-between items-center mb-stack-md">
+<h2 class="font-title-md text-title-md text-primary">Featured Brands</h2>
+<button class="text-secondary font-bold text-label-caps font-label-caps flex items-center gap-1">View All <span class="material-symbols-outlined text-[16px]">arrow_forward</span></button>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-gutter-mobile md:gap-gutter-desktop">
+<!-- Apple -->
+<div class="group bg-white border border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:shadow-lg hover:border-secondary transition-all cursor-pointer scale-on-click">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary">apps</span>
+</div>
+<span class="font-title-md text-body-lg text-primary">Apple</span>
+<span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-data-mono text-data-mono">+4.2%</span>
+</div>
+<!-- Amazon -->
+<div class="group bg-white border border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:shadow-lg hover:border-secondary transition-all cursor-pointer scale-on-click">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary">shopping_bag</span>
+</div>
+<span class="font-title-md text-body-lg text-primary">Amazon</span>
+<span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-data-mono text-data-mono">+2.8%</span>
+</div>
+<!-- Steam -->
+<div class="group bg-white border border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:shadow-lg hover:border-secondary transition-all cursor-pointer scale-on-click">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary">videogame_asset</span>
+</div>
+<span class="font-title-md text-body-lg text-primary">Steam</span>
+<span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-data-mono text-data-mono">+5.1%</span>
+</div>
+<!-- Google Play -->
+<div class="group bg-white border border-outline-variant rounded-xl p-6 flex flex-col items-center justify-center gap-4 hover:shadow-lg hover:border-secondary transition-all cursor-pointer scale-on-click">
+<div class="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl text-primary">play_books</span>
+</div>
+<span class="font-title-md text-body-lg text-primary">Google Play</span>
+<span class="text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full font-data-mono text-data-mono">+1.5%</span>
+</div>
+</div>
+</div>
+<!-- Rate Card Table -->
+<div class="bg-white border border-outline-variant rounded-2xl overflow-hidden">
+<div class="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<h3 class="font-title-md text-title-md text-primary">Live Exchange Rates</h3>
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-label-caps font-label-caps uppercase">Live Updates</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface">
+<tr>
+<th class="px-6 py-4 text-label-caps font-label-caps text-outline">Brand</th>
+<th class="px-6 py-4 text-label-caps font-label-caps text-outline">Buy Rate</th>
+<th class="px-6 py-4 text-label-caps font-label-caps text-outline">Sell Rate</th>
+<th class="px-6 py-4 text-label-caps font-label-caps text-outline text-right">Trend</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr class="hover:bg-surface-container transition-colors cursor-pointer">
+<td class="px-6 py-4 font-bold text-primary flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">apps</span>
+</div>
+                                        Apple US
+                                    </td>
+<td class="px-6 py-4 font-data-mono text-data-mono">$1 = 890 ₦</td>
+<td class="px-6 py-4 font-data-mono text-data-mono">$1 = 920 ₦</td>
+<td class="px-6 py-4 text-right">
+<span class="text-emerald-600 font-bold">+0.4%</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors cursor-pointer">
+<td class="px-6 py-4 font-bold text-primary flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>
+</div>
+                                        Amazon UK
+                                    </td>
+<td class="px-6 py-4 font-data-mono text-data-mono">£1 = 1,120 ₦</td>
+<td class="px-6 py-4 font-data-mono text-data-mono">£1 = 1,155 ₦</td>
+<td class="px-6 py-4 text-right">
+<span class="text-emerald-600 font-bold">+1.2%</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors cursor-pointer">
+<td class="px-6 py-4 font-bold text-primary flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-sm">stadium</span>
+</div>
+                                        Steam Global
+                                    </td>
+<td class="px-6 py-4 font-data-mono text-data-mono">$1 = 875 ₦</td>
+<td class="px-6 py-4 font-data-mono text-data-mono">$1 = 905 ₦</td>
+<td class="px-6 py-4 text-right">
+<span class="text-error font-bold">-0.2%</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Transaction Flow -->
+<aside class="lg:col-span-4 space-y-stack-lg sticky top-24">
+<div class="bg-primary-container p-8 rounded-3xl text-white relative overflow-hidden">
+<!-- Subtle Background Decoration -->
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-secondary/20 rounded-full blur-3xl"></div>
+<div class="relative z-10 space-y-6">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-white">sell</span>
+</div>
+<h3 class="font-title-md text-title-md">Start Selling</h3>
+</div>
+<p class="text-on-primary-container text-body-sm font-body-sm">Convert your unused gift cards to instant cash at the industry's best rates.</p>
+<form class="space-y-4" id="sellForm">
+<div class="space-y-2">
+<label class="text-label-caps font-label-caps text-on-primary-container uppercase">Select Asset</label>
+<select class="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 text-white focus:ring-2 focus:ring-secondary outline-none appearance-none cursor-pointer">
+<option class="text-primary">Apple (United States)</option>
+<option class="text-primary">Amazon (United Kingdom)</option>
+<option class="text-primary">Google Play (Global)</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-label-caps font-label-caps text-on-primary-container uppercase">Amount ($)</label>
+<div class="relative">
+<input class="w-full h-12 bg-white/10 border border-white/20 rounded-xl px-4 text-white focus:ring-2 focus:ring-secondary outline-none font-data-mono" type="number" value="100"/>
+<span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-primary-container font-data-mono">USD</span>
+</div>
+</div>
+<div class="pt-4 border-t border-white/10 mt-6 space-y-2">
+<div class="flex justify-between text-body-sm font-body-sm">
+<span class="text-on-primary-container">Exchange Rate</span>
+<span class="font-data-mono">920 ₦ / $</span>
+</div>
+<div class="flex justify-between font-bold text-title-md">
+<span>You Receive</span>
+<span class="font-data-mono">92,000 ₦</span>
+</div>
+</div>
+<button class="w-full h-14 bg-secondary hover:bg-on-secondary-fixed-variant text-white font-bold rounded-xl scale-on-click transition-colors flex items-center justify-center gap-2 shadow-lg shadow-secondary/20 mt-4" onclick="showSuccess()" type="button">
+                                Sell Now <span class="material-symbols-outlined">bolt</span>
+</button>
+</form>
+</div>
+</div>
+<!-- Transaction Tracking / Confirmation (Initially Hidden) -->
+<div class="hidden animate-in fade-in slide-in-from-bottom-4 duration-500 bg-white border border-outline-variant p-6 rounded-3xl shadow-xl" id="successCard">
+<div class="text-center space-y-4">
+<div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
+<span class="material-symbols-outlined text-4xl">check_circle</span>
+</div>
+<h4 class="font-title-md text-title-md text-primary">Transaction Initiated</h4>
+<p class="text-body-sm text-on-surface-variant">Your request to sell <span class="font-bold text-primary">$100 Apple Gift Card</span> is being processed.</p>
+<div class="flex flex-col gap-4 py-4">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white text-xs font-bold">1</div>
+<div class="text-left">
+<p class="font-bold text-sm text-primary">Submission</p>
+<p class="text-xs text-on-surface-variant">Completed just now</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-outline text-xs font-bold animate-pulse">2</div>
+<div class="text-left">
+<p class="font-bold text-sm text-on-surface-variant">Verification</p>
+<p class="text-xs text-outline">Estimating 2-5 mins</p>
+</div>
+</div>
+<div class="flex items-center gap-4 opacity-50">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-outline text-xs font-bold">3</div>
+<div class="text-left">
+<p class="font-bold text-sm text-on-surface-variant">Payment</p>
+<p class="text-xs text-outline">Instant after verification</p>
+</div>
+</div>
+</div>
+<button class="w-full py-3 border border-outline-variant rounded-xl text-primary font-bold hover:bg-surface-container transition-colors" onclick="resetFlow()">Done</button>
+</div>
+</div>
+<!-- Recent History Card -->
+<div class="bg-white border border-outline-variant rounded-2xl p-6">
+<h3 class="font-label-caps font-label-caps text-outline uppercase mb-4">Recent Transactions</h3>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">apps</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary">Apple Store Card</p>
+<p class="text-xs text-on-surface-variant">2 hours ago</p>
+</div>
+</div>
+<p class="font-data-mono text-emerald-600 font-bold">+46,000 ₦</p>
+</div>
+<div class="flex justify-between items-center opacity-80">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">shopping_bag</span>
+</div>
+<div>
+<p class="text-sm font-bold text-primary">Amazon Global</p>
+<p class="text-xs text-on-surface-variant">Yesterday</p>
+</div>
+</div>
+<p class="font-data-mono text-emerald-600 font-bold">+210,000 ₦</p>
+</div>
+</div>
+</div>
+</aside>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface dark:bg-surface-dim shadow-[0_-4px_12px_rgba(0,0,0,0.04)] flex justify-around items-center h-20 pb-safe px-unit">
+<a class="flex flex-col items-center justify-center gap-1 text-secondary dark:text-secondary-fixed-dim font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-label-caps font-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-outline hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="text-label-caps font-label-caps">Wallet</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-outline hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined">currency_exchange</span>
+<span class="text-label-caps font-label-caps">Trade</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant dark:text-outline hover:bg-surface-container transition-all" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-label-caps font-label-caps">Profile</span>
+</a>
+</nav>
+<!-- Script for interactive elements -->
+<script>
+        function switchTab(type) {
+            const buyTab = document.getElementById('buyTab');
+            const sellTab = document.getElementById('sellTab');
+            
+            if (type === 'buy') {
+                buyTab.classList.add('bg-white', 'text-primary', 'shadow-sm', 'font-bold');
+                buyTab.classList.remove('text-on-surface-variant');
+                sellTab.classList.remove('bg-white', 'text-primary', 'shadow-sm', 'font-bold');
+                sellTab.classList.add('text-on-surface-variant');
+            } else {
+                sellTab.classList.add('bg-white', 'text-primary', 'shadow-sm', 'font-bold');
+                sellTab.classList.remove('text-on-surface-variant');
+                buyTab.classList.remove('bg-white', 'text-primary', 'shadow-sm', 'font-bold');
+                buyTab.classList.add('text-on-surface-variant');
+            }
+        }
+
+        function showSuccess() {
+            const sellForm = document.getElementById('sellForm').parentElement.parentElement;
+            const successCard = document.getElementById('successCard');
+            
+            sellForm.classList.add('hidden');
+            successCard.classList.remove('hidden');
+        }
+
+        function resetFlow() {
+            const sellForm = document.getElementById('sellForm').parentElement.parentElement;
+            const successCard = document.getElementById('successCard');
+            
+            sellForm.classList.remove('hidden');
+            successCard.classList.add('hidden');
+        }
+
+        // Apply scale animation to interactive items
+        document.querySelectorAll('.scale-on-click').forEach(el => {
+            el.addEventListener('click', () => {
+                el.style.transform = 'scale(0.96)';
+                setTimeout(() => { el.style.transform = ''; }, 100);
+            });
+        });
+    </script>
+</body></html>

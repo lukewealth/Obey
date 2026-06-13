@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | OBEY Fintech</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#004ee7",
+                    "on-secondary-container": "#004d66",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#6dd2ff",
+                    "on-surface-variant": "#434656",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-container": "#e5e8ff",
+                    "on-tertiary-fixed-variant": "#00522c",
+                    "tertiary-container": "#007943",
+                    "surface-dim": "#cbdbf5",
+                    "inverse-primary": "#b6c4ff",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "surface-bright": "#f8f9ff",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "surface": "#f8f9ff",
+                    "secondary-container": "#00c4fd",
+                    "error": "#ba1a1a",
+                    "tertiary": "#005e33",
+                    "outline-variant": "#c3c5d9",
+                    "surface-container-low": "#eff4ff",
+                    "primary": "#0043c8",
+                    "secondary-fixed": "#bfe9ff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#51df8e",
+                    "on-tertiary-container": "#98ffba",
+                    "on-primary-fixed": "#001550",
+                    "on-background": "#0b1c30",
+                    "on-error": "#ffffff",
+                    "background": "#f8f9ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary-container": "#0057ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-surface": "#0b1c30",
+                    "primary-fixed": "#dce1ff",
+                    "on-tertiary-fixed": "#00210e",
+                    "surface-container": "#e5eeff",
+                    "tertiary-fixed": "#70fda7",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary": "#006685",
+                    "on-primary-fixed-variant": "#003ab2",
+                    "on-secondary-fixed-variant": "#004d65",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#213145",
+                    "on-secondary-fixed": "#001f2a",
+                    "outline": "#737688"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "3xl": "64px",
+                    "container-margin-mobile": "16px",
+                    "xl": "32px",
+                    "container-margin-desktop": "40px",
+                    "gutter": "24px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "2xl": "48px",
+                    "xs": "4px",
+                    "base": "4px",
+                    "sm": "8px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-pattern {
+            background-color: #f8f9ff;
+            background-image: radial-gradient(at 0% 0%, hsla(220,100%,95%,1) 0, transparent 50%), 
+                              radial-gradient(at 50% 0%, hsla(200,100%,90%,1) 0, transparent 50%), 
+                              radial-gradient(at 100% 0%, hsla(220,100%,95%,1) 0, transparent 50%);
+        }
+        .input-focus-ring:focus {
+            box-shadow: 0 0 0 2px #0057ff33;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .float-animation { animation: float 6s ease-in-out infinite; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-pattern min-h-screen flex flex-col text-on-surface selection:bg-primary-container selection:text-on-primary-container overflow-x-hidden">
+<!-- Top Navigation (Simplified for Login) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md">
+<div class="flex justify-between items-center px-container-margin-mobile md:px-container-margin-desktop py-stack-sm w-full max-w-7xl mx-auto h-16">
+<div class="font-headline-lg-mobile md:font-headline-lg text-primary font-bold tracking-tight">OBEY</div>
+<div class="hidden md:flex items-center gap-md">
+<span class="font-label-md text-on-surface-variant">New to OBEY?</span>
+<button class="font-label-md text-primary font-semibold hover:opacity-80 transition-opacity">Create Account</button>
+</div>
+</div>
+</header>
+<main class="flex-grow flex items-center justify-center pt-20 pb-12 px-container-margin-mobile">
+<div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
+<!-- Left Side: Visual & Marketing -->
+<div class="hidden lg:flex flex-col justify-center space-y-xl pr-lg">
+<div class="space-y-md">
+<h1 class="font-display-lg text-primary leading-tight">One Platform For Airtime, Crypto, Gift Cards &amp; Digital Payments</h1>
+<p class="font-body-lg text-on-surface-variant max-w-md">Institutional-grade security meeting world-class user experience. Manage all your digital assets in a single, fluid interface.</p>
+</div>
+<div class="relative w-full aspect-square max-w-lg">
+<!-- Animated Illustration Area -->
+<div class="absolute inset-0 flex items-center justify-center">
+
+</div>
+<!-- Floating Tech Cards (Micro-interactions) -->
+<div class="absolute -top-4 -right-4 glass-card p-md rounded-xl shadow-xl float-animation" style="animation-delay: 0s;">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary" data-icon="shield_check">shield_lock</span>
+</div>
+<div>
+<p class="font-label-sm text-on-surface-variant uppercase">Security</p>
+<p class="font-label-md font-bold text-on-surface">Verified</p>
+</div>
+</div>
+</div>
+<div class="absolute bottom-12 -left-8 glass-card p-md rounded-xl shadow-xl float-animation" style="animation-delay: -3s;">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-container/20 flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+</div>
+<div>
+<p class="font-label-sm text-on-surface-variant uppercase">Execution</p>
+<p class="font-label-md font-bold text-on-surface">0.1s Avg</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Side: Login Form -->
+<div class="flex justify-center">
+<div class="w-full max-w-md bg-surface-container-lowest border border-outline-variant/30 shadow-2xl rounded-3xl p-lg md:p-xl space-y-xl relative overflow-hidden">
+<!-- Subtle Glass Highlight -->
+<div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/5 blur-3xl rounded-full"></div>
+<div class="space-y-sm relative z-10">
+<h2 class="font-headline-lg text-on-surface">Welcome back</h2>
+<p class="font-body-md text-on-surface-variant">Sign in to manage your treasury and digital assets.</p>
+</div>
+<!-- Toggle Login Type -->
+<div class="flex p-1 bg-surface-container-low rounded-xl relative z-10" id="login-tabs">
+<button class="flex-1 py-2 font-label-md rounded-lg transition-all duration-200 bg-surface-container-lowest text-primary shadow-sm" id="email-tab-btn" onclick="switchTab('email')">Email</button>
+<button class="flex-1 py-2 font-label-md rounded-lg transition-all duration-200 text-on-surface-variant hover:text-on-surface" id="phone-tab-btn" onclick="switchTab('phone')">Phone</button>
+</div>
+<form class="space-y-lg relative z-10">
+<!-- Email Input Section -->
+<div class="space-y-md" id="email-section">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant" for="email">Email Address</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors" data-icon="mail">mail</span>
+</div>
+<input class="block w-full h-12 pl-10 bg-surface-container-low border-transparent rounded-xl font-body-md text-on-surface focus:border-primary focus:ring-0 input-focus-ring transition-all" id="email" placeholder="name@company.com" type="email"/>
+</div>
+</div>
+</div>
+<!-- Phone Input Section (Hidden by default) -->
+<div class="hidden space-y-md" id="phone-section">
+<div class="space-y-xs">
+<label class="font-label-md text-on-surface-variant" for="phone">Phone Number</label>
+<div class="relative group flex">
+<div class="flex items-center px-3 bg-surface-container-low border-r border-outline-variant/30 rounded-l-xl">
+<span class="font-label-md text-on-surface-variant">+234</span>
+</div>
+<input class="block w-full h-12 px-4 bg-surface-container-low border-transparent rounded-r-xl font-body-md text-on-surface focus:border-primary focus:ring-0 input-focus-ring transition-all" id="phone" placeholder="800 000 0000" type="tel"/>
+</div>
+</div>
+</div>
+<div class="space-y-xs">
+<div class="flex justify-between">
+<label class="font-label-md text-on-surface-variant" for="password">Password</label>
+<a class="font-label-sm text-primary hover:underline" href="#">Forgot?</a>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline group-focus-within:text-primary transition-colors" data-icon="lock">lock</span>
+</div>
+<input class="block w-full h-12 pl-10 pr-10 bg-surface-container-low border-transparent rounded-xl font-body-md text-on-surface focus:border-primary focus:ring-0 input-focus-ring transition-all" id="password" placeholder="••••••••" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-outline hover:text-on-surface" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full h-14 bg-primary text-on-primary rounded-xl font-label-md font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all duration-200" type="submit">
+                            Sign In
+                        </button>
+</form>
+<div class="relative flex py-2 items-center">
+<div class="flex-grow border-t border-outline-variant/30"></div>
+<span class="flex-shrink mx-4 font-label-sm text-outline uppercase tracking-widest">or continue with</span>
+<div class="flex-grow border-t border-outline-variant/30"></div>
+</div>
+<!-- Social Login -->
+<div class="grid grid-cols-2 gap-md relative z-10">
+<button class="flex items-center justify-center h-12 bg-surface-container-low border border-outline-variant/30 rounded-xl hover:bg-surface-variant transition-colors group">
+<img alt="Google" class="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" data-alt="A clean, vector-style Google logo icon displayed in high resolution with its characteristic four colors red, yellow, green, and blue. The icon is isolated on a transparent background, perfect for modern UI design integration within a fintech platform's social login section." src="https://lh3.googleusercontent.com/aida/AP1WRLtXLuN3mFz_awK-X7rib-k1x0oTUYohODRGToMi4BojglaDchESGOw9bpG7niuox6Tu2b9XKSvX7JBz4XnCxyRBZ5wdu6d-4l1gcBChr1GyJhuklwhkifhHyrekjuDafKwh2nvEHGLPPHpEAGNeVHkK_ZUmdgRgu4y67fBlDG_oAmX8XtEitsXIGXHQEoeg1X-G87_gLh11Ifw5O2QSdDOFqmFkL3371mN9dY0BTIVbyBygskpDgUmpgL0x"/>
+<span class="font-label-md text-on-surface">Google</span>
+</button>
+<button class="flex items-center justify-center h-12 bg-surface-container-low border border-outline-variant/30 rounded-xl hover:bg-surface-variant transition-colors group">
+<span class="material-symbols-outlined mr-2 text-on-surface text-[24px]" data-icon="apple" data-weight="fill">apps</span>
+<span class="font-label-md text-on-surface">Apple</span>
+</button>
+</div>
+<p class="text-center font-body-md text-on-surface-variant relative z-10 md:hidden">
+                        New to OBEY? <a class="text-primary font-bold" href="#">Create Account</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Space -->
+<footer class="mt-auto py-lg text-center">
+<p class="font-label-sm text-outline uppercase tracking-wider">Secure Cloud Infrastructure • © 2024 OBEY Fintech</p>
+</footer>
+<script>
+        function switchTab(type) {
+            const emailTab = document.getElementById('email-tab-btn');
+            const phoneTab = document.getElementById('phone-tab-btn');
+            const emailSection = document.getElementById('email-section');
+            const phoneSection = document.getElementById('phone-section');
+
+            if (type === 'email') {
+                emailTab.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                emailTab.classList.remove('text-on-surface-variant');
+                phoneTab.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                phoneTab.classList.add('text-on-surface-variant');
+                
+                emailSection.classList.remove('hidden');
+                phoneSection.classList.add('hidden');
+            } else {
+                phoneTab.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                phoneTab.classList.remove('text-on-surface-variant');
+                emailTab.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+                emailTab.classList.add('text-on-surface-variant');
+
+                phoneSection.classList.remove('hidden');
+                emailSection.classList.add('hidden');
+            }
+        }
+
+        // Add some interaction to inputs
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('ring-2', 'ring-primary/20');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('ring-2', 'ring-primary/20');
+            });
+        });
+    </script>
+</body></html>

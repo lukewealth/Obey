@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. Global safety net - default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+    
+    // Global primitive functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+    
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'lukeokagha@gmail.com'
+      );
+    }
+    
+    // 2. User Profiles
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUserProfile(request.resource.data);
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidUserProfile(request.resource.data);
+      
+      function isValidUserProfile(data) {
+        return data.keys().hasAll(['name', 'email', 'phone', 'avatar', 'kycStatus', 'balance', 'promoCode', 'twoFactorEnabled'])
+          && data.keys().size() == 8
+          && data.name is string && data.name.size() > 0 && data.name.size() <= 100
+          && data.email is string && data.email.size() <= 100
+          && data.phone is string && data.phone.size() <= 30
+          && data.avatar is string && data.avatar.size() <= 10
+          && data.kycStatus in ['Unverified', 'Pending', 'Verified']
+          && data.balance is number
+          && data.promoCode is string && data.promoCode.size() <= 50
+          && data.twoFactorEnabled is bool;
+      }
+    }
+    
+    // 3. User Transactions subcollection
+    match /users/{userId}/transactions/{transactionId} {
+      allow list: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow get: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidId(transactionId);
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidId(transactionId) && isValidTransaction(request.resource.data);
+      allow update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isValidId(transactionId) && isValidTransaction(request.resource.data);
+      
+      function isValidTransaction(data) {
+        return data.keys().hasAll(['id', 'title', 'category', 'type', 'amount', 'fee', 'date', 'time', 'status'])
+          && data.keys().size() >= 9 && data.keys().size() <= 13
+          && data.id is string && data.id.size() <= 50
+          && data.title is string && data.title.size() <= 150
+          && data.category in ['Electronics', 'Transfer', 'Dining', 'Travel', 'Food', 'Crypto', 'Airtime', 'Data', 'GiftCard']
+          && data.type in ['Debit', 'Credit']
+          && data.amount is number
+          && data.fee is number
+          && data.date is string && data.date.size() <= 30
+          && data.time is string && data.time.size() <= 30
+          && data.status in ['Success', 'Processing', 'Failed']
+          && (data.get('recipientWallet', '') is string)
+          && (data.get('network', '') is string)
+          && (data.get('brand', '') is string);
+      }
+    }
+    
+    // 4. System Metrics
+    match /system/metrics {
+      allow get: if isSignedIn();
+      allow create, update: if isSignedIn() && (request.auth.uid != null || isAdmin()) && isValidSystemMetrics(request.resource.data);
+      
+      function isValidSystemMetrics(data) {
+        return data.keys().hasAll(['totalUsers', 'totalVolume', 'monthlyRevenue', 'pendingKycCount', 'systemStatus'])
+          && data.keys().size() == 5
+          && data.totalUsers is number
+          && data.totalVolume is number
+          && data.monthlyRevenue is number
+          && data.pendingKycCount is number
+          && data.systemStatus in ['OPERATIONAL', 'DEGRADED', 'MAINTENANCE'];
+      }
+    }
+  }
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- STITCH_SVG_START:ANIMATION_19 class="fixed inset-0 w-full h-full" --><div class="fixed inset-0 w-full h-full" id="animated-svg-ANIMATION_19" style="display:block;"><svg viewbox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="checkGradient" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:#12B76A;stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:#079455;stop-opacity:1"></stop>
+</lineargradient>
+<filter height="140%" id="glow" width="140%" x="-20%" y="-20%">
+<blur result="blur" stddeviation="3"></blur>
+<composite in="SourceGraphic" in2="blur" operator="over"></composite>
+</filter>
+</defs>
+<!-- Outer circle expanding -->
+<circle cx="50" cy="50" fill="none" opacity="0" r="45" stroke="#12B76A" stroke-width="2">
+<animate attributename="r" begin="0s" dur="0.8s" fill="freeze" from="40" to="48"></animate>
+<animate attributename="opacity" begin="0s" dur="0.8s" fill="freeze" from="1" to="0"></animate>
+</circle>
+<!-- Main green circle -->
+<circle cx="50" cy="50" fill="url(#checkGradient)" filter="url(#glow)" r="40">
+<animate attributename="r" calcmode="spline" dur="0.4s" fill="freeze" from="0" keysplines="0.4, 0, 0.2, 1" to="40"></animate>
+</circle>
+<!-- Success Checkmark -->
+<path d="M30 50 L45 65 L70 35" fill="none" stroke="white" stroke-dasharray="100" stroke-dashoffset="100" stroke-linecap="round" stroke-linejoin="round" stroke-width="8">
+<animate attributename="stroke-dashoffset" begin="0.3s" dur="0.5s" fill="freeze" from="100" to="0"></animate>
+</path>
+</svg></div><!-- STITCH_SVG_END:ANIMATION_19 -->
+</body>
+</html>

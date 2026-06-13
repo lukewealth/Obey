@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Withdraw - OBEY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary-fixed": "#001550",
+                    "secondary": "#006685",
+                    "inverse-primary": "#b6c4ff",
+                    "surface": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#004d65",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#007943",
+                    "primary-fixed": "#dce1ff",
+                    "on-secondary-container": "#004d66",
+                    "surface-container-low": "#eff4ff",
+                    "on-tertiary-fixed": "#00210e",
+                    "on-background": "#0b1c30",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed-variant": "#00522c",
+                    "surface-container-highest": "#d3e4fe",
+                    "outline-variant": "#c3c5d9",
+                    "primary-container": "#0057ff",
+                    "surface-variant": "#d3e4fe",
+                    "secondary-fixed": "#bfe9ff",
+                    "primary": "#0043c8",
+                    "on-primary-container": "#e5e8ff",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#70fda7",
+                    "inverse-surface": "#213145",
+                    "on-tertiary-container": "#98ffba",
+                    "surface-container": "#e5eeff",
+                    "on-secondary-fixed": "#001f2a",
+                    "on-tertiary": "#ffffff",
+                    "tertiary": "#005e33",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-container": "#00c4fd",
+                    "background": "#f8f9ff",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "surface-tint": "#004ee7",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-high": "#dce9ff",
+                    "on-primary-fixed-variant": "#003ab2",
+                    "outline": "#737688",
+                    "on-surface-variant": "#434656",
+                    "secondary-fixed-dim": "#6dd2ff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#51df8e",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xl": "32px",
+                    "2xl": "48px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "3xl": "64px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "md": "16px",
+                    "container-margin-desktop": "40px",
+                    "container-margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- TopAppBar Shell -->
+<nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_12px_32px_-4px_rgba(0,0,0,0.08)]">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<button class="active:scale-95 duration-200 text-on-surface-variant">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-black tracking-tighter text-primary">OBEY</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLuVzzf4SKoEUHThFbbU-aBbOAugby9zBI9ZgNt4pTNKKJnMZofCi1hv6q1wTr6eBGjSMVXbvmCZKHzkrIz29AadmIWJn6HAOHbduBY-gHABTO8psvw5K48bfvEQSXIY3TaE1NuZshc5DfwH80mrtbZSCy1zlSiqFk5jrlZoCYF2KsgZiku4boiM8WnQVTq4jpGV4PCtfQBmoc1eSEGAtMVHWHRemvcp0ByqonAXiAMub1PBYN31GSZ0FOFx"/>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-container-margin-mobile max-w-lg mx-auto space-y-lg">
+<!-- Progress Stepper -->
+<div class="flex items-center justify-between w-full px-xs">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-label-sm text-label-sm">1</div>
+<span class="font-label-sm text-label-sm text-primary">Details</span>
+</div>
+<div class="flex-1 h-0.5 bg-surface-container-highest mx-2 mb-6">
+<div class="h-full bg-primary-container w-1/2"></div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-label-sm text-label-sm">2</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Confirm</span>
+</div>
+<div class="flex-1 h-0.5 bg-surface-container-highest mx-2 mb-6"></div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-label-sm text-label-sm">3</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Done</span>
+</div>
+</div>
+<!-- Header Info -->
+<section class="space-y-xs">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Withdraw Funds</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Securely transfer capital to your verified institutional bank accounts.</p>
+</section>
+<!-- Transaction Form -->
+<div class="space-y-lg">
+<!-- Bank Selection -->
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant block">Destination Account</label>
+<div class="glass-card rounded-xl p-md flex items-center justify-between cursor-pointer hover:bg-surface-container/50 transition-colors active:scale-[0.98] duration-150">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+</div>
+<div>
+<p class="font-headline-md text-headline-md text-on-surface !text-body-md">Chase Corporate Premium</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant tracking-wider">ENDING IN •••• 9821</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline">expand_more</span>
+</div>
+</div>
+<!-- Amount Input -->
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface-variant">Withdrawal Amount</label>
+<span class="font-label-sm text-label-sm text-primary">Limit: $250,000.00</span>
+</div>
+<div class="relative">
+<span class="absolute left-lg top-1/2 -translate-y-1/2 font-display-lg-mobile text-display-lg-mobile text-on-surface-variant">$</span>
+<input class="w-full bg-[#F1F5F9] border-transparent focus:border-primary-container focus:ring-0 rounded-xl py-xl pl-12 pr-lg font-display-lg-mobile text-display-lg-mobile text-on-surface" placeholder="0.00" type="number"/>
+</div>
+<div class="flex gap-sm">
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm hover:bg-primary-container hover:text-on-primary-container transition-all">25%</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm hover:bg-primary-container hover:text-on-primary-container transition-all">50%</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm hover:bg-primary-container hover:text-on-primary-container transition-all">75%</button>
+<button class="px-md py-xs rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm hover:bg-primary-container hover:text-on-primary-container transition-all">MAX</button>
+</div>
+</div>
+<!-- Summary Card -->
+<div class="glass-card rounded-xl p-lg space-y-md">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Transaction Summary</h3>
+<div class="space-y-sm">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Processing Fee</span>
+<span class="font-body-md text-body-md text-on-surface">$12.50</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-on-surface-variant">Network Duration</span>
+<span class="font-body-md text-body-md text-on-surface">Instant (SEPA)</span>
+</div>
+<div class="pt-sm border-t border-outline-variant/30 flex justify-between items-center">
+<span class="font-headline-md text-headline-md !text-body-md text-on-surface">Total Deduction</span>
+<span class="font-headline-md text-headline-md !text-body-md text-primary">$0.00</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Call to Action -->
+<section class="space-y-md">
+<button class="w-full h-14 bg-primary-container text-on-primary-container rounded-xl font-headline-md !text-body-md flex items-center justify-center gap-2 shadow-[0px_12px_32px_-4px_rgba(0,87,255,0.2)] hover:scale-[1.02] active:scale-95 transition-all">
+<span>Review Withdrawal</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-center font-label-sm text-label-sm text-on-surface-variant px-lg">
+                By proceeding, you agree to OBEY's institutional transfer terms and conditions.
+            </p>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_-8px_24px_-4px_rgba(0,0,0,0.06)] flex justify-around items-center px-4 py-3 pb-safe rounded-t-xl">
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1.5 active:scale-90 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Wallet</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm text-label-sm">Services</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span class="font-label-sm text-label-sm">Trade</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 hover:text-primary transition-all active:scale-90 duration-150">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<!-- Atmospheric Effect -->
+<div class="fixed top-0 left-0 w-full h-full pointer-events-none -z-10 opacity-30">
+
+</div>
+<script>
+        // Simple micro-interaction for input update
+        const input = document.querySelector('input[type="number"]');
+        const summaryTotal = document.querySelector('.pt-sm .text-primary');
+        const fee = 12.50;
+
+        input.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value) || 0;
+            const total = val > 0 ? (val + fee).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "0.00";
+            summaryTotal.textContent = `$${total}`;
+        });
+
+        // Quick percent buttons
+        document.querySelectorAll('.gap-sm button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const max = 250000;
+                let pct = 0;
+                if(btn.textContent === '25%') pct = 0.25;
+                if(btn.textContent === '50%') pct = 0.50;
+                if(btn.textContent === '75%') pct = 0.75;
+                if(btn.textContent === 'MAX') pct = 1;
+                
+                const calc = max * pct;
+                input.value = calc;
+                input.dispatchEvent(new Event('input'));
+            });
+        });
+    </script>
+</body></html>

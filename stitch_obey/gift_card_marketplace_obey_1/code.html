@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .hover-lift {
+      transition: all 0.2s ease-out;
+    }
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0px 20px 40px -8px rgba(0, 0, 0, 0.12);
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed-variant": "#004d65",
+            "tertiary-fixed": "#70fda7",
+            "on-secondary-container": "#004d66",
+            "on-primary": "#ffffff",
+            "background": "#f8f9ff",
+            "on-primary-container": "#e5e8ff",
+            "on-background": "#0b1c30",
+            "error-container": "#ffdad6",
+            "tertiary": "#005e33",
+            "surface-container-low": "#eff4ff",
+            "primary-fixed-dim": "#b6c4ff",
+            "on-tertiary-fixed-variant": "#00522c",
+            "on-error": "#ffffff",
+            "inverse-primary": "#b6c4ff",
+            "surface-bright": "#f8f9ff",
+            "on-surface-variant": "#434656",
+            "surface": "#f8f9ff",
+            "tertiary-fixed-dim": "#51df8e",
+            "surface-variant": "#d3e4fe",
+            "surface-tint": "#004ee7",
+            "primary": "#0043c8",
+            "inverse-on-surface": "#eaf1ff",
+            "on-tertiary": "#ffffff",
+            "secondary": "#006685",
+            "surface-container-highest": "#d3e4fe",
+            "error": "#ba1a1a",
+            "on-secondary-fixed": "#001f2a",
+            "tertiary-container": "#007943",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-fixed": "#001550",
+            "outline": "#737688",
+            "on-secondary": "#ffffff",
+            "primary-fixed": "#dce1ff",
+            "secondary-fixed": "#bfe9ff",
+            "on-primary-fixed-variant": "#003ab2",
+            "surface-container": "#e5eeff",
+            "secondary-fixed-dim": "#6dd2ff",
+            "on-error-container": "#93000a",
+            "outline-variant": "#c3c5d9",
+            "inverse-surface": "#213145",
+            "surface-container-high": "#dce9ff",
+            "on-tertiary-container": "#98ffba",
+            "secondary-container": "#00c4fd",
+            "on-surface": "#0b1c30",
+            "on-tertiary-fixed": "#00210e",
+            "surface-dim": "#cbdbf5",
+            "primary-container": "#0057ff"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "24px",
+            "xs": "4px",
+            "md": "16px",
+            "lg": "24px",
+            "container-margin-desktop": "40px",
+            "3xl": "64px",
+            "2xl": "48px",
+            "xl": "32px",
+            "sm": "8px",
+            "base": "4px",
+            "container-margin-mobile": "16px"
+          },
+          "fontFamily": {
+            "label-sm": ["Inter"],
+            "headline-md": ["Inter"],
+            "display-lg-mobile": ["Inter"],
+            "display-lg": ["Inter"],
+            "body-lg": ["Inter"],
+            "label-md": ["Inter"],
+            "headline-lg": ["Inter"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+            "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+            "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl shadow-[0px_12px_32px_-4px_rgba(0,0,0,0.08)]">
+<div class="flex justify-between items-center px-gutter h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-primary-fixed-dim overflow-hidden flex items-center justify-center">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A professional headshot of a young male executive with a confident smile, wearing a sharp charcoal suit. The lighting is soft and studio-quality, creating a high-end corporate feel consistent with a premium financial application. The background is a clean, neutral gradient of soft grays." src="https://lh3.googleusercontent.com/aida/AP1WRLttUJMyUkuK1BUxKXQGh924zkZ2YcEjbIFI1DpKTpxEN1L3Ch9HZwvzO7gYQex1un31Rlj7GD097HlbpOB-OLN-brVctp7tIaJFNhF4HN24DHgneq3mz1OtOFB3uwC5HFJQMS_chaO9H7yaB3DBL9pr55dQ5ku-hjzi39m-yS-2xh22m0RCkcM6kDYVYxmqPI2Ch57d7OS_CA38h0QalI9Chi2H6qEeZ3EOKZEgBtmX_1mxZWABmNbh8Ro"/>
+</div>
+<span class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">OBEY</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<nav class="flex gap-6">
+<a class="text-primary font-label-md" href="#">Marketplace</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Portfolio</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-md" href="#">Exchange</a>
+</nav>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-primary/5 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined text-primary">menu</span>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-gutter pt-24">
+<!-- Hero & Search Section -->
+<section class="py-lg flex flex-col gap-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-background tracking-tight">Gift Card Marketplace</h1>
+<p class="text-on-surface-variant font-body-lg mt-2 max-w-2xl">Institutional-grade liquidity for premium digital assets. Buy, sell, and trade global gift cards with instant settlement.</p>
+</div>
+<!-- Buy/Sell Toggle -->
+<div class="flex p-1 bg-surface-container rounded-xl w-fit">
+<button class="px-8 py-2.5 rounded-lg bg-surface-container-lowest shadow-sm text-primary font-label-md transition-all active:scale-95" id="buy-toggle">Buy</button>
+<button class="px-8 py-2.5 rounded-lg text-on-surface-variant font-label-md transition-all hover:text-primary active:scale-95" id="sell-toggle">Sell</button>
+</div>
+</div>
+<!-- Search Bar -->
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full h-14 pl-12 pr-4 bg-surface-container-low border-none rounded-2xl focus:ring-2 focus:ring-primary/20 font-body-md placeholder:text-outline transition-all" placeholder="Search brands, regions, or categories..." type="text"/>
+</div>
+</section>
+<!-- Featured Categories Grid -->
+<section class="py-lg">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="font-headline-md text-headline-md">Top Assets</h2>
+<a class="text-primary font-label-md flex items-center gap-1 hover:underline" href="#">View All <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-lg">
+<!-- Apple Card -->
+<div class="glass-card rounded-3xl p-lg hover-lift group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px]">apps</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white">
+<span class="material-symbols-outlined">apps</span>
+</div>
+<div class="bg-tertiary-container/10 px-2 py-1 rounded-lg">
+<span class="text-tertiary text-label-sm font-bold">+2.4%</span>
+</div>
+</div>
+<h3 class="font-headline-md text-on-background mb-1">Apple</h3>
+<p class="text-on-surface-variant font-label-md mb-4">Global Reach</p>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-outline text-label-sm uppercase tracking-wider mb-1">Current Rate</p>
+<p class="font-headline-md text-primary">$0.92<span class="text-label-md text-on-surface-variant">/$1</span></p>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Amazon Card -->
+<div class="glass-card rounded-3xl p-lg hover-lift group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px]">shopping_cart</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-2xl bg-[#FF9900] flex items-center justify-center text-white">
+<span class="material-symbols-outlined">shopping_cart</span>
+</div>
+<div class="bg-tertiary-container/10 px-2 py-1 rounded-lg">
+<span class="text-tertiary text-label-sm font-bold">+1.8%</span>
+</div>
+</div>
+<h3 class="font-headline-md text-on-background mb-1">Amazon</h3>
+<p class="text-on-surface-variant font-label-md mb-4">Prime Liquidity</p>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-outline text-label-sm uppercase tracking-wider mb-1">Current Rate</p>
+<p class="font-headline-md text-primary">$0.89<span class="text-label-md text-on-surface-variant">/$1</span></p>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Steam Card -->
+<div class="glass-card rounded-3xl p-lg hover-lift group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px]">sports_esports</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-2xl bg-[#171a21] flex items-center justify-center text-white">
+<span class="material-symbols-outlined">sports_esports</span>
+</div>
+<div class="bg-error-container/10 px-2 py-1 rounded-lg">
+<span class="text-error text-label-sm font-bold">-0.5%</span>
+</div>
+</div>
+<h3 class="font-headline-md text-on-background mb-1">Steam</h3>
+<p class="text-on-surface-variant font-label-md mb-4">Gaming Equity</p>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-outline text-label-sm uppercase tracking-wider mb-1">Current Rate</p>
+<p class="font-headline-md text-primary">$0.78<span class="text-label-md text-on-surface-variant">/$1</span></p>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Google Play Card -->
+<div class="glass-card rounded-3xl p-lg hover-lift group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px]">google</span>
+</div>
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-2xl bg-[#34A853] flex items-center justify-center text-white">
+<span class="material-symbols-outlined">google</span>
+</div>
+<div class="bg-tertiary-container/10 px-2 py-1 rounded-lg">
+<span class="text-tertiary text-label-sm font-bold">+3.1%</span>
+</div>
+</div>
+<h3 class="font-headline-md text-on-background mb-1">Google Play</h3>
+<p class="text-on-surface-variant font-label-md mb-4">App Ecosystem</p>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-outline text-label-sm uppercase tracking-wider mb-1">Current Rate</p>
+<p class="font-headline-md text-primary">$0.84<span class="text-label-md text-on-surface-variant">/$1</span></p>
+</div>
+<button class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Recent Transactions & Insights Section -->
+<section class="py-2xl flex flex-col lg:flex-row gap-xl">
+<!-- Recent History -->
+<div class="flex-grow lg:w-2/3">
+<div class="flex items-center justify-between mb-lg">
+<h2 class="font-headline-md text-headline-md">Recent Market Activity</h2>
+<button class="text-outline font-label-md hover:text-primary transition-colors">Filters</button>
+</div>
+<div class="glass-card rounded-3xl overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-lg py-md font-label-sm text-outline uppercase">Asset</th>
+<th class="px-lg py-md font-label-sm text-outline uppercase">Type</th>
+<th class="px-lg py-md font-label-sm text-outline uppercase">Volume</th>
+<th class="px-lg py-md font-label-sm text-outline uppercase">Status</th>
+<th class="px-lg py-md font-label-sm text-outline uppercase">Time</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline/5">
+<tr class="hover:bg-primary/5 transition-colors cursor-pointer group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-black flex items-center justify-center text-white text-[12px]">
+<span class="material-symbols-outlined text-[16px]">apps</span>
+</div>
+<span class="font-label-md">Apple USD</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-primary font-label-md">Purchase</span>
+</td>
+<td class="px-lg py-md">
+<span class="font-headline-md text-[18px]">$500.00</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-label-sm">Completed</span>
+</td>
+<td class="px-lg py-md text-outline font-label-sm">2m ago</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors cursor-pointer group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#FF9900] flex items-center justify-center text-white text-[12px]">
+<span class="material-symbols-outlined text-[16px]">shopping_cart</span>
+</div>
+<span class="font-label-md">Amazon GBP</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-secondary font-label-md">Sale</span>
+</td>
+<td class="px-lg py-md">
+<span class="font-headline-md text-[18px]">£250.00</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-label-sm">Processing</span>
+</td>
+<td class="px-lg py-md text-outline font-label-sm">15m ago</td>
+</tr>
+<tr class="hover:bg-primary/5 transition-colors cursor-pointer group">
+<td class="px-lg py-md">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-[#171a21] flex items-center justify-center text-white text-[12px]">
+<span class="material-symbols-outlined text-[16px]">sports_esports</span>
+</div>
+<span class="font-label-md">Steam Global</span>
+</div>
+</td>
+<td class="px-lg py-md">
+<span class="text-primary font-label-md">Purchase</span>
+</td>
+<td class="px-lg py-md">
+<span class="font-headline-md text-[18px]">$100.00</span>
+</td>
+<td class="px-lg py-md">
+<span class="bg-tertiary/10 text-tertiary px-3 py-1 rounded-full text-label-sm">Completed</span>
+</td>
+<td class="px-lg py-md text-outline font-label-sm">1h ago</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Quick Action Card -->
+<div class="lg:w-1/3 flex flex-col gap-lg">
+<h2 class="font-headline-md text-headline-md">Market Insights</h2>
+<div class="bg-primary text-on-primary rounded-3xl p-lg shadow-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+<div class="relative z-10">
+<h4 class="font-headline-md mb-2">Liquidity Score</h4>
+<div class="flex items-center gap-4 mb-6">
+<span class="text-[40px] font-black">98.4</span>
+<div class="bg-white/20 px-3 py-1 rounded-full text-label-sm">Optimal</div>
+</div>
+<p class="text-on-primary/80 font-body-md mb-6 leading-relaxed">Market depth for major assets is currently at peak levels. Ideal time for high-volume transactions.</p>
+<button class="w-full py-4 bg-white text-primary font-label-md rounded-2xl active:scale-95 transition-all shadow-lg">Generate Report</button>
+</div>
+</div>
+<div class="glass-card rounded-3xl p-lg border-primary/10">
+<h4 class="font-label-md text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+            Trending Brands
+          </h4>
+<div class="flex flex-wrap gap-2">
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-label-sm">Nike</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-label-sm">Uber</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-label-sm">Starbucks</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-label-sm">Airbnb</span>
+<span class="bg-surface-container-high text-on-surface-variant px-4 py-2 rounded-xl text-label-sm">Spotify</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface/70 backdrop-blur-xl shadow-[0px_-8px_24px_-4px_rgba(0,0,0,0.06)] rounded-t-xl">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1.5">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 opacity-70 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-sm text-label-sm">Wallet</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 opacity-70 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label-sm text-label-sm">Services</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 opacity-70 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined">swap_horiz</span>
+<span class="font-label-sm text-label-sm">Trade</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1.5 opacity-70 hover:opacity-100 transition-all">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</div>
+</nav>
+<script>
+    // Micro-interactions for Buy/Sell Toggles
+    const buyToggle = document.getElementById('buy-toggle');
+    const sellToggle = document.getElementById('sell-toggle');
+
+    buyToggle.addEventListener('click', () => {
+      buyToggle.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+      buyToggle.classList.remove('text-on-surface-variant');
+      sellToggle.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+      sellToggle.classList.add('text-on-surface-variant');
+    });
+
+    sellToggle.addEventListener('click', () => {
+      sellToggle.classList.add('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+      sellToggle.classList.remove('text-on-surface-variant');
+      buyToggle.classList.remove('bg-surface-container-lowest', 'shadow-sm', 'text-primary');
+      buyToggle.classList.add('text-on-surface-variant');
+    });
+
+    // Simple interaction for the search bar
+    const searchInput = document.querySelector('input[type="text"]');
+    searchInput.addEventListener('focus', () => {
+      searchInput.parentElement.classList.add('scale-[1.01]');
+    });
+    searchInput.addEventListener('blur', () => {
+      searchInput.parentElement.classList.remove('scale-[1.01]');
+    });
+  </script>
+</body></html>

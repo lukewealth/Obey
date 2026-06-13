@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OBEY | The Future of Finance</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#f6ba92",
+                        "on-primary-fixed": "#141545",
+                        "on-tertiary-fixed-variant": "#663d1e",
+                        "surface-container": "#f0edf2",
+                        "outline": "#777680",
+                        "secondary": "#0040df",
+                        "on-tertiary-container": "#b07d59",
+                        "surface-tint": "#585a8d",
+                        "surface-container-low": "#f6f2f7",
+                        "on-background": "#1c1b1f",
+                        "primary-fixed-dim": "#c1c1fc",
+                        "tertiary": "#150600",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-secondary-container": "#efefff",
+                        "tertiary-container": "#381800",
+                        "inverse-primary": "#c1c1fc",
+                        "on-surface": "#1c1b1f",
+                        "secondary-fixed": "#dde1ff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e5e1e6",
+                        "on-tertiary-fixed": "#301400",
+                        "surface-container-high": "#eae7ec",
+                        "surface": "#fcf8fd",
+                        "surface-bright": "#fcf8fd",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c8c5d0",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#46464f",
+                        "background": "#fcf8fd",
+                        "primary": "#020135",
+                        "on-primary-container": "#8384ba",
+                        "inverse-surface": "#313034",
+                        "on-secondary-fixed": "#001355",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed-variant": "#0035bd",
+                        "on-primary-fixed-variant": "#404273",
+                        "inverse-on-surface": "#f3eff4",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dcd9de",
+                        "secondary-container": "#2d5bff",
+                        "surface-container-highest": "#e5e1e6",
+                        "primary-container": "#1a1b4b",
+                        "secondary-fixed-dim": "#b8c3ff",
+                        "primary-fixed": "#e1e0ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px",
+                        "stack-sm": "8px",
+                        "gutter-mobile": "12px",
+                        "container-padding-mobile": "16px",
+                        "container-padding-desktop": "32px",
+                        "gutter-desktop": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["JetBrains Mono"],
+                        "title-md": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .premium-shimmer {
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite linear;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .ticker-scroll {
+            animation: ticker 30s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-lg selection:bg-secondary/20 overflow-x-hidden">
+<!-- Top Navigation Shell -->
+<header class="sticky top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex items-center justify-between px-container-padding-mobile md:px-container-padding-desktop h-16">
+<div class="flex items-center gap-stack-md">
+<span class="font-display-lg text-display-lg font-bold tracking-tighter text-primary">OBEY</span>
+</div>
+<nav class="hidden md:flex items-center gap-stack-lg">
+<a class="text-label-caps font-label-caps text-primary" href="#">Home</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Solutions</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+<a class="text-label-caps font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Trade</a>
+</nav>
+<div class="flex items-center gap-stack-sm">
+<button class="material-symbols-outlined text-primary p-2 hover:bg-surface-container-high rounded-full transition-all">search</button>
+<div class="w-8 h-8 rounded-full bg-secondary-fixed flex items-center justify-center overflow-hidden border border-outline-variant">
+<img alt="User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLt2p0ioyxu5q8nOeZlmAvVdKdlPgQyPKBedjsW85HQjGiZ0Q7UyHEsOGGqG5n6mq53ULYFgfGXySkBY47LUv6-WGUKD5_tjmPJP-eGMsehvW_lRt6otTat1SeDbdeUcqjjd70tqGV4H3t7Udz9j7PDnmOz00Hub0v78h0G6u1RvCISDVAQNvFwFNWdLixYAL-AYStN2siI5o9Rc7hdTHw5hXjaRsgsGDg008OnvIcXPjtJlwXDh-Mwopnks"/>
+</div>
+</div>
+</header>
+<main class="w-full">
+<!-- Hero Section -->
+<section class="relative min-h-[751px] flex flex-col justify-center items-center px-container-padding-mobile md:px-container-padding-desktop overflow-hidden py-stack-lg">
+<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,_rgba(45,91,255,0.05)_0%,_rgba(252,248,253,1)_100%)]"></div>
+<!-- Animated Visual Background Placeholder -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-20 -z-20 pointer-events-none">
+
+</div>
+<div class="max-w-4xl w-full text-center space-y-stack-md">
+<div class="inline-flex items-center px-4 py-1.5 rounded-full bg-secondary-fixed/30 border border-secondary-fixed text-primary font-label-caps text-label-caps animate-fade-in">
+<span class="mr-2">NEW</span> Institutional Crypto Trading is Live
+                </div>
+<h1 class="font-display-lg text-[40px] md:text-[80px] leading-[1.1] text-primary tracking-tight font-extrabold">
+                    The Future of <br/> Finance is <span class="text-secondary">OBEY.</span>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl mx-auto opacity-80">
+                    A hyper-efficient digital ecosystem for global payments, crypto assets, and enterprise liquidity. Designed for those who demand precision.
+                </p>
+<div class="flex flex-col sm:flex-row gap-stack-md justify-center pt-stack-md">
+<button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-title-md text-title-md hover:bg-primary-container transition-all active:scale-95 shadow-lg shadow-primary/10">
+                        Get Started Now
+                    </button>
+<button class="bg-white border border-outline-variant text-primary px-8 py-4 rounded-xl font-title-md text-title-md hover:bg-surface-container-high transition-all active:scale-95">
+                        View Ecosystem
+                    </button>
+</div>
+</div>
+<!-- Trust Indicator Icons -->
+<div class="mt-20 flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
+<span class="font-display-lg text-title-md text-primary font-bold">SECURE.</span>
+<span class="font-display-lg text-title-md text-primary font-bold">FAST.</span>
+<span class="font-display-lg text-title-md text-primary font-bold">GLOBAL.</span>
+<span class="font-display-lg text-title-md text-primary font-bold">OBEY.</span>
+</div>
+</section>
+<!-- Live Ticker -->
+<div class="w-full bg-surface-container-low border-y border-outline-variant/20 overflow-hidden py-3">
+<div class="flex whitespace-nowrap ticker-scroll gap-12 items-center">
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">BTC/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$64,231.50</span>
+<span class="font-data-mono text-data-mono text-emerald-600">+2.4%</span>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ETH/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$3,421.12</span>
+<span class="font-data-mono text-data-mono text-emerald-600">+1.8%</span>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">SOL/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$145.67</span>
+<span class="font-data-mono text-data-mono text-red-600">-0.4%</span>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">USDC/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$1.0001</span>
+<span class="font-data-mono text-data-mono text-on-surface-variant">0.0%</span>
+</div>
+<!-- Repeat for infinite loop -->
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">BTC/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$64,231.50</span>
+<span class="font-data-mono text-data-mono text-emerald-600">+2.4%</span>
+</div>
+<div class="flex items-center gap-4 px-4">
+<span class="font-label-caps text-label-caps text-on-surface-variant">ETH/USD</span>
+<span class="font-data-mono text-data-mono text-primary">$3,421.12</span>
+<span class="font-data-mono text-data-mono text-emerald-600">+1.8%</span>
+</div>
+</div>
+</div>
+<!-- Trust Indicator Section -->
+<section class="py-stack-lg px-container-padding-mobile md:px-container-padding-desktop bg-white">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-stack-lg items-center">
+<div class="space-y-stack-md">
+<h2 class="font-headline-lg text-headline-lg text-primary">Security first.<br/>Enterprise-ready.</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">We process over $2.5B in monthly volume with zero downtime. Our infrastructure is built on multiple layers of bank-grade encryption and cold-storage institutional custody.</p>
+<div class="flex items-center gap-stack-md pt-stack-sm">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-white bg-surface-container-high overflow-hidden">
+<img alt="Partner 1" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLvTVbhq546mOf8dL77Ja-Exg2yV2s_QiRP35EtQ9LgO9PNwUClysBddVzQwJjOm_4nvRpOg-F6Yf4QqpwUCZdZsbGjcfCoQCf91zQCNsM0V2XIUG6rVqyH6GNeK3iBlIGnGybylDB7gnjfcxTHKhgGxRZoVHmtj4YRw9OvqXA2G3SK8csWMtNNkrGvLqKN8NXIdB2nMHDqg3GoWxYcn07Vc7kz1L4Ygr_kE90c0lGAQ4RouKSVo-Vxa1Av6"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-surface-container-high overflow-hidden">
+<img alt="Partner 2" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLtbXYHvOr2ZRFyFNm0DkFHigcmCIok9-kRSJHHb0BzVuGlhAk6kKGuPXO3C5DR2RCegXBgXmJ4IrxhH_QMpCME0tJ03gi-glVv2HgGzXXTuCtj4EoFcXZGcb7_N8ItjhumvACZvI3ML9o2oIYMskqNl50ckPIRpKZ8iLWkpekISJQw-zBrcuBBXaoIdFFCTgqKrT48psKVvcUQOicC3fXjruU822DmfCpn5n81nz3LY2F-2aojUubWICzH8"/>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-white bg-surface-container-high overflow-hidden">
+<img alt="Partner 3" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida/AP1WRLs7nz_6megBwxaV879wMwd2cAiNUhMPuejOrrdi0ZV4QIAE8HIO9v3DKnVMarZ6ug0keyTw5aHTI9xAzj-t09N3_I68E3BI8acFw3daD-wpc8wvgy6CuGePbvRn63MEXedxBWMgecOkP3KnzrslA3KUnhR_vP7GBQW0FQNfLY1MUTrntQk8dPcNsV-fomKrfTFI9lWRO6kBcfIpJ7Z2R42fY-TjINBbzNVmHljcmRYAtssDoPf2mUEVviA"/>
+</div>
+</div>
+<span class="text-body-sm font-body-sm text-on-surface-variant">Trusted by 500+ global enterprises</span>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute -inset-4 bg-secondary/5 rounded-[2rem] blur-2xl group-hover:bg-secondary/10 transition-all"></div>
+<div class="relative glass-card rounded-[1.5rem] p-1 overflow-hidden shadow-2xl">
+<img class="w-full h-[400px] object-cover rounded-[1.25rem]" data-alt="A high-fidelity close-up of a futuristic digital vault interface, showcasing translucent glass surfaces and glowing holographic lock symbols. The lighting is dominated by deep indigo and electric blue tones, reflecting a clean and professional fintech aesthetic. Subtle light rays penetrate the dark background, emphasizing security, strength, and advanced cryptography." src="https://lh3.googleusercontent.com/aida/AP1WRLutHcPnESDSgtsjZdmPdcJ8Hyel06r_xgaHB-pqd4GLpKIFHdNWm9kOWO8AJsw52-xFJzpZEoVR6HmaIrN1svxo-6z30hRNvB6PUuDxC-5UjQ8EwxMSC9veKQTo2-Pjv8EGvbjw8dbUq0zRfr1Kwu3wAIK2_MwzG11xPdPVmXOSXSaMoZkAinZqNlI-9NE9PZv7t9Ao1OiogtNjoGot3tXAoPNyLX57aiYJ40sOsy3SO0CFpnUYiTD84LNG"/>
+<div class="absolute bottom-6 left-6 right-6 glass-card p-4 rounded-xl border border-white/20">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-label-caps text-label-caps text-on-surface-variant">PROTECTION LEVEL</p>
+<p class="font-title-md text-title-md text-primary">Military Grade AES-256</p>
+</div>
+<span class="material-symbols-outlined text-secondary scale-125" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Features: Bento Grid Layout -->
+<section class="py-stack-lg px-container-padding-mobile md:px-container-padding-desktop bg-surface">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-lg gap-stack-md">
+<div class="max-w-2xl">
+<span class="text-secondary font-label-caps text-label-caps tracking-[0.2em] mb-stack-sm block">CAPABILITIES</span>
+<h2 class="font-headline-lg text-headline-lg text-primary">Modular Financial Engineering.</h2>
+</div>
+<a class="group inline-flex items-center gap-2 text-primary font-label-caps text-label-caps border-b border-primary/20 pb-1 hover:border-primary transition-all" href="#">
+                        EXPLORE ALL PRODUCTS <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-stack-md h-auto md:h-[600px]">
+<!-- Large Feature: Payments -->
+<div class="md:col-span-8 group relative overflow-hidden rounded-3xl bg-white border border-outline-variant/30 hover:shadow-2xl transition-all duration-500">
+<div class="absolute inset-0 bg-[radial-gradient(circle_at_100%_0%,_rgba(45,91,255,0.05)_0%,_transparent_50%)]"></div>
+<div class="p-10 flex flex-col h-full">
+<div class="mb-auto">
+<span class="material-symbols-outlined text-secondary mb-stack-sm text-4xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+<h3 class="font-title-md text-[28px] text-primary mb-stack-sm">Global Instant Payments</h3>
+<p class="text-on-surface-variant max-w-sm">Settle cross-border transactions in seconds, not days. Connect your local bank to the global digital economy.</p>
+</div>
+<div class="mt-10 overflow-hidden rounded-2xl border border-outline-variant/20 shadow-lg">
+<img class="w-full h-[250px] object-cover group-hover:scale-105 transition-transform duration-700" data-alt="An ultra-modern minimalist payment dashboard visible on a high-resolution display. The UI features clean white cards, subtle blue progress bars, and elegant sans-serif typography. The scene is shot from a shallow depth of field in a sunlit architectural studio, conveying a sense of calm professionalism and financial clarity in light mode." src="https://lh3.googleusercontent.com/aida/AP1WRLva0NJEFytGfzPdwC4OJPE6OYjAZ1jGgx16a49W_3vK6FENBhH9mud1pbJie-wFCwg58wQcM_KUyfmBGU6-moRmhwOO-y9uIq4Fs5GdyntBd46hcPCxbMXVYKV6wuIm85gHMQkkMBXyw7G55FWpQd99Te55-ebew6Phe_I3L1PQ5YIqud9UKHljLG1O_PZF2M14sUVrj4CpWlAngdaFCvEenEoeEB9Q_H-AmE7EauEzV7e1RELEv28ooI8Y"/>
+</div>
+</div>
+</div>
+<!-- Secondary Feature: Crypto -->
+<div class="md:col-span-4 group relative overflow-hidden rounded-3xl bg-primary text-white hover:shadow-2xl transition-all duration-500">
+<div class="absolute inset-0 premium-shimmer opacity-10"></div>
+<div class="p-10 flex flex-col h-full">
+<span class="material-symbols-outlined text-secondary-fixed-dim mb-stack-sm text-4xl">currency_exchange</span>
+<h3 class="font-title-md text-title-md mb-stack-sm text-primary-fixed">Digital Asset Vault</h3>
+<p class="text-on-primary-container text-body-sm mb-stack-lg">Institutional-grade custody for Bitcoin, Ethereum, and major stablecoins. Securely trade with zero spread.</p>
+<div class="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
+<span class="font-data-mono text-data-mono text-secondary-fixed-dim">LIVE TRADING</span>
+<div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+</div>
+</div>
+</div>
+<!-- Tertiary Feature: Gift Cards -->
+<div class="md:col-span-12 group relative overflow-hidden rounded-3xl bg-white border border-outline-variant/30 hover:shadow-xl transition-all duration-500">
+<div class="p-8 md:flex items-center gap-stack-lg">
+<div class="w-16 h-16 rounded-2xl bg-surface-container-high flex items-center justify-center mb-stack-md md:mb-0">
+<span class="material-symbols-outlined text-primary text-3xl">featured_seasonal_and_gifts</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-primary">Global Gift Card Network</h3>
+<p class="text-on-surface-variant text-body-sm">Redeem your assets for 2,000+ top brands instantly. No fees, no fuss.</p>
+</div>
+<button class="mt-stack-md md:mt-0 px-6 py-3 rounded-full border border-primary text-primary font-label-caps text-label-caps hover:bg-primary hover:text-white transition-all active:scale-95">
+                                GET THE APP
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Why Choose Obey: Minimalist Grid -->
+<section class="py-stack-lg px-container-padding-mobile md:px-container-padding-desktop bg-white">
+<div class="max-w-7xl mx-auto text-center mb-20">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-stack-sm">Why Professional Firms Choose OBEY.</h2>
+<div class="w-16 h-1 bg-secondary mx-auto rounded-full"></div>
+</div>
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+<div class="group">
+<div class="mb-stack-md w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-low text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+<h4 class="font-title-md text-title-md text-primary mb-stack-sm">Sub-second Latency</h4>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">Our engine is built for speed. Execute trades and settle payments at the speed of thought, anywhere in the world.</p>
+</div>
+<div class="group">
+<div class="mb-stack-md w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-low text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined">shield_lock</span>
+</div>
+<h4 class="font-title-md text-title-md text-primary mb-stack-sm">Deep Liquidity</h4>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">Access massive liquidity pools without moving the market. Secure execution for orders of any size.</p>
+</div>
+<div class="group">
+<div class="mb-stack-md w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-low text-secondary group-hover:bg-secondary group-hover:text-white transition-all duration-300">
+<span class="material-symbols-outlined">api</span>
+</div>
+<h4 class="font-title-md text-title-md text-primary mb-stack-sm">Unified API</h4>
+<p class="text-body-sm text-on-surface-variant leading-relaxed">One clean interface for every financial action. Build on top of OBEY with our developer-first SDKs.</p>
+</div>
+</div>
+</section>
+<!-- Final CTA Section -->
+<section class="py-24 px-container-padding-mobile md:px-container-padding-desktop">
+<div class="max-w-7xl mx-auto relative rounded-[2.5rem] bg-primary overflow-hidden p-10 md:p-20 text-center">
+<div class="absolute inset-0 opacity-10">
+
+</div>
+<div class="relative z-10 space-y-stack-md max-w-3xl mx-auto">
+<h2 class="font-display-lg text-[32px] md:text-[56px] text-white leading-tight">Ready to transcend traditional finance?</h2>
+<p class="text-primary-fixed text-body-lg opacity-80">Join 2M+ users and 10,000+ businesses redefining money.</p>
+<div class="pt-stack-md">
+<button class="bg-secondary-container text-white px-10 py-5 rounded-2xl font-title-md text-title-md hover:scale-105 transition-transform shadow-2xl shadow-secondary/40 active:scale-95">
+                            Open Your Account
+                        </button>
+</div>
+<p class="text-white/40 text-label-caps pt-4 tracking-widest">NO MONTHLY FEES • ZERO SETUP COST • 24/7 SUPPORT</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface py-20 px-container-padding-mobile md:px-container-padding-desktop border-t border-outline-variant/30">
+<div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-6 gap-stack-lg">
+<div class="col-span-2 space-y-stack-md">
+<span class="font-display-lg text-display-lg font-bold tracking-tighter text-primary">OBEY</span>
+<p class="text-body-sm text-on-surface-variant max-w-xs">Building the global standard for digital liquidity and payment infrastructure.</p>
+<div class="flex gap-stack-sm">
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-secondary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">public</span>
+</a>
+<a class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-secondary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">alternate_email</span>
+</a>
+</div>
+</div>
+<div class="space-y-4">
+<h5 class="text-primary font-bold text-label-caps">Platform</h5>
+<ul class="space-y-2 text-body-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Payments</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Crypto Vault</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Cards</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Yield</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-primary font-bold text-label-caps">Company</h5>
+<ul class="space-y-2 text-body-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">About</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Press</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Contact</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-primary font-bold text-label-caps">Legal</h5>
+<ul class="space-y-2 text-body-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Privacy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Terms</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Cookie Policy</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">AML</a></li>
+</ul>
+</div>
+<div class="space-y-4">
+<h5 class="text-primary font-bold text-label-caps">Support</h5>
+<ul class="space-y-2 text-body-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">API Docs</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Status</a></li>
+</ul>
+</div>
+</div>
+<div class="max-w-7xl mx-auto mt-20 pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-4 text-on-surface-variant text-label-caps">
+<p>© 2024 OBEY FINANCIAL TECHNOLOGIES LTD. ALL RIGHTS RESERVED.</p>
+<div class="flex gap-6">
+<span>SYSTEM STATUS: OPERATIONAL</span>
+<span>GLOBAL VERSION: 2.4.0-STABLE</span>
+</div>
+</div>
+</footer>
+<!-- Bottom Nav Shell (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.04)] flex justify-around items-center h-20 pb-safe px-unit">
+<a class="flex flex-col items-center justify-center gap-1 text-secondary font-bold" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">account_balance_wallet</span>
+<span class="font-label-caps text-label-caps">Wallet</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">currency_exchange</span>
+<span class="font-label-caps text-label-caps">Trade</span>
+</a>
+<a class="flex flex-col items-center justify-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions and smooth scroll
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.addEventListener('mousedown', () => btn.classList.add('scale-95'));
+                btn.addEventListener('mouseup', () => btn.classList.remove('scale-95'));
+                btn.addEventListener('mouseleave', () => btn.classList.remove('scale-95'));
+            });
+            
+            // Interaction for product cards
+            const cards = document.querySelectorAll('.group');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                });
+            });
+        });
+    </script>
+</body></html>
