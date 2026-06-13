@@ -197,14 +197,14 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Quick Actions Grid */}
-        <motion.section variants={itemVariants} className="lg:col-span-7 grid grid-cols-2 gap-6">
+        <motion.section variants={itemVariants} className="lg:col-span-12 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { id: "buy-airtime", label: "Airtime", desc: "Global Top-up", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50" },
             { id: "buy-data", label: "Network", desc: "Data Bundles", icon: Zap, color: "text-amber-500", bg: "bg-amber-50" },
-            { id: "buy-giftcard", label: "Gifts", desc: "Digital Market", icon: Gift, color: "text-purple-500", bg: "bg-purple-50" },
+            { id: "buy-giftcard", label: "Buy Gifts", desc: "Digital Market", icon: Gift, color: "text-purple-500", bg: "bg-purple-50" },
             { id: "sell-giftcard", label: "Sell Card", desc: "Fast Liquidity", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50" }
           ].map((action) => (
-            <button 
+            <button
               key={action.id}
               onClick={() => onSelectAction(action.id)}
               className="bento-card p-8 flex flex-col justify-between gap-6 hover:border-primary/40 group active-press"
@@ -214,37 +214,11 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               </div>
               <div>
                 <p className="text-xl font-black text-gray-900 tracking-tight">{action.label}</p>
-                <p className="text-sm text-gray-400 font-medium mt-1">{action.desc}</p>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{action.desc}</p>
               </div>
             </button>
           ))}
         </motion.section>
-
-        {/* Reference Image: Dashboard Improvement Widget */}
-        <motion.div 
-          variants={itemVariants}
-          className="lg:col-span-5 bento-card p-0 overflow-hidden relative group cursor-pointer"
-        >
-          <img 
-            src="/Dasboard improvement.jpg" 
-            alt="Dashboard Performance" 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          <div className="absolute bottom-8 left-8 right-8 space-y-3">
-             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary text-white text-[9px] font-black uppercase tracking-widest">
-              Live Preview
-            </div>
-            <h3 className="text-2xl font-black text-white tracking-tight leading-tight">
-              Institutional Console v4.0 <br />
-              <span className="text-white/60">Coming Summer 2026.</span>
-            </h3>
-            <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest pt-2">
-              Learn More <ArrowRight size={14} />
-            </div>
-          </div>
-        </motion.div>
-
       </div>
 
       {/* Bottom Row: Ledger + Market */}

@@ -51,6 +51,7 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.MARKETING);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
   // System Alert State
   const [systemAlert, setSystemAlert] = useState({

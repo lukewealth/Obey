@@ -6,6 +6,7 @@ import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import vtuRoutes from './routes/vtu';
 import syncRoutes from './routes/sync';
+import giftCardRoutes from './routes/giftcards';
 import { connectDB } from './db';
 
 dotenv.config();
@@ -67,6 +68,7 @@ app.use('/api/ai', sanitizeInput); // Apply only to AI endpoints if they exist
 // Routes
 app.use('/api/vtu', vtuRoutes);
 app.use('/api/sync', syncRoutes);
+app.use('/api/giftcards', giftCardRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ 

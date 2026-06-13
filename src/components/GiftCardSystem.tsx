@@ -1,12 +1,13 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UserProfile, GiftCardAsset, GiftCardTab } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Gift, DollarSign, ArrowDownLeft, ArrowUpRight, Check, Upload, Trash, 
   HelpCircle, ShieldAlert, ArrowRight, ChevronRight, Calculator, 
   FileText, Image, RefreshCw, Smartphone, Search, Zap, Star, Activity,
-  ShieldCheck
+  ShieldCheck, Globe, ShoppingCart, Gamepad2, Info
 } from "lucide-react";
+import api from "../services/api";
 
 interface GiftCardSystemProps {
   profile: UserProfile;
@@ -18,9 +19,11 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
   const [selectedCard, setSelectedCard] = useState<string>("itunes");
   const [cardValue, setCardValue] = useState("");
   const [claimCode, setClaimCode] = useState("");
+  const [rates, setRates] = useState<GiftCardAsset[]>([]);
+  const [loadingRates, setLoadingRates] = useState(true);
 
   // Rate calculator
-  const [calcBrand, setCalcBrand] = useState("steam");
+  const [calcBrand, setCalcBrand] = useState("itunes");
   const [calcQty, setCalcQty] = useState("100");
   const [calcType, setCalcType] = useState<"buy" | "sell">("sell");
 
@@ -32,15 +35,34 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
   // States
   const [stage, setStage] = useState<"idle" | "processing" | "completed">("idle");
   const [checkoutSheet, setCheckoutSheet] = useState(false);
+  const [marketActivity, setMarketActivity] = useState<any[]>([]);
 
-  const giftCards: GiftCardAsset[] = [
-    { id: "itunes", brand: "Apple", region: "Global", buyRate: 1480, sellRate: 1520, trend: "+1.2%", logoUrl: "A", description: "Universal app store and media credits." },
-    { id: "steam", brand: "Steam", region: "USA/UK", buyRate: 1515, sellRate: 1560, trend: "+2.4%", logoUrl: "S", description: "Gaming platform asset codes." },
-    { id: "amazon", brand: "Amazon", region: "USA/GER", buyRate: 1350, sellRate: 1420, trend: "-0.5%", logoUrl: "Z", description: "E-commerce retail credits." },
-    { id: "razer", brand: "Razer Gold", region: "Global", buyRate: 1530, sellRate: 1585, trend: "+4.1%", logoUrl: "R", description: "Gaming and virtual pin credits." },
-  ];
+  useEffect(() => {
+    fetchRates();
+    fetchActivity();
+  }, []);
 
-  const activeCardDetails = giftCards.find((c) => c.id === selectedCard) || giftCards[0];
+  const fetchRates = async () => {
+    try {
+      const response = await api.get('/giftcards/rates');
+      setRates(response.data);
+      setLoadingRates(false);
+    } catch (error) {
+      console.error('Failed to fetch rates:', error);
+      setLoadingRates(false);
+    }
+  };
+
+  const fetchActivity = async () => {
+    // Mock activity for now, could be fetched from backend
+    setMarketActivity([
+      { id: 1, brand: "Apple USD", type: "Purchase", volume: 500.00, status: "Completed", time: "2m ago" },
+      { id: 2, brand: "Amazon GBP", type: "Sale", volume: 250.00, status: "Processing", time: "15m ago" },
+      { id: 3, brand: "Steam Global", type: "Purchase", volume: 100.00, status: "Completed", time: "1h ago" },
+    ]);
+  };
+
+  const activeCardDetails = rates.find((c) => c.id === selectedCard) || rates[0];
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -65,28 +87,34 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     }
   };
 
-  const triggerSellPipeline = (e: React.FormEvent) => {
-    e.preventDefault();
+  const triggerTrade = async (type: 'buy' | 'sell') => {
     const val = parseFloat(cardValue);
     if (!val || val <= 0) return;
 
     setStage("processing");
-    setTimeout(() => {
-      setStage("completed");
-      onTradeCompleted(val, `Redeemed $${val} ${activeCardDetails.brand} Card`, true);
-    }, 3000);
-  };
+    try {
+      const totalAmount = type === 'buy' ? val : val * (activeCardDetails.sellRate / 1000); // Sample rate math
+      
+      const response = await api.post('/giftcards/trade', {
+        userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id", // Should use real ID
+        type,
+        brand: activeCardDetails.brand,
+        amount: val,
+        totalAmount,
+        details: `${type === 'buy' ? 'Purchased' : 'Sold'} ${activeCardDetails.brand} Gift Card`
+      });
 
-  const triggerBuyPipeline = () => {
-    const val = parseFloat(cardValue);
-    if (!val || val <= 0 || val > profile.balance) return;
-
-    setStage("processing");
-    setTimeout(() => {
-      setStage("completed");
-      onTradeCompleted(val, `Purchased $${val} ${activeCardDetails.brand} Code`, false);
-      setCheckoutSheet(false);
-    }, 2500);
+      if (response.data.success) {
+        setTimeout(() => {
+          setStage("completed");
+          onTradeCompleted(totalAmount, response.data.transaction.title, type === 'sell');
+          setCheckoutSheet(false);
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Trade failed:', error);
+      setStage("idle");
+    }
   };
 
   const resetTradeScreen = () => {
@@ -102,18 +130,24 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     exit: { opacity: 0, y: -15 }
   };
 
+  if (loadingRates) return (
+    <div className="flex items-center justify-center h-96">
+      <RefreshCw className="animate-spin text-primary" size={40} />
+    </div>
+  );
+
   return (
     <div className="space-y-12 pb-24">
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Gift Card Market</h2>
-          <p className="text-gray-500 font-medium">Liquidate digital assets or acquire premium brand codes.</p>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Gift Card Marketplace</h2>
+          <p className="text-gray-500 font-medium">Institutional-grade liquidity for premium digital assets.</p>
         </div>
-        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto">
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[22px] border border-gray-200 w-full md:w-fit overflow-hidden">
           {[
-            { id: GiftCardTab.BUY, label: "Buy Codes", icon: Smartphone },
-            { id: GiftCardTab.SELL, label: "Sell / Redeem", icon: RefreshCw }
+            { id: GiftCardTab.BUY, label: "Buy Assets", icon: ShoppingCart },
+            { id: GiftCardTab.SELL, label: "Liquidate / Sell", icon: RefreshCw }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -139,301 +173,314 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
             initial="initial"
             animate="animate"
             exit="exit"
-            className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start"
+            className="space-y-12"
           >
-            {/* Action Card */}
-            <div className="lg:col-span-8 bento-card p-10 space-y-12 group overflow-hidden">
-               <div className="absolute top-0 right-0 w-96 h-96 bg-accent-blue/30 rounded-full blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-[3s]"></div>
-               
-               <div className="flex justify-between items-center border-b border-gray-100 pb-10 relative z-10">
-                <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-gray-900 tracking-tight">
-                    {activeTab === GiftCardTab.BUY ? "Acquisition Terminal" : "Liquidity Gateway"}
-                  </h3>
-                  <p className="text-sm text-gray-500 font-medium mt-1">Select merchant and configure asset magnitude.</p>
-                </div>
-                <div className="w-14 h-14 bg-primary/10 rounded-[22px] flex items-center justify-center text-primary">
-                   <Gift size={28} />
-                </div>
+            {/* Top Assets Grid */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between px-4">
+                 <h3 className="text-xl font-black tracking-tight">Top Assets</h3>
+                 <button className="text-primary text-xs font-black uppercase tracking-widest hover:underline">View All Nodes</button>
               </div>
-
-              {/* Brand Grid */}
-              <div className="space-y-5 relative z-10">
-                <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Premium Merchants</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                  {giftCards.map((card) => (
-                    <button
-                      key={card.id}
-                      onClick={() => setSelectedCard(card.id)}
-                      className={`p-8 rounded-[32px] border transition-all duration-400 group/p flex flex-col items-center text-center ${
-                        selectedCard === card.id
-                          ? "border-primary bg-white shadow-xl shadow-primary/10"
-                          : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
-                      }`}
-                    >
-                      <div className={`w-16 h-16 rounded-[22px] ${selectedCard === card.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-gray-50 text-gray-400'} flex items-center justify-center font-black text-2xl mb-4 transition-all group-hover/p:scale-110`}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {rates.map((card) => (
+                  <button
+                    key={card.id}
+                    onClick={() => setSelectedCard(card.id)}
+                    className={`p-8 rounded-[35px] border transition-all duration-500 group relative overflow-hidden text-left ${
+                      selectedCard === card.id
+                        ? "border-primary bg-white shadow-[0_30px_60px_-15px_rgba(0,87,255,0.15)]"
+                        : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
+                    }`}
+                  >
+                    <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                       <ShoppingCart size={80} />
+                    </div>
+                    <div className="flex justify-between items-start mb-6 relative z-10">
+                      <div className={`w-14 h-14 rounded-2xl ${selectedCard === card.id ? 'bg-primary text-white' : 'bg-gray-900 text-white'} flex items-center justify-center font-black text-2xl transition-all group-hover:scale-110 shadow-lg`}>
                         {card.logoUrl === 'A' ? <Star size={24} fill="currentColor" /> : card.logoUrl}
                       </div>
-                      <p className="text-sm font-black text-gray-900 tracking-tight uppercase">{card.brand}</p>
-                      <p className="text-[9px] text-emerald-500 font-black mt-1 uppercase tracking-widest">Optimized</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <form onSubmit={activeTab === GiftCardTab.SELL ? triggerSellPipeline : (e) => { e.preventDefault(); setCheckoutSheet(true); }} className="space-y-10 relative z-10">
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Magnitude (USD)</label>
-                      <div className="relative">
-                        <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-primary" size={24} />
-                        <input
-                          type="number"
-                          required
-                          value={cardValue}
-                          onChange={(e) => setCardValue(e.target.value)}
-                          placeholder="0.00"
-                          className="w-full h-16 pl-16 pr-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-black focus:ring-2 focus:ring-primary/10 outline-none transition-all"
-                        />
+                      <div className="bg-emerald-500/10 px-2.5 py-1 rounded-lg">
+                        <span className="text-emerald-600 text-[10px] font-black">{card.trend}</span>
                       </div>
                     </div>
-
-                    <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">
-                        {activeTab === GiftCardTab.BUY ? "Protocol Mode" : "Authorization Secret"}
-                      </label>
-                      <input
-                        type="text"
-                        disabled={activeTab === GiftCardTab.BUY}
-                        value={activeTab === GiftCardTab.BUY ? "AUTO-SETTLEMENT" : claimCode}
-                        onChange={(e) => setClaimCode(e.target.value)}
-                        placeholder="XXXX-XXXX-XXXX"
-                        className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-black focus:ring-2 focus:ring-primary/10 outline-none disabled:opacity-40 transition-all uppercase tracking-widest"
-                      />
+                    <h4 className="text-2xl font-black text-gray-900 tracking-tighter mb-1 uppercase">{card.brand}</h4>
+                    <p className="text-[11px] text-gray-400 font-bold uppercase tracking-[0.1em] mb-6">{card.region}</p>
+                    
+                    <div className="flex justify-between items-end relative z-10">
+                       <div className="space-y-1">
+                          <p className="text-[9px] text-gray-400 font-black uppercase tracking-widest">Global Rate</p>
+                          <p className="text-xl font-black text-primary font-mono">${(card.buyRate / 1600).toFixed(2)}<span className="text-xs text-gray-400">/$1</span></p>
+                       </div>
+                       <div className={`w-10 h-10 rounded-full ${selectedCard === card.id ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400'} flex items-center justify-center transition-all`}>
+                          <ArrowRight size={18} />
+                       </div>
                     </div>
-                 </div>
-
-                 {activeTab === GiftCardTab.SELL && (
-                  <div className="space-y-5">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Asset Node (Physical Copy)</label>
-                    <AnimatePresence mode="wait">
-                      {uploadedFile ? (
-                        <motion.div 
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="flex items-center justify-between p-8 bg-accent-blue/30 border border-blue-100 rounded-[32px]"
-                        >
-                          <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center text-primary shadow-sm">
-                              <Image size={28} />
-                            </div>
-                            <div className="space-y-1">
-                              <p className="text-lg font-black text-gray-900 truncate max-w-xs">{uploadedFile.name}</p>
-                              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Node ready for audit</p>
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setUploadedFile(null)}
-                            className="w-14 h-14 bg-red-50 hover:bg-red-100 text-red-500 rounded-2xl transition-all active-press flex items-center justify-center"
-                          >
-                            <Trash size={24} />
-                          </button>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          onDragEnter={handleDrag}
-                          onDragOver={handleDrag}
-                          onDragLeave={handleDrag}
-                          onDrop={handleDrop}
-                          onClick={() => fileInputRef.current?.click()}
-                          className={`border-2 border-dashed rounded-[45px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-all duration-400 ${
-                            dragActive 
-                              ? "border-primary bg-accent-blue/40" 
-                              : "border-gray-200 bg-gray-50/50 hover:bg-white hover:border-primary/20"
-                          }`}
-                        >
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                          <div className="w-20 h-20 bg-white rounded-[28px] flex items-center justify-center text-gray-300 shadow-sm mb-6">
-                            <Upload size={40} />
-                          </div>
-                          <h4 className="text-xl font-black text-gray-900 tracking-tight">Broadcast Card Asset</h4>
-                          <p className="text-sm text-gray-400 font-medium mt-2">Drag high-fidelity capture or <span className="text-primary font-bold">browse device node</span></p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                 )}
-
-                 <button
-                  type="submit"
-                  disabled={!cardValue || (activeTab === GiftCardTab.SELL && !uploadedFile)}
-                  className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50"
-                >
-                  <div className="flex items-center gap-3">
-                     {activeTab === GiftCardTab.BUY ? "Process Acquisition" : "Initiate Audit"} <ArrowRight size={20} />
-                  </div>
-                </button>
-              </form>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Info Bento Column */}
-            <div className="lg:col-span-4 space-y-8">
-               <div className="bento-card p-10 space-y-10 group overflow-hidden">
-                  <div className="absolute -top-4 -right-4 w-32 h-32 bg-accent-yellow/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-                  
-                  <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-12 h-12 bg-accent-blue rounded-[20px] flex items-center justify-center text-primary">
-                      <Calculator size={24} />
-                    </div>
-                    <h4 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.3em]">Market Index</h4>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+               {/* Transaction Terminal */}
+               <div className="lg:col-span-8 bento-card p-10 space-y-10">
+                  <div className="flex items-center gap-4 border-b border-gray-100 pb-8">
+                     <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+                        {activeTab === GiftCardTab.BUY ? <ShoppingCart size={24} /> : <ArrowUpRight size={24} />}
+                     </div>
+                     <div>
+                        <h3 className="text-xl font-black tracking-tight">{activeTab === GiftCardTab.BUY ? 'Acquisition Terminal' : 'Redemption Gateway'}</h3>
+                        <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mt-1">Merchant: {activeCardDetails.brand}</p>
+                     </div>
                   </div>
 
-                  <div className="space-y-8 relative z-10">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-2">Asset Merchant</label>
-                      <select 
-                        value={calcBrand}
-                        onChange={(e) => setCalcBrand(e.target.value)}
-                        className="w-full h-14 px-6 bg-gray-50 border border-gray-100 rounded-[18px] text-sm font-black outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-                      >
-                        {giftCards.map(c => <option key={c.id} value={c.id}>{c.brand} (USA/GLOBAL)</option>)}
-                      </select>
-                    </div>
+                  <form onSubmit={(e) => { e.preventDefault(); activeTab === GiftCardTab.BUY ? setCheckoutSheet(true) : triggerTrade('sell'); }} className="space-y-10">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                           <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Magnitude (USD)</label>
+                           <div className="relative">
+                              <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-primary" size={24} />
+                              <input
+                                 type="number"
+                                 required
+                                 value={cardValue}
+                                 onChange={(e) => setCardValue(e.target.value)}
+                                 placeholder="0.00"
+                                 className="w-full h-16 pl-16 pr-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-black focus:ring-2 focus:ring-primary/10 outline-none transition-all shadow-inner"
+                              />
+                           </div>
+                        </div>
+                        <div className="space-y-3">
+                           <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">{activeTab === GiftCardTab.BUY ? 'Settlement Protocol' : 'Card / Pin Secret'}</label>
+                           <input
+                              type="text"
+                              required={activeTab === GiftCardTab.SELL}
+                              value={activeTab === GiftCardTab.BUY ? "AUTO-SETTLEMENT" : claimCode}
+                              onChange={(e) => setClaimCode(e.target.value)}
+                              disabled={activeTab === GiftCardTab.BUY}
+                              placeholder="XXXX-XXXX-XXXX"
+                              className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-black focus:ring-2 focus:ring-primary/10 outline-none transition-all uppercase tracking-widest disabled:opacity-40 shadow-inner"
+                           />
+                        </div>
+                     </div>
 
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-2">Magnitude (USD)</label>
-                      <input 
-                        type="number"
-                        value={calcQty}
-                        onChange={(e) => setCalcQty(e.target.value)}
-                        className="w-full h-14 px-6 bg-gray-50 border border-gray-100 rounded-[18px] text-lg font-black outline-none focus:ring-2 focus:ring-primary/10 transition-all"
-                      />
-                    </div>
+                     {activeTab === GiftCardTab.SELL && (
+                        <div className="space-y-4">
+                           <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Asset Proof (Physical Node)</label>
+                           <div 
+                              onDragEnter={handleDrag} onDragOver={handleDrag} onDragLeave={handleDrag} onDrop={handleDrop}
+                              onClick={() => fileInputRef.current?.click()}
+                              className={`border-2 border-dashed rounded-[40px] p-16 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${dragActive ? 'border-primary bg-primary/5' : 'border-gray-100 bg-gray-50/50 hover:bg-white hover:border-primary/20'}`}
+                           >
+                              <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                              {uploadedFile ? (
+                                 <div className="flex items-center gap-4 bg-white p-6 rounded-[24px] shadow-xl border border-gray-100 animate-in zoom-in-95">
+                                    <Image className="text-primary" size={32} />
+                                    <div className="text-left">
+                                       <p className="text-sm font-black truncate max-w-[200px] uppercase">{(uploadedFile as any).name}</p>
+                                       <p className="text-[9px] text-emerald-500 font-black uppercase tracking-widest">Asset Ready</p>
+                                    </div>
+                                    <button type="button" onClick={(e) => { e.stopPropagation(); setUploadedFile(null); }} className="w-10 h-10 bg-red-50 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-100 transition-all"><Trash size={18} /></button>
+                                 </div>
+                              ) : (
+                                 <>
+                                    <div className="w-20 h-20 bg-white rounded-[28px] flex items-center justify-center text-gray-200 shadow-sm mb-6">
+                                       <Upload size={32} />
+                                    </div>
+                                    <h4 className="text-xl font-black text-gray-900 tracking-tight">Upload Asset Proof</h4>
+                                    <p className="text-sm text-gray-400 font-medium mt-2 max-w-xs mx-auto">High-fidelity capture of your physical asset for sub-second audit.</p>
+                                 </>
+                              )}
+                           </div>
+                        </div>
+                     )}
 
-                    <div className="flex bg-gray-100 p-1.5 rounded-[18px]">
-                      <button 
-                        onClick={() => setCalcType("sell")}
-                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${calcType === "sell" ? "bg-emerald-500 text-white shadow-lg" : "text-gray-400"}`}
-                      >
-                        Redeem
-                      </button>
-                      <button 
-                        onClick={() => setCalcType("buy")}
-                        className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${calcType === "buy" ? "bg-primary text-white shadow-lg" : "text-gray-400"}`}
-                      >
-                        Acquire
-                      </button>
-                    </div>
-
-                    <div className="pt-8 border-t border-gray-100 flex justify-between items-end px-2">
-                      <div className="space-y-1">
-                         <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Est. Settlement</span>
-                         <p className="text-xs font-bold text-gray-900 uppercase">Primary Vault</p>
-                      </div>
-                      <span className="text-3xl font-black text-gray-900 font-mono tracking-tighter">
-                        ₦{(parseFloat(calcQty) * (calcType === "sell" ? activeCardDetails.sellRate : activeCardDetails.buyRate)).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
+                     <button
+                        type="submit"
+                        disabled={!cardValue || (activeTab === GiftCardTab.SELL && (!uploadedFile || !claimCode))}
+                        className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-base uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(0,87,255,0.4)] transition-all flex items-center justify-center active-press disabled:opacity-50 disabled:shadow-none"
+                     >
+                        <div className="flex items-center gap-3">
+                           {activeTab === GiftCardTab.BUY ? 'Confirm Acquisition' : 'Initiate Liquidaton'} <ArrowRight size={20} />
+                        </div>
+                     </button>
+                  </form>
                </div>
 
-               <div className="bg-primary rounded-[45px] p-10 text-white relative overflow-hidden shadow-2xl shadow-primary/30 group">
-                  <div className="absolute inset-0 shimmer opacity-10"></div>
-                  <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-                  <div className="relative z-10 space-y-6">
-                    <ShieldCheck size={32} className="text-white/80" />
-                    <h5 className="text-2xl font-black tracking-tight leading-tight">Verification <br /> Protocol.</h5>
-                    <p className="text-white/60 font-medium text-sm leading-relaxed">
-                       Physical assets are audited across global nodes for sub-second settlement and risk mitigation.
-                    </p>
-                    <button className="text-white text-xs font-black uppercase tracking-[0.2em] border-b-2 border-white/20 hover:border-white transition-all pb-1.5">
-                       VIEW STANDARDS
-                    </button>
+               {/* Right Side Column */}
+               <div className="lg:col-span-4 space-y-8">
+                  {/* Liquidity Score Card */}
+                  <div className="bg-primary rounded-[45px] p-10 text-white relative overflow-hidden group shadow-2xl shadow-primary/20">
+                     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                     <div className="relative z-10 space-y-8">
+                        <div>
+                           <h4 className="text-[11px] font-black uppercase tracking-[0.4em] opacity-40 mb-4">Liquidity Score</h4>
+                           <div className="flex items-center gap-4">
+                              <span className="text-6xl font-black font-space">98.4</span>
+                              <div className="px-3 py-1 bg-white/20 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/20">Optimal</div>
+                           </div>
+                        </div>
+                        <p className="text-white/60 font-medium text-sm leading-relaxed">Market depth for primary assets is currently at peak level. Dynamic settlement enabled.</p>
+                        <button className="w-full py-5 bg-white text-primary rounded-[22px] text-xs font-black uppercase tracking-[0.2em] shadow-xl active-press hover:scale-[1.02] transition-all">GENERATE REPORT</button>
+                     </div>
+                  </div>
+
+                  {/* Calculator Bento */}
+                  <div className="bento-card p-10 space-y-10 group overflow-hidden">
+                     <div className="flex items-center gap-3 relative z-10">
+                        <div className="w-12 h-12 bg-accent-blue rounded-2xl flex items-center justify-center text-primary shadow-sm"><Calculator size={24} /></div>
+                        <h4 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.4em]">Exchange Desk</h4>
+                     </div>
+                     <div className="space-y-6 relative z-10">
+                        <div className="space-y-2">
+                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-2">Asset Merchant</label>
+                           <select 
+                              value={calcBrand} onChange={(e) => setCalcBrand(e.target.value)}
+                              className="w-full h-14 px-6 bg-gray-50 border border-gray-100 rounded-[18px] text-sm font-black outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                           >
+                              {rates.map(r => <option key={r.id} value={r.id}>{r.brand} (GLOBAL)</option>)}
+                           </select>
+                        </div>
+                        <div className="space-y-2">
+                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest pl-2">Value (USD)</label>
+                           <input 
+                              type="number" value={calcQty} onChange={(e) => setCalcQty(e.target.value)}
+                              className="w-full h-14 px-6 bg-gray-50 border border-gray-100 rounded-[18px] text-lg font-black outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                           />
+                        </div>
+                        <div className="flex bg-gray-100 p-1.5 rounded-[18px]">
+                           <button onClick={() => setCalcType('sell')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${calcType === 'sell' ? 'bg-emerald-500 text-white shadow-lg' : 'text-gray-400'}`}>Liquidate</button>
+                           <button onClick={() => setCalcType('buy')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${calcType === 'buy' ? 'bg-primary text-white shadow-lg' : 'text-gray-400'}`}>Acquire</button>
+                        </div>
+                        <div className="pt-8 border-t border-gray-100 flex justify-between items-end">
+                           <div className="space-y-1">
+                              <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Est. Settlement</span>
+                              <p className="text-[11px] font-bold text-gray-900 uppercase">Primary Vault</p>
+                           </div>
+                           <span className="text-3xl font-black text-gray-900 font-mono tracking-tighter">₦{(parseFloat(calcQty) * (calcType === 'sell' ? activeCardDetails.sellRate : activeCardDetails.buyRate)).toLocaleString()}</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* Market Activity Table */}
+            <div className="space-y-8">
+               <div className="flex items-center justify-between px-4">
+                  <h3 className="text-xl font-black tracking-tight">Market Activity</h3>
+                  <button className="text-outline text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Filters</button>
+               </div>
+               <div className="bento-card overflow-hidden">
+                  <div className="overflow-x-auto">
+                     <table className="w-full text-left">
+                        <thead>
+                           <tr className="bg-gray-50/50">
+                              <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Asset Node</th>
+                              <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Type</th>
+                              <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Volume</th>
+                              <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
+                              <th className="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Time</th>
+                           </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                           {marketActivity.map((act) => (
+                              <tr key={act.id} className="hover:bg-accent-blue/20 transition-all cursor-pointer group">
+                                 <td className="px-10 py-6">
+                                    <div className="flex items-center gap-4">
+                                       <div className="w-9 h-9 rounded-xl bg-gray-900 flex items-center justify-center text-white text-[10px] font-black group-hover:scale-110 transition-transform shadow-sm">
+                                          {act.brand[0]}
+                                       </div>
+                                       <span className="text-sm font-black text-gray-900 uppercase tracking-tight">{act.brand}</span>
+                                    </div>
+                                 </td>
+                                 <td className="px-10 py-6">
+                                    <span className={`text-[11px] font-black uppercase tracking-widest ${act.type === 'Purchase' ? 'text-primary' : 'text-indigo-600'}`}>{act.type}</span>
+                                 </td>
+                                 <td className="px-10 py-6 font-mono font-black text-gray-900">${act.volume.toFixed(2)}</td>
+                                 <td className="px-10 py-6">
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${act.status === 'Completed' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
+                                       <div className={`w-1 h-1 rounded-full ${act.status === 'Completed' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`}></div>
+                                       {act.status}
+                                    </div>
+                                 </td>
+                                 <td className="px-10 py-6 text-[10px] font-bold text-gray-400 uppercase tracking-widest">{act.time}</td>
+                              </tr>
+                           ))}
+                        </tbody>
+                     </table>
                   </div>
                </div>
             </div>
           </motion.div>
         ) : stage === "processing" ? (
-          <motion.div 
-            key="processing"
-            variants={tabVariants}
-            initial="initial"
-            animate="animate"
-            className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-[50px] p-20 text-center shadow-2xl space-y-10 relative overflow-hidden"
-          >
-            <div className="w-24 h-24 bg-accent-blue rounded-[32px] flex items-center justify-center mx-auto shadow-inner group">
-              <RefreshCw className="animate-spin text-primary" size={48} />
-            </div>
-            <div className="space-y-3">
-               <h3 className="text-4xl font-black text-gray-900 tracking-tighter">Identity Audit</h3>
-               <p className="text-gray-500 font-medium leading-relaxed max-w-xs mx-auto">Dynamic validation of digital assets across merchant gateway protocols.</p>
-            </div>
-            <div className="flex justify-center gap-3">
-               {[1, 2, 3].map(i => (
-                 <div key={i} className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }}></div>
-               ))}
-            </div>
+          <motion.div key="processing" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="max-w-2xl mx-auto bento-card p-20 text-center space-y-12 overflow-hidden">
+             <div className="absolute top-0 inset-x-0 h-1.5 bg-gray-50 overflow-hidden">
+                <motion.div initial={{ x: "-100%" }} animate={{ x: "100%" }} transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }} className="w-1/2 h-full bg-primary shadow-[0_0_15px_rgba(0,87,255,0.5)]" />
+             </div>
+             <div className="w-24 h-24 bg-accent-blue rounded-[35px] flex items-center justify-center mx-auto shadow-inner relative group">
+                <RefreshCw className="animate-spin text-primary" size={48} />
+             </div>
+             <div className="space-y-4">
+                <h3 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">Sequential Audit</h3>
+                <p className="text-gray-500 font-medium leading-relaxed max-w-sm mx-auto">Dynamic validation of digital asset parameters across global merchant nodes. Authorizing liquidity settlement...</p>
+             </div>
+             <div className="flex justify-center gap-3">
+                {[1, 2, 3].map(i => (
+                  <motion.div key={i} animate={{ scale: [1, 1.5, 1], opacity: [0.3, 1, 0.3] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }} className="w-2 h-2 bg-primary rounded-full" />
+                ))}
+             </div>
           </motion.div>
         ) : (
-          <motion.div 
-            key="completed"
-            variants={tabVariants}
-            initial="initial"
-            animate="animate"
-            className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-[50px] p-16 text-center shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] space-y-10 relative overflow-hidden"
-          >
+          <motion.div key="completed" variants={tabVariants} initial="initial" animate="animate" exit="exit" className="max-w-2xl mx-auto bento-card p-20 text-center space-y-10 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-500"></div>
-            <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner border border-emerald-100">
               <Check size={48} />
             </div>
-            <div className="space-y-2">
-               <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Settlement Complete</h2>
-               <p className="text-gray-500 font-medium">Digital assets have been successfully audited and settled.</p>
+            <div className="space-y-3">
+               <h2 className="text-4xl font-black text-gray-900 tracking-tighter uppercase leading-tight">Settlement Complete</h2>
+               <p className="text-gray-500 font-medium text-lg leading-relaxed">Digital asset nodes successfully audited. Liquidity has been settled to your primary USD vault.</p>
             </div>
-            <button onClick={resetTradeScreen} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl active-press">
-              Return to Market
-            </button>
+            <div className="pt-8 grid grid-cols-2 gap-6">
+               <button onClick={resetTradeScreen} className="bg-gray-900 text-white py-6 rounded-[24px] font-black text-xs uppercase tracking-[0.2em] active-press hover:bg-black transition-all shadow-xl">Market Home</button>
+               <button className="bg-primary/5 text-primary border border-primary/10 py-6 rounded-[24px] font-black text-xs uppercase tracking-[0.2em] active-press hover:bg-primary/10 transition-all flex items-center justify-center gap-2">View Receipt <FileText size={16} /></button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Buy Overlay: Apple Pro Inspired */}
+      {/* Checkout Sheet */}
       <AnimatePresence>
         {checkoutSheet && (
-          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-xl z-50 flex items-center justify-center p-6">
+          <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-2xl z-[100] flex items-center justify-center p-6">
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="w-full max-w-xl bg-white border border-gray-100 rounded-[50px] p-12 shadow-[0_100px_200px_-20px_rgba(0,0,0,0.2)] space-y-10 relative overflow-hidden"
+              initial={{ opacity: 0, scale: 0.9, y: 50, rotateX: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0, rotateX: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50, rotateX: 20 }}
+              className="w-full max-w-xl bg-white border border-gray-100 rounded-[55px] p-14 shadow-[0_120px_200px_-40px_rgba(0,0,0,0.4)] space-y-12 relative overflow-hidden"
             >
-              <div className="space-y-2 text-center">
-                <h3 className="text-3xl font-black text-gray-900 tracking-tight">Invoice Review</h3>
-                <p className="text-sm text-gray-500 font-medium uppercase tracking-widest">Verify and Authorize Settlement</p>
+              <div className="space-y-3 text-center">
+                <div className="w-20 h-20 bg-gray-50 rounded-[28px] flex items-center justify-center mx-auto mb-8 shadow-sm">
+                   {activeCardDetails.logoUrl === 'A' ? <Star size={32} className="text-primary fill-primary" /> : <span className="text-3xl font-black text-gray-900">{activeCardDetails.logoUrl}</span>}
+                </div>
+                <h3 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">Invoice Summary</h3>
+                <p className="text-[10px] text-gray-400 font-black uppercase tracking-[0.4em]">Authorization Protocol Required</p>
               </div>
 
-              <div className="bg-gray-50/50 rounded-[40px] p-10 space-y-8 border border-gray-100">
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Brand Protocol</span>
-                  <span className="text-lg font-black text-gray-900 uppercase tracking-tighter">{activeCardDetails.brand}</span>
+              <div className="bg-gray-50 rounded-[40px] p-10 space-y-8 border border-gray-100 relative group overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                <div className="flex justify-between items-center relative z-10">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Merchant Node</span>
+                  <span className="text-xl font-black text-gray-900 uppercase tracking-tighter">{activeCardDetails.brand}</span>
                 </div>
                 <div className="h-px bg-gray-200/50"></div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Region Node</span>
-                  <span className="text-sm font-black text-gray-900">{activeCardDetails.region}</span>
+                <div className="flex justify-between items-center relative z-10">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Asset Region</span>
+                  <span className="text-sm font-black text-gray-900 uppercase">{activeCardDetails.region}</span>
                 </div>
                 <div className="h-px bg-gray-200/50"></div>
-                <div className="flex justify-between items-center">
-                  <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Service Fee</span>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-                     <Activity size={12} />
+                <div className="flex justify-between items-center relative z-10">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Platform Fee</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                     <Zap size={14} className="fill-emerald-600" />
                      <span className="text-[10px] font-black uppercase tracking-widest">SUB-ZERO</span>
                   </div>
                 </div>
@@ -441,31 +488,29 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
 
               <div className="flex justify-between items-end px-4">
                 <div className="space-y-1">
-                   <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Authorized Magnitude</p>
-                   <p className="text-sm font-black text-primary uppercase tracking-widest">Primary USD Vault</p>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Settlement Magnitude</p>
+                   <p className="text-sm font-black text-primary uppercase tracking-[0.1em] flex items-center gap-2"><ShieldCheck size={14} /> SUI Mainnet Node</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-6xl font-black text-gray-900 tracking-tighter leading-none">
-                    ${parseFloat(cardValue).toFixed(2)}
+                  <p className="text-7xl font-black text-gray-900 tracking-tighter leading-none font-space">
+                    ${parseFloat(cardValue || "0").toFixed(2)}
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 pt-4">
+              <div className="grid grid-cols-2 gap-8 pt-4">
                 <button
-                  type="button"
-                  onClick={() => setCheckoutSheet(false)}
-                  className="py-6 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-[22px] text-xs font-black uppercase tracking-widest transition-all active-press"
+                  type="button" onClick={() => setCheckoutSheet(false)}
+                  className="py-6 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-[28px] text-xs font-black uppercase tracking-[0.3em] transition-all active-press"
                 >
-                  Cancel
+                  Terminate
                 </button>
                 <button
-                  type="button"
-                  onClick={triggerBuyPipeline}
+                  type="button" onClick={() => triggerTrade('buy')}
                   disabled={parseFloat(cardValue) > profile.balance}
-                  className="py-6 bg-primary hover:bg-primary/90 text-white rounded-[22px] text-xs font-black uppercase tracking-widest shadow-2xl shadow-primary/20 transition-all flex items-center justify-center active-press"
+                  className="py-6 bg-primary hover:bg-primary/90 text-white rounded-[28px] text-xs font-black uppercase tracking-[0.3em] shadow-[0_20px_40px_-10px_rgba(0,87,255,0.4)] transition-all flex items-center justify-center active-press"
                 >
-                  Authorize Settlement
+                  Authorize Node
                 </button>
               </div>
             </motion.div>
