@@ -19,11 +19,36 @@ const port = process.env.PORT || 5001;
 connectDB();
 
 // --- Security Middleware ---
-app.use(helmet()); // Basic security headers
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+})); // Enhanced security headers
 app.use(cookieParser()); // Cookie support
+
+// Enhanced CORS: Allow local dev and Vercel production/previews
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  'https://obey-kappa.vercel.app',
+];
+
 app.use(cors({
-  origin: process.env.APP_URL || 'http://localhost:3000',
-  credentials: true
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    const isAllowed = allowedOrigins.includes(origin) || 
+                     origin.endsWith('.vercel.app'); // Allow all Vercel previews
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS_BLOCK] Request from blocked origin: ${origin}`);
+      callback(new Error('Not allowed by CORS policy'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Rate Limiting: 100 requests per 15 minutes per IP
