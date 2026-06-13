@@ -6,6 +6,9 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../supabase";
+import { auth as firebaseAuth } from "../firebase";
+import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
+import { getWebsiteConfig } from "../metadata";
 
 interface AuthSystemProps {
   onSuccess: (profile: Partial<UserProfile>) => void;
@@ -103,6 +106,27 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
     setLoading(true);
     setErrorMsg(null);
     try {
+      // Primary: Firebase Social Login
+      let userCredential = null;
+      try {
+        if (provider === 'google') {
+          const googleProvider = new GoogleAuthProvider();
+          userCredential = await signInWithPopup(firebaseAuth, googleProvider);
+        } else if (provider === 'apple') {
+          const appleProvider = new OAuthProvider('apple.com');
+          userCredential = await signInWithPopup(firebaseAuth, appleProvider);
+        }
+      } catch (fbError: any) {
+        console.warn(`Firebase ${provider} login failed, falling back to Supabase:`, fbError.message);
+      }
+
+      if (userCredential) {
+        // Success via Firebase
+        onNavigate(AppScreen.DASHBOARD);
+        return;
+      }
+
+      // Fallback: Supabase Social Login
       if (!supabase) throw new Error("Supabase connection missing");
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -216,10 +240,10 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
 
                  <div className="grid grid-cols-2 gap-6">
                     <button type="button" onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[22px] text-xs font-black uppercase tracking-widest transition-all active-press">
-                       <GoogleIcon /> Google
+                       {!getWebsiteConfig.auth.google.updateIcon && <GoogleIcon />} Google
                     </button>
                     <button type="button" onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[22px] text-xs font-black uppercase tracking-widest transition-all active-press">
-                       <AppleIcon /> Apple ID
+                       {!getWebsiteConfig.auth.apple.updateIcon && <AppleIcon />} Apple ID
                     </button>
                  </div>
               </div>
