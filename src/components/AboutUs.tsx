@@ -60,9 +60,9 @@ export default function AboutUs() {
               <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-2xl group-hover:bg-primary/10 transition-all duration-1000"></div>
               <div className="relative bg-white p-2 rounded-[3.5rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.05)] overflow-hidden border border-gray-100">
                 <img 
-                  src="https://lh3.googleusercontent.com/aida/AP1WRLutHcPnESDSgtsjZdmPdcJ8Hyel06r_xgaHB-pqd4GLpKIFHdNWm9kOWO8AJsw52-xFJzpZEoVR6HmaIrN1svxo-6z30hRNvB6PUuDxC-5UjQ8EwxMSC9veKQTo2-Pjv8EGvbjw8dbUq0zRfr1Kwu3wAIK2_MwzG11xPdPVmXOSXSaMoZkAinZqNlI-9NE9PZv7t9Ao1OiogtNjoGot3tXAoPNyLX57aiYJ40sOsy3SO0CFpnUYiTD84LNG" 
+                  src="/features_section.jpg" 
                   alt="Security Vault" 
-                  className="w-full h-[550px] object-cover rounded-[3.2rem] grayscale group-hover:grayscale-0 transition-all duration-1000"
+                  className="w-full h-[550px] object-cover rounded-[3.2rem] group-hover:scale-105 transition-all duration-1000"
                 />
                 <div className="absolute bottom-10 left-10 right-10 bg-white/80 backdrop-blur-2xl p-8 rounded-[2.5rem] border border-white shadow-2xl">
                   <div className="flex items-center justify-between">
