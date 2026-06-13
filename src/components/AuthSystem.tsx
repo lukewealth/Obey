@@ -7,7 +7,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "../supabase";
 import { auth as firebaseAuth } from "../firebase";
-import { GoogleAuthProvider, OAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, OAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { getWebsiteConfig } from "../metadata";
 
 interface AuthSystemProps {
@@ -68,6 +68,20 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
     setLoading(true);
     setErrorMsg(null);
     try {
+      // Primary: Firebase Email/Password Login
+      let userCredential = null;
+      try {
+        userCredential = await signInWithEmailAndPassword(firebaseAuth, email, password);
+      } catch (fbError: any) {
+        console.warn("Firebase email login failed, falling back to Supabase:", fbError.message);
+      }
+
+      if (userCredential) {
+        // Success via Firebase - the App.tsx listener will handle navigation
+        return;
+      }
+
+      // Fallback: Supabase Email/Password Login
       if (!supabase) throw new Error("Supabase connection missing");
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -121,8 +135,7 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
       }
 
       if (userCredential) {
-        // Success via Firebase
-        onNavigate(AppScreen.DASHBOARD);
+        // Success via Firebase - the App.tsx listener will handle navigation
         return;
       }
 

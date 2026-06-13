@@ -43,6 +43,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
+import { auth as firebaseAuth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function App() {
   const { notify } = useNotification();
@@ -92,17 +94,87 @@ export default function App() {
   // Sync with MongoDB
   useEffect(() => {
     if (currentUser) {
-      syncUserWithMongoDB(currentUser.id, profile);
+      syncUserWithMongoDB(currentUser.id || currentUser.uid, profile);
     }
   }, [profile, currentUser]);
 
   useEffect(() => {
     if (currentUser && transactions.length > 0) {
-      syncTransactionsWithMongoDB(currentUser.id, transactions);
+      syncTransactionsWithMongoDB(currentUser.id || currentUser.uid, transactions);
     }
   }, [transactions, currentUser]);
 
-  // Auth Listener
+  // Firebase Auth Listener
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
+      if (user) {
+        setCurrentUser(user);
+        
+        if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
+           setCurrentScreen(AppScreen.DASHBOARD);
+           notify("success", "Access Authorized (Firebase)", `Welcome back to the secure node, ${user.email}`);
+        }
+
+        const fetchProfile = async () => {
+          try {
+            const { data, error } = await supabase.from('profiles').select('*').eq('id', user.uid).single();
+            if (error) throw error;
+            if (data) {
+              const updatedProfile: UserProfile = {
+                name: data.full_name,
+                email: data.email,
+                role: data.role || (data.email === "contact@tricode.pro" ? "admin" : "user"),
+                phone: data.phone,
+                avatar: data.avatar_url || data.full_name[0],
+                kycStatus: data.kyc_status,
+                balance: data.balance,
+                promoCode: "OBEY-ELITE",
+                twoFactorEnabled: true
+              };
+              setProfile(updatedProfile);
+              localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
+            } else {
+              // Try MongoDB fallback
+              const fallback = await fetchUserFallback(user.uid);
+              if (fallback) {
+                setProfile(fallback);
+                localStorage.setItem("obey-profile-cache", JSON.stringify(fallback));
+              } else {
+                const newProfile: any = {
+                  id: user.uid,
+                  full_name: user.displayName || user.email?.split("@")[0],
+                  email: user.email,
+                  role: user.email === "contact@tricode.pro" ? "admin" : "user",
+                  avatar_url: user.photoURL || user.email?.[0].toUpperCase(),
+                  kyc_status: "Pending",
+                  balance: 142580.42
+                };
+                // We attempt to insert into Supabase if missing
+                await supabase.from('profiles').insert([newProfile]);
+                setProfile({
+                  name: newProfile.full_name,
+                  email: newProfile.email,
+                  role: newProfile.role,
+                  phone: "",
+                  avatar: newProfile.avatar_url,
+                  kycStatus: "Pending",
+                  balance: 142580.42,
+                  promoCode: "OBEY-ELITE",
+                  twoFactorEnabled: false
+                });
+              }
+            }
+          } catch (error) {
+            console.warn("⚠️ Firebase Profile Sync Warning");
+          }
+        };
+        fetchProfile();
+      }
+    });
+    return () => unsubscribe();
+  }, [currentScreen]);
+
+  // Supabase Auth Listener
   useEffect(() => {
     if (!supabase) return;
 
@@ -163,11 +235,14 @@ export default function App() {
         };
         fetchProfile();
       } else {
-        setCurrentUser(null);
-        if (currentScreen === AppScreen.DASHBOARD) {
-           setCurrentScreen(AppScreen.MARKETING);
+        // Only clear if Firebase is also not logged in
+        if (!firebaseAuth.currentUser) {
+          setCurrentUser(null);
+          if (currentScreen === AppScreen.DASHBOARD) {
+             setCurrentScreen(AppScreen.MARKETING);
+          }
+          localStorage.removeItem("obey-profile-cache");
         }
-        localStorage.removeItem("obey-profile-cache");
       }
     });
 
@@ -175,7 +250,10 @@ export default function App() {
   }, [currentScreen]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await Promise.all([
+      supabase.auth.signOut(),
+      firebaseAuth.signOut()
+    ]);
     notify("info", "Session Terminated", "Your institutional access has been securely revoked.");
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
