@@ -307,7 +307,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                     <div className="space-y-3">
                       <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-2 md:pl-4">Amount (USD)</label>
                       <div className="relative">
-                        <DollarSign className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary" size={20} className="md:w-6 md:h-6" />
+                        <DollarSign className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary md:w-6 md:h-6" size={20} />
                         <input
                           type="number"
                           required

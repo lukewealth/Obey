@@ -210,7 +210,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
             ) : (
               <div className="space-y-6 md:space-y-8 relative z-10">
                 <div className="p-5 md:p-8 bg-yellow-50/80 border border-yellow-100 rounded-[24px] md:rounded-[32px] flex gap-4 md:gap-6 items-start">
-                  <AlertTriangle className="text-yellow-600 shrink-0 mt-0.5" size={20} className="md:w-6 md:h-6" />
+                  <AlertTriangle className="text-yellow-600 shrink-0 mt-0.5 md:w-6 md:h-6" size={20} />
                   <div className="space-y-1 md:space-y-2">
                     <h4 className="text-base md:text-lg font-black text-gray-900 tracking-tight leading-none">Upgrade Required</h4>
                     <p className="text-xs md:text-sm text-yellow-800 font-medium leading-relaxed">

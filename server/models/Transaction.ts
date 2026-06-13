@@ -14,7 +14,11 @@ const TransactionSchema = new mongoose.Schema({
   fee: { type: Number, default: 0 },
   date: { type: String, required: true },
   time: { type: String, required: true },
-  status: { type: String, enum: ["Success", "Processing", "Failed"], default: "Success" },
+  status: { 
+    type: String, 
+    enum: ["Success", "Processing", "Failed", "Awaiting Audit", "Escrow", "Disputed"], 
+    default: "Success" 
+  },
   recipientWallet: { type: String },
   network: { type: String },
   brand: { type: String }

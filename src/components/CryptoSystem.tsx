@@ -298,7 +298,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                     <span className="text-[10px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
                   </div>
                   <div className="relative">
-                    <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary" size={24} className="md:w-7 md:h-7" />
+                    <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
                     <input
                       type="number"
                       required
@@ -337,7 +337,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                     tradeType === "buy" ? "bg-primary shadow-primary/20" : "bg-red-500 shadow-red-500/20"
                   } disabled:opacity-50`}
                 >
-                  {processing ? <RefreshCw className="animate-spin" size={24} className="md:w-7 md:h-7" /> : (
+                  {processing ? <RefreshCw className="animate-spin md:w-7 md:h-7" size={24} /> : (
                     <div className="flex items-center gap-3">
                        Confirm {tradeType} <ArrowRight size={20} />
                     </div>

@@ -461,7 +461,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        <div className="space-y-3 md:space-y-4">
                           <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center block">Funding Magnitude (USD)</label>
                           <div className="relative">
-                            <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary" size={24} className="md:w-7 md:h-7" />
+                            <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
                             <input
                               type="number"
                               required
@@ -539,7 +539,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <span className="text-[9px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
                        </div>
                        <div className="relative">
-                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary" size={24} className="md:w-7 md:h-7" />
+                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
                           <input
                             type="number"
                             required
@@ -609,7 +609,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <span className="text-[9px] md:text-[11px] font-black text-primary">LIMIT: $50,000.00</span>
                        </div>
                        <div className="relative">
-                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary" size={24} className="md:w-7 md:h-7" />
+                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
                           <input
                             type="number"
                             required

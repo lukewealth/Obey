@@ -47,10 +47,12 @@ export interface Transaction {
   fee: number;
   date: string;
   time: string;
-  status: "Success" | "Processing" | "Failed";
+  status: "Success" | "Processing" | "Failed" | "Awaiting Audit" | "Escrow" | "Disputed";
   recipientWallet?: string;
   network?: string;
   brand?: string;
+  assetName?: string;
+  faceValue?: number;
 }
 
 export interface CryptoAsset {
@@ -66,13 +68,12 @@ export interface CryptoAsset {
 
 export interface GiftCardAsset {
   id: string;
-  brand: string;
-  region: string;
-  buyRate: number; // ₦/$ or $ equivalent
-  sellRate: number; // ₦/$ or $ equivalent
-  trend: string;
-  logoUrl: string;
-  description: string;
+  name: string;
+  buyRate: number; 
+  sellRate: number;
+  logo: string;
+  popularity: number;
+  trending: boolean;
 }
 
 export interface AdminMetrics {
