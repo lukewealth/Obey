@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { UserProfile, Transaction } from "../types";
-import { Copy, Check, DollarSign, ArrowDownLeft, ArrowUpRight, Send, HelpCircle, Shield, Download, Share2, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Copy, Check, DollarSign, ArrowDownLeft, ArrowUpRight, Send, 
+  HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
+  CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star
+} from "lucide-react";
 
 interface WalletSystemProps {
   profile: UserProfile;
@@ -16,17 +21,12 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
   // Funding state
   const [fundMethod, setFundMethod] = useState<"bank" | "card">("bank");
   const [fundAmount, setFundAmount] = useState("");
-  const [cardNo, setCardNo] = useState("");
-  const [cardExpiry, setCardExpiry] = useState("");
-  const [cardCvv, setCardCvv] = useState("");
   const [paymentProcessing, setPaymentStatus] = useState(false);
   const [fundReceipt, setFundReceipt] = useState<Transaction | null>(null);
 
   // Withdraw state
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [bankName, setBankName] = useState("");
-  const [accountNo, setAccountNo] = useState("");
-  const [routingNo, setRoutingNo] = useState("");
   const [withdrawProcessing, setWithdrawProcessing] = useState(false);
   const [withdrawSuccess, setWithdrawSuccess] = useState(false);
 
@@ -52,30 +52,20 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setPaymentStatus(true);
     setTimeout(() => {
       setPaymentStatus(false);
-      
-      // Call parent balance updater
       const desc = fundMethod === "bank" ? "Virtual Vault Funding" : "Credit Card Top-Up";
       onFundWallet(amountVal, desc);
-
-      // Create internal receipt
       const now = new Date();
-      const mockTx: Transaction = {
+      setFundReceipt({
         id: `OBY-${Math.floor(Math.random() * 899999) + 100000}X`,
         title: "Wallet Funding",
         category: "Transfer",
         type: "Credit",
         amount: amountVal,
         fee: 0,
-        date: now.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }),
-        time: now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
+        date: now.toLocaleDateString(),
+        time: now.toLocaleTimeString(),
         status: "Success"
-      };
-
-      setFundReceipt(mockTx);
-      setFundAmount("");
-      setCardNo("");
-      setCardExpiry("");
-      setCardCvv("");
+      });
     }, 1500);
   };
 
@@ -83,18 +73,11 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     e.preventDefault();
     const amountVal = parseFloat(withdrawAmount);
     if (!amountVal || amountVal <= 0 || amountVal > profile.balance) return;
-
     setWithdrawProcessing(true);
     setTimeout(async () => {
       const isSuccess = await onWithdrawWallet(amountVal, `Withdrawal to ${bankName || "Clearing Account"}`);
       setWithdrawProcessing(false);
-      if (isSuccess) {
-        setWithdrawSuccess(true);
-        setWithdrawAmount("");
-        setBankName("");
-        setAccountNo("");
-        setRoutingNo("");
-      }
+      if (isSuccess) setWithdrawSuccess(true);
     }, 1500);
   };
 
@@ -102,16 +85,11 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     e.preventDefault();
     const amountVal = parseFloat(transferAmount);
     if (!amountVal || amountVal <= 0 || amountVal > profile.balance) return;
-
     setTransferProcessing(true);
     setTimeout(async () => {
       const isSuccess = await onTransfer(amountVal, recipientEmail);
       setTransferProcessing(false);
-      if (isSuccess) {
-        setTransferSuccess(true);
-        setTransferAmount("");
-        setRecipientEmail("");
-      }
+      if (isSuccess) setTransferSuccess(true);
     }, 1500);
   };
 
@@ -122,508 +100,489 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setActiveSubState("overview");
   };
 
+  const tabVariants = {
+    initial: { opacity: 0, y: 15 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -15 }
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Tab Selectors */}
-      <div className="flex bg-[#161F30] border border-[#242F41] p-1 rounded-2xl w-fit">
-        <button
-          onClick={() => { resetAllSubFlows(); setActiveSubState("overview"); }}
-          className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeSubTab === "overview" ? "bg-[#0057FF] text-white shadow-lg" : "text-slate-400 hover:text-white"
-          }`}
-        >
-          Wallet Balance
-        </button>
-        <button
-          onClick={() => { resetAllSubFlows(); setActiveSubState("fund"); }}
-          className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeSubTab === "fund" ? "bg-[#0057FF] text-white shadow-lg" : "text-slate-400 hover:text-white"
-          }`}
-        >
-          Fund Wallet
-        </button>
-        <button
-          onClick={() => { resetAllSubFlows(); setActiveSubState("withdraw"); }}
-          className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeSubTab === "withdraw" ? "bg-[#0057FF] text-white shadow-lg" : "text-slate-400 hover:text-white"
-          }`}
-        >
-          Withdrawal
-        </button>
-        <button
-          onClick={() => { resetAllSubFlows(); setActiveSubState("transfer"); }}
-          className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-            activeSubTab === "transfer" ? "bg-[#0057FF] text-white shadow-lg" : "text-slate-400 hover:text-white"
-          }`}
-        >
-          Transfer cash
-        </button>
+    <div className="space-y-12">
+      {/* Header & Tab Selector */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Treasury Operations</h2>
+          <p className="text-gray-500 font-medium">Manage your institutional liquidity nodes.</p>
+        </div>
+        
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto">
+          {[
+            { id: "overview", label: "Dashboard", icon: LayoutDashboard },
+            { id: "fund", label: "Fund", icon: ArrowDownLeft },
+            { id: "withdraw", label: "Withdraw", icon: ArrowUpRight },
+            { id: "transfer", label: "Transfer", icon: Send }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => { resetAllSubFlows(); setActiveSubState(tab.id as any); }}
+              className={`px-6 py-3 rounded-[18px] text-[13px] font-black tracking-tight transition-all flex items-center gap-2 whitespace-nowrap ${
+                activeSubTab === tab.id 
+                  ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                  : "text-gray-400 hover:text-gray-900"
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* RENDER ACTIVE SUB FLOW */}
-      {activeSubTab === "overview" && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Quick Stats */}
-          <div className="lg:col-span-8 space-y-6">
-            <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 rounded-[20px] p-8 relative overflow-hidden flex flex-col min-h-[220px] justify-between">
-              <div className="space-y-1">
-                <p className="text-xs uppercase tracking-widest text-slate-400 font-bold">Total Capital Base</p>
-                <p className="text-4xl sm:text-5xl font-mono font-bold text-white shrink-0 pt-0.5">
-                  ${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </p>
+      <AnimatePresence mode="wait">
+        {activeSubTab === "overview" && (
+          <motion.div 
+            key="overview"
+            variants={tabVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+          >
+            {/* Primary Stats */}
+            <div className="lg:col-span-8 space-y-8">
+              <div className="bento-card p-12 min-h-[320px] flex flex-col justify-between relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-accent-blue/40 rounded-full blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-[2s]"></div>
+                
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-primary/10 text-primary rounded-[20px] flex items-center justify-center">
+                      <Wallet size={24} />
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em]">Treasury Balance</p>
+                      <p className="text-sm font-bold text-gray-900">Primary USD Liquidity Node</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-baseline gap-4">
+                    <span className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-none">
+                      ${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </span>
+                    <span className="text-2xl text-gray-400 font-bold font-mono">USD</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-6 mt-12">
+                   {[
+                    { id: "fund", label: "Fund", icon: ArrowDownLeft, bg: "bg-primary text-white shadow-primary/20" },
+                    { id: "withdraw", label: "Withdraw", icon: ArrowUpRight, bg: "bg-accent-blue text-primary border border-blue-200/50 shadow-blue-500/10" },
+                    { id: "transfer", label: "Transfer", icon: Send, bg: "bg-white text-gray-700 border border-gray-200 shadow-gray-200/50" }
+                  ].map((btn) => (
+                    <button
+                      key={btn.id}
+                      onClick={() => setActiveSubState(btn.id as any)}
+                      className={`${btn.bg} py-5 px-4 rounded-[22px] text-sm font-black flex items-center justify-center gap-3 active-press transition-all shadow-xl hover:-translate-y-1`}
+                    >
+                      <btn.icon size={20} /> {btn.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setActiveSubState("fund")}
-                  className="flex-1 bg-[#0057FF] hover:bg-blue-600 text-white rounded-xl py-4 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active-press"
-                >
-                  <ArrowDownLeft size={16} /> Fund
-                </button>
-                <button
-                  onClick={() => setActiveSubState("withdraw")}
-                  className="flex-1 bg-white/5 hover:bg-white/10 border border-[#242F41] text-white rounded-xl py-4 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 active-press"
-                >
-                  <ArrowUpRight size={16} /> Withdraw
-                </button>
+              {/* Virtual Account Card: Finsy/Wallet Obey Inspired */}
+              <div className="bento-card p-10 space-y-10 relative overflow-hidden group">
+                 <div className="absolute -top-12 -right-12 w-64 h-64 bg-accent-yellow/30 rounded-full blur-[80px]"></div>
+                 
+                 <div className="flex justify-between items-center relative z-10">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gray-50 rounded-[22px] flex items-center justify-center text-gray-400 border border-gray-100 group-hover:border-primary/20 group-hover:text-primary transition-all">
+                        <Landmark size={28} />
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-black text-gray-900 tracking-tight">Virtual Clearing Node</h3>
+                        <p className="text-sm text-gray-400 font-medium">Auto-settlement account ID</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+                       <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                       Operational
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                    <div className="p-6 bg-gray-50/50 rounded-[24px] border border-gray-100 space-y-2">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Clearing Bank</p>
+                       <p className="text-lg font-black text-gray-900">OBEY Global Settlement</p>
+                    </div>
+                    <div className="p-6 bg-accent-blue/40 rounded-[24px] border border-blue-100 space-y-2 group/acc">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Number</p>
+                       <div className="flex items-center justify-between">
+                          <p className="text-2xl font-mono font-black text-primary tracking-widest leading-none pt-1">8829104422</p>
+                          <button 
+                            onClick={triggerCopyAccount}
+                            className="w-10 h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-primary active-press"
+                          >
+                            {copiedText ? <Check size={18} className="text-emerald-500" /> : <Copy size={18} />}
+                          </button>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="p-5 bg-white/40 backdrop-blur-md rounded-[24px] border border-white flex items-center gap-5">
+                    <div className="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center shrink-0">
+                       <Shield size={24} />
+                    </div>
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed">
+                       All inbound transfers to this node are instantly credited to your treasury. Settlement latency is typically <span className="text-primary font-black">&lt;2.4s</span>.
+                    </p>
+                 </div>
               </div>
             </div>
 
-            {/* Virtual clearing account display */}
-            <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 rounded-[20px] p-6 sm:p-8 space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-base font-bold text-white leading-tight">Virtual Clearing Account</h3>
-                <span className="bg-emerald-500/10 border border-emerald-500/20 text-[#12B76A] px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                  Operational
-                </span>
-              </div>
+            {/* Side Content */}
+            <div className="lg:col-span-4 space-y-8">
+               <div className="bento-card p-10 space-y-10">
+                  <h4 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.3em]">Node Allocation</h4>
+                  <div className="space-y-8">
+                    {[
+                      { label: "Fiat Reserves", val: 65, color: "bg-primary", text: "text-primary" },
+                      { label: "Digital Assets", val: 35, color: "bg-secondary", text: "text-secondary" }
+                    ].map((node) => (
+                      <div key={node.label} className="space-y-3">
+                        <div className="flex justify-between items-end">
+                          <p className="text-sm font-black text-gray-900">{node.label}</p>
+                          <p className={`text-sm font-mono font-black ${node.text}`}>{node.val}%</p>
+                        </div>
+                        <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                           <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: `${node.val}%` }}
+                            transition={{ duration: 1.5, ease: "easeOut" }}
+                            className={`${node.color} h-full rounded-full shadow-lg shadow-black/5`}
+                           ></motion.div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Index</span>
+                     <div className="flex items-center gap-1.5 text-emerald-600 font-black text-[13px]">
+                        <TrendingUp size={14} /> +12.4%
+                     </div>
+                  </div>
+               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-1">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Bank Name</p>
-                  <p className="text-sm font-bold text-white">OBEY Global Clearing Bank</p>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Clearing ID</p>
-                  <div className="flex items-center justify-between">
-                    <p className="font-mono text-sm tracking-widest font-semibold text-white">8829 1044 22</p>
-                    <button 
-                      onClick={triggerCopyAccount}
-                      className="text-[#0057FF] hover:text-blue-400 p-2 hover:bg-white/5 rounded-lg active-press shrink-0"
-                    >
-                      {copiedText ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
+               <div className="bg-primary rounded-[45px] p-10 text-white relative overflow-hidden shadow-2xl shadow-primary/30 group">
+                  <div className="absolute inset-0 shimmer opacity-10"></div>
+                  <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                  <div className="relative z-10 space-y-6">
+                    <Shield size={32} className="text-white/80" />
+                    <h5 className="text-2xl font-black tracking-tight leading-tight">Institutional <br /> Protection.</h5>
+                    <p className="text-white/60 font-medium text-sm leading-relaxed">
+                       Your assets are backed by multi-signature cold storage and bank-grade insurance policies.
+                    </p>
+                    <button className="text-white text-xs font-black uppercase tracking-[0.2em] border-b-2 border-white/20 hover:border-white transition-all pb-1.5">
+                       VIEW POLICY
                     </button>
                   </div>
-                </div>
-              </div>
+               </div>
 
-              <p className="text-xs text-slate-400 italic max-w-sm">
-                Deposits routed to this virtual clearing address settle instantly and credit your primary balance profile.
-              </p>
-            </div>
-          </div>
-
-          {/* Allocation column */}
-          <div className="lg:col-span-4 space-y-6">
-            <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 rounded-[20px] p-6 space-y-6">
-              <h4 className="text-xs font-black uppercase text-slate-400 tracking-widest">Capital Allocations</h4>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
-                    <span>Fiat Reserves</span>
-                    <span className="font-mono">65%</span>
-                  </div>
-                  <div className="w-full bg-[#0B1220] rounded-full h-1.5">
-                    <div className="bg-[#0057FF] h-1.5 rounded-full" style={{ width: "65%" }}></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-medium text-slate-300 mb-1">
-                    <span>Cryptocurrency desk</span>
-                    <span className="font-mono">35%</span>
-                  </div>
-                  <div className="w-full bg-[#0B1220] rounded-full h-1.5">
-                    <div className="bg-[#00C6FF] h-1.5 rounded-full" style={{ width: "35%" }}></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 rounded-[20px] p-5 flex items-start gap-4">
-              <Shield className="text-[#00C6FF] shrink-0" size={24} />
-              <div>
-                <h5 className="text-xs font-bold text-white uppercase tracking-wider">Multi-Signature Lock</h5>
-                <p className="text-[11px] text-slate-400 font-light leading-relaxed mt-1">
-                  100% of capital assets are backed by full reserve values and protected under institutional multisig safety standards.
-                </p>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      )}
-
-      {/* FUNDING FORM FLOW */}
-      {activeSubTab === "fund" && (
-        <div className="max-w-xl mx-auto">
-          {fundReceipt ? (
-            /* Successful Funding Receipt Page */
-            <div className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-8 space-y-8 flex flex-col text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
-              
-              <div className="flex flex-col items-center">
-                <div className="w-16 h-16 bg-[#12B76A]/10 border border-[#12B76A]/20 rounded-full flex items-center justify-center text-emerald-400 mb-4 animate-pulse">
-                  <Check size={32} />
-                </div>
-                <p className="text-xs font-extrabold uppercase tracking-widest text-[#12B76A]">Transaction Successful</p>
-                <h2 className="text-3xl font-mono font-bold text-white mt-2">${fundReceipt.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</h2>
-                <p className="text-xs text-slate-400 font-light mt-1">{fundReceipt.title}</p>
-              </div>
-
-              {/* Receipt invoice specifications */}
-              <div className="space-y-4 bg-[#0B1220] border border-[#242F41] p-5 rounded-2xl text-left text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Transaction ID</span>
-                  <span className="font-mono text-white font-bold select-all">{fundReceipt.id}</span>
-                </div>
-                <div className="border-t border-[#242F41]"></div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-slate-400">Date</span>
-                  <span className="text-white font-semibold">{fundReceipt.date} • {fundReceipt.time}</span>
-                </div>
-                <div className="border-t border-[#242F41]"></div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-slate-400">Fee status</span>
-                  <span className="bg-emerald-500/15 text-[#12B76A] px-2 py-0.5 rounded font-black text-[10px] uppercase">Free</span>
-                </div>
-                <div className="border-t border-[#242F41]"></div>
-                <div className="flex justify-between pt-1">
-                  <span className="text-slate-400">Ledger status</span>
-                  <span className="inline-flex items-center gap-1.5 text-emerald-400 font-bold">
-                    <span className="w-1.5 h-1.5 bg-[#12B76A] rounded-full animate-ping"></span>
-                    Completed
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3">
-                <button className="w-full h-12 bg-[#0057FF] hover:bg-blue-600 active-press rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2">
-                  <Download size={14} /> Download PDF Invoice
-                </button>
-                <button onClick={resetAllSubFlows} className="w-full text-xs text-slate-400 hover:text-white font-bold mt-2 hover:underline">
-                  Done
-                </button>
-              </div>
-            </div>
-          ) : (
-            /* Funding checkout selections module */
-            <div className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-6 sm:p-8 space-y-6 shadow-xl">
-              <h3 className="text-base font-black text-white">Fund Cash Capital</h3>
-              <p className="text-xs text-slate-400 font-medium">Select your preferred funding source to credit your wallet instantly.</p>
-
-              <div className="grid grid-cols-2 gap-3 p-1 bg-[#0B1220] rounded-2xl border border-[#242F41]">
-                <button
-                  type="button"
-                  onClick={() => setFundMethod("bank")}
-                  className={`py-2.5 rounded-xl text-xs font-bold transition-all ${
-                    fundMethod === "bank" ? "bg-[#0057FF] text-white" : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  Bank Transfer
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFundMethod("card")}
-                  className={`py-2.5 rounded-xl text-xs font-bold transition-all ${
-                    fundMethod === "card" ? "bg-[#0057FF] text-white" : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  Credit Card
-                </button>
-              </div>
-
-              {fundMethod === "bank" ? (
-                <div className="space-y-6">
-                  {/* Bank Details Visual display */}
-                  <div className="bg-[#0B1220] border border-[#242F41] p-5 rounded-2xl space-y-4">
-                    <p className="text-xs text-slate-400 leading-relaxed font-light">
-                      Initiate a bank transfer referencing your custom clearing numbers below. Funds credit instantly upon bank clearance.
+               <div className="bg-accent-yellow border border-yellow-200 rounded-[45px] p-10 relative overflow-hidden group shadow-xl shadow-yellow-500/5">
+                  <div className="relative z-10 space-y-5">
+                    <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-yellow-600 shadow-sm">
+                       <Zap size={24} fill="currentColor" />
+                    </div>
+                    <h4 className="text-xl font-black text-gray-900 tracking-tight">Elite Perks</h4>
+                    <p className="text-sm text-gray-600 font-medium">
+                       Enjoy zero-fee internal transfers and premium utility rates.
                     </p>
-                    <div className="space-y-3 pt-2">
-                      <div className="flex justify-between text-xs">
-                        <span className="text-slate-400 uppercase tracking-widest font-black text-[9px]">Receipt bank</span>
-                        <span className="text-white font-bold">OBEY Global Clearing Bank</span>
+                  </div>
+               </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Action Flows: Fund, Withdraw, Transfer */}
+        {["fund", "withdraw", "transfer"].includes(activeSubTab) && (
+           <motion.div 
+            key={activeSubTab}
+            variants={tabVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="max-w-2xl mx-auto w-full"
+          >
+             {/* Funding Flow */}
+             {activeSubTab === "fund" && (
+                fundReceipt ? (
+                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] space-y-10 relative overflow-hidden animate-fade-in">
+                    <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-500"></div>
+                    <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                      <Check size={48} />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Settlement Successful</h2>
+                      <p className="text-gray-500 font-medium">Your treasury balance has been updated.</p>
+                    </div>
+                    <div className="bg-gray-50 rounded-[32px] p-8 space-y-6 text-left border border-gray-100">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
+                        <span className="text-3xl font-black text-gray-900">${fundReceipt.amount.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between text-xs items-center">
-                        <span className="text-slate-400 uppercase tracking-widest font-black text-[9px]">Clearing Account</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-mono font-semibold">8829104422</span>
-                          <button onClick={triggerCopyAccount} className="text-[#0057FF] p-1.5 rounded bg-white/5 hover:bg-white/10 active-press shrink-0">
-                            {copiedText ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
-                          </button>
+                      <div className="h-px bg-gray-200"></div>
+                      <div className="grid grid-cols-2 gap-8">
+                         <div className="space-y-1">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">ID Reference</p>
+                          <p className="text-sm font-bold text-gray-900 font-mono uppercase">{fundReceipt.id}</p>
+                        </div>
+                        <div className="space-y-1 text-right">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network Node</p>
+                          <p className="text-sm font-bold text-gray-900">SUI Mainnet</p>
                         </div>
                       </div>
                     </div>
+                    <div className="flex flex-col gap-4">
+                      <button className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/20 active-press">
+                        Download Report
+                      </button>
+                      <button onClick={resetAllSubFlows} className="text-sm font-black text-gray-400 hover:text-gray-900 tracking-widest uppercase py-2">
+                        Dismiss
+                      </button>
+                    </div>
                   </div>
+                ) : (
+                  <div className="bento-card p-12 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] space-y-10">
+                    <div className="space-y-2 text-center md:text-left">
+                       <h3 className="text-3xl font-black text-gray-900 tracking-tight">Node Funding</h3>
+                       <p className="text-gray-500 font-medium">Inject liquidity into your USD treasury.</p>
+                    </div>
 
-                  <form onSubmit={handleFundSubmit} className="space-y-4">
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400 font-semibold">Simulated Transfer Amount ($)</label>
-                      <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                          <DollarSign size={16} />
-                        </span>
-                        <input
-                          type="number"
-                          required
-                          value={fundAmount}
-                          onChange={(e) => setFundAmount(e.target.value)}
-                          placeholder="25000.00"
-                          className="block w-full h-12 pl-10 pr-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold outline-none text-white font-mono"
-                        />
-                      </div>
+                    <div className="flex bg-gray-100 p-1.5 rounded-[22px] border border-gray-200/50">
+                      <button
+                        onClick={() => setFundMethod("bank")}
+                        className={`flex-1 py-4 rounded-[18px] text-sm font-black transition-all ${
+                          fundMethod === "bank" ? "bg-white text-primary shadow-sm" : "text-gray-400"
+                        }`}
+                      >
+                        Bank Node
+                      </button>
+                      <button
+                        onClick={() => setFundMethod("card")}
+                        className={`flex-1 py-4 rounded-[18px] text-sm font-black transition-all ${
+                          fundMethod === "card" ? "bg-white text-primary shadow-sm" : "text-gray-400"
+                        }`}
+                      >
+                        Institutional Card
+                      </button>
+                    </div>
+
+                    <form onSubmit={handleFundSubmit} className="space-y-8">
+                       {fundMethod === "bank" ? (
+                          <div className="bg-accent-blue/30 border border-blue-100 p-8 rounded-[32px] space-y-6">
+                             <div className="flex items-center gap-4">
+                                <Landmark size={24} className="text-primary" />
+                                <span className="text-lg font-black text-primary tracking-tight">Direct Settlement</span>
+                             </div>
+                             <p className="text-sm text-blue-800 font-medium leading-relaxed">
+                                Funds wired to your clearing account are automatically recognized and credited. Sub-second clearance for institutional nodes.
+                             </p>
+                             <div className="pt-4 flex justify-between items-center border-t border-blue-100">
+                                <span className="text-xs font-black text-blue-400 uppercase tracking-widest">Account ID</span>
+                                <span className="font-mono text-lg font-black text-primary tracking-[0.1em]">8829104422</span>
+                             </div>
+                          </div>
+                       ) : (
+                          <div className="space-y-6">
+                             <div className="space-y-3">
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account Holder</label>
+                                <input type="text" required placeholder="Felix Anderson" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                             </div>
+                             <div className="space-y-3">
+                                <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Card Identifier</label>
+                                <input type="text" required placeholder="•••• •••• •••• 8824" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                             </div>
+                             <div className="grid grid-cols-2 gap-6">
+                                <div className="space-y-3">
+                                   <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Expiry</label>
+                                   <input type="text" required placeholder="06/28" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                </div>
+                                <div className="space-y-3">
+                                   <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">CVC Node</label>
+                                   <input type="password" required placeholder="•••" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                </div>
+                             </div>
+                          </div>
+                       )}
+
+                       <div className="space-y-4">
+                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4 text-center block">Funding Magnitude (USD)</label>
+                          <div className="relative">
+                            <DollarSign className="absolute left-8 top-1/2 -translate-y-1/2 text-primary" size={28} />
+                            <input
+                              type="number"
+                              required
+                              value={fundAmount}
+                              onChange={(e) => setFundAmount(e.target.value)}
+                              placeholder="0.00"
+                              className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                            />
+                          </div>
+                       </div>
+
+                       <button
+                        type="submit"
+                        disabled={paymentProcessing || !fundAmount}
+                        className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                      >
+                        {paymentProcessing ? <RefreshCw className="animate-spin" size={28} /> : "Authorize Settlement"}
+                      </button>
+                    </form>
+                  </div>
+                )
+             )}
+
+             {/* Withdrawal Flow */}
+             {activeSubTab === "withdraw" && (
+                withdrawSuccess ? (
+                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-2 bg-primary"></div>
+                    <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
+                      <ArrowUpRight size={48} />
+                    </div>
+                    <div className="space-y-2">
+                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Liquidity Dispatched</h2>
+                       <p className="text-gray-500 font-medium">Funds have been routed to your bank node.</p>
+                    </div>
+                    <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl active-press">
+                      Return to Treasury
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleWithdrawalSubmit} className="bento-card p-12 shadow-2xl space-y-10">
+                    <div className="space-y-2 text-center md:text-left">
+                       <h3 className="text-3xl font-black text-gray-900 tracking-tight">Withdrawal Dispatch</h3>
+                       <p className="text-gray-500 font-medium">Send assets to your external clearing account.</p>
+                    </div>
+
+                    <div className="space-y-6">
+                       <div className="space-y-3">
+                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Destination Bank</label>
+                          <input type="text" required value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Chase, Wells Fargo, etc." className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                       </div>
+                       <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-3">
+                             <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account ID</label>
+                             <input type="text" required placeholder="•••• •••• ••••" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                          </div>
+                          <div className="space-y-3">
+                             <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Routing Node</label>
+                             <input type="text" required placeholder="012345678" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                          </div>
+                       </div>
+                    </div>
+
+                    <div className="space-y-4">
+                       <div className="flex justify-between items-center px-4">
+                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magniture (USD)</label>
+                          <span className="text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
+                       </div>
+                       <div className="relative">
+                          <DollarSign className="absolute left-8 top-1/2 -translate-y-1/2 text-primary" size={28} />
+                          <input
+                            type="number"
+                            required
+                            max={profile.balance}
+                            value={withdrawAmount}
+                            onChange={(e) => setWithdrawAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                          />
+                       </div>
                     </div>
 
                     <button
                       type="submit"
-                      disabled={paymentProcessing}
-                      className="w-full h-14 bg-[#0057FF] hover:bg-blue-600 active-press text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center pt-0.5 shadow-lg shadow-blue-500/10"
+                      disabled={withdrawProcessing || !withdrawAmount}
+                      className="w-full h-20 bg-gray-900 hover:bg-black text-white rounded-[28px] font-black text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press"
                     >
-                      {paymentProcessing ? <RefreshCw className="animate-spin mr-2" size={14} /> : "Simulate Payout Received"}
+                      {withdrawProcessing ? <RefreshCw className="animate-spin" size={28} /> : "Initiate Cashout"}
                     </button>
                   </form>
-                </div>
-              ) : (
-                <form onSubmit={handleFundSubmit} className="space-y-4">
-                  <div className="space-y-1">
-                    <label className="text-xs text-slate-400 font-semibold">Card Number</label>
-                    <input
-                      type="text"
-                      required
-                      value={cardNo}
-                      onChange={(e) => setCardNo(e.target.value)}
-                      placeholder="4000 1234 5678 9010"
-                      className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-mono outline-none text-white"
-                    />
-                  </div>
+                )
+             )}
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400 font-semibold">Expiry Date</label>
-                      <input
-                        type="text"
-                        required
-                        value={cardExpiry}
-                        onChange={(e) => setCardExpiry(e.target.value)}
-                        placeholder="MM/YY"
-                        className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-mono outline-none text-white text-center"
-                      />
+             {/* Transfer Flow */}
+             {activeSubTab === "transfer" && (
+                transferSuccess ? (
+                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-500"></div>
+                    <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                      <Send size={48} />
                     </div>
-                    <div className="space-y-1">
-                      <label className="text-xs text-slate-400 font-semibold">CVV Sec-Code</label>
-                      <input
-                        type="password"
-                        required
-                        maxLength={3}
-                        value={cardCvv}
-                        onChange={(e) => setCardCvv(e.target.value)}
-                        placeholder="•••"
-                        className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-mono outline-none text-white text-center"
-                      />
+                    <div className="space-y-2">
+                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Peer Transfer Sent</h2>
+                       <p className="text-gray-500 font-medium">Liquidity has been moved to the target node.</p>
                     </div>
+                    <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl active-press">
+                      Return to Dashboard
+                    </button>
                   </div>
-
-                  <div className="space-y-1 pt-1">
-                    <label className="text-xs text-slate-400 font-semibold">Top-up Value ($)</label>
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                        <DollarSign size={16} />
-                      </span>
-                      <input
-                        type="number"
-                        required
-                        value={fundAmount}
-                        onChange={(e) => setFundAmount(e.target.value)}
-                        placeholder="500.00"
-                        className="block w-full h-12 pl-10 pr-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold outline-none text-white font-mono"
-                      />
+                ) : (
+                  <form onSubmit={handleTransferSubmit} className="bento-card p-12 shadow-2xl space-y-10">
+                    <div className="space-y-2 text-center md:text-left">
+                       <h3 className="text-3xl font-black text-gray-900 tracking-tight">Peer Transfer</h3>
+                       <p className="text-gray-500 font-medium">Internal settlement between OBEY nodes.</p>
                     </div>
-                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={paymentProcessing}
-                    className="w-full h-14 bg-[#0057FF] hover:bg-blue-600 active-press text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center pt-0.5 shadow-lg"
-                  >
-                    {paymentProcessing ? <RefreshCw className="animate-spin mr-2" size={14} /> : "Authorize Settlement Checkout"}
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
-        </div>
-      )}
+                    <div className="space-y-3">
+                       <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Target Node (Email)</label>
+                       <div className="relative">
+                          <input
+                            type="email"
+                            required
+                            value={recipientEmail}
+                            onChange={(e) => setRecipientEmail(e.target.value)}
+                            placeholder="hello@obey.finance"
+                            className="w-full h-20 px-8 bg-gray-50 border border-gray-100 rounded-[28px] text-xl font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+                          />
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-accent-blue rounded-xl flex items-center justify-center text-primary">
+                             <Check size={20} />
+                          </div>
+                       </div>
+                    </div>
 
-      {/* WITHDRAWAL FLOW */}
-      {activeSubTab === "withdraw" && (
-        <div className="max-w-xl mx-auto">
-          {withdrawSuccess ? (
-            <div className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-8 space-y-6 flex flex-col text-center relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
-              <div className="w-16 h-16 bg-[#12B76A]/10 border border-[#12B76A]/20 rounded-full flex items-center justify-center text-emerald-400 mx-auto mb-2 animate-bounce">
-                <Check size={32} />
-              </div>
-              <h3 className="text-2xl font-black text-white">Cashout Initiated</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Your wallet reserves withdrawal payout has been successfully queued. Settles instantly to clearing credentials.
-              </p>
-              <button onClick={resetAllSubFlows} className="w-full bg-[#0057FF] hover:bg-blue-600 py-4 font-bold text-xs uppercase tracking-wider text-white rounded-xl active-press mt-4">
-                Done
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleWithdrawalSubmit} className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-6 sm:p-8 space-y-5 shadow-xl">
-              <h3 className="text-base font-black text-white">Withdrawal Cashout</h3>
-              <p className="text-xs text-slate-400 font-medium">Withdraw fiat assets back to your verified outer bank clearing profiles.</p>
+                    <div className="space-y-4">
+                       <div className="flex justify-between items-center px-4">
+                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magniture (USD)</label>
+                          <span className="text-[11px] font-black text-primary">LIMIT: $50,000.00</span>
+                       </div>
+                       <div className="relative">
+                          <DollarSign className="absolute left-8 top-1/2 -translate-y-1/2 text-primary" size={28} />
+                          <input
+                            type="number"
+                            required
+                            max={profile.balance}
+                            value={transferAmount}
+                            onChange={(e) => setTransferAmount(e.target.value)}
+                            placeholder="0.00"
+                            className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                          />
+                       </div>
+                    </div>
 
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-semibold">Bank Name</label>
-                <input
-                  type="text"
-                  required
-                  value={bankName}
-                  onChange={(e) => setBankName(e.target.value)}
-                  placeholder="Chase Bank, Citibank, JP Morgan"
-                  className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-400 font-semibold">Account Number</label>
-                  <input
-                    type="text"
-                    required
-                    value={accountNo}
-                    onChange={(e) => setAccountNo(e.target.value)}
-                    placeholder="9923847291"
-                    className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white font-mono text-center outline-none"
-                  />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-xs text-slate-400 font-semibold">Routing Number</label>
-                  <input
-                    type="text"
-                    required
-                    value={routingNo}
-                    onChange={(e) => setRoutingNo(e.target.value)}
-                    placeholder="012489248"
-                    className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white font-mono text-center outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1 pt-1">
-                <div className="flex justify-between items-center text-xs">
-                  <label className="text-slate-400 font-semibold">Withdrawal Amount ($)</label>
-                  <span className="text-slate-400 font-mono">Available: ${profile.balance.toLocaleString()}</span>
-                </div>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                    <DollarSign size={16} />
-                  </span>
-                  <input
-                    type="number"
-                    required
-                    max={profile.balance}
-                    value={withdrawAmount}
-                    onChange={(e) => setWithdrawAmount(e.target.value)}
-                    placeholder="100.00"
-                    className="block w-full h-12 pl-10 pr-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white font-mono"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={withdrawProcessing || !withdrawAmount || parseFloat(withdrawAmount) > profile.balance}
-                className="w-full h-14 bg-red-500 hover:bg-red-600 active-press text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center pt-0.5 shadow-lg shadow-red-500/10 disabled:opacity-50"
-              >
-                {withdrawProcessing ? <RefreshCw className="animate-spin mr-2" size={14} /> : "Initiate Cashout Wire"}
-              </button>
-            </form>
-          )}
-        </div>
-      )}
-
-      {/* TRANSFER FLOW */}
-      {activeSubTab === "transfer" && (
-        <div className="max-w-xl mx-auto">
-          {transferSuccess ? (
-            <div className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-8 space-y-6 flex flex-col text-center relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-500"></div>
-              <div className="w-16 h-16 bg-[#12B76A]/10 border border-[#12B76A]/20 rounded-full flex items-center justify-center text-emerald-400 mx-auto mb-2 animate-bounce">
-                <Check size={32} />
-              </div>
-              <h3 className="text-2xl font-black text-white">Funds Dispatched</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-                Your OBEY peer transaction ledger processed correctly. Settle times are complete.
-              </p>
-              <button onClick={resetAllSubFlows} className="w-full bg-[#0057FF] hover:bg-blue-600 py-4 font-bold text-xs uppercase tracking-wider text-white rounded-xl active-press mt-4">
-                Done
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleTransferSubmit} className="bg-[#161F30] border border-[#242F41] rounded-[20px] p-6 sm:p-8 space-y-5 shadow-xl">
-              <h3 className="text-base font-black text-white">Peer Wallet Transfer</h3>
-              <p className="text-xs text-slate-400 font-medium">Transfer instant liquidity to any registered OBEY ledger email address. Free of cost.</p>
-
-              <div className="space-y-1">
-                <label className="text-xs text-slate-400 font-semibold">Recipient Email Address</label>
-                <input
-                  type="email"
-                  required
-                  value={recipientEmail}
-                  onChange={(e) => setRecipientEmail(e.target.value)}
-                  placeholder="recipient@obey.finance"
-                  className="block w-full h-12 px-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <div className="flex justify-between items-center text-xs">
-                  <label className="text-slate-400 font-semibold">Transfer value ($)</label>
-                  <span className="text-slate-400 font-mono">Available: ${profile.balance.toLocaleString()}</span>
-                </div>
-                <div className="relative">
-                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-                    <DollarSign size={16} />
-                  </span>
-                  <input
-                    type="number"
-                    required
-                    max={profile.balance}
-                    value={transferAmount}
-                    onChange={(e) => setTransferAmount(e.target.value)}
-                    placeholder="100.00"
-                    className="block w-full h-12 pl-10 pr-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-sm font-semibold text-white font-mono"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={transferProcessing || !transferAmount || parseFloat(transferAmount) > profile.balance}
-                className="w-full h-14 bg-[#0057FF] hover:bg-blue-600 active-press text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center justify-center pt-0.5 shadow-lg shadow-blue-500/10 disabled:opacity-50"
-              >
-                {transferProcessing ? <RefreshCw className="animate-spin mr-2" size={14} /> : "Dispatch Funds Instantly"}
-              </button>
-            </form>
-          )}
-        </div>
-      )}
+                    <button
+                      type="submit"
+                      disabled={transferProcessing || !transferAmount}
+                      className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                    >
+                      {transferProcessing ? <RefreshCw className="animate-spin" size={28} /> : "Confirm Dispatch"}
+                    </button>
+                  </form>
+                )
+             )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
