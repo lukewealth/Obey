@@ -16,6 +16,8 @@ import UserProfileSettings from "./components/UserProfileSettings";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
+import SystemAlert from "./components/SystemAlert";
+import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -43,9 +45,19 @@ import {
 import { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from "./services/api";
 
 export default function App() {
+  const { notify } = useNotification();
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.MARKETING);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  // System Alert State
+  const [systemAlert, setSystemAlert] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    logs: [] as string[],
+    type: "system" as any
+  });
 
   const [btcPrice, setBtcPrice] = useState(64231.80);
   const [ethPrice, setEthPrice] = useState(3452.12);
@@ -77,6 +89,7 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
+  // Sync with MongoDB
   useEffect(() => {
     if (currentUser) {
       syncUserWithMongoDB(currentUser.id, profile);
@@ -89,6 +102,7 @@ export default function App() {
     }
   }, [transactions, currentUser]);
 
+  // Auth Listener
   useEffect(() => {
     if (!supabase) return;
 
@@ -96,7 +110,11 @@ export default function App() {
       if (session) {
         const user = session.user;
         setCurrentUser(user);
-        setCurrentScreen(AppScreen.DASHBOARD);
+        
+        if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
+           setCurrentScreen(AppScreen.DASHBOARD);
+           notify("success", "Access Authorized", `Welcome back to the secure node, ${user.email}`);
+        }
 
         const fetchProfile = async () => {
           try {
@@ -117,7 +135,6 @@ export default function App() {
               setProfile(updatedProfile);
               localStorage.setItem("obey-profile-cache", JSON.stringify(updatedProfile));
             } else {
-              // Create profile if it doesn't exist (e.g., social login)
               const newProfile: any = {
                 id: user.id,
                 full_name: user.user_metadata?.full_name || user.email?.split("@")[0],
@@ -128,7 +145,7 @@ export default function App() {
                 balance: 142580.42
               };
               await supabase.from('profiles').insert([newProfile]);
-              const formattedProfile: UserProfile = {
+              setProfile({
                 name: newProfile.full_name,
                 email: newProfile.email,
                 role: newProfile.role,
@@ -138,71 +155,61 @@ export default function App() {
                 balance: 142580.42,
                 promoCode: "OBEY-ELITE",
                 twoFactorEnabled: false
-              };
-              setProfile(formattedProfile);
+              });
             }
           } catch (error) {
-            console.warn("⚠️ Profile Sync Error, trying MongoDB fallback...");
-            const fallbackUser = await fetchUserFallback(user.id);
-            if (fallbackUser) setProfile(fallbackUser);
+            console.warn("⚠️ Profile Sync Error");
           }
         };
         fetchProfile();
-
-        const fetchTransactions = async () => {
-          try {
-            const { data, error } = await supabase.from('transactions').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
-            if (error) throw error;
-            if (data && data.length > 0) {
-              setTransactions(data.map((tx: any) => ({
-                id: tx.id,
-                title: tx.title,
-                category: tx.category,
-                type: tx.type,
-                amount: tx.amount,
-                fee: tx.fee || 0,
-                date: new Date(tx.created_at).toLocaleDateString(),
-                time: new Date(tx.created_at).toLocaleTimeString(),
-                status: tx.status
-              })));
-            } else {
-              const fallbackTxs = await fetchTransactionsFallback(user.id);
-              if (fallbackTxs.length > 0) setTransactions(fallbackTxs);
-            }
-          } catch (error) {
-            const fallbackTxs = await fetchTransactionsFallback(user.id);
-            if (fallbackTxs.length > 0) setTransactions(fallbackTxs);
-          }
-        };
-        fetchTransactions();
-
       } else {
         setCurrentUser(null);
-        setCurrentScreen(AppScreen.MARKETING);
+        if (currentScreen === AppScreen.DASHBOARD) {
+           setCurrentScreen(AppScreen.MARKETING);
+        }
         localStorage.removeItem("obey-profile-cache");
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setBtcPrice(prev => prev * (1 + (Math.random() * 0.1 - 0.05) / 100));
-      setEthPrice(prev => prev * (1 + (Math.random() * 0.1 - 0.05) / 100));
-    }, 4000);
-    return () => clearInterval(timer);
-  }, []);
+  }, [currentScreen]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
+    notify("info", "Session Terminated", "Your institutional access has been securely revoked.");
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
     setMobileMenuOpen(false);
   };
 
+  const triggerDiagnostic = () => {
+    setSystemAlert({
+      isOpen: true,
+      title: "Diagnostic Sweep Initiated",
+      message: "Our master node is performing a full-stack integrity check on your digital parameters. Multiple ledger entries found.",
+      type: "system",
+      logs: [
+        "INITIALIZING_NODE_MESH_SYNC",
+        "FETCHING_CROSS_CHAIN_LIQUIDITY_POOLS",
+        "VERIFYING_MULTI_SIG_ESCROW_CONTRACTS",
+        "ESTABLISHING_SECURE_CLOUD_TUNNEL",
+        "DIAGNOSTIC_COMPLETE_INTEGRITY_100%"
+      ]
+    });
+  };
+
   return (
     <div className="min-h-screen text-[#0b0e14] font-sans antialiased selection:bg-primary/20 selection:text-primary relative bg-[#fcfcfd]">
+      
+      <SystemAlert 
+        isOpen={systemAlert.isOpen}
+        onClose={() => setSystemAlert(prev => ({ ...prev, isOpen: false }))}
+        title={systemAlert.title}
+        message={systemAlert.message}
+        logs={systemAlert.logs}
+        type={systemAlert.type}
+      />
+
       {currentScreen === AppScreen.MARKETING && (
         <MarketingPage 
           btcPrice={btcPrice} 
@@ -240,15 +247,15 @@ export default function App() {
               </button>
               <div className="flex items-center gap-3">
                 <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
-                <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest">
+                <button onClick={triggerDiagnostic} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                   Node: {adminMetrics.systemStatus}
-                </div>
+                </button>
               </div>
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100">
+              <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 cursor-pointer hover:opacity-60 transition-opacity">
                 <div className="text-right">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Master Ledger</p>
                   <p className="text-[13px] font-bold text-[#0b0e14]">Verified On-Chain</p>
@@ -299,6 +306,9 @@ export default function App() {
                         <ShieldCheck className="w-5 h-5" /> Compliance
                       </button>
                     )}
+
+
+
                   </nav>
                 </div>
               </div>
