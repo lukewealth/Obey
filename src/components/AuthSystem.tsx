@@ -189,26 +189,26 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
     <div className="min-h-screen relative flex flex-col font-sans text-gray-900 selection:bg-primary/20 selection:text-primary overflow-x-hidden">
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-bg-white)_0%,_var(--color-accent-blue)_50%,_var(--color-accent-yellow)_100%)] -z-20"></div>
 
-      <header className="fixed top-0 w-full z-50 h-20 px-6 md:px-12 flex items-center justify-between">
+      <header className="fixed top-0 w-full z-50 h-16 md:h-20 px-4 md:px-12 flex items-center justify-between">
         <button onClick={() => onNavigate(AppScreen.MARKETING)} className="flex items-center gap-2 group">
-          <div className="w-10 h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all">
-             <ChevronLeft size={20} />
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all">
+             <ChevronLeft size={18} className="md:w-5 md:h-5" />
           </div>
-          <span className="text-xl font-black tracking-tighter text-primary">OBEY</span>
+          <span className="text-lg md:text-xl font-black tracking-tighter text-[#0b0e14]">OBEY</span>
         </button>
-        <button onClick={() => onNavigate(currentScreen === AppScreen.LOGIN ? AppScreen.REGISTER : AppScreen.LOGIN)} className="text-sm font-black text-primary hover:underline underline-offset-4">
+        <button onClick={() => onNavigate(currentScreen === AppScreen.LOGIN ? AppScreen.REGISTER : AppScreen.LOGIN)} className="text-[11px] md:text-sm font-black text-primary uppercase tracking-widest hover:underline underline-offset-4">
           {currentScreen === AppScreen.LOGIN ? "Create Account" : "Sign In"}
         </button>
       </header>
 
-      <main className="flex-grow flex items-center justify-center p-6 pt-24 pb-12">
+      <main className="flex-grow flex items-center justify-center p-4 md:p-6 pt-20 md:pt-24 pb-12">
         <AnimatePresence mode="wait">
           {currentScreen === AppScreen.LOGIN && (
             <motion.div key="login" variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -20 }} className="w-full max-w-lg">
-              <div className="bento-card p-10 md:p-12 shadow-2xl space-y-10 relative overflow-hidden group">
+              <div className="bento-card p-8 md:p-12 shadow-2xl space-y-8 md:space-y-10 relative overflow-hidden group">
                  <div className="space-y-2 text-center md:text-left">
-                    <h2 className="text-4xl font-black tracking-tighter text-gray-900">Sign In.</h2>
-                    <p className="text-gray-500 font-medium">Manage your digital treasury nodes.</p>
+                    <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-900">Sign In.</h2>
+                    <p className="text-sm md:text-base text-gray-500 font-medium">Manage your digital treasury nodes.</p>
                  </div>
 
                  {errorMsg && (
@@ -217,45 +217,45 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
                    </div>
                  )}
 
-                 <form onSubmit={handleLoginSubmit} className="space-y-6">
+                 <form onSubmit={handleLoginSubmit} className="space-y-5 md:space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Account ID</label>
+                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Account ID</label>
                       <div className="relative">
                          <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                         <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@obey.finance" className="w-full h-16 pl-14 pr-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                         <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@obey.finance" className="w-full h-14 md:h-16 pl-14 pr-6 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                       </div>
                     </div>
 
                     <div className="space-y-3">
                       <div className="flex justify-between items-center px-4">
-                        <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em]">Access Code</label>
-                        <button type="button" className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Forgot?</button>
+                        <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Access Code</label>
+                        <button type="button" className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Forgot?</button>
                       </div>
                       <div className="relative">
                          <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
-                         <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full h-16 pl-14 pr-14 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                         <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full h-14 md:h-16 pl-14 pr-14 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors">
                             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                          </button>
                       </div>
                     </div>
 
-                    <button type="submit" disabled={loading} className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press">
-                       {loading ? <RefreshCw className="animate-spin" size={20} /> : <div className="flex items-center gap-3">Authorize Access <ArrowRight size={20} /></div>}
+                    <button type="submit" disabled={loading} className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press">
+                       {loading ? <RefreshCw className="animate-spin" size={20} /> : <div className="flex items-center gap-3">Authorize Access <ArrowRight size={18} className="md:w-5 md:h-5" /></div>}
                     </button>
                  </form>
 
                  <div className="relative flex items-center py-2">
                     <div className="flex-grow border-t border-gray-100"></div>
-                    <span className="mx-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">Institutional SSO</span>
+                    <span className="mx-4 md:mx-6 text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Institutional SSO</span>
                     <div className="flex-grow border-t border-gray-100"></div>
                  </div>
 
-                 <div className="grid grid-cols-2 gap-6">
-                    <button type="button" onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[22px] text-xs font-black uppercase tracking-widest transition-all active-press">
+                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                    <button type="button" onClick={() => handleSocialLogin('google')} className="flex items-center justify-center gap-3 h-14 md:h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[18px] md:rounded-[22px] text-[11px] md:text-xs font-black uppercase tracking-widest transition-all active-press">
                        {!getWebsiteConfig.auth.google.updateIcon && <GoogleIcon />} Google
                     </button>
-                    <button type="button" onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[22px] text-xs font-black uppercase tracking-widest transition-all active-press">
+                    <button type="button" onClick={() => handleSocialLogin('apple')} className="flex items-center justify-center gap-3 h-14 md:h-16 bg-white border border-gray-100 hover:bg-gray-50 rounded-[18px] md:rounded-[22px] text-[11px] md:text-xs font-black uppercase tracking-widest transition-all active-press">
                        {!getWebsiteConfig.auth.apple.updateIcon && <AppleIcon />} Apple ID
                     </button>
                  </div>
@@ -265,22 +265,22 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
 
           {currentScreen === AppScreen.REGISTER && (
             <motion.div key="register" variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -20 }} className="w-full max-w-lg">
-              <div className="bento-card p-10 md:p-12 shadow-2xl space-y-10">
-                 <h2 className="text-4xl font-black tracking-tighter text-gray-900">Onboard.</h2>
-                 <form onSubmit={handleRegisterSubmit} className="space-y-6">
+              <div className="bento-card p-8 md:p-12 shadow-2xl space-y-8 md:space-y-10">
+                 <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-900">Onboard.</h2>
+                 <form onSubmit={handleRegisterSubmit} className="space-y-5 md:space-y-6">
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Legal Name</label>
-                      <input type="text" required value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Felix Anderson" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Legal Name</label>
+                      <input type="text" required value={regName} onChange={(e) => setRegName(e.target.value)} placeholder="Felix Anderson" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Account ID (Email)</label>
-                      <input type="email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="name@company.com" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Account ID (Email)</label>
+                      <input type="email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="name@company.com" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.3em] pl-4">Access Code</label>
-                      <input type="password" required value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Access Code</label>
+                      <input type="password" required value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••••" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                     </div>
-                    <button type="submit" disabled={loading} className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press">
+                    <button type="submit" disabled={loading} className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press">
                        {loading ? <RefreshCw className="animate-spin" size={20} /> : "Initiate Verification"}
                     </button>
                  </form>
@@ -290,14 +290,14 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
 
           {currentScreen === AppScreen.OTP && (
             <motion.div key="otp" variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -20 }} className="w-full max-w-md text-center space-y-10">
-              <div className="bento-card p-10 md:p-12 shadow-2xl space-y-10">
-                 <h2 className="text-3xl font-black tracking-tighter text-gray-900">Verification.</h2>
-                 <div className="flex gap-3 justify-center">
+              <div className="bento-card p-8 md:p-12 shadow-2xl space-y-8 md:space-y-10">
+                 <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-gray-900">Verification.</h2>
+                 <div className="flex gap-2 md:gap-3 justify-center">
                     {otpValues.map((value, i) => (
-                      <input key={i} ref={otpRefs[i]} type="text" inputMode="numeric" maxLength={1} value={value} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} className="w-12 h-16 sm:w-14 sm:h-20 text-center font-black text-2xl rounded-[18px] bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-primary/10 outline-none transition-all shadow-inner" />
+                      <input key={i} ref={otpRefs[i]} type="text" inputMode="numeric" maxLength={1} value={value} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} className="w-10 h-14 sm:w-14 sm:h-20 text-center font-black text-xl md:text-2xl rounded-[14px] md:rounded-[18px] bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-primary/10 outline-none transition-all shadow-inner" />
                     ))}
                  </div>
-                 <button onClick={verifyOtpCode} disabled={!otpValues.every(v => v !== "") || verifying} className="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-[28px] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50">
+                 <button onClick={verifyOtpCode} disabled={!otpValues.every(v => v !== "") || verifying} className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50">
                     {verifying ? <RefreshCw className="animate-spin" size={20} /> : "Authorize Settlement"}
                  </button>
               </div>
@@ -307,16 +307,16 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
       </main>
 
       {verifiedOverlay && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-white/90 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-8 text-center">
-          <div className="w-32 h-32 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-10 shadow-inner">
-             <CheckCircle2 size={64} />
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-white/90 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-24 h-24 md:w-32 md:h-32 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-8 md:mb-10 shadow-inner">
+             <CheckCircle2 size={48} className="md:w-16 md:h-16" />
           </div>
-          <h2 className="text-5xl font-black text-gray-900 tracking-tighter mb-4">Identity Authorized.</h2>
-          <p className="text-xl text-gray-500 font-medium max-w-md leading-relaxed">Secure protocol established. Redirecting...</p>
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter mb-4">Identity Authorized.</h2>
+          <p className="text-lg md:text-xl text-gray-500 font-medium max-w-md leading-relaxed">Secure protocol established. Redirecting...</p>
         </motion.div>
       )}
 
-      <footer className="py-10 text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.4em]">
+      <footer className="py-8 md:py-10 text-center text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] md:tracking-[0.4em]">
          SECURE CLOUD NODES • © 2026 OBEY FINANCIAL TECHNOLOGIES
       </footer>
     </div>

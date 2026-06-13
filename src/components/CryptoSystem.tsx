@@ -114,14 +114,14 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
   };
 
   return (
-    <div className="space-y-12 pb-24">
+    <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Trading Terminal</h2>
-          <p className="text-gray-500 font-medium">Institutional market access with sub-second settlement.</p>
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Trading Terminal</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Institutional market access with sub-second settlement.</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-100 rounded-full text-emerald-600">
+        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-100 rounded-full text-emerald-600 self-center md:self-auto">
            <Activity size={16} className="animate-pulse" />
            <span className="text-[10px] font-black uppercase tracking-widest">Global liquidity node active</span>
         </div>
@@ -135,64 +135,64 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
             initial="initial"
             animate="animate"
             exit="exit"
-            className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] space-y-10 relative overflow-hidden"
+            className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-[35px] md:rounded-[45px] p-8 md:p-12 text-center shadow-2xl space-y-8 md:space-y-10 relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 right-0 h-2 bg-primary"></div>
             
             <div className="space-y-4">
-              <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
-                <Check size={48} />
+              <div className="w-16 h-16 md:w-24 md:h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <Check size={32} className="md:w-12 md:h-12" />
               </div>
-              <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Order Executed</h2>
-              <p className="text-gray-500 font-medium leading-relaxed">Your digital assets have been settled into your vault node.</p>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">Order Executed</h2>
+              <p className="text-sm md:text-base text-gray-500 font-medium leading-relaxed">Your digital assets have been settled into your vault node.</p>
             </div>
 
-            <div className="bg-gray-50 rounded-[32px] p-10 space-y-8 text-left border border-gray-100">
-              <div className="flex justify-between items-center">
-                <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Volume Settled</span>
-                <span className={`text-3xl font-black ${orderReceipt.type === "buy" ? "text-emerald-600" : "text-red-500"}`}>
+            <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-10 space-y-6 md:space-y-8 text-left border border-gray-100">
+              <div className="flex justify-between items-center gap-4">
+                <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Volume Settled</span>
+                <span className={`text-xl md:text-3xl font-black ${orderReceipt.type === "buy" ? "text-emerald-600" : "text-red-500"}`}>
                   {orderReceipt.type === "buy" ? "+" : "-"}{orderReceipt.cryptoAmount.toFixed(5)} {orderReceipt.symbol}
                 </span>
               </div>
               <div className="h-px bg-gray-200"></div>
-              <div className="grid grid-cols-2 gap-12">
+              <div className="grid grid-cols-2 gap-8 md:gap-12">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Fiat Value</p>
-                  <p className="text-lg font-black text-gray-900">${orderReceipt.fiatAmount.toLocaleString()}</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Fiat Value</p>
+                  <p className="text-base md:text-lg font-black text-gray-900">${orderReceipt.fiatAmount.toLocaleString()}</p>
                 </div>
                 <div className="space-y-1 text-right">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Execution Rate</p>
-                  <p className="text-lg font-black text-gray-900 font-mono tracking-tighter">${orderReceipt.executionPrice.toLocaleString()}</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Execution Rate</p>
+                  <p className="text-base md:text-lg font-black text-gray-900 font-mono tracking-tighter">${orderReceipt.executionPrice.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
-            <button onClick={() => setOrderReceipt(null)} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/20 active-press">
+            <button onClick={() => setOrderReceipt(null)} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
               Return to Terminal
             </button>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
             
             {/* Asset List */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="lg:col-span-8 bento-card p-10 space-y-10 group overflow-hidden"
+              className="lg:col-span-8 bento-card p-6 md:p-10 space-y-8 md:space-y-10 group overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-96 h-96 bg-accent-blue/30 rounded-full blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-[3s]"></div>
+              <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/30 rounded-full blur-[60px] md:blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-[3s]"></div>
               
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-8 relative z-10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-8 relative z-10">
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-gray-900 tracking-tight">Market Assets</h3>
-                  <p className="text-sm text-gray-400 font-medium">Real-time depth and liquidity nodes.</p>
+                  <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Market Assets</h3>
+                  <p className="text-xs md:text-sm text-gray-400 font-medium">Real-time depth and liquidity nodes.</p>
                 </div>
-                <div className="relative group">
+                <div className="relative group w-full sm:w-auto">
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={16} />
                     <input 
                       type="text" 
                       placeholder="Find assets..." 
-                      className="bg-gray-50 border border-gray-100 rounded-[18px] pl-11 pr-4 py-2.5 text-xs focus:ring-2 focus:ring-primary/10 w-56 font-bold outline-none transition-all"
+                      className="bg-gray-50 border border-gray-100 rounded-[18px] pl-11 pr-4 py-2.5 text-xs focus:ring-2 focus:ring-primary/10 w-full sm:w-56 font-bold outline-none transition-all"
                     />
                 </div>
               </div>
@@ -207,19 +207,19 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                       key={asset.symbol}
                       whileHover={{ scale: 1.01 }}
                       onClick={() => setSelectedSymbol(asset.symbol)}
-                      className={`p-6 rounded-[28px] border flex items-center justify-between cursor-pointer transition-all duration-400 ${
+                      className={`p-4 md:p-6 rounded-[24px] md:rounded-[28px] border flex items-center justify-between cursor-pointer transition-all duration-400 gap-4 ${
                         isSelected
                           ? "border-primary bg-white shadow-xl shadow-primary/10"
                           : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
                       }`}
                     >
-                      <div className="flex items-center gap-6">
-                        <div className={`w-14 h-14 rounded-[22px] ${isSelected ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400 border border-gray-100'} flex items-center justify-center font-black text-2xl transition-colors shadow-sm`}>
-                          {asset.logo === '₿' ? <Star size={24} fill="currentColor" /> : asset.logo === 'E' ? <Zap size={24} fill="currentColor" /> : asset.logo}
+                      <div className="flex items-center gap-3 md:gap-6 shrink-0">
+                        <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[14px] md:rounded-[22px] ${isSelected ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400 border border-gray-100'} flex items-center justify-center font-black text-xl md:text-2xl transition-colors shadow-sm`}>
+                          {asset.logo === '₿' ? <Star size={20} fill="currentColor" className="md:w-6 md:h-6" /> : asset.logo === 'E' ? <Zap size={20} fill="currentColor" className="md:w-6 md:h-6" /> : asset.logo}
                         </div>
-                        <div>
-                          <p className="text-lg font-black text-gray-900 tracking-tight">{asset.name}</p>
-                          <p className="text-[11px] text-gray-400 font-black uppercase tracking-widest mt-0.5">{asset.symbol} • Balance: {asset.balance}</p>
+                        <div className="overflow-hidden">
+                          <p className="text-sm md:text-lg font-black text-gray-900 tracking-tight truncate">{asset.name}</p>
+                          <p className="text-[9px] md:text-[11px] text-gray-400 font-black uppercase tracking-widest mt-0.5 truncate">{asset.symbol} • Balance: {asset.balance}</p>
                         </div>
                       </div>
 
@@ -240,12 +240,12 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                         </svg>
                       </div>
 
-                      <div className="text-right">
-                        <p className="text-lg font-black text-gray-900 font-mono tracking-tighter">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black mt-1.5 ${
+                      <div className="text-right shrink-0">
+                        <p className="text-sm md:text-lg font-black text-gray-900 font-mono tracking-tighter">${asset.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                        <div className={`inline-flex items-center gap-1.5 px-2 md:px-3 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-black mt-1 md:mt-1.5 ${
                           isPositive ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
                         }`}>
-                          {isPositive ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                          {isPositive ? <TrendingUp size={10} className="md:w-3 md:h-3" /> : <TrendingDown size={10} className="md:w-3 md:h-3" />}
                           {isPositive ? "+" : ""}{asset.priceChangePercent}%
                         </div>
                       </div>
@@ -259,22 +259,22 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="lg:col-span-4 bento-card p-10 space-y-10 group overflow-hidden"
+              className="lg:col-span-4 bento-card p-6 md:p-10 space-y-8 md:space-y-10 group overflow-hidden"
             >
-              <div className="absolute top-0 right-0 w-40 h-40 bg-accent-yellow/30 rounded-full blur-[60px] pointer-events-none group-hover:scale-150 transition-transform duration-1000"></div>
+              <div className="absolute top-0 right-0 w-32 md:w-40 h-32 md:h-40 bg-accent-yellow/30 rounded-full blur-[40px] md:blur-[60px] pointer-events-none group-hover:scale-150 transition-transform duration-1000"></div>
               
               <div className="flex items-center gap-3 relative z-10">
-                <div className="w-12 h-12 bg-primary/10 rounded-[20px] flex items-center justify-center text-primary">
-                  <BarChart3 size={24} />
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary">
+                  <BarChart3 size={20} className="md:w-6 md:h-6" />
                 </div>
-                <h3 className="text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Execution Desk</h3>
+                <h3 className="text-[10px] md:text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Execution Desk</h3>
               </div>
 
-              <div className="flex bg-gray-100 p-1.5 rounded-[22px] border border-gray-200 relative z-10">
+              <div className="flex bg-gray-100 p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 relative z-10">
                 <button
                   type="button"
                   onClick={() => setTradeType("buy")}
-                  className={`flex-1 py-4 rounded-[18px] text-[13px] font-black transition-all ${
+                  className={`flex-1 py-3 md:py-4 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black transition-all ${
                     tradeType === "buy" ? "bg-white text-primary shadow-lg shadow-black/5" : "text-gray-400"
                   }`}
                 >
@@ -283,7 +283,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                 <button
                   type="button"
                   onClick={() => setTradeType("sell")}
-                  className={`flex-1 py-4 rounded-[18px] text-[13px] font-black transition-all ${
+                  className={`flex-1 py-3 md:py-4 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black transition-all ${
                     tradeType === "sell" ? "bg-white text-red-500 shadow-lg shadow-black/5" : "text-gray-400"
                   }`}
                 >
@@ -291,21 +291,21 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                 </button>
               </div>
 
-              <form onSubmit={executeTrade} className="space-y-10 relative z-10">
+              <form onSubmit={executeTrade} className="space-y-8 md:space-y-10 relative z-10">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center px-4">
-                    <span className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Order Magnitude (USD)</span>
-                    <span className="text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
+                    <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Order Magnitude</span>
+                    <span className="text-[10px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
                   </div>
                   <div className="relative">
-                    <DollarSign className="absolute left-8 top-1/2 -translate-y-1/2 text-primary" size={28} />
+                    <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary" size={24} className="md:w-7 md:h-7" />
                     <input
                       type="number"
                       required
                       value={fiatValue}
                       onChange={(e) => setFiatValue(e.target.value)}
                       placeholder="0.00"
-                      className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none transition-all tracking-tighter"
+                      className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none transition-all tracking-tighter"
                     />
                   </div>
                 </div>
@@ -314,18 +314,18 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                   <motion.div 
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="p-8 bg-accent-blue/40 rounded-[32px] border border-blue-100 space-y-4"
+                    className="p-6 md:p-8 bg-accent-blue/40 rounded-[24px] md:rounded-[32px] border border-blue-100 space-y-4"
                   >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">Estimated Payout</span>
-                      <span className="text-xl font-black text-primary font-mono tracking-tighter">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-[10px] md:text-[11px] font-black text-blue-400 uppercase tracking-widest shrink-0">Estimated Payout</span>
+                      <span className="text-lg md:text-xl font-black text-primary font-mono tracking-tighter truncate">
                         {(parseFloat(fiatValue) / activeAsset.price).toFixed(6)} {activeAsset.symbol}
                       </span>
                     </div>
                     <div className="h-px bg-blue-100"></div>
                     <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-black text-blue-400 uppercase tracking-widest">Execution Fee</span>
-                      <span className="text-sm font-black text-emerald-500 uppercase tracking-widest">SUB-ZERO</span>
+                      <span className="text-[10px] md:text-[11px] font-black text-blue-400 uppercase tracking-widest">Execution Fee</span>
+                      <span className="text-[10px] md:text-sm font-black text-emerald-500 uppercase tracking-widest">SUB-ZERO</span>
                     </div>
                   </motion.div>
                 )}
@@ -333,11 +333,11 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                 <button
                   type="submit"
                   disabled={processing || !fiatValue}
-                  className={`w-full h-20 text-white rounded-[28px] font-black text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press ${
+                  className={`w-full h-16 md:h-20 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press ${
                     tradeType === "buy" ? "bg-primary shadow-primary/20" : "bg-red-500 shadow-red-500/20"
                   } disabled:opacity-50`}
                 >
-                  {processing ? <RefreshCw className="animate-spin" size={28} /> : (
+                  {processing ? <RefreshCw className="animate-spin" size={24} className="md:w-7 md:h-7" /> : (
                     <div className="flex items-center gap-3">
                        Confirm {tradeType} <ArrowRight size={20} />
                     </div>
@@ -345,14 +345,14 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                 </button>
               </form>
 
-              <div className="p-6 bg-gray-900 rounded-[32px] flex gap-5 relative z-10 text-white">
-                <div className="w-12 h-12 bg-white/10 rounded-[20px] flex items-center justify-center text-primary shrink-0">
-                  <ShieldCheck size={24} />
+              <div className="p-5 md:p-6 bg-gray-900 rounded-[24px] md:rounded-[32px] flex gap-4 md:gap-5 relative z-10 text-white">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary shrink-0">
+                  <ShieldCheck size={20} className="md:w-6 md:h-6" />
                 </div>
-                <div className="space-y-1">
-                   <p className="text-sm font-black tracking-tight">Compliance Shield Active</p>
-                   <p className="text-[10px] text-white/40 font-medium leading-relaxed uppercase tracking-widest">
-                     Orders are routed through institutional liquidity nodes.
+                <div className="space-y-0.5 md:space-y-1">
+                   <p className="text-xs md:text-sm font-black tracking-tight">Compliance Shield Active</p>
+                   <p className="text-[9px] md:text-[10px] text-white/40 font-medium leading-relaxed uppercase tracking-widest">
+                     Orders are routed through institutional nodes.
                    </p>
                 </div>
               </div>

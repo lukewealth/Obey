@@ -1,34 +1,33 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ShieldAlert, RefreshCw, CheckCircle2, Shield } from "lucide-react";
+import { ShieldCheck, RefreshCw, ChevronLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface OtpVerificationProps {
-  onSuccess: () => void;
+  onVerify: (code: string) => void;
   onResend: () => void;
-  emailOrPhone: string;
+  onBack: () => void;
+  phone?: string;
+  email?: string;
 }
 
-export default function OtpVerification({ onSuccess, onResend, emailOrPhone }: OtpVerificationProps) {
+export default function OtpVerification({ onVerify, onResend, onBack, phone, email }: OtpVerificationProps) {
   const [otpValues, setOtpValues] = useState<string[]>(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(119);
+  const [timerActive, setTimerActive] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const otpRefs = [
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-    useRef<HTMLInputElement>(null),
-  ];
+  const otpRefs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
+    let interval: NodeJS.Timeout;
+    if (timerActive && timer > 0) {
+      interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
+    } else if (timer === 0) {
+      setTimerActive(false);
+    }
     return () => clearInterval(interval);
-  }, []);
+  }, [timerActive, timer]);
 
   const handleOtpChange = (index: number, value: string) => {
     const cleaned = value.replace(/[^0-9]/g, "");
@@ -48,102 +47,119 @@ export default function OtpVerification({ onSuccess, onResend, emailOrPhone }: O
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
+    const code = otpValues.join("");
+    if (code.length !== 6) return;
     setVerifying(true);
     setTimeout(() => {
       setVerifying(false);
       setSuccess(true);
-      setTimeout(onSuccess, 1500);
-    }, 1500);
+      setTimeout(() => onVerify(code), 1500);
+    }, 1600);
   };
 
-  const formattedTimer = () => {
-    const min = Math.floor(timer / 60);
-    const sec = timer % 60;
-    return `${min.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+  const formatTimer = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] p-6">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-md bg-white p-10 md:p-12 rounded-[40px] border border-gray-100 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] space-y-10 relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gray-50">
-           <motion.div 
-             initial={{ width: "100%" }}
-             animate={{ width: `${(timer / 119) * 100}%` }}
-             className="h-full bg-primary"
-           />
-        </div>
-
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-black tracking-tighter text-gray-900">Secure Verification.</h2>
-          <p className="text-gray-500 font-medium">Enter the 6-digit code sent to {emailOrPhone}</p>
-        </div>
-
-        <div className="flex gap-3 justify-center">
-          {otpValues.map((val, i) => (
-            <input
-              key={i}
-              ref={otpRefs[i]}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              value={val}
-              onChange={(e) => handleOtpChange(i, e.target.value)}
-              onKeyDown={(e) => handleOtpKeyDown(i, e)}
-              className="w-12 h-16 sm:w-14 sm:h-20 text-center font-black text-2xl rounded-[18px] bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-primary/10 outline-none transition-all shadow-inner"
-            />
-          ))}
-        </div>
-
-        <div className="space-y-6">
-          <button 
-            onClick={handleVerify}
-            disabled={!otpValues.every(v => v !== "") || verifying}
-            className="w-full h-20 bg-primary text-white rounded-[28px] font-black text-sm uppercase tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50"
-          >
-            {verifying ? <RefreshCw className="animate-spin" size={20} /> : "Authorize Settlement"}
-          </button>
-          
-          <div className="flex items-center justify-between px-2">
-             <div className="flex items-center gap-2 text-xs font-black text-gray-400">
-                <ShieldAlert size={14} /> {timer > 0 ? `Expiring in ${formattedTimer()}` : "Expired"}
-             </div>
-             <button 
-               onClick={onResend}
-               disabled={timer > 0}
-               className="text-[11px] font-black text-primary uppercase tracking-widest hover:underline disabled:opacity-20"
-             >
-               Resend Code
-             </button>
-          </div>
-        </div>
-
-        <div className="pt-8 border-t border-gray-100 flex flex-col items-center gap-3 opacity-40">
-           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.3em]">
-              <Shield size={12} className="text-emerald-500" /> AES-256 Bit Encryption
-           </div>
-        </div>
-      </motion.div>
-
-      <AnimatePresence>
-        {success && (
+    <div className="min-h-[80vh] flex items-center justify-center p-4 md:p-6">
+      <AnimatePresence mode="wait">
+        {success ? (
           <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-white/90 backdrop-blur-2xl z-[100] flex flex-col items-center justify-center p-8 text-center"
+            key="success"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center space-y-8 md:space-y-10"
           >
-            <div className="w-32 h-32 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-10 shadow-inner">
-               <CheckCircle2 size={64} />
+             <div className="w-24 h-24 md:w-32 md:h-32 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 size={48} className="md:w-16 md:h-16" />
+             </div>
+             <div className="space-y-2">
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter">Node Authorized.</h2>
+                <p className="text-base md:text-xl text-gray-500 font-medium">Establishing secure protocol...</p>
+             </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            key="otp-form"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full max-w-md"
+          >
+            <div className="bento-card p-8 md:p-12 shadow-2xl space-y-8 md:space-y-10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl"></div>
+              
+              <div className="space-y-2 text-center">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/10 text-primary rounded-2xl md:rounded-3xl flex items-center justify-center mx-auto mb-6">
+                  <ShieldCheck size={24} className="md:w-8 md:h-8" />
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Security Code</h2>
+                <p className="text-xs md:text-sm text-gray-500 font-medium leading-relaxed">
+                  Enter the 6-digit node authorization code sent to your registered device.
+                </p>
+              </div>
+
+              <div className="flex gap-2 md:gap-3 justify-center">
+                {otpValues.map((value, i) => (
+                  <input
+                    key={i}
+                    ref={otpRefs[i]}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={value}
+                    onChange={(e) => handleOtpChange(i, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                    className="w-10 h-14 sm:w-14 sm:h-20 text-center font-black text-xl md:text-2xl rounded-[14px] md:rounded-[18px] bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-primary/10 outline-none transition-all shadow-inner"
+                  />
+                ))}
+              </div>
+
+              <div className="space-y-6">
+                <button
+                  onClick={handleVerify}
+                  disabled={!otpValues.every((v) => v !== "") || verifying}
+                  className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50"
+                >
+                  {verifying ? <RefreshCw className="animate-spin" size={20} /> : (
+                    <div className="flex items-center gap-3">
+                      Verify Node <ArrowRight size={18} className="md:w-5 md:h-5" />
+                    </div>
+                  )}
+                </button>
+
+                <div className="text-center space-y-4">
+                  {timerActive ? (
+                    <p className="text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest">
+                      Request new code in <span className="text-primary">{formatTimer(timer)}</span>
+                    </p>
+                  ) : (
+                    <button
+                      onClick={() => { setTimer(119); setTimerActive(true); onResend(); }}
+                      className="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest hover:underline underline-offset-4"
+                    >
+                      Resend Authorization Code
+                    </button>
+                  )}
+                  
+                  <button
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-[10px] md:text-xs font-black text-gray-400 uppercase tracking-widest mx-auto hover:text-gray-900 transition-colors"
+                  >
+                    <ChevronLeft size={14} /> Back to Sign In
+                  </button>
+                </div>
+              </div>
             </div>
-            <h2 className="text-5xl font-black text-gray-900 tracking-tighter mb-4">Authorized.</h2>
-            <p className="text-xl text-gray-500 font-medium max-w-md leading-relaxed">
-               Secure protocol established. Redirecting...
-            </p>
           </motion.div>
         )}
       </AnimatePresence>

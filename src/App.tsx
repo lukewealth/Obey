@@ -271,22 +271,22 @@ export default function App() {
 
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[#fcfcfd]">
-          <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-gray-100 px-6 md:px-10 h-20 md:h-24 flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden w-11 h-11 flex items-center justify-center text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all">
-                <MenuIcon className="w-6 h-6" />
+          <header className="sticky top-0 z-40 bg-white/60 backdrop-blur-3xl border-b border-gray-100 px-4 md:px-10 h-16 md:h-24 flex items-center justify-between">
+            <div className="flex items-center gap-3 md:gap-6">
+              <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden w-10 h-10 flex items-center justify-center text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all">
+                <MenuIcon className="w-5 h-5 md:w-6 md:h-6" />
               </button>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 md:gap-3">
                 <button 
                   onClick={() => setSidebarExpanded(!sidebarExpanded)}
                   className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all mr-2"
                 >
                   <MenuIcon className="w-6 h-6" />
                 </button>
-                <div className="w-11 h-11 bg-[#0b0e14] flex items-center justify-center rounded-[10px] shadow-lg overflow-hidden">
+                <div className="w-9 h-9 md:w-11 md:h-11 bg-[#0b0e14] flex items-center justify-center rounded-[8px] md:rounded-[10px] shadow-lg overflow-hidden">
                   <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
                 </div>
-                <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
+                <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
                 <button onClick={triggerDiagnostic} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
                   Node: {adminMetrics.systemStatus}
@@ -294,7 +294,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 md:gap-6">
               <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 cursor-pointer hover:opacity-60 transition-opacity">
                 <div className="text-right">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Master Ledger</p>
@@ -302,14 +302,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-3 pl-2 cursor-pointer group select-none">
-                <div className="w-11 h-11 rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-sm uppercase shadow-xl group-hover:scale-105 transition-transform">
+              <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-2 md:gap-3 pl-2 cursor-pointer group select-none">
+                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform">
                   {profile.avatar}
                 </div>
-                <div className="hidden lg:block">
-                  <p className="text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
-                  <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                    <VerifiedIcon className="w-3.5 h-3.5 text-primary" /> {profile.role === "admin" ? "Institutional Admin" : "Tier 2 Secure"}
+                <div className="hidden sm:block">
+                  <p className="text-[12px] md:text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
+                  <p className="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                    <VerifiedIcon className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" /> {profile.role === "admin" ? "Institutional Admin" : "Tier 2 Secure"}
                   </p>
                 </div>
               </div>

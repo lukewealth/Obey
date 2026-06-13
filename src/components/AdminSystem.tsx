@@ -51,20 +51,20 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
   };
 
   return (
-    <div className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div>
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight">Ecosystem Monitoring</h2>
-          <p className="text-sm text-gray-500 font-medium mt-1">Supervise compliant statuses and platform health.</p>
+    <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
+        <div className="space-y-1 text-center md:text-left">
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Ecosystem Monitoring</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium">Supervise compliant statuses and platform health.</p>
         </div>
-        <div className="flex items-center gap-3 px-4 py-2 bg-accent-blue rounded-full border border-blue-100">
+        <div className="flex items-center justify-center gap-3 px-4 py-2 bg-accent-blue rounded-full border border-blue-100 self-center md:self-auto">
           <Server size={16} className="text-primary" />
-          <span className="text-[11px] text-primary font-black uppercase tracking-widest">Master Node: v4.0.0</span>
+          <span className="text-[10px] md:text-[11px] text-primary font-black uppercase tracking-widest">Master Node: v4.0.0</span>
         </div>
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
         {[
           { label: "Total Users", val: metrics.totalUsers.toLocaleString(), icon: Users, color: "text-primary", bg: "bg-accent-blue" },
           { label: "Trade Volume", val: `$${metrics.totalVolume.toLocaleString()}`, icon: DollarSign, color: "text-emerald-600", bg: "bg-emerald-50" },
@@ -74,66 +74,66 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
           <motion.div 
             key={m.label}
             whileHover={{ y: -5 }}
-            className="bg-white border border-gray-100 p-6 rounded-[28px] shadow-xl shadow-gray-200/50 flex items-center justify-between group transition-all"
+            className="bg-white border border-gray-100 p-5 md:p-8 rounded-[24px] md:rounded-[32px] shadow-xl shadow-gray-200/50 flex flex-col sm:flex-row items-center justify-between group transition-all text-center sm:text-left gap-4"
           >
             <div>
-              <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">{m.label}</p>
-              <p className="text-2xl font-black text-gray-900 tracking-tight">{m.val}</p>
+              <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest mb-1">{m.label}</p>
+              <p className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">{m.val}</p>
             </div>
-            <div className={`w-12 h-12 ${m.bg} ${m.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
-              <m.icon size={24} />
+            <div className={`w-10 h-10 md:w-14 md:h-14 ${m.bg} ${m.color} rounded-[16px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm shrink-0`}>
+              <m.icon size={22} className="md:w-7 md:h-7" />
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-10 items-start">
         
         {/* Compliance Queue */}
         <motion.div 
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-8 bg-white border border-gray-100 rounded-[32px] p-8 space-y-8 shadow-xl shadow-gray-200/50 relative overflow-hidden"
+          className="lg:col-span-8 bg-white border border-gray-100 rounded-[35px] md:rounded-[45px] p-6 md:p-10 space-y-8 md:space-y-12 shadow-xl shadow-gray-200/50 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-80 h-80 bg-accent-blue/30 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/30 rounded-full blur-[60px] md:blur-[100px] -z-10 transition-transform duration-[3s]"></div>
           
-          <div className="flex justify-between items-center border-b border-gray-100 pb-8 relative z-10">
-            <div>
-              <h3 className="text-xl font-black text-gray-900 tracking-tight">Compliance Queue</h3>
-              <p className="text-sm text-gray-500 font-medium">Audit identity records for Level 2 clearance.</p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 md:gap-8 relative z-10 border-b border-gray-100 pb-8 md:pb-10 text-center sm:text-left">
+            <div className="space-y-1">
+              <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Compliance Queue</h3>
+              <p className="text-xs md:text-sm text-gray-500 font-medium">Audit identity records for Level 2 clearance.</p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg text-[10px] font-black uppercase text-gray-400">
+            <div className="flex items-center justify-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg text-[9px] md:text-[10px] font-black uppercase text-gray-400 self-center sm:self-auto">
               <UserCheck size={14} />
               Gatekeeper
             </div>
           </div>
 
-          <div className="space-y-4 relative z-10">
+          <div className="space-y-4 md:space-y-5 relative z-10">
             <AnimatePresence mode="popLayout">
               {profile.kycStatus === "Pending" && (
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-6 bg-accent-yellow/30 border border-yellow-200 rounded-[24px] flex flex-col sm:flex-row items-center justify-between gap-6"
+                  className="p-6 md:p-8 bg-accent-yellow/30 border border-yellow-200 rounded-[24px] md:rounded-[32px] flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left"
                 >
-                  <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-yellow-600 shadow-sm font-black">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-[16px] md:rounded-[22px] bg-white flex items-center justify-center text-yellow-600 shadow-sm font-black text-xl shrink-0">
                       {profile.avatar}
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-[15px] font-black text-gray-900">{profile.name} (YOU)</p>
+                      <div className="flex items-center justify-center sm:justify-start gap-2">
+                        <p className="text-base md:text-lg font-black text-gray-900">{profile.name} (YOU)</p>
                         <span className="bg-yellow-500 text-white px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest">OWNER</span>
                       </div>
-                      <p className="text-[11px] text-gray-500 font-medium mt-1">Passport Card • {profile.email}</p>
+                      <p className="text-[10px] md:text-[11px] text-gray-500 font-medium mt-1">Passport Card • {profile.email}</p>
                     </div>
                   </div>
                   <button 
                     onClick={onApproveKyc}
-                    className="h-12 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[11px] uppercase tracking-widest rounded-xl flex items-center gap-2 shadow-lg shadow-emerald-500/20 active-press transition-all"
+                    className="w-full sm:w-auto h-12 md:h-14 px-6 md:px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[10px] md:text-[11px] uppercase tracking-widest rounded-xl md:rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active-press transition-all shrink-0"
                   >
-                    <Check size={16} /> Approve Profile
+                    <Check size={18} /> Approve Profile
                   </button>
                 </motion.div>
               )}
@@ -144,28 +144,28 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-6 bg-white border border-gray-100 rounded-[24px] flex flex-col sm:flex-row items-center justify-between gap-6 hover:bg-gray-50 transition-all group"
+                  className="p-6 md:p-8 bg-white border border-gray-100 rounded-[24px] md:rounded-[32px] flex flex-col sm:flex-row items-center justify-between gap-6 hover:bg-gray-50 transition-all group text-center sm:text-left"
                 >
-                  <div className="flex items-center gap-5">
-                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 font-black group-hover:bg-white group-hover:text-primary transition-colors border border-gray-100">
+                  <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-[16px] md:rounded-[22px] bg-gray-50 flex items-center justify-center text-gray-400 font-black text-xl group-hover:bg-white group-hover:text-primary transition-colors border border-gray-100 shrink-0">
                       {item.name[0]}
                     </div>
-                    <div>
-                      <p className="text-[15px] font-black text-gray-900">{item.name}</p>
-                      <p className="text-[11px] text-gray-500 font-medium mt-1 uppercase tracking-widest">{item.documentType} • {item.email}</p>
+                    <div className="overflow-hidden">
+                      <p className="text-base md:text-lg font-black text-gray-900 truncate">{item.name}</p>
+                      <p className="text-[10px] md:text-[11px] text-gray-400 font-medium mt-1 uppercase tracking-widest truncate">{item.documentType} • {item.email}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button 
                       onClick={() => handleRejectQueueItem(item.id)}
-                      className="p-3 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition-all active-press"
+                      className="flex-1 sm:flex-none p-3.5 md:p-4 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl md:rounded-2xl transition-all active-press flex items-center justify-center"
                     >
-                      <X size={18} />
+                      <X size={20} />
                     </button>
                     <button 
                       onClick={() => handleApproveQueueItem(item.id)}
-                      className="h-12 px-6 bg-primary hover:bg-primary/90 text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 active-press transition-all"
+                      className="flex-[2] sm:flex-none h-12 md:h-14 px-6 md:px-10 bg-primary hover:bg-primary/90 text-white font-black text-[10px] md:text-[11px] uppercase tracking-widest rounded-xl md:rounded-2xl shadow-lg shadow-primary/20 active-press transition-all"
                     >
                       Approve
                     </button>
@@ -174,11 +174,11 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
               ))}
 
               {kycQueue.length === 0 && profile.kycStatus !== "Pending" && (
-                <div className="p-12 text-center space-y-4">
-                  <div className="w-16 h-16 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
-                    <CheckCircle2 size={32} />
+                <div className="py-20 text-center space-y-4">
+                  <div className="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                    <CheckCircle2 size={40} />
                   </div>
-                  <p className="text-[13px] font-black text-gray-400 uppercase tracking-widest">Queue Fully Audited</p>
+                  <p className="text-sm font-black text-gray-400 uppercase tracking-widest">Queue Fully Audited</p>
                 </div>
               )}
             </AnimatePresence>
@@ -189,16 +189,16 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
         <motion.div 
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-4 space-y-10"
+          className="lg:col-span-4 space-y-6 md:space-y-10"
         >
-          <div className="bg-white border border-gray-100 rounded-[32px] p-8 shadow-xl shadow-gray-200/50 space-y-8 relative overflow-hidden group">
-            <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent-blue/30 rounded-full blur-xl group-hover:scale-150 transition-transform duration-1000"></div>
+          <div className="bg-white border border-gray-100 rounded-[30px] md:rounded-[45px] p-8 md:p-10 shadow-xl shadow-gray-200/50 space-y-8 relative overflow-hidden group">
+            <div className="absolute -top-4 -right-4 w-32 h-32 bg-accent-blue/30 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
             
             <div className="flex items-center gap-3 relative z-10">
-              <div className="w-10 h-10 bg-accent-blue rounded-xl flex items-center justify-center text-primary">
-                <Settings size={20} />
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-accent-blue rounded-[14px] md:rounded-2xl flex items-center justify-center text-primary">
+                <Settings size={22} className="md:w-6 md:h-6" />
               </div>
-              <h4 className="text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">System State</h4>
+              <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">System State</h4>
             </div>
 
             <div className="space-y-3 relative z-10">
@@ -210,29 +210,29 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                 <button 
                   key={s.id}
                   onClick={() => changeStatus(s.id as any)}
-                  className={`w-full py-4 px-6 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center justify-between transition-all border ${
+                  className={`w-full py-4 md:py-5 px-6 rounded-2xl md:rounded-[22px] text-[10px] md:text-[11px] font-black uppercase tracking-widest flex items-center justify-between transition-all border ${
                     activeStatus === s.id 
                       ? `bg-${s.color}-50 border-${s.color}-200 text-${s.color}-600 shadow-sm` 
                       : "bg-gray-50 border-gray-100 text-gray-400 grayscale"
                   }`}
                 >
                   <span>{s.label}</span>
-                  <div className={`w-2.5 h-2.5 rounded-full bg-${s.color}-500 ${activeStatus === s.id ? 'animate-pulse' : ''}`}></div>
+                  <div className={`w-2 md:w-2.5 h-2 md:h-2.5 rounded-full bg-${s.color}-500 ${activeStatus === s.id ? 'animate-pulse' : ''}`}></div>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="bg-gray-900 rounded-[32px] p-8 shadow-2xl flex flex-col justify-between text-white min-h-[240px] relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-1000"></div>
-            <div className="space-y-4 relative z-10">
-              <ShieldAlert size={32} className="text-primary" />
-              <h5 className="text-xl font-black tracking-tight">Security Protocol</h5>
-              <p className="text-sm text-white/50 font-medium leading-relaxed">
+          <div className="bg-gray-900 rounded-[30px] md:rounded-[45px] p-8 md:p-10 shadow-2xl flex flex-col justify-between text-white min-h-[260px] md:min-h-[300px] relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 md:w-48 h-32 md:h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+            <div className="space-y-4 md:space-y-6 relative z-10 text-center sm:text-left">
+              <ShieldAlert size={36} className="text-primary mx-auto sm:mx-0 md:w-12 md:h-12" />
+              <h5 className="text-xl md:text-2xl font-black tracking-tight leading-tight">Security Protocol</h5>
+              <p className="text-[11px] md:text-sm text-white/50 font-medium leading-relaxed">
                 All administrative actions are signed sequentially on the private ledger node. 2FA is mandatory for all state changes.
               </p>
             </div>
-            <button className="w-full mt-6 py-4 bg-white/10 hover:bg-white/20 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest border border-white/10 backdrop-blur-md transition-all">
+            <button className="w-full mt-8 py-4 md:py-5 bg-white/10 hover:bg-white/20 text-white rounded-[18px] md:rounded-[22px] font-black text-[10px] md:text-xs uppercase tracking-widest border border-white/10 backdrop-blur-md transition-all active-press">
               Audit Logs
             </button>
           </div>
@@ -243,9 +243,9 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-[#0b0e14] text-white rounded-[40px] p-10 space-y-10 shadow-2xl relative overflow-hidden"
+        className="bg-[#0b0e14] text-white rounded-[35px] md:rounded-[50px] p-6 md:p-12 space-y-10 md:space-y-16 shadow-2xl relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 w-full h-1 bg-primary/20">
+        <div className="absolute top-0 left-0 w-full h-1.5 bg-primary/20">
            <motion.div 
              initial={{ width: 0 }}
              animate={{ width: "100%" }}
@@ -254,25 +254,25 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
            />
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
-          <div className="space-y-2">
-            <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                  <Lock size={20} className="text-white" />
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-8 relative z-10 text-center md:text-left">
+          <div className="space-y-3">
+            <div className="flex flex-col md:flex-row items-center gap-3 md:gap-4">
+               <div className="w-12 h-12 md:w-14 md:h-14 bg-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center shadow-lg shadow-primary/20">
+                  <Lock size={24} className="text-white md:w-7 md:h-7" />
                </div>
-               <h3 className="text-2xl font-black tracking-tighter">Marketplace Escrow</h3>
+               <h3 className="text-3xl md:text-5xl font-black tracking-tighter">Marketplace Escrow</h3>
             </div>
-            <p className="text-gray-500 font-medium max-w-xl text-sm">Release and audit global retail liquidity settlements from the decentralized escrow vault.</p>
+            <p className="text-gray-500 font-medium max-w-xl text-sm md:text-base leading-relaxed">Release and audit global retail liquidity settlements from the decentralized escrow vault node.</p>
           </div>
-          <div className="flex gap-4">
-             <div className="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl">
-                <p className="text-[10px] font-black uppercase text-gray-500 tracking-widest mb-1">Locked Value</p>
-                <p className="text-lg font-black font-space text-primary">₦5,575,000.00</p>
+          <div className="flex gap-4 w-full md:w-auto justify-center">
+             <div className="px-6 md:px-8 py-4 md:py-5 bg-white/5 border border-white/10 rounded-[20px] md:rounded-[28px] text-center">
+                <p className="text-[9px] md:text-[10px] font-black uppercase text-gray-500 tracking-widest mb-1">Locked Value</p>
+                <p className="text-xl md:text-3xl font-black font-space text-primary tracking-tighter">₦5,575,000.00</p>
              </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-10 relative z-10">
           <AnimatePresence mode="popLayout">
             {escrowTrades.map((trade) => (
               <motion.div 
@@ -281,27 +281,27 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="p-8 bg-white/5 border border-white/10 rounded-[32px] flex flex-col justify-between gap-8 group hover:border-primary/50 transition-all"
+                className="p-8 md:p-10 bg-white/5 border border-white/10 rounded-[30px] md:rounded-[40px] flex flex-col justify-between gap-10 md:gap-12 group hover:border-primary/50 transition-all text-left"
               >
-                <div className="flex justify-between items-start">
-                   <div className="space-y-1">
-                      <p className="text-xl font-black tracking-tight">{trade.asset}</p>
-                      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Seller: {trade.seller}</p>
+                <div className="flex justify-between items-start gap-4">
+                   <div className="space-y-1 overflow-hidden">
+                      <p className="text-xl md:text-2xl font-black tracking-tight truncate">{trade.asset}</p>
+                      <p className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest truncate">Seller Node: {trade.seller}</p>
                    </div>
-                   <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${trade.security === 'Critical' ? 'bg-red-500/20 text-red-500' : 'bg-primary/20 text-primary'}`}>
+                   <div className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shrink-0 ${trade.security === 'Critical' ? 'bg-red-500/20 text-red-500' : 'bg-primary/20 text-primary'}`}>
                       {trade.security} Risk
                    </div>
                 </div>
 
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
                    <div>
-                      <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">Settlement</p>
-                      <p className="text-2xl font-black font-space">₦{trade.amount.toLocaleString()}</p>
+                      <p className="text-[9px] md:text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1.5 md:mb-2">Settlement Magnitude</p>
+                      <p className="text-3xl md:text-4xl font-black font-space tracking-tight">₦{trade.amount.toLocaleString()}</p>
                    </div>
-                   <div className="flex gap-2">
+                   <div className="flex gap-3">
                       <button 
                         onClick={() => handleReleaseEscrow(trade.id)}
-                        className="px-6 h-12 bg-white text-[#0b0e14] rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all active-press"
+                        className="w-full sm:w-auto px-8 md:px-10 h-14 md:h-16 bg-white text-[#0b0e14] rounded-xl md:rounded-2xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all active-press shadow-xl"
                       >
                          Release Fund
                       </button>
@@ -313,9 +313,11 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
         </div>
 
         {escrowTrades.length === 0 && (
-           <div className="py-20 text-center space-y-4">
-              <CheckCircle2 size={48} className="text-emerald-500 mx-auto opacity-20" />
-              <p className="text-gray-500 font-black uppercase tracking-widest text-xs">All Marketplace Funds Released</p>
+           <div className="py-24 text-center space-y-6">
+              <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto border border-white/5">
+                <CheckCircle2 size={40} className="text-emerald-500 opacity-20" />
+              </div>
+              <p className="text-gray-500 font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">All Marketplace Funds Released</p>
            </div>
         )}
       </motion.div>

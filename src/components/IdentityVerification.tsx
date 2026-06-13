@@ -24,48 +24,48 @@ export default function IdentityVerification({ onComplete }: IdentityVerificatio
   };
 
   return (
-    <div className="max-w-7xl mx-auto py-12 px-6">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div className="max-w-7xl mx-auto py-8 md:py-12 px-4 md:px-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
         {/* Content Section */}
         <motion.div 
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="lg:col-span-7 flex flex-col justify-center space-y-10"
+          className="lg:col-span-7 flex flex-col justify-center space-y-8 md:space-y-10"
         >
-          <div>
-            <h1 className="text-5xl md:text-6xl font-black text-gray-900 tracking-tighter leading-tight">
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-tight">
               Verify Your<br/><span className="text-primary">Institutional Identity</span>
             </h1>
-            <p className="mt-6 text-gray-500 text-lg max-w-xl font-medium">
+            <p className="mt-4 md:mt-6 text-gray-500 text-base md:text-lg max-w-xl font-medium mx-auto md:mx-0">
               To maintain the highest standards of security and regulatory compliance, we require a one-time identity verification to unlock full platform capabilities.
             </p>
           </div>
 
           {/* Progress Tracker */}
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8 max-w-lg mx-auto md:mx-0 w-full">
             {[
               { id: 1, title: "ID Upload", desc: "Official Passport, Driver’s License, or National ID card.", icon: CreditCard },
               { id: 2, title: "Selfie Verification", desc: "Liveness check to ensure the document belongs to you.", icon: User },
               { id: 3, title: "BVN Verification", desc: "Final validation against national financial databases.", icon: ShieldCheck }
             ].map((s) => (
-              <div key={s.id} className={`flex items-start gap-6 relative ${s.id < 3 ? "after:content-[''] after:absolute after:left-5 after:top-12 after:bottom-[-24px] after:w-0.5 after:bg-gray-100" : ""}`}>
+              <div key={s.id} className={`flex items-start gap-4 md:gap-6 relative ${s.id < 3 ? "after:content-[''] after:absolute after:left-5 after:top-12 after:bottom-[-24px] after:w-0.5 after:bg-gray-100" : ""}`}>
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 z-10 transition-colors ${step >= s.id ? "bg-primary text-white" : "bg-gray-100 text-gray-400"}`}>
                   <s.icon size={20} />
                 </div>
-                <div className="pt-1">
-                  <h3 className={`text-xl font-black ${step >= s.id ? "text-gray-900" : "text-gray-400"}`}>{s.title}</h3>
-                  <p className="text-gray-500 font-medium mt-1">{s.desc}</p>
+                <div className="pt-1 overflow-hidden">
+                  <h3 className={`text-lg md:text-xl font-black ${step >= s.id ? "text-gray-900" : "text-gray-400"}`}>{s.title}</h3>
+                  <p className="text-sm md:text-base text-gray-500 font-medium mt-1 leading-relaxed">{s.desc}</p>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center gap-4 pt-6">
+          <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 md:pt-6">
             <button 
               onClick={handleStart}
               disabled={loading}
-              className="w-full sm:w-auto px-12 h-16 bg-primary text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/30 hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-8 md:px-12 h-14 md:h-16 bg-primary text-white rounded-[18px] md:rounded-2xl font-black text-sm uppercase tracking-widest shadow-2xl shadow-primary/30 hover:-translate-y-1 active:scale-95 transition-all flex items-center justify-center gap-3"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -73,7 +73,7 @@ export default function IdentityVerification({ onComplete }: IdentityVerificatio
                 <>Start Verification <ChevronRight size={20} /></>
               )}
             </button>
-            <button className="w-full sm:w-auto px-12 h-16 border-2 border-gray-100 text-gray-900 font-black text-sm uppercase tracking-widest rounded-2xl hover:bg-gray-50 transition-all">
+            <button className="w-full sm:w-auto px-8 md:px-12 h-14 md:h-16 border-2 border-gray-100 text-gray-900 font-black text-sm uppercase tracking-widest rounded-[18px] md:rounded-2xl hover:bg-gray-50 transition-all">
               Learn More
             </button>
           </div>

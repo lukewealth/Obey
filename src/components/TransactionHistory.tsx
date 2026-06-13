@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Transaction } from "../types";
 import { 
   Search, SlidersHorizontal, ArrowDownLeft, ArrowUpRight, Check, X, 
-  Clock, Download, Share2, CornerDownRight, ExternalLink, Calendar, HelpCircle 
+  Clock, Download, Share2, CornerDownRight, ExternalLink, Calendar, HelpCircle, ArrowRight
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface TransactionHistoryProps {
   transactions: Transaction[];
@@ -33,40 +34,42 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold text-white tracking-tight">Ledger Audit History</h2>
-          <p className="text-xs text-gray-400 font-light mt-0.5">Comprehensive chronological list of all ledger actions and processing receipts.</p>
+    <div className="space-y-6 md:space-y-10 pb-24 px-1 md:px-0">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
+        <div className="space-y-1">
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Audit Log</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Sequential record of all institutional settlements.</p>
+        </div>
+        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary self-center md:self-auto">
+           <Clock size={16} />
+           <span className="text-[10px] font-black uppercase tracking-widest">Real-time ledger sync active</span>
         </div>
       </div>
 
       {/* Filter Options Control Panel */}
-      <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 p-4 rounded-[20px] flex flex-col md:flex-row gap-4 items-center justify-between shadow-lg">
+      <div className="bento-card p-4 md:p-6 flex flex-col lg:flex-row gap-4 md:gap-6 items-center justify-between shadow-xl">
         {/* Search bar */}
-        <div className="relative w-full md:max-w-xs group">
-          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
-            <Search size={16} />
-          </span>
+        <div className="relative w-full lg:max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={18} />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Ledger (e.g. Card, Crypto, Airtime)..."
-            className="block w-full h-10 pl-10 pr-4 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] focus:ring-1 focus:ring-[#0057FF] rounded-xl text-xs font-semibold outline-none transition-all placeholder:text-slate-500 text-white"
+            placeholder="Search Ledger (e.g. Card, Crypto)..."
+            className="w-full h-12 md:h-14 pl-12 pr-6 bg-gray-50 border border-gray-100 rounded-[16px] md:rounded-[20px] text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
           />
         </div>
 
         {/* Filters Selectors */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
           {/* Credit vs Debit togglers */}
-          <div className="flex bg-[#0B1220] border border-[#242F41] rounded-lg p-0.5 max-h-10">
+          <div className="flex bg-gray-100 p-1 rounded-[14px] md:rounded-[18px] w-full sm:w-auto">
             {(["All", "Credit", "Debit"] as const).map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type)}
-                className={`px-3 py-1 text-[11px] font-bold rounded transition-all duration-150 ${
-                  filterType === type ? "bg-[#0057FF] text-white" : "text-slate-400 hover:text-white"
+                className={`px-4 md:px-6 py-2 md:py-2.5 text-[11px] md:text-xs font-black rounded-[11px] md:rounded-[15px] transition-all flex-1 sm:flex-none ${
+                  filterType === type ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-gray-600"
                 }`}
               >
                 {type}
@@ -78,136 +81,150 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="h-10 px-3 bg-[#0B1220] border border-[#242F41] focus:border-[#0057FF] rounded-lg text-xs text-white outline-none"
+            className="h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:ring-2 focus:ring-primary/10 rounded-[16px] md:rounded-[20px] text-xs md:text-sm font-bold text-gray-900 outline-none w-full sm:w-auto transition-all"
           >
-            <option value="All" className="bg-[#0b1220]">All Statuses</option>
-            <option value="Success" className="bg-[#0b1220]">Success Only</option>
-            <option value="Processing" className="bg-[#0b1220]">Processing Only</option>
-            <option value="Failed" className="bg-[#0b1220]">Failed Only</option>
+            <option value="All">All Statuses</option>
+            <option value="Success">Success Only</option>
+            <option value="Processing">Processing Only</option>
+            <option value="Failed">Failed Only</option>
           </select>
         </div>
       </div>
 
       {/* Audit List of Rows */}
-      <div className="bg-[#161F30] border border-[#242F41] hover:border-[#0057FF] transition-all duration-200 rounded-[20px] overflow-hidden shadow-xl">
+      <div className="bento-card overflow-hidden shadow-2xl">
         {filteredTx.length === 0 ? (
-          <div className="p-12 text-center text-slate-400 flex flex-col items-center">
-            <SlidersHorizontal className="mb-4 opacity-50" size={32} />
-            <p className="text-xs font-bold uppercase tracking-wider">No matching transaction indexes found</p>
-            <p className="text-[11px] text-[#242F41] mt-1">Review your filters or search constraints above.</p>
+          <div className="py-24 text-center space-y-4">
+             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                <SlidersHorizontal size={40} />
+             </div>
+             <div className="space-y-1">
+                <p className="text-sm font-black text-gray-900 uppercase tracking-widest">No matching indexes</p>
+                <p className="text-xs text-gray-400 font-medium">Refine your search parameters.</p>
+             </div>
           </div>
         ) : (
-          <div className="divide-y divide-[#242F41]">
+          <div className="divide-y divide-gray-100">
             {filteredTx.map((tx) => {
               const isExpanded = expandedId === tx.id;
               const isCredit = tx.type === "Credit";
 
               return (
                 <div key={tx.id} className="transition-all">
-                  {/* Primary Row header summary */}
                   <div
                     onClick={() => toggleExpandRow(tx.id)}
-                    className={`flex items-center justify-between p-5 hover:bg-[#0B1220]/40 cursor-pointer select-none transition-colors border-l-4 ${
-                      isExpanded ? "bg-[#0B1220]/20 border-l-[#0057FF]" : "border-l-transparent"
+                    className={`flex items-center justify-between p-5 md:p-8 hover:bg-accent-blue/40 cursor-pointer select-none transition-all border-l-8 ${
+                      isExpanded ? "bg-accent-blue/20 border-primary" : "border-transparent"
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                    <div className="flex items-center gap-4 md:gap-6">
+                      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[22px] flex items-center justify-center shrink-0 shadow-sm ${
                         isCredit 
-                          ? "bg-green-500/10 text-emerald-400" 
-                          : "bg-red-500/10 text-red-400"
+                          ? "bg-emerald-50 text-emerald-600" 
+                          : "bg-red-50 text-red-600"
                       }`}>
-                        {isCredit ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+                        {isCredit ? <ArrowDownLeft size={22} className="md:w-7 md:h-7" /> : <ArrowUpRight size={22} className="md:w-7 md:h-7" />}
                       </div>
-                      <div>
-                        <p className="text-xs sm:text-sm font-black text-white">{tx.title}</p>
-                        <p className="text-[10px] text-slate-400 font-mono mt-0.5">
+                      <div className="overflow-hidden">
+                        <p className="text-sm md:text-xl font-black text-gray-900 tracking-tight truncate">{tx.title}</p>
+                        <p className="text-[9px] md:text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1 truncate">
                           {tx.id} • {tx.category} • {tx.time}
                         </p>
                       </div>
                     </div>
 
-                    <div className="text-right flex items-center gap-4">
+                    <div className="text-right flex items-center gap-4 md:gap-8 shrink-0">
                       <div>
-                        <p className={`text-xs sm:text-sm font-mono font-bold ${isCredit ? "text-[#12B76A]" : "text-white"}`}>
+                        <p className={`text-base md:text-2xl font-mono font-black ${isCredit ? "text-emerald-600" : "text-gray-900"}`}>
                           {isCredit ? "+" : "-"}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
-                        <p className="text-[9px] text-slate-400 font-mono mt-0.5">{tx.date}</p>
+                        <p className="text-[9px] md:text-[11px] text-gray-400 font-black mt-1 uppercase tracking-widest">{tx.date}</p>
                       </div>
                       
-                      {/* Operational Status badge indicator */}
-                      <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full shrink-0 ${
                         tx.status === "Success" ? "bg-emerald-500" :
-                        tx.status === "Processing" ? "bg-[#F79009] animate-pulse" : "bg-red-500"
+                        tx.status === "Processing" ? "bg-amber-500 animate-pulse" : "bg-red-500"
                       }`} title={tx.status}></span>
                     </div>
                   </div>
 
-                  {/* Expandable detailed Invoice specs info drawer */}
-                  {isExpanded && (
-                    <div className="bg-[#0B1220] p-5 sm:p-6 border-t border-b border-[#242F41] text-xs font-light space-y-5 animate-fade-in">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        
-                        {/* Summary Column */}
-                        <div className="space-y-4">
-                          <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Audit Details</p>
-                          <div className="space-y-2 mt-2">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Order Ref ID</span>
-                              <span className="font-mono text-white font-bold select-all">{tx.id}</span>
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="bg-gray-50/50 border-y border-gray-100 overflow-hidden"
+                      >
+                        <div className="p-6 md:p-10 space-y-8 md:space-y-12">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                            
+                            {/* Summary Column */}
+                            <div className="space-y-4 md:space-y-6">
+                              <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Audit Parameters</p>
+                              <div className="space-y-3 md:space-y-4">
+                                <div className="flex justify-between">
+                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Node Reference</span>
+                                  <span className="text-[11px] md:text-xs font-mono text-gray-900 font-black select-all uppercase">{tx.id}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Protocol Cluster</span>
+                                  <span className="text-[11px] md:text-xs text-gray-900 font-bold uppercase">{tx.category} Hub</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Execution Node</span>
+                                  <span className="text-[11px] md:text-xs text-gray-900 font-bold">OBEY-SUI-0{Math.floor(Math.random()*9)+1}</span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Settle Block</span>
-                              <span className="text-white font-mono">#98231 {tx.category}</span>
+
+                            {/* Charges breakdown Column */}
+                            <div className="space-y-4 md:space-y-6">
+                              <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Settlement Ledger</p>
+                              <div className="space-y-3 md:space-y-4">
+                                <div className="flex justify-between">
+                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Gross Magnitude</span>
+                                  <span className="text-[11px] md:text-xs text-gray-900 font-mono font-bold">${tx.amount.toFixed(2)}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Protocol Surcharge</span>
+                                  <span className="text-[11px] md:text-xs text-gray-900 font-mono font-bold">${tx.fee.toFixed(2)}</span>
+                                </div>
+                                <div className="h-px bg-gray-200 my-2"></div>
+                                <div className="flex justify-between font-black">
+                                  <span className="text-[11px] md:text-xs text-primary uppercase">Total Authorised</span>
+                                  <span className="text-[13px] md:text-base text-primary font-mono">${(tx.amount + tx.fee).toFixed(2)}</span>
+                                </div>
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400">Execution time</span>
-                              <span className="text-white">{tx.date} at {tx.time}</span>
+
+                            {/* System Status column */}
+                            <div className="space-y-6 flex flex-col justify-between">
+                              <div className="space-y-3">
+                                <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Institutional Clearing</p>
+                                <div className="p-4 bg-white border border-gray-100 rounded-2xl flex items-center gap-3">
+                                   <ShieldCheck size={18} className="text-emerald-500 shrink-0" />
+                                   <p className="text-[10px] md:text-xs text-gray-500 font-medium leading-relaxed">
+                                     Processed on decentralized OBEY settlement pipeline. Secure record verified on chain.
+                                   </p>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                                <button className="h-12 bg-white border border-gray-200 hover:border-primary/20 hover:bg-gray-50 active-press rounded-[14px] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-gray-700 transition-all shadow-sm">
+                                  <Download size={16} /> PDF
+                                </button>
+                                <button className="h-12 bg-white border border-gray-200 hover:border-primary/20 hover:bg-gray-50 active-press rounded-[14px] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-gray-700 transition-all shadow-sm">
+                                  <Share2 size={16} /> Share
+                                </button>
+                              </div>
                             </div>
+
                           </div>
                         </div>
-
-                        {/* Charges breakdown Column */}
-                        <div className="space-y-4">
-                          <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Charges breakdown</p>
-                          <div className="space-y-2 pt-2">
-                            <div className="flex justify-between">
-                              <span className="text-slate-400 font-medium">Original Settle Value</span>
-                              <span className="text-white font-mono">${tx.amount.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-slate-400 font-medium">Processing Fee charge</span>
-                              <span className="text-white font-mono">${tx.fee.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between border-t border-[#242F41] pt-1.5 font-bold">
-                              <span className="text-slate-300">Total Charged reserves</span>
-                              <span className="text-[#00C6FF] font-mono">${(tx.amount + tx.fee).toFixed(2)}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* System Status column */}
-                        <div className="space-y-4 flex flex-col justify-between">
-                          <div className="space-y-2">
-                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-wider">Routing Clearance</p>
-                            <p className="text-slate-400 leading-relaxed text-[11px] pt-1">
-                              Processed on decentralized OBEY settlement pipeline. Identity confirmed securely.
-                            </p>
-                          </div>
-
-                          <div className="flex gap-2 pt-2">
-                            <button className="flex-1 h-9 bg-white/5 border border-[#242F41] hover:bg-white/10 active-press rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 text-white">
-                              <Download size={12} /> PDF
-                            </button>
-                            <button className="flex-1 h-9 bg-white/5 border border-[#242F41] hover:bg-white/10 active-press rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 text-white">
-                              <Share2 size={12} /> Share
-                            </button>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}
