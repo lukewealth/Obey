@@ -7,6 +7,7 @@ import {
   AlertTriangle, ShieldCheck, Download, Zap, Search,
   ArrowRight, Landmark, CreditCard, Star, Activity, DollarSign
 } from "lucide-react";
+import api from "../services/api";
 
 const rechargeSchema = z.object({
   phone: z.string().length(10, "Phone number must be exactly 10 digits"),
@@ -26,6 +27,7 @@ interface NetworkProvider {
   color: string;
   textColor: string;
   logoChar: string;
+  paymentCode: string;
 }
 
 interface DataPlan {
@@ -34,6 +36,7 @@ interface DataPlan {
   price: number;
   dataAmount: string;
   validity: string;
+  paymentCode: string;
 }
 
 export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProps) {
@@ -48,27 +51,27 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const [successReceipt, setSuccessReceipt] = useState<any | null>(null);
 
   const providers: NetworkProvider[] = [
-    { id: "mtn", name: "MTN", color: "bg-[#FFCC00]", textColor: "text-black", logoChar: "M" },
-    { id: "airtel", name: "Airtel", color: "bg-[#E50914]", textColor: "text-white", logoChar: "A" },
-    { id: "glo", name: "Glo", color: "bg-[#339933]", textColor: "text-white", logoChar: "G" },
-    { id: "9mobile", name: "9mobile", color: "bg-[#015249]", textColor: "text-white", logoChar: "9" },
+    { id: "mtn", name: "MTN", color: "bg-[#FFCC00]", textColor: "text-black", logoChar: "M", paymentCode: "10101" },
+    { id: "airtel", name: "Airtel", color: "bg-[#E50914]", textColor: "text-white", logoChar: "A", paymentCode: "10201" },
+    { id: "glo", name: "Glo", color: "bg-[#339933]", textColor: "text-white", logoChar: "G", paymentCode: "10301" },
+    { id: "9mobile", name: "9mobile", color: "bg-[#015249]", textColor: "text-white", logoChar: "9", paymentCode: "10401" },
   ];
 
   const dataPlans: Record<string, DataPlan[]> = {
     mtn: [
-      { id: "m1", name: "Daily Value", price: 1.0, dataAmount: "1.5GB", validity: "24 Hours" },
-      { id: "m2", name: "Weekly Mega", price: 5.0, dataAmount: "10GB", validity: "7 Days" },
-      { id: "m3", name: "Monthly Pro", price: 15.0, dataAmount: "40GB", validity: "30 Days" },
+      { id: "m1", name: "Daily Value", price: 1.0, dataAmount: "1.5GB", validity: "24 Hours", paymentCode: "10102" },
+      { id: "m2", name: "Weekly Mega", price: 5.0, dataAmount: "10GB", validity: "7 Days", paymentCode: "10103" },
+      { id: "m3", name: "Monthly Pro", price: 15.0, dataAmount: "40GB", validity: "30 Days", paymentCode: "10104" },
     ],
     airtel: [
-      { id: "a1", name: "Binge Plan", price: 1.5, dataAmount: "2.5GB", validity: "24 Hours" },
-      { id: "a2", name: "Work Force", price: 8.0, dataAmount: "15GB", validity: "7 Days" },
+      { id: "a1", name: "Binge Plan", price: 1.5, dataAmount: "2.5GB", validity: "24 Hours", paymentCode: "10202" },
+      { id: "a2", name: "Work Force", price: 8.0, dataAmount: "15GB", validity: "7 Days", paymentCode: "10203" },
     ],
     glo: [
-      { id: "g1", name: "Glo Special", price: 1.0, dataAmount: "2GB", validity: "24 Hours" },
+      { id: "g1", name: "Glo Special", price: 1.0, dataAmount: "2GB", validity: "24 Hours", paymentCode: "10302" },
     ],
     "9mobile": [
-      { id: "n1", name: "Smart Plan", price: 2.0, dataAmount: "3GB", validity: "48 Hours" },
+      { id: "n1", name: "Smart Plan", price: 2.0, dataAmount: "3GB", validity: "48 Hours", paymentCode: "10402" },
     ]
   };
 
@@ -106,15 +109,18 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const handlePurchaseFinal = async () => {
     let price = 0;
     let description = "";
+    let pCode = "";
 
     if (activeSegment === "airtime") {
       price = parseFloat(amount);
       description = `Airtime dispatched to ${phoneNo} (${currentProvider.name})`;
+      pCode = currentProvider.paymentCode;
     } else {
       const plan = activePlans.find((p) => p.id === selectedDataPlan);
       if (!plan) return;
       price = plan.price;
       description = `${plan.dataAmount} Data delivered to ${phoneNo} (${currentProvider.name})`;
+      pCode = plan.paymentCode;
     }
 
     if (price > profile.balance) {
@@ -123,13 +129,22 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     }
 
     setProcessing(true);
-    setTimeout(async () => {
+    try {
+      // 1. Call Interswitch Backend
+      const response = await api.post('/vtu/recharge', {
+        paymentCode: pCode,
+        customerId: `234${phoneNo}`,
+        amount: price * 100, // Kobo or simulated unit
+        requestReference: `VTU-${Date.now()}`
+      });
+
+      // 2. Call Parent Update
       const isSuccess = await onPurchase(price, description);
-      setProcessing(false);
+      
       if (isSuccess) {
         setShowCheckout(false);
         setSuccessReceipt({
-          txId: `OBY-VTU-${Date.now()}`,
+          txId: response.data.transactionReference || `OBY-VTU-${Date.now()}`,
           phone: phoneNo,
           provider: currentProvider.name,
           planType: activeSegment === "airtime" ? "Airtime Top-Up" : `${activePlans.find(p => p.id === selectedDataPlan)?.dataAmount} Data`,
@@ -137,7 +152,12 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
           date: new Date().toLocaleString()
         });
       }
-    }, 1500);
+    } catch (error) {
+      console.error('VTU Error:', error);
+      alert("System dispatch failed. Please try again.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   const tabVariants = {

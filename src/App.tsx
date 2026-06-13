@@ -277,6 +277,12 @@ export default function App() {
                 <MenuIcon className="w-6 h-6" />
               </button>
               <div className="flex items-center gap-3">
+                <button 
+                  onClick={() => setSidebarExpanded(!sidebarExpanded)}
+                  className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50 rounded-xl transition-all mr-2"
+                >
+                  <MenuIcon className="w-6 h-6" />
+                </button>
                 <span className="text-2xl font-black tracking-tighter text-[#0b0e14] font-space uppercase">OBEY</span>
                 <button onClick={triggerDiagnostic} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
@@ -308,10 +314,10 @@ export default function App() {
           </header>
 
           <div className="flex-grow flex">
-            <aside className="hidden lg:flex w-72 bg-white border-r border-gray-100 p-8 flex-col justify-between">
+            <aside className={`hidden lg:flex ${sidebarExpanded ? "w-72" : "w-24"} bg-white border-r border-gray-100 p-6 flex-col justify-between transition-all duration-500 ease-[0.22, 1, 0.36, 1]`}>
               <div className="space-y-10">
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Liquidity</p>
+                  {sidebarExpanded && <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Liquidity</p>}
                   <nav className="space-y-1">
                     {[
                       { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
@@ -319,34 +325,52 @@ export default function App() {
                       { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
                       { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                     ].map((item) => (
-                      <button key={item.label} onClick={() => setActiveTab(item.tab)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
-                        <item.icon className="w-5 h-5" /> {item.label}
+                      <button 
+                        key={item.label} 
+                        onClick={() => setActiveTab(item.tab)} 
+                        className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
+                        title={!sidebarExpanded ? item.label : ""}
+                      >
+                        <item.icon className="w-5 h-5 flex-shrink-0" /> 
+                        {sidebarExpanded && <span>{item.label}</span>}
                       </button>
                     ))}
                   </nav>
                 </div>
 
                 <div className="space-y-4">
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Ecosystem</p>
+                  {sidebarExpanded && <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Ecosystem</p>}
                   <nav className="space-y-1">
-                    <button onClick={() => setActiveTab(AppTab.PROFILE)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.PROFILE ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
-                      <SettingsIcon className="w-5 h-5" /> Parameters
+                    <button 
+                      onClick={() => setActiveTab(AppTab.PROFILE)} 
+                      className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.PROFILE ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
+                      title={!sidebarExpanded ? "Parameters" : ""}
+                    >
+                      <SettingsIcon className="w-5 h-5 flex-shrink-0" /> 
+                      {sidebarExpanded && <span>Parameters</span>}
                     </button>
                     {profile.role === "admin" && (
-                      <button onClick={() => setActiveTab(AppTab.ADMIN)} className={`w-full flex items-center gap-4 px-4 h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}>
-                        <ShieldCheck className="w-5 h-5" /> Compliance
+                      <button 
+                        onClick={() => setActiveTab(AppTab.ADMIN)} 
+                        className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
+                        title={!sidebarExpanded ? "Compliance" : ""}
+                      >
+                        <ShieldCheck className="w-5 h-5 flex-shrink-0" /> 
+                        {sidebarExpanded && <span>Compliance</span>}
                       </button>
                     )}
-
-
-
                   </nav>
                 </div>
               </div>
 
               <div className="pt-8 border-t border-gray-100">
-                <button onClick={handleLogout} className="w-full h-14 rounded-[22px] bg-white border border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center gap-3 text-gray-400 active-press shadow-sm">
-                  <LogOutIcon className="w-5 h-5" /> Sign Out
+                <button 
+                  onClick={handleLogout} 
+                  className={`w-full h-14 rounded-[22px] bg-white border border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center ${sidebarExpanded ? "gap-3" : ""} text-gray-400 active-press shadow-sm`}
+                  title={!sidebarExpanded ? "Sign Out" : ""}
+                >
+                  <LogOutIcon className="w-5 h-5 flex-shrink-0" /> 
+                  {sidebarExpanded && <span>Sign Out</span>}
                 </button>
               </div>
             </aside>

@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import vtuRoutes from './routes/vtu';
 import syncRoutes from './routes/sync';
 import giftCardRoutes from './routes/giftcards';
+import paymentRoutes from './routes/payments';
 import { connectDB } from './db';
 
 dotenv.config();
@@ -69,6 +70,7 @@ app.use('/api/ai', sanitizeInput); // Apply only to AI endpoints if they exist
 app.use('/api/vtu', vtuRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/giftcards', giftCardRoutes);
+app.use('/api/payments', paymentRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ 

@@ -6,6 +6,7 @@ import {
   HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
   CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp
 } from "lucide-react";
+import api from "../services/api";
 
 interface WalletSystemProps {
   profile: UserProfile;
@@ -21,12 +22,16 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
   // Funding state
   const [fundMethod, setFundMethod] = useState<"bank" | "card">("bank");
   const [fundAmount, setFundAmount] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
   const [paymentProcessing, setPaymentStatus] = useState(false);
   const [fundReceipt, setFundReceipt] = useState<Transaction | null>(null);
 
   // Withdraw state
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
   const [withdrawProcessing, setWithdrawProcessing] = useState(false);
   const [withdrawSuccess, setWithdrawSuccess] = useState(false);
 
@@ -44,41 +49,77 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setTimeout(() => setCopiedText(false), 2000);
   };
 
-  const handleFundSubmit = (e: React.FormEvent) => {
+  const handleFundSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const amountVal = parseFloat(fundAmount);
     if (!amountVal || amountVal <= 0) return;
 
     setPaymentStatus(true);
-    setTimeout(() => {
+    try {
+      if (fundMethod === "card") {
+        const [month, year] = expiry.split("/");
+        const response = await api.post('/payments/topup-card', {
+          userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id", // Should be real user ID
+          amount: amountVal,
+          cardNumber: cardNumber.replace(/\s/g, ""),
+          expiryMonth: month,
+          expiryYear: year,
+          cvv: cvc
+        });
+
+        if (response.data.success) {
+          onFundWallet(amountVal, "Interswitch Card Top-Up");
+          setFundReceipt(response.data.transaction);
+        }
+      } else {
+        // Bank transfer simulation
+        setTimeout(() => {
+          onFundWallet(amountVal, "Virtual Vault Funding");
+          setFundReceipt({
+            id: `OBY-${Math.floor(Math.random() * 899999) + 100000}X`,
+            title: "Wallet Funding",
+            category: "Transfer",
+            type: "Credit",
+            amount: amountVal,
+            fee: 0,
+            date: new Date().toLocaleDateString(),
+            time: new Date().toLocaleTimeString(),
+            status: "Success"
+          } as Transaction);
+          setPaymentStatus(false);
+        }, 1500);
+        return;
+      }
+    } catch (error) {
+      console.error('Funding failed:', error);
+    } finally {
       setPaymentStatus(false);
-      const desc = fundMethod === "bank" ? "Virtual Vault Funding" : "Credit Card Top-Up";
-      onFundWallet(amountVal, desc);
-      const now = new Date();
-      setFundReceipt({
-        id: `OBY-${Math.floor(Math.random() * 899999) + 100000}X`,
-        title: "Wallet Funding",
-        category: "Transfer",
-        type: "Credit",
-        amount: amountVal,
-        fee: 0,
-        date: now.toLocaleDateString(),
-        time: now.toLocaleTimeString(),
-        status: "Success"
-      });
-    }, 1500);
+    }
   };
 
-  const handleWithdrawalSubmit = (e: React.FormEvent) => {
+  const handleWithdrawalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const amountVal = parseFloat(withdrawAmount);
     if (!amountVal || amountVal <= 0 || amountVal > profile.balance) return;
+    
     setWithdrawProcessing(true);
-    setTimeout(async () => {
-      const isSuccess = await onWithdrawWallet(amountVal, `Withdrawal to ${bankName || "Clearing Account"}`);
+    try {
+      const response = await api.post('/payments/withdraw', {
+        userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        amount: amountVal,
+        bankName,
+        accountNumber
+      });
+
+      if (response.data.success) {
+        await onWithdrawWallet(amountVal, `Withdrawal to ${bankName}`);
+        setWithdrawSuccess(true);
+      }
+    } catch (error) {
+      console.error('Withdrawal failed:', error);
+    } finally {
       setWithdrawProcessing(false);
-      if (isSuccess) setWithdrawSuccess(true);
-    }, 1500);
+    }
   };
 
   const handleTransferSubmit = (e: React.FormEvent) => {
@@ -98,6 +139,9 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setWithdrawSuccess(false);
     setTransferSuccess(false);
     setActiveSubState("overview");
+    setFundAmount("");
+    setWithdrawAmount("");
+    setTransferAmount("");
   };
 
   const tabVariants = {
@@ -189,7 +233,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                 </div>
               </div>
 
-              {/* Virtual Account Card: Finsy/Wallet Obey Inspired */}
+              {/* Virtual Account Card */}
               <div className="bento-card p-10 space-y-10 relative overflow-hidden group">
                  <div className="absolute -top-12 -right-12 w-64 h-64 bg-accent-yellow/30 rounded-full blur-[80px]"></div>
                  
@@ -322,7 +366,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     </div>
                     <div className="space-y-2">
                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Settlement Successful</h2>
-                      <p className="text-gray-500 font-medium">Your treasury balance has been updated.</p>
+                      <p className="text-gray-500 font-medium">Your treasury balance has been updated via {fundMethod.toUpperCase()} node.</p>
                     </div>
                     <div className="bg-gray-50 rounded-[32px] p-8 space-y-6 text-left border border-gray-100">
                       <div className="flex justify-between items-center">
@@ -336,8 +380,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <p className="text-sm font-bold text-gray-900 font-mono uppercase">{fundReceipt.id}</p>
                         </div>
                         <div className="space-y-1 text-right">
-                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network Node</p>
-                          <p className="text-sm font-bold text-gray-900">SUI Mainnet</p>
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Gateway</p>
+                          <p className="text-sm font-bold text-gray-900 uppercase">Interswitch Hub</p>
                         </div>
                       </div>
                     </div>
@@ -395,20 +439,32 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <div className="space-y-6">
                              <div className="space-y-3">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account Holder</label>
-                                <input type="text" required placeholder="Felix Anderson" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                <input type="text" required placeholder="Felix Anderson" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                              </div>
                              <div className="space-y-3">
                                 <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Card Identifier</label>
-                                <input type="text" required placeholder="•••• •••• •••• 8824" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                <input 
+                                  type="text" required 
+                                  value={cardNumber} onChange={(e) => setCardNumber(e.target.value)}
+                                  placeholder="•••• •••• •••• 8824" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                />
                              </div>
                              <div className="grid grid-cols-2 gap-6">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Expiry</label>
-                                   <input type="text" required placeholder="06/28" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                   <input 
+                                      type="text" required 
+                                      value={expiry} onChange={(e) => setExpiry(e.target.value)}
+                                      placeholder="06/28" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                   />
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">CVC Node</label>
-                                   <input type="password" required placeholder="•••" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                   <input 
+                                      type="password" required 
+                                      value={cvc} onChange={(e) => setCvc(e.target.value)}
+                                      placeholder="•••" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-center text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                   />
                                 </div>
                              </div>
                           </div>
@@ -444,14 +500,14 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
              {/* Withdrawal Flow */}
              {activeSubTab === "withdraw" && (
                 withdrawSuccess ? (
-                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden">
+                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden animate-fade-in">
                     <div className="absolute top-0 left-0 right-0 h-2 bg-primary"></div>
-                    <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
+                    <div className="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
                       <ArrowUpRight size={48} />
                     </div>
                     <div className="space-y-2">
-                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Liquidity Dispatched</h2>
-                       <p className="text-gray-500 font-medium">Funds have been routed to your bank node.</p>
+                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">Liquidity Dispatched</h2>
+                       <p className="text-gray-500 font-medium text-lg">Funds have been routed to your external clearing node via Interswitch Payout.</p>
                     </div>
                     <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl active-press">
                       Return to Treasury
@@ -461,29 +517,37 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                   <form onSubmit={handleWithdrawalSubmit} className="bento-card p-12 shadow-2xl space-y-10">
                     <div className="space-y-2 text-center md:text-left">
                        <h3 className="text-3xl font-black text-gray-900 tracking-tight">Withdrawal Dispatch</h3>
-                       <p className="text-gray-500 font-medium">Send assets to your external clearing account.</p>
+                       <p className="text-gray-500 font-medium">Send assets to your external bank clearing account.</p>
                     </div>
 
                     <div className="space-y-6">
                        <div className="space-y-3">
                           <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Destination Bank</label>
-                          <input type="text" required value={bankName} onChange={(e) => setBankName(e.target.value)} placeholder="Chase, Wells Fargo, etc." className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                          <input 
+                            type="text" required value={bankName} onChange={(e) => setBankName(e.target.value)} 
+                            placeholder="Chase, Wells Fargo, etc." 
+                            className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                          />
                        </div>
                        <div className="grid grid-cols-2 gap-6">
                           <div className="space-y-3">
                              <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account ID</label>
-                             <input type="text" required placeholder="•••• •••• ••••" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                             <input 
+                                type="text" required 
+                                value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)}
+                                placeholder="•••• •••• ••••" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                             />
                           </div>
                           <div className="space-y-3">
                              <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Routing Node</label>
-                             <input type="text" required placeholder="012345678" className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                             <input type="text" placeholder="012345678" className="w-full h-16 px-8 bg-gray-50 border border-gray-100 rounded-[22px] text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
                           </div>
                        </div>
                     </div>
 
                     <div className="space-y-4">
                        <div className="flex justify-between items-center px-4">
-                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magniture (USD)</label>
+                          <label className="text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (USD)</label>
                           <span className="text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
                        </div>
                        <div className="relative">
@@ -514,14 +578,14 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
              {/* Transfer Flow */}
              {activeSubTab === "transfer" && (
                 transferSuccess ? (
-                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden">
+                  <div className="bg-white border border-gray-100 rounded-[45px] p-12 text-center shadow-2xl space-y-10 relative overflow-hidden animate-fade-in">
                     <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-500"></div>
-                    <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                    <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
                       <Send size={48} />
                     </div>
                     <div className="space-y-2">
-                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter">Peer Transfer Sent</h2>
-                       <p className="text-gray-500 font-medium">Liquidity has been moved to the target node.</p>
+                       <h2 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">Peer Transfer Sent</h2>
+                       <p className="text-gray-500 font-medium text-lg">Liquidity has been moved to the target OBEY node instantly.</p>
                     </div>
                     <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-6 rounded-[22px] font-black text-sm uppercase tracking-widest shadow-2xl active-press">
                       Return to Dashboard
@@ -531,7 +595,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                   <form onSubmit={handleTransferSubmit} className="bento-card p-12 shadow-2xl space-y-10">
                     <div className="space-y-2 text-center md:text-left">
                        <h3 className="text-3xl font-black text-gray-900 tracking-tight">Peer Transfer</h3>
-                       <p className="text-gray-500 font-medium">Internal settlement between OBEY nodes.</p>
+                       <p className="text-gray-500 font-medium">Internal settlement between high-fidelity nodes.</p>
                     </div>
 
                     <div className="space-y-3">
@@ -545,7 +609,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                             placeholder="hello@obey.finance"
                             className="w-full h-20 px-8 bg-gray-50 border border-gray-100 rounded-[28px] text-xl font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
                           />
-                          <div className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-accent-blue rounded-xl flex items-center justify-center text-primary">
+                          <div className="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-accent-blue rounded-xl flex items-center justify-center text-primary shadow-sm">
                              <Check size={20} />
                           </div>
                        </div>
