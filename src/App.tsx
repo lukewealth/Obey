@@ -17,6 +17,7 @@ import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
 import SystemAlert from "./components/SystemAlert";
+import GatedVerificationModal from "./components/GatedVerificationModal";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -72,6 +73,7 @@ export default function App() {
 
   // --- Real-Time Initialization & Database Wakeup ---
   const [isInitializing, setIsInitializing] = useState(false);
+  const [showGatedModal, setShowGatedModal] = useState(false);
 
   // Cookie Utility for Hybrid Tracking
   const getCookie = (name: string) => {
@@ -131,8 +133,12 @@ export default function App() {
               throw new Error("No node found");
             }
           } catch (err) {
-            finalProfile = profile; // Default ELITE profile
-            console.log("[WAKEUP] No existing node found. Using institutional defaults.");
+            finalProfile = { ...profile, email: trackedEmail || profile.email };
+            console.log("[WAKEUP] No existing node found. Using defaults.");
+            // Trigger gated verification for new or un-synced users
+            if (currentScreen === AppScreen.DASHBOARD) {
+               setShowGatedModal(true);
+            }
           }
         }
 
@@ -143,7 +149,7 @@ export default function App() {
         notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
       } catch (err) {
         console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
-        notify("error", "Sync Failure", "Failed to synchronize ledger nodes. Operating in local mode.");
+        notify("error", "Sync Failure", "Failed to synchronize ledger nodes.");
       } finally {
         setIsInitializing(false);
       }
@@ -152,9 +158,9 @@ export default function App() {
     if (currentUser || getCookie('obey_user_email')) {
       wakeupDatabase();
     }
-  }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
+  }, [currentUser?.id, currentUser?.uid, syncProfile, notify, currentScreen]);
 
-  // Local state for profile (initialized with ELITE defaults, settled by cache)
+  // Local state for profile
   const [profile, setProfile] = useState<UserProfile>(() => ({
     name: "Felix Anderson",
     email: "felix@obey.finance",
@@ -163,23 +169,32 @@ export default function App() {
     avatar: "FA",
     avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     kycStatus: "Verified",
-    balance: 228128672.00, // Balanced in NGN magnitude
+    balance: 228128672.00,
     currency: "NGN",
     promoCode: "OBEY-ELITE",
     twoFactorEnabled: true
   }));
+
+  const handleVerificationComplete = () => {
+    setShowGatedModal(false);
+    const updatedProfile: UserProfile = { ...profile, kycStatus: "Verified" };
+    setProfile(updatedProfile);
+    notify("success", "Node Authorized", "Institutional access levels established.");
+    if (currentUser || profile.id) {
+       syncProfile({ id: profile.id || currentUser.id || currentUser.uid, profile: updatedProfile });
+    }
+  };
 
   // Role Confirmation for Admin Dashboard
   const [adminVerifying, setAdminVerifying] = useState(false);
 
   const handleAdminAccess = () => {
     if (profile.role !== "admin") {
-      notify("error", "Access Denied", "Institutional credentials required for this node.");
+      notify("error", "Access Denied", "Institutional credentials required.");
       return;
     }
 
     setAdminVerifying(true);
-    // Simulate deep role verification
     setTimeout(() => {
       setAdminVerifying(false);
       setActiveTab(AppTab.ADMIN);
@@ -187,7 +202,6 @@ export default function App() {
     }, 1200);
   };
 
-  // Optimized Sync to MongoDB (Only sync explicitly or on significant changes)
   const handleProfileUpdate = (updated: Partial<UserProfile>) => {
     const nextProfile = { ...profile, ...updated };
     setProfile(nextProfile);
@@ -196,7 +210,6 @@ export default function App() {
     }
   };
 
-  // System Alert State
   const [systemAlert, setSystemAlert] = useState({
     isOpen: false,
     title: "",
@@ -205,18 +218,16 @@ export default function App() {
     type: "system" as any
   });
 
-  const [btcPrice, setBtcPrice] = useState(96000000); // Default to NGN
+  const [btcPrice, setBtcPrice] = useState(96000000);
   const [ethPrice, setEthPrice] = useState(5200000);
   const [solPrice, setSolPrice] = useState(245000);
   const [suiPrice, setSuiPrice] = useState(5200);
 
-  // Fetch Live Market Data Node (NGN Optimized)
   useEffect(() => {
     const fetchPrices = async () => {
       try {
         const response = await api.get('/market/prices?symbols=BTC,ETH,SOL,SUI');
         if (response.data) {
-          // Convert USD results to NGN using our institutional peg (approx 1600)
           const peg = 1600; 
           if (response.data.BTC) setBtcPrice(response.data.BTC * peg);
           if (response.data.ETH) setEthPrice(response.data.ETH * peg);
@@ -224,12 +235,12 @@ export default function App() {
           if (response.data.SUI) setSuiPrice(response.data.SUI * peg);
         }
       } catch (error) {
-        console.error('[MARKET_ERROR] Failed to synchronize live depth node:', error);
+        console.error('[MARKET_ERROR] Failed to synchronize price node:', error);
       }
     };
 
     fetchPrices();
-    const interval = setInterval(fetchPrices, 1000 * 60 * 5); // Update every 5 mins
+    const interval = setInterval(fetchPrices, 1000 * 60 * 5);
     return () => clearInterval(interval);
   }, []);
 
@@ -241,7 +252,6 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
-  // Auth Listeners (Hybrid Firebase/Supabase)
   useEffect(() => {
     if (!supabase) return;
 
@@ -294,7 +304,7 @@ export default function App() {
     setSystemAlert({
       isOpen: true,
       title: "Diagnostic Sweep Initiated",
-      message: "Our master node is performing a full-stack integrity check on your digital parameters. Multiple ledger entries found.",
+      message: "Integrity check in progress on digital parameters.",
       type: "system",
       logs: [
         "INITIALIZING_NODE_MESH_SYNC",
@@ -316,6 +326,13 @@ export default function App() {
         message={systemAlert.message}
         logs={systemAlert.logs}
         type={systemAlert.type}
+      />
+
+      <GatedVerificationModal 
+        isOpen={showGatedModal}
+        onClose={() => setShowGatedModal(false)}
+        onVerify={handleVerificationComplete}
+        profile={profile}
       />
 
       {currentScreen === AppScreen.MARKETING && (
@@ -476,7 +493,6 @@ export default function App() {
                             setActiveTab(AppTab.WALLET);
                           } else if (action === "buy-giftcard" || action === "sell-giftcard") {
                             setActiveTab(AppTab.TRADE);
-                            // We can use a local state to pass down sub-tab preference if needed
                           } else {
                             setActiveTab(AppTab.SERVICES);
                           }
@@ -529,7 +545,7 @@ export default function App() {
                         metrics={adminMetrics} 
                         profile={profile} 
                         onApproveKyc={() => {
-                          notify("success", "Compliance Verified", "Identity node has been authorized and synced.");
+                          notify("success", "Compliance Verified", "Identity node authorized.");
                           handleProfileUpdate({ kycStatus: "Verified" });
                         }} 
                         onUpdateSystemStatus={(status) => {
