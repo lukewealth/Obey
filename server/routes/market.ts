@@ -1,35 +1,57 @@
 import express from 'express';
-import { getExchangeRate } from '../services/coinapi';
+import { getExchangeRate, getAllAssets } from '../services/coinapi';
 
 const router = express.Router();
 
-// Cache prices to avoid hitting CoinAPI limits too fast (Free tier is limited)
+// Cache prices to avoid hitting CoinAPI limits too fast
 let priceCache: Record<string, { price: number, timestamp: number }> = {};
-const CACHE_TTL = 1000 * 60 * 5; // 5 minutes
+let assetsCache: { data: any[], timestamp: number } | null = null;
+
+const PRICE_TTL = 1000 * 60 * 5; // 5 minutes
+const ASSETS_TTL = 1000 * 60 * 60 * 24; // 24 hours (Asset list doesn't change often)
+
+// Get Top Assets (Filtered for UI performance)
+router.get('/assets', async (req, res) => {
+  try {
+    if (assetsCache && (Date.now() - assetsCache.timestamp < ASSETS_TTL)) {
+      return res.json(assetsCache.data);
+    }
+
+    const allAssets = await getAllAssets();
+    // Filter for assets with a price and notable popularity (example filter)
+    const topAssets = allAssets
+      .filter((a: any) => a.price_usd && a.volume_1day_usd > 1000000)
+      .slice(0, 100); // Return top 100 for prototype fidelity
+
+    assetsCache = { data: topAssets, timestamp: Date.now() };
+    res.json(topAssets);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch global asset mesh.' });
+  }
+});
 
 router.get('/prices', async (req, res) => {
-  const assets = ['BTC', 'ETH', 'SOL', 'SUI'];
+  const symbols = (req.query.symbols as string || 'BTC,ETH,SOL,SUI').split(',');
   const results: Record<string, number> = {};
 
   try {
-    for (const asset of assets) {
-      const cached = priceCache[asset];
-      if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
-        results[asset] = cached.price;
+    for (const symbol of symbols) {
+      const cached = priceCache[symbol];
+      if (cached && (Date.now() - cached.timestamp < PRICE_TTL)) {
+        results[symbol] = cached.price;
       } else {
-        const data = await getExchangeRate(asset, 'USD');
+        const data = await getExchangeRate(symbol, 'USD');
         if (data && data.rate) {
-          results[asset] = data.rate;
-          priceCache[asset] = { price: data.rate, timestamp: Date.now() };
-        } else {
-          // Fallback to last known price if API fails
-          results[asset] = cached ? cached.price : 0;
+          results[symbol] = data.rate;
+          priceCache[symbol] = { price: data.rate, timestamp: Date.now() };
+        } else if (cached) {
+          results[symbol] = cached.price;
         }
       }
     }
     res.json(results);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch market data node.' });
+    res.status(500).json({ error: 'Failed to synchronize live price nodes.' });
   }
 });
 

@@ -29,6 +29,8 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
     { symbol: 'SUI', name: 'Sui Network', price: suiPrice, prevPrice: suiPrice, priceChangePercent: 8.42, logo: 'S', balance: 1240, history: [2.8, 2.9, 3.1, 3.0, 3.2, 3.25] }
   ]);
 
+  const [loadingAssets, setLoadingAssets] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSymbol, setSelectedSymbol] = useState("BTC");
   const [tradeType, setTradeType] = useState<"buy" | "sell">("buy");
   const [fiatValue, setFiatValue] = useState("");
@@ -42,6 +44,35 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
   const [listingForm, setListingForm] = useState({ amount: "", price: "" });
 
   const activeAsset = assets.find(a => a.symbol === selectedSymbol) || assets[0];
+
+  const fetchGlobalAssets = async () => {
+    setLoadingAssets(true);
+    try {
+      const res = await api.get('/market/assets');
+      if (res.data && res.data.length > 0) {
+        const globalAssets = res.data.map((a: any) => ({
+          symbol: a.asset_id,
+          name: a.name,
+          price: a.price_usd,
+          prevPrice: a.price_usd,
+          priceChangePercent: 0,
+          logo: a.asset_id[0],
+          balance: 0,
+          history: [a.price_usd * 0.95, a.price_usd * 0.98, a.price_usd]
+        }));
+        // Merge with current balances if any
+        setAssets(globalAssets);
+      }
+    } catch (error) {
+      console.error("Failed to fetch global assets:", error);
+    } finally {
+      setLoadingAssets(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGlobalAssets();
+  }, []);
 
   const fetchMarketListings = async () => {
     setLoadingMarket(true);
@@ -373,13 +404,15 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                     <input 
                       type="text" 
                       placeholder="Find assets..." 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       className="bg-gray-50 border border-gray-100 rounded-[18px] pl-11 pr-4 py-2.5 text-xs focus:ring-2 focus:ring-primary/10 w-full sm:w-56 font-bold outline-none transition-all"
                     />
                 </div>
               </div>
 
-              <div className="space-y-3 relative z-10">
-                {assets.map((asset) => {
+              <div className="space-y-3 relative z-10 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                {assets.filter(a => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.symbol.toLowerCase().includes(searchQuery.toLowerCase())).map((asset) => {
                   const isPositive = asset.priceChangePercent >= 0;
                   const isSelected = asset.symbol === selectedSymbol;
 

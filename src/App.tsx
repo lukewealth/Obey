@@ -90,8 +90,28 @@ export default function App() {
     }
   }, [cachedProfile, profile]);
 
-  // Optimized Sync to MongoDB (Only sync explicitly or on significant changes with debounce)
-  // Moving sync logic to action handlers for prototype stability
+  // Harden Real-Time Identity Sync
+  useEffect(() => {
+    if (currentUser && profile) {
+      const syncIdentity = async () => {
+        try {
+          await syncProfile({ 
+            id: currentUser.id || currentUser.uid, 
+            profile: {
+              ...profile,
+              email: currentUser.email || profile.email // Ensure email is from the master session
+            } 
+          });
+          console.log(`[IDENTITY_SYNC] Session established for ${currentUser.email}`);
+        } catch (e) {
+          console.error('[IDENTITY_SYNC_ERROR] Node alignment failed:', e);
+        }
+      };
+      syncIdentity();
+    }
+  }, [currentUser?.id, currentUser?.uid, currentUser?.email, syncProfile]);
+
+  // Optimized Sync to MongoDB (Only sync explicitly or on significant changes)
   const handleProfileUpdate = (updated: Partial<UserProfile>) => {
     const nextProfile = { ...profile, ...updated };
     setProfile(nextProfile);

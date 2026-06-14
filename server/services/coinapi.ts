@@ -23,16 +23,13 @@ export const getExchangeRate = async (base: string, quote: string = 'USD') => {
   }
 };
 
-export const getMultipleRates = async (base: string = 'USD', assets: string[]) => {
+export const getAllAssets = async () => {
   try {
-    // CoinAPI documentation says we can get all rates for a base
-    const response = await coinApi.get(`/exchangerate/${base}`);
-    const rates = response.data.rates;
-    
-    // Filter only the requested assets
-    return rates.filter((r: any) => assets.includes(r.asset_id_quote));
+    const response = await coinApi.get('/assets');
+    // CoinAPI returns a massive list. We filter for cryptocurrencies (type_is_crypto=1)
+    return response.data.filter((a: any) => a.type_is_crypto === 1);
   } catch (error) {
-    console.error(`[CoinAPI_ERROR] Failed to fetch multiple rates:`, error);
+    console.error(`[CoinAPI_ERROR] Failed to fetch assets:`, error);
     return [];
   }
 };
