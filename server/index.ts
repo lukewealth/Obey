@@ -8,6 +8,7 @@ import vtuRoutes from './routes/vtu';
 import syncRoutes from './routes/sync';
 import giftCardRoutes from './routes/giftcards';
 import cryptoMarketRoutes from './routes/crypto_market';
+import marketRoutes from './routes/market';
 import paymentRoutes from './routes/payments';
 import { connectDB } from './db';
 
@@ -98,6 +99,8 @@ app.use('/api/ai', sanitizeInput); // Apply only to AI endpoints if they exist
 app.use('/api/vtu', vtuRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/giftcards', giftCardRoutes);
+app.use('/api/crypto-market', cryptoMarketRoutes);
+app.use('/api/market', marketRoutes);
 app.use('/api/payments', paymentRoutes);
 
 app.get('/health', (req, res) => {

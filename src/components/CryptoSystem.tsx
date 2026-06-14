@@ -14,17 +14,19 @@ interface CryptoSystemProps {
   profile: UserProfile;
   btcPrice: number;
   ethPrice: number;
+  solPrice: number;
+  suiPrice: number;
   onTradeCompleted: (amount: number, details: string, isSell: boolean) => void;
 }
 
-export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompleted }: CryptoSystemProps) {
+export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, suiPrice, onTradeCompleted }: CryptoSystemProps) {
   const { notify } = useNotification();
   const [activeTab, setActiveTab] = useState<"PLATFORM" | "P2P">("PLATFORM");
   const [assets, setAssets] = useState<CryptoAsset[]>([
     { symbol: 'BTC', name: 'Bitcoin', price: btcPrice, prevPrice: btcPrice, priceChangePercent: 2.45, logo: '₿', balance: 0.045, history: [62000, 62150, 62400, 62300, 63100, 64231] },
     { symbol: 'ETH', name: 'Ethereum', price: ethPrice, prevPrice: ethPrice, priceChangePercent: 1.82, logo: 'E', balance: 0.85, history: [3380, 3400, 3390, 3420, 3460, 3452] },
-    { symbol: 'SOL', name: 'Solana', price: 145.67, prevPrice: 145.67, priceChangePercent: -0.42, logo: 'S', balance: 12.4, history: [148, 147, 146.5, 146, 145.2, 145.67] },
-    { symbol: 'SUI', name: 'Sui Network', price: 3.25, prevPrice: 3.25, priceChangePercent: 8.42, logo: 'S', balance: 1240, history: [2.8, 2.9, 3.1, 3.0, 3.2, 3.25] }
+    { symbol: 'SOL', name: 'Solana', price: solPrice, prevPrice: solPrice, priceChangePercent: -0.42, logo: 'S', balance: 12.4, history: [148, 147, 146.5, 146, 145.2, 145.67] },
+    { symbol: 'SUI', name: 'Sui Network', price: suiPrice, prevPrice: suiPrice, priceChangePercent: 8.42, logo: 'S', balance: 1240, history: [2.8, 2.9, 3.1, 3.0, 3.2, 3.25] }
   ]);
 
   const [selectedSymbol, setSelectedSymbol] = useState("BTC");
@@ -56,6 +58,16 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
   useEffect(() => {
     if (activeTab === 'P2P') fetchMarketListings();
   }, [activeTab]);
+
+  useEffect(() => {
+    setAssets(prev => prev.map(a => {
+      if (a.symbol === 'BTC') return { ...a, price: btcPrice };
+      if (a.symbol === 'ETH') return { ...a, price: ethPrice };
+      if (a.symbol === 'SOL') return { ...a, price: solPrice };
+      if (a.symbol === 'SUI') return { ...a, price: suiPrice };
+      return a;
+    }));
+  }, [btcPrice, ethPrice, solPrice, suiPrice]);
 
   useEffect(() => {
     const timer = setInterval(() => {

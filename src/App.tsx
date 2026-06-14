@@ -111,6 +111,29 @@ export default function App() {
 
   const [btcPrice, setBtcPrice] = useState(64231.80);
   const [ethPrice, setEthPrice] = useState(3452.12);
+  const [solPrice, setSolPrice] = useState(145.67);
+  const [suiPrice, setSuiPrice] = useState(3.25);
+
+  // Fetch Live Market Data Node
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await api.get('/market/prices');
+        if (response.data) {
+          if (response.data.BTC) setBtcPrice(response.data.BTC);
+          if (response.data.ETH) setEthPrice(response.data.ETH);
+          if (response.data.SOL) setSolPrice(response.data.SOL);
+          if (response.data.SUI) setSuiPrice(response.data.SUI);
+        }
+      } catch (error) {
+        console.error('[MARKET_ERROR] Failed to synchronize live depth node:', error);
+      }
+    };
+
+    fetchPrices();
+    const interval = setInterval(fetchPrices, 1000 * 60 * 5); // Update every 5 mins
+    return () => clearInterval(interval);
+  }, []);
 
   const [adminMetrics, setAdminMetrics] = useState<AdminMetrics>({
     totalUsers: 1420,
@@ -358,29 +381,29 @@ export default function App() {
                     
                     {activeTab === AppTab.TRADE && (
                       <div className="space-y-8">
-                        <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-gray-100 w-fit mx-auto md:mx-0">
+                        <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-gray-100 w-fit mx-auto md:mx-0 shadow-sm">
                            <button 
-                            onClick={() => (window as any).setTradeSubTab?.('crypto')}
-                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${(!activeTab || (window as any).tradeSubTab !== 'giftcard') ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                            onClick={() => setTradeSubTab('crypto')}
+                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'crypto' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
                            >
                              Digital Assets
                            </button>
                            <button 
-                            onClick={() => (window as any).setTradeSubTab?.('giftcard')}
-                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${(window as any).tradeSubTab === 'giftcard' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                            onClick={() => setTradeSubTab('giftcard')}
+                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'giftcard' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
                            >
                              Gift Cards
                            </button>
                         </div>
                         
                         <AnimatePresence mode="wait">
-                          {(window as any).tradeSubTab === 'giftcard' ? (
+                          {tradeSubTab === 'giftcard' ? (
                             <motion.div key="giftcard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                               <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
                             </motion.div>
                           ) : (
                             <motion.div key="crypto" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
+                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} solPrice={solPrice} suiPrice={suiPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
                             </motion.div>
                           )}
                         </AnimatePresence>
