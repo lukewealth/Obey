@@ -108,7 +108,7 @@ export default function App() {
             .from("profiles")
             .select("*")
             .eq("id", currentUser?.id || currentUser?.uid || trackedId)
-            .maybeSingle(); // Use maybeSingle to prevent 404 console noise
+            .maybeSingle(); 
           if (!error) sbProfile = data;
         }
 
@@ -172,7 +172,6 @@ export default function App() {
         notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
       } catch (err) {
         console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
-        notify("error", "Sync Failure", "Failed to synchronize ledger nodes.");
       } finally {
         // Institutional delay for high-fidelity discovery animation
         setTimeout(() => {
@@ -181,10 +180,8 @@ export default function App() {
       }
     };
 
-    if (currentUser || getCookie('obey_user_email')) {
-      wakeupDatabase();
-    }
-  }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
+    wakeupDatabase();
+  }, [currentUser?.id, currentUser?.uid, currentScreen, syncProfile, notify]);
 
   // Local state for profile (Default placeholder removed for dynamic institutional alignment)
   const [profile, setProfile] = useState<UserProfile>(() => ({

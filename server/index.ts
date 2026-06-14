@@ -57,22 +57,29 @@ app.use('/api/', limiter);
 
 app.use(express.json({ limit: '10kb' }));
 
-// Routes
-app.use('/api/vtu', vtuRoutes);
-app.use('/api/sync', syncRoutes);
-app.use('/api/giftcards', giftCardRoutes);
-app.use('/api/crypto-market', cryptoMarketRoutes);
-app.use('/api/market', marketRoutes);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/admin', adminRoutes);
+// --- Dual-Path Routing Alignment ---
+// This ensures routes work both with and without /api prefix for Vercel/Local compatibility.
+const router = express.Router();
 
-app.get('/api/health', (req, res) => {
+router.use('/vtu', vtuRoutes);
+router.use('/sync', syncRoutes);
+router.use('/giftcards', giftCardRoutes);
+router.use('/crypto-market', cryptoMarketRoutes);
+router.use('/market', marketRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/admin', adminRoutes);
+
+router.get('/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     database: 'MongoDB Atlas Fallback Ready',
     timestamp: new Date().toISOString() 
   });
 });
+
+// Mount router on both root and /api for institutional redundancy
+app.use('/api', router);
+app.use('/', router);
 
 // For Vercel, we export the app. For local, we listen.
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {

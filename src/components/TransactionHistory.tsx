@@ -94,7 +94,7 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
 
       {/* Audit List of Rows */}
       <div className="bento-card overflow-hidden shadow-2xl">
-        {filteredTx.length === 0 ? (
+        {!Array.isArray(transactions) || filteredTx.length === 0 ? (
           <div className="py-24 text-center space-y-4">
              <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
                 <SlidersHorizontal size={40} />

@@ -248,35 +248,35 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <div className="space-y-1">
             {Array.isArray(transactions) && transactions.length > 0 ? (
               transactions.slice(0, 5).map((tx) => (
-              <div 
-                key={tx.id} 
-                className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 transition-all rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 cursor-pointer"
-              >
-                <div className="flex items-center gap-4 md:gap-6">
-                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[20px] bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all shadow-sm shrink-0">
-                    {getCategoryIcon(tx.category)}
+                <div 
+                  key={tx.id} 
+                  className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 transition-all rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 cursor-pointer"
+                >
+                  <div className="flex items-center gap-4 md:gap-6">
+                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[20px] bg-white border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all shadow-sm shrink-0">
+                      {getCategoryIcon(tx.category)}
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-sm md:text-lg font-black text-gray-900 tracking-tight truncate">{tx.title}</p>
+                      <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
+                        {tx.category} • {tx.time}
+                      </p>
+                    </div>
                   </div>
-                  <div className="overflow-hidden">
-                    <p className="text-sm md:text-lg font-black text-gray-900 tracking-tight truncate">{tx.title}</p>
-                    <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
-                      {tx.category} • {tx.time}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="text-right shrink-0">
-                  <p className={`text-base md:text-xl font-mono font-black ${tx.type === "Credit" ? "text-emerald-600" : "text-gray-900"}`}>
-                    {tx.type === "Credit" ? "+" : "-"}₦{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                  </p>
-                  <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-1.5 md:mt-2 ${
-                    tx.status === "Success" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
-                  }`}>
-                    {tx.status}
+                  <div className="text-right shrink-0">
+                    <p className={`text-base md:text-xl font-mono font-black ${tx.type === "Credit" ? "text-emerald-600" : "text-gray-900"}`}>
+                      {tx.type === "Credit" ? "+" : "-"}₦{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    </p>
+                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-1.5 md:mt-2 ${
+                      tx.status === "Success" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
+                    }`}>
+                      {tx.status}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {transactions.length === 0 && (
+              ))
+            ) : (
               <div className="py-20 text-center space-y-4">
                  <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300 shadow-inner">
                     <Activity size={32} />
