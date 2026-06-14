@@ -1,10 +1,17 @@
 import axios from 'axios';
 import { UserProfile, Transaction } from '../types';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api';
+// Detect production environment and use relative path to avoid localhost:5001 failures in production
+const isProd = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+const API_BASE_URL = isProd 
+  ? '/api' 
+  : ((import.meta as any).env?.VITE_API_URL || 'http://localhost:5001/api');
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
 });
 
 export const syncUserWithMongoDB = async (supabaseId: string, profile: UserProfile) => {
