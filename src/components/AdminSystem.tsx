@@ -5,7 +5,8 @@ import {
   Users, DollarSign, Activity, AlertCircle, Check, X, 
   TrendingUp, RefreshCw, BarChart2, ShieldAlert, CheckCircle2, UserCheck, Settings,
   Zap, Shield, Server, ArrowUpRight, ShoppingCart, Lock, Trash2, Loader2,
-  ChevronRight, ArrowRight, Search, Plus, Minus, Bell, CreditCard, Send, ShieldCheck
+  ChevronRight, ArrowRight, Search, Plus, Minus, Bell, CreditCard, Send, ShieldCheck,
+  Cpu, Globe, Database, HardDrive, Terminal
 } from "lucide-react";
 import api, { settleEscrowTrade, adjustUserBalance } from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -19,7 +20,7 @@ interface AdminSystemProps {
 
 export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSystemStatus }: AdminSystemProps) {
   const { notify } = useNotification();
-  const [activeAdminTab, setActiveAdminTab] = useState<"monitoring" | "users" | "marketplace" | "notifications">("monitoring");
+  const [activeAdminTab, setActiveAdminTab] = useState<"monitoring" | "users" | "marketplace" | "notifications" | "vit">("monitoring");
   
   const [kycQueue, setKycQueue] = useState<any[]>([]);
   const [escrowTrades, setEscrowTrades] = useState<any[]>([]);
@@ -27,6 +28,15 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [activeStatus, setActiveStatus] = useState(metrics.systemStatus);
   const [settlingId, setSettlingId] = useState<string | null>(null);
+
+  // VIT (Verified Institutional Tier) State
+  const [vitLogs, setVitLogs] = useState<string[]>([
+    "INITIALIZING_VIT_MESH_SYNC...",
+    "ESTABLISHING_HIGH_FIDELITY_TUNNEL_01",
+    "VERIFYING_MULTI_SIG_TREASURY_RESERVES",
+    "VIT_NODE_ONLINE_INTEGRITY_100%"
+  ]);
+  const [isVitSimulating, setIsVitSimulating] = useState(false);
 
   // Push Notification State
   const [pushTitle, setPushTitle] = useState("");
@@ -130,6 +140,25 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
     }
   };
 
+  const runVitDiagnostic = () => {
+    setIsVitSimulating(true);
+    setVitLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] INITIATING_DEEP_INSPECTION...`]);
+    
+    setTimeout(() => {
+       setVitLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] SWEEPING_ESCROW_MESH...`]);
+    }, 1000);
+    
+    setTimeout(() => {
+       setVitLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] ALIGNING_CROSS_CHAIN_LIQUIDITY...`]);
+    }, 2500);
+
+    setTimeout(() => {
+       setVitLogs(prev => [...prev, `[${new Date().toLocaleTimeString()}] SYSTEM_INTEGRITY_OPTIMIZED_100%`]);
+       setIsVitSimulating(false);
+       notify("success", "VIT Optimization Complete", "Verified Institutional nodes re-aligned.");
+    }, 4000);
+  };
+
   const handleCreditAdjustment = async () => {
     if (!selectedUser || !creditAmount) return;
     const amount = parseFloat(creditAmount);
@@ -165,13 +194,14 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
             { id: "users", label: "Ledger", icon: Users },
             { id: "marketplace", label: "Treasury", icon: ShoppingCart },
             { id: "notifications", label: "Broadcast", icon: Bell },
+            { id: "vit", label: "VIT Access", icon: Zap },
            ].map(t => (
              <button 
               key={t.id}
               onClick={() => setActiveAdminTab(t.id as any)}
               className={`px-6 py-2.5 rounded-xl text-[11px] font-black transition-all flex items-center gap-2 whitespace-nowrap ${activeAdminTab === t.id ? 'bg-[#0b0e14] text-white shadow-lg' : 'text-gray-400 hover:text-gray-900'}`}
              >
-               <t.icon size={14} /> {t.label}
+               <t.icon size={14} className={t.id === 'vit' ? 'text-primary' : ''} /> {t.label}
              </button>
            ))}
         </div>
@@ -384,6 +414,115 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                 <button onClick={handleSendPush} disabled={sendingPush || !pushTitle || !pushMessage} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/30 active-press flex items-center justify-center gap-3 disabled:opacity-50">
                    {sendingPush ? <Loader2 className="animate-spin" size={18} /> : <><Send size={18} /> Dispatch Broadcast</>}
                 </button>
+             </div>
+          </motion.div>
+        )}
+
+        {activeAdminTab === "vit" && (
+          <motion.div key="vit" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-8">
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* VIT Status */}
+                <div className="lg:col-span-4 space-y-8">
+                   <div className="bg-[#0b0e14] rounded-[2.5rem] p-10 border border-primary/20 relative overflow-hidden group">
+                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all" />
+                      <div className="space-y-6 relative z-10">
+                         <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center text-primary">
+                            <Zap size={32} />
+                         </div>
+                         <div className="space-y-1">
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tighter italic">VIT Mesh</h3>
+                            <p className="text-gray-500 text-xs font-bold uppercase tracking-widest">Verified Institutional Tier</p>
+                         </div>
+                         <div className="p-4 bg-white/5 rounded-2xl border border-white/10 space-y-4">
+                            <div className="flex justify-between items-center">
+                               <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Uptime</span>
+                               <span className="text-[10px] font-black text-emerald-500 uppercase">99.99%</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                               <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Node Latency</span>
+                               <span className="text-[10px] font-black text-primary uppercase">12ms</span>
+                            </div>
+                         </div>
+                         <button 
+                          onClick={runVitDiagnostic}
+                          disabled={isVitSimulating}
+                          className="w-full h-14 bg-primary text-white rounded-xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/30 active-press flex items-center justify-center gap-2"
+                         >
+                            {isVitSimulating ? <Loader2 size={16} className="animate-spin" /> : <><Cpu size={16} /> Run VIT Diagnostic</>}
+                         </button>
+                      </div>
+                   </div>
+
+                   <div className="bento-card p-8 space-y-6">
+                      <h4 className="text-[10px] font-black uppercase text-gray-400 tracking-widest flex items-center gap-2"><Globe size={14} /> Global Edge Nodes</h4>
+                      <div className="space-y-4">
+                         {[
+                           { name: "Lagos Center", load: "42%", status: "online" },
+                           { name: "London Node", load: "18%", status: "online" },
+                           { name: "NYC Gateway", load: "31%", status: "online" }
+                         ].map(n => (
+                           <div key={n.name} className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-gray-900">{n.name}</span>
+                              <div className="flex items-center gap-3">
+                                 <span className="text-[10px] font-mono text-gray-400">{n.load}</span>
+                                 <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+
+                {/* VIT System Logs */}
+                <div className="lg:col-span-8 space-y-8">
+                   <div className="bg-[#0b0e14] rounded-[2.5rem] p-10 border border-white/5 h-full min-h-[600px] flex flex-col">
+                      <div className="flex items-center justify-between mb-10">
+                         <div className="flex items-center gap-4">
+                            <Terminal className="text-primary" size={24} />
+                            <h3 className="text-xl font-black text-white uppercase tracking-widest">Protocol Introspection</h3>
+                         </div>
+                         <div className="flex gap-2">
+                            <div className="w-3 h-3 rounded-full bg-red-500/20" />
+                            <div className="w-3 h-3 rounded-full bg-amber-500/20" />
+                            <div className="w-3 h-3 rounded-full bg-emerald-500/20" />
+                         </div>
+                      </div>
+                      
+                      <div className="flex-grow font-mono text-[11px] space-y-3 overflow-y-auto max-h-[500px] pr-4 custom-scrollbar">
+                         {vitLogs.map((log, i) => (
+                           <motion.div 
+                            key={i} 
+                            initial={{ opacity: 0, x: -10 }} 
+                            animate={{ opacity: 1, x: 0 }} 
+                            className="flex gap-4"
+                           >
+                              <span className="text-gray-700">[{i.toString().padStart(2, '0')}]</span>
+                              <span className={log.includes('OPTIMIZED') || log.includes('ONLINE') ? 'text-emerald-500' : 'text-primary/70'}>
+                                 {log}
+                              </span>
+                           </motion.div>
+                         ))}
+                         {isVitSimulating && (
+                           <motion.div 
+                            animate={{ opacity: [0, 1, 0] }}
+                            transition={{ duration: 0.8, repeat: Infinity }}
+                            className="w-2 h-4 bg-primary inline-block ml-4"
+                           />
+                         )}
+                      </div>
+
+                      <div className="mt-auto pt-10 border-t border-white/5 flex gap-4">
+                         <div className="flex-1 bg-white/5 rounded-xl border border-white/10 p-5 space-y-2">
+                            <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Total Mesh Compute</p>
+                            <p className="text-2xl font-black text-white font-space">2.4 PFLOPS</p>
+                         </div>
+                         <div className="flex-1 bg-white/5 rounded-xl border border-white/10 p-5 space-y-2">
+                            <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">Secured Transactions</p>
+                            <p className="text-2xl font-black text-white font-space">8.2M+</p>
+                         </div>
+                      </div>
+                   </div>
+                </div>
              </div>
           </motion.div>
         )}

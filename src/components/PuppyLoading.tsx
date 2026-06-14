@@ -3,80 +3,103 @@ import { motion } from "framer-motion";
 
 export default function PuppyLoading() {
   return (
-    <div className="flex flex-col items-center justify-center space-y-6 py-12 md:py-20">
-      <div className="relative w-32 h-32 md:w-40 md:h-40">
-        {/* Puppy Body (Simplistic Cartoon Representation) */}
+    <div className="flex flex-col items-center justify-center space-y-10 py-12 md:py-24">
+      <div className="relative w-48 h-48 md:w-64 md:h-64">
+        {/* High-Fidelity Puppy Image Design Container */}
         <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ 
-            y: [0, -30, 0],
-            rotate: [0, -5, 5, 0]
+            scale: [1, 1.05, 1],
+            rotate: [0, -2, 2, 0],
+            opacity: 1
           }}
           transition={{ 
-            duration: 0.6, 
+            duration: 2, 
             repeat: Infinity, 
             ease: "easeInOut" 
           }}
-          className="relative z-10"
+          className="relative z-10 w-full h-full rounded-[45px] overflow-hidden shadow-2xl border-4 border-white shadow-primary/20"
         >
-          {/* Ears */}
-          <motion.div 
-            animate={{ rotate: [-10, 10, -10] }}
-            transition={{ duration: 0.3, repeat: Infinity }}
-            className="absolute -top-2 -left-2 w-8 h-12 bg-amber-700 rounded-full"
-          />
-          <motion.div 
-            animate={{ rotate: [10, -10, 10] }}
-            transition={{ duration: 0.3, repeat: Infinity }}
-            className="absolute -top-2 -right-2 w-8 h-12 bg-amber-700 rounded-full"
+          <img 
+            src="/assets/puppy/puppy_big_eyes.jpg" 
+            alt="Happy Puppy" 
+            className="w-full h-full object-cover"
+            loading="eager"
           />
           
-          {/* Head */}
-          <div className="w-24 h-20 bg-amber-500 rounded-[40px] flex items-center justify-center relative shadow-lg">
-             {/* Eyes */}
-             <div className="flex gap-6">
-                <motion.div 
-                  animate={{ scaleY: [1, 0.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-3 h-3 bg-gray-900 rounded-full"
-                />
-                <motion.div 
-                  animate={{ scaleY: [1, 0.1, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-3 h-3 bg-gray-900 rounded-full"
-                />
-             </div>
-             {/* Nose */}
-             <div className="absolute bottom-4 w-4 h-2.5 bg-gray-900 rounded-full" />
-          </div>
-
-          {/* Body */}
-          <div className="w-20 h-24 bg-amber-500 rounded-[35px] -mt-4 mx-auto shadow-inner relative">
-             {/* Tail */}
-             <motion.div 
-              animate={{ rotate: [-20, 20, -20] }}
-              transition={{ duration: 0.2, repeat: Infinity }}
-              className="absolute -right-4 top-4 w-10 h-3 bg-amber-700 rounded-full origin-left"
-             />
-             {/* Happy Paws */}
-             <div className="absolute -bottom-2 -left-2 w-8 h-8 bg-amber-600 rounded-full shadow-md" />
-             <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-amber-600 rounded-full shadow-md" />
-          </div>
+          {/* Animated Sparkling Effects (Blue Eyes Vibe) */}
+          <motion.div 
+            animate={{ 
+              opacity: [0, 1, 0],
+              scale: [0.5, 1.2, 0.5],
+              x: [20, 40, 20],
+              y: [40, 30, 40]
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }}
+            className="absolute top-1/3 left-1/4 w-4 h-4 bg-blue-400 rounded-full blur-md"
+          />
+          <motion.div 
+            animate={{ 
+              opacity: [0, 1, 0],
+              scale: [0.5, 1.5, 0.5],
+              x: [80, 100, 80],
+              y: [40, 50, 40]
+            }}
+            transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+            className="absolute top-1/3 right-1/4 w-3 h-3 bg-white rounded-full blur-sm"
+          />
         </motion.div>
 
-        {/* Shadow */}
+        {/* Happy Particle Mesh */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            animate={{
+              y: [0, -100],
+              x: Math.sin(i) * 50,
+              opacity: [0, 1, 0],
+              scale: [0, 1, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              delay: i * 0.3,
+              ease: "easeOut"
+            }}
+            className="absolute left-1/2 bottom-1/2 w-2 h-2 bg-primary rounded-full"
+          />
+        ))}
+
+        {/* Dynamic Shadow */}
         <motion.div 
           animate={{ 
-            scale: [1, 0.6, 1],
-            opacity: [0.2, 0.1, 0.2]
+            scale: [1, 0.8, 1],
+            opacity: [0.3, 0.15, 0.3]
           }}
-          transition={{ duration: 0.6, repeat: Infinity }}
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-gray-900/10 rounded-full blur-md"
+          transition={{ duration: 1, repeat: Infinity }}
+          className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-900/20 rounded-full blur-xl"
         />
       </div>
 
-      <div className="text-center space-y-2">
-        <h3 className="text-xl font-black text-gray-900 uppercase tracking-widest italic">Node Discovery...</h3>
-        <p className="text-[10px] font-black text-primary uppercase tracking-[0.4em] animate-pulse">Syncing institutional depth mesh</p>
+      <div className="text-center space-y-3 relative">
+        <motion.div
+          animate={{ opacity: [0.4, 1, 0.4] }}
+          transition={{ duration: 1.5, repeat: Infinity }}
+        >
+          <h3 className="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter italic">
+            Synchronizing <span className="text-primary">Ecosystem...</span>
+          </h3>
+        </motion.div>
+        <div className="flex flex-col items-center gap-2">
+           <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.5em] pl-2">Institutional Node Discovery</p>
+           <div className="w-48 h-1 bg-gray-100 rounded-full overflow-hidden relative">
+              <motion.div 
+                animate={{ left: ["-100%", "100%"] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                className="absolute top-0 bottom-0 w-1/2 bg-primary"
+              />
+           </div>
+        </div>
       </div>
     </div>
   );

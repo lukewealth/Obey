@@ -153,6 +153,14 @@ export default function App() {
         // 3. Synchronize All Global States
         setProfile(finalProfile);
         
+        // Role-Based Tab Initialization
+        if (finalProfile.role === "admin") {
+           setActiveTab(AppTab.ADMIN);
+           notify("info", "Institutional Entry", "Administrative console initialized.");
+        } else {
+           setActiveTab(AppTab.HOME);
+        }
+
         // Final Security Check: Ensure email is verified for dashboard access
         if (!finalProfile.isEmailVerified && currentScreen === AppScreen.DASHBOARD) {
            setCurrentScreen(AppScreen.LOGIN);
@@ -190,6 +198,8 @@ export default function App() {
     balance: 228128672.00,
     currency: "NGN",
     promoCode: "OBEY-ELITE",
+    isEmailVerified: true,
+    kycLevel: 2,
     twoFactorEnabled: true
   }));
 
@@ -415,11 +425,21 @@ export default function App() {
               </div>
 
               <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-2 md:gap-3 pl-2 cursor-pointer group select-none">
-                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform shrink-0">
-                  {profile.avatar}
+                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform shrink-0 relative">
+                   {profile.avatar}
+                   {profile.role === "admin" && (
+                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-white flex items-center justify-center">
+                        <ZapIcon className="w-2.5 h-2.5 text-white" />
+                     </div>
+                   )}
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-[12px] md:text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[12px] md:text-[13px] font-black text-[#0b0e14] group-hover:text-primary transition-colors">{profile.name}</p>
+                    {profile.role === "admin" && (
+                      <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[7px] font-black uppercase rounded-[4px] border border-primary/20">VIT NODE</span>
+                    )}
+                  </div>
                   <p className="text-[8px] md:text-[9px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                     <VerifiedIcon className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" /> {profile.role === "admin" ? "Institutional Admin" : "Tier 2 Secure"}
                   </p>
