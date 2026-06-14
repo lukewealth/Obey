@@ -567,7 +567,7 @@ export default function App() {
                         profile={profile} 
                         onApproveKyc={() => {
                           notify("success", "Compliance Verified", "Identity node authorized.");
-                          handleProfileUpdate({ kycStatus: "Verified" });
+                          handleProfileUpdate({ kycStatus: "Verified", kycLevel: 2 });
                         }} 
                         onUpdateSystemStatus={(status) => {
                           setAdminMetrics(prev => ({ ...prev, systemStatus: status }));

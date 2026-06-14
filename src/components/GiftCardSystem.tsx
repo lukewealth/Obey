@@ -204,15 +204,23 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
           ].map((tab) => (
             <button
               key={tab.id}
-              onClick={() => { setTradeReceipt(null); setActiveTab(tab.id as any); }}
+              onClick={() => { 
+                if (tab.id === 'P2P' && profile.kycLevel < 2) {
+                  notify("error", "Access Gated", "Level 2 verification required for Marketplace Escrow.");
+                  return;
+                }
+                setTradeReceipt(null); 
+                setActiveTab(tab.id as any); 
+              }}
               className={`px-4 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
                 activeTab === tab.id 
                   ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                  : "text-gray-400 hover:text-gray-900"
+                  : (tab.id === 'P2P' && profile.kycLevel < 2 ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:text-gray-900")
               }`}
             >
               <tab.icon size={16} />
               {tab.label}
+              {tab.id === 'P2P' && profile.kycLevel < 2 && <Lock size={12} className="ml-1" />}
               {activeTab === tab.id && (
                 <motion.div layoutId="market-tab" className="absolute inset-0 bg-primary rounded-[14px] md:rounded-[18px] -z-10" transition={{ type: "spring", stiffness: 300, damping: 30 }} />
               )}

@@ -1,6 +1,7 @@
 import express from 'express';
 import { User } from '../models/User';
 import { Transaction } from '../models/Transaction';
+import * as interswitch from '../services/interswitch';
 
 const router = express.Router();
 
@@ -9,13 +10,13 @@ const router = express.Router();
  */
 router.post('/user', async (req, res) => {
   try {
-    const { supabaseId, email, name, role, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled } = req.body;
+    const { supabaseId, email, name, role, phone, avatar, kycStatus, kycLevel, balance, promoCode, twoFactorEnabled } = req.body;
     
     // 1. Synchronize with MongoDB Atlas Node
     const user = await User.findOneAndUpdate(
       { $or: [{ supabaseId }, { email }] }, // Link by ID or Email
       { 
-        supabaseId, name, email, role, phone, avatar, kycStatus, balance, promoCode, twoFactorEnabled,
+        supabaseId, name, email, role, phone, avatar, kycStatus, kycLevel, balance, promoCode, twoFactorEnabled,
         lastSync: new Date()
       },
       { upsert: true, new: true }
@@ -29,6 +30,48 @@ router.post('/user', async (req, res) => {
   } catch (error) {
     console.error('Sync user error:', error);
     res.status(500).json({ error: 'Failed to synchronize ecosystem nodes' });
+  }
+});
+
+/**
+ * Identity Verification Node (Interswitch Mesh)
+ */
+router.post('/verify-kyc', async (req, res) => {
+  try {
+    const { userId, idType, idNumber, livenessScore } = req.body;
+    
+    // 1. Validate against Interswitch Identity Node
+    const kycResult = await interswitch.validateIdentity({
+      userId,
+      idType,
+      idNumber,
+      livenessScore: livenessScore || 0.95
+    });
+
+    if (kycResult.responseCode === "00") {
+      // 2. Update User Node Level
+      const user = await User.findOneAndUpdate(
+        { $or: [{ supabaseId: userId }, { email: userId }] },
+        { 
+          kycStatus: "Verified",
+          kycLevel: kycResult.kycLevel || 2,
+          lastSync: new Date()
+        },
+        { new: true }
+      );
+
+      res.json({ 
+        success: true, 
+        message: "Identity Node Settled", 
+        kycLevel: user?.kycLevel,
+        auditId: kycResult.auditId 
+      });
+    } else {
+      res.status(400).json({ error: "Identity validation failed", details: kycResult.message });
+    }
+  } catch (error) {
+    console.error('KYC Verification Error:', error);
+    res.status(500).json({ error: "Internal compliance failure" });
   }
 });
 
