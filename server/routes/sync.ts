@@ -2,34 +2,31 @@ import express from 'express';
 import { User } from '../models/User';
 import { Transaction } from '../models/Transaction';
 import * as interswitch from '../services/interswitch';
+import { syncUserNode } from '../mesh/id_user';
+import { saveTransactionNode } from '../mesh/save';
+import { syncCryptoAsset } from '../mesh/crypto';
 
 const router = express.Router();
 
 /**
  * Enhanced Sync Node: Handles cross-state management between Supabase, MongoDB, and local cookies.
+ * Uses Institutional Mesh for real-time node alignment.
  */
 router.post('/user', async (req, res) => {
   try {
-    const { supabaseId, email, name, role, phone, avatar, kycStatus, kycLevel, balance, promoCode, twoFactorEnabled } = req.body;
+    const profile = req.body;
     
-    if (!supabaseId || !email) {
+    if (!profile.supabaseId || !profile.email) {
       console.warn('[SYNC_WARN] Missing required parameters in sync request');
       return res.status(400).json({ error: 'Missing required sync parameters: supabaseId and email are required.' });
     }
 
-    // 1. Synchronize with MongoDB Atlas Node
-    const user = await User.findOneAndUpdate(
-      { $or: [{ supabaseId }, { email }] }, // Link by ID or Email
-      { 
-        supabaseId, name, email, role, phone, avatar, kycStatus, kycLevel, balance, promoCode, twoFactorEnabled,
-        lastSync: new Date()
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+    // 1. Synchronize with Modular Institutional Mesh
+    const user = await syncUserNode(profile);
 
     // 2. Set Tracking Cookies for Hybrid Load Optimization
-    res.cookie('obey_user_email', email, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
-    res.cookie('obey_user_id', supabaseId, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
+    res.cookie('obey_user_email', user.email, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
+    res.cookie('obey_user_id', user.supabaseId, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
 
     res.json({ success: true, user });
   } catch (error: any) {
@@ -61,16 +58,12 @@ router.post('/verify-kyc', async (req, res) => {
     });
 
     if (kycResult.responseCode === "00") {
-      // 2. Update User Node Level
-      const user = await User.findOneAndUpdate(
-        { $or: [{ supabaseId: userId }, { email: userId }] },
-        { 
-          kycStatus: "Verified",
-          kycLevel: kycResult.kycLevel || 2,
-          lastSync: new Date()
-        },
-        { new: true }
-      );
+      // 2. Update User Node Level via Mesh Alignment
+      const user = await syncUserNode({
+        supabaseId: userId,
+        kycStatus: "Verified",
+        kycLevel: kycResult.kycLevel || 2
+      });
 
       res.json({ 
         success: true, 
@@ -97,17 +90,27 @@ router.post('/transactions', async (req, res) => {
     }
 
     const syncResults = await Promise.all(transactions.map(async (tx: any) => {
-      return Transaction.findOneAndUpdate(
-        { id: tx.id },
-        { ...tx, userId },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
+      // Use Mesh Save Node for real-time transaction synchronization
+      return saveTransactionNode({ ...tx, userId });
     }));
 
     res.json({ success: true, count: syncResults.length });
   } catch (error: any) {
     console.error('Sync transactions error:', error.message);
     res.status(500).json({ error: 'Failed to sync transactions' });
+  }
+});
+
+/**
+ * Real-Time Asset Data Node: Triggers CoinAPI pull and Mesh alignment.
+ */
+router.get('/asset-sync/:symbol', async (req, res) => {
+  try {
+    const { symbol } = req.params;
+    const assetData = await syncCryptoAsset(symbol);
+    res.json(assetData);
+  } catch (error) {
+    res.status(500).json({ error: 'Asset synchronization failed' });
   }
 });
 
