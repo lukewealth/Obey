@@ -6,10 +6,11 @@ import {
   HelpCircle, Shield, History, Tag, ChevronRight, Zap, 
   Star, Activity, ArrowRight, ShieldCheck, Upload, X, Check,
   RefreshCw, Loader2, Sparkles, AlertCircle, ShoppingCart, 
-  LayoutGrid, List, CheckCircle2, User, Globe, Play, Gamepad2, Package, Apple as AppleIcon, Clock
+  LayoutGrid, List, CheckCircle2, User, Globe, Play, Gamepad2, Package, Apple as AppleIcon, Clock, Lock
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
+import PuppyLoading from "./PuppyLoading";
 
 interface GiftCardSystemProps {
   profile: UserProfile;
@@ -64,7 +65,10 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     } catch (error) {
       console.error("Failed to fetch listings:", error);
     } finally {
-      setLoadingMarket(false);
+      // High-fidelity delay for puppy loading discovery pulse
+      setTimeout(() => {
+        setLoadingMarket(false);
+      }, 2000);
     }
   };
 
@@ -377,82 +381,84 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
             exit="exit"
             className="space-y-8"
           >
-            {/* Market Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-               <div className="relative group w-full md:w-96">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                  <input 
-                    type="text" 
-                    placeholder="Search global marketplace..." 
-                    className="w-full h-14 pl-12 pr-6 bg-white border border-gray-200 rounded-2xl font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all"
-                  />
-               </div>
-               <button 
-                onClick={() => setShowListingModal(true)}
-                className="w-full md:w-auto px-10 h-14 bg-black text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl active-press"
-               >
-                 <Tag size={18} /> Broadcast Listing
-               </button>
-            </div>
-
-            {/* Listing Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-               {loadingMarket ? (
-                 Array(6).fill(0).map((_, i) => (
-                   <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-[32px]"></div>
-                 ))
-               ) : marketListings.length > 0 ? (
-                 marketListings.map((listing) => {
-                   const asset = assets.find(a => a.name === listing.assetName);
-                   const AssetIcon = asset?.icon || Gift;
-                   return (
-                    <motion.div 
-                      key={listing.id}
-                      whileHover={{ y: -5 }}
-                      className="bg-white border border-gray-100 p-8 rounded-[35px] shadow-xl hover:shadow-2xl transition-all group relative overflow-hidden"
-                    >
-                      <div className="flex justify-between items-start mb-6">
-                          <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/5 transition-colors">
-                            <AssetIcon size={28} />
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Face Value</p>
-                            <p className="text-2xl font-black text-gray-900">${listing.faceValue}</p>
-                          </div>
-                      </div>
-
-                      <div className="space-y-4 mb-8">
-                          <h4 className="text-xl font-black text-gray-900 tracking-tight">{listing.assetName} Asset Node</h4>
-                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg w-fit">
-                            <User size={12} className="text-gray-400" />
-                            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[100px]">{listing.sellerName}</span>
-                          </div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-                          <div>
-                            <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Acquisition Cost</p>
-                            <p className="text-2xl font-black text-primary font-mono tracking-tighter">₦{listing.price.toLocaleString()}</p>
-                          </div>
-                          <button 
-                            onClick={() => handlePurchaseListing(listing.id)}
-                            className="h-14 px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all active-press shadow-lg shadow-primary/20"
-                          >
-                            Buy <ArrowRight size={14} />
-                          </button>
-                      </div>
-                    </motion.div>
-                   );
-                 })
-               ) : (
-                 <div className="col-span-full py-32 text-center space-y-4">
-                    <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto">
-                       <ShoppingCart size={40} />
+            {loadingMarket ? (
+               <PuppyLoading />
+            ) : (
+               <>
+                  {/* Market Header */}
+                  <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="relative group w-full md:w-96">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                        <input 
+                          type="text" 
+                          placeholder="Search global marketplace..." 
+                          className="w-full h-14 pl-12 pr-6 bg-white border border-gray-200 rounded-2xl font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all"
+                        />
                     </div>
-                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No active listings in the global node</p>
-                 </div>
-               )}
-            </div>
+                    <button 
+                      onClick={() => setShowListingModal(true)}
+                      className="w-full md:w-auto px-10 h-14 bg-black text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl active-press"
+                    >
+                      <Tag size={18} /> Broadcast Listing
+                    </button>
+                  </div>
+
+                  {/* Listing Grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {marketListings.length > 0 ? (
+                      marketListings.map((listing) => {
+                        const asset = assets.find(a => a.name === listing.assetName);
+                        const AssetIcon = asset?.icon || Gift;
+                        return (
+                          <motion.div 
+                            key={listing.id}
+                            whileHover={{ y: -5 }}
+                            className="bg-white border border-gray-100 p-8 rounded-[35px] shadow-xl hover:shadow-2xl transition-all group relative overflow-hidden"
+                          >
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-primary shadow-inner group-hover:bg-primary/5 transition-colors">
+                                  <AssetIcon size={28} />
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Face Value</p>
+                                  <p className="text-2xl font-black text-gray-900">${listing.faceValue}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4 mb-8">
+                                <h4 className="text-xl font-black text-gray-900 tracking-tight">{listing.assetName} Asset Node</h4>
+                                <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg w-fit">
+                                  <User size={12} className="text-gray-400" />
+                                  <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest truncate max-w-[100px]">{listing.sellerName}</span>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                                <div>
+                                  <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Acquisition Cost</p>
+                                  <p className="text-2xl font-black text-primary font-mono tracking-tighter">₦{listing.price.toLocaleString()}</p>
+                                </div>
+                                <button 
+                                  onClick={() => handlePurchaseListing(listing.id)}
+                                  className="h-14 px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all active-press shadow-lg shadow-primary/20"
+                                >
+                                  Buy <ArrowRight size={14} />
+                                </button>
+                            </div>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <div className="col-span-full py-32 text-center space-y-4">
+                          <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto">
+                            <ShoppingCart size={40} />
+                          </div>
+                          <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No active listings in the global node</p>
+                      </div>
+                    )}
+                  </div>
+               </>
+            )}
 
             {/* Listing Modal (Simulated overlay) */}
             <AnimatePresence>

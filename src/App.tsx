@@ -18,6 +18,7 @@ import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
 import SystemAlert from "./components/SystemAlert";
 import GatedVerificationModal from "./components/GatedVerificationModal";
+import PuppyLoading from "./components/PuppyLoading";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -156,7 +157,10 @@ export default function App() {
         console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
         notify("error", "Sync Failure", "Failed to synchronize ledger nodes.");
       } finally {
-        setIsInitializing(false);
+        // Institutional delay for high-fidelity discovery animation
+        setTimeout(() => {
+          setIsInitializing(false);
+        }, 2200);
       }
     };
 
@@ -480,10 +484,7 @@ export default function App() {
             <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12 relative">
               {(isInitializing || adminVerifying) && (
                 <div className="absolute inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
-                   <RefreshIcon className="w-10 h-10 text-primary animate-spin" />
-                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0b0e14]">
-                     {isInitializing ? "Synchronizing Nodes..." : "Confirming Identity..."}
-                   </p>
+                   <PuppyLoading />
                 </div>
               )}
               <AnimatePresence mode="wait">

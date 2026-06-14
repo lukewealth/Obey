@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Clock, ShieldCheck, Globe, Zap, BarChart3, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
+import PuppyLoading from "./PuppyLoading";
 
 interface MarketMetadataProps {
   symbol: string;
@@ -24,13 +25,17 @@ export default function MarketMetadata({ symbol }: MarketMetadataProps) {
       } catch (error) {
         console.error("Failed to fetch node depth:", error);
       } finally {
-        setLoading(false);
+        // Institutional discovery delay for high-fidelity discovery animation
+        setTimeout(() => {
+          setLoading(false);
+        }, 1500);
       }
     };
 
     fetchDetails();
   }, [symbol]);
 
+  if (loading) return <PuppyLoading />;
   if (!details && !loading) return null;
 
   return (

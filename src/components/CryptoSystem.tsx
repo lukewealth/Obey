@@ -11,6 +11,7 @@ import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
 import CryptoSearch from "./CryptoSearch";
 import MarketMetadata from "./MarketMetadata";
+import PuppyLoading from "./PuppyLoading";
 
 interface CryptoSystemProps {
   profile: UserProfile;
