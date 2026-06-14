@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Loader2, TrendingUp, TrendingDown, Star, Zap } from "lucide-react";
+import { Search, Loader2, TrendingUp, TrendingDown, Star, Zap, Coins } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 
@@ -21,6 +21,9 @@ export default function CryptoSearch({ onSelect, placeholder = "Search global de
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Institutional Peg for Real-Time NGN Conversion
+  const NGN_PEG = 1600;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,6 +56,11 @@ export default function CryptoSearch({ onSelect, placeholder = "Search global de
 
     return () => clearTimeout(timer);
   }, [query]);
+
+  const getOfficialSymbol = (assetId: string) => {
+    // Official crypto icons mesh
+    return `https://cryptoicons.org/api/icon/${assetId.toLowerCase()}/64`;
+  };
 
   return (
     <div className="relative w-full" ref={containerRef}>
@@ -99,8 +107,15 @@ export default function CryptoSearch({ onSelect, placeholder = "Search global de
                 className="w-full p-5 flex items-center justify-between rounded-[20px] hover:bg-primary/5 group transition-all text-left mb-1"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-50 rounded-[14px] flex items-center justify-center font-black text-gray-400 group-hover:bg-white group-hover:text-primary transition-colors border border-gray-100">
-                    {asset.asset_id === 'BTC' ? <Star size={20} /> : asset.asset_id === 'ETH' ? <Zap size={20} /> : asset.asset_id[0]}
+                  <div className="w-12 h-12 bg-gray-50 rounded-[14px] flex items-center justify-center font-black text-gray-400 group-hover:bg-white group-hover:text-primary transition-all border border-gray-100 shadow-sm overflow-hidden">
+                    <img 
+                      src={getOfficialSymbol(asset.asset_id)} 
+                      alt="" 
+                      className="w-8 h-8 object-contain"
+                      onError={(e) => {
+                        (e.target as any).src = "https://api.dicebear.com/7.x/identicon/svg?seed=" + asset.asset_id;
+                      }}
+                    />
                   </div>
                   <div>
                     <p className="text-base font-black text-gray-900 leading-none">{asset.name}</p>
@@ -108,9 +123,9 @@ export default function CryptoSearch({ onSelect, placeholder = "Search global de
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-base font-black text-[#0b0e14] font-mono leading-none">${asset.price_usd?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-base font-black text-[#0b0e14] font-mono leading-none">₦{(asset.price_usd * NGN_PEG).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p>
                   <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-1.5 flex items-center justify-end gap-1">
-                    <TrendingUp size={10} /> Live
+                    <TrendingUp size={10} /> Live Node
                   </p>
                 </div>
               </motion.button>

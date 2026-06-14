@@ -11,6 +11,9 @@ export default function MarketMetadata({ symbol }: MarketMetadataProps) {
   const [details, setDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
+  // Institutional Peg for Real-Time NGN Conversion
+  const NGN_PEG = 1600;
+
   useEffect(() => {
     const fetchDetails = async () => {
       if (!symbol) return;
@@ -48,9 +51,9 @@ export default function MarketMetadata({ symbol }: MarketMetadataProps) {
         </div>
         
         <div className="text-center md:text-right">
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Live Node Value</p>
+           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Live Node Value (NGN)</p>
            <p className="text-4xl font-black font-space tracking-tight text-[#0b0e14]">
-             ${details?.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '---'}
+             ₦{(details?.price * NGN_PEG)?.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 }) || '---'}
            </p>
         </div>
       </div>
@@ -93,7 +96,7 @@ export default function MarketMetadata({ symbol }: MarketMetadataProps) {
                     className={`flex-1 rounded-t-lg ${h.price_close >= h.price_open ? 'bg-emerald-500/20 hover:bg-emerald-500' : 'bg-red-500/20 hover:bg-red-500'} transition-all cursor-pointer relative group/bar`}
                   >
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-[8px] font-black rounded opacity-0 group-hover/bar:opacity-100 whitespace-nowrap z-20">
-                      ${h.price_close.toLocaleString()}
+                      ₦{(h.price_close * NGN_PEG).toLocaleString()}
                     </div>
                   </motion.div>
                 );

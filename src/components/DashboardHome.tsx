@@ -14,9 +14,15 @@ interface DashboardHomeProps {
   transactions: Transaction[];
   onNavigateTab: (tab: AppTab) => void;
   onSelectAction: (action: string) => void;
+  prices: {
+    BTC: number;
+    ETH: number;
+    SOL: number;
+    SUI: number;
+  };
 }
 
-export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction }: DashboardHomeProps) {
+export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
   const [hideBalance, setHideBalance] = React.useState(false);
 
   // Helper icons for categories
@@ -72,7 +78,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/50 border border-blue-100 text-primary text-[10px] font-black uppercase tracking-widest"
           >
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-            System Live: v2.4.0
+            System Live: v4.2.0-NGN
           </motion.div>
           <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter">
             Welcome back, <span className="gradient-text">{profile.name.split(" ")[0]}</span>.
@@ -108,12 +114,12 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <div className="space-y-6 md:space-y-8">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center shadow-inner">
                   <Wallet size={20} className="md:w-6 md:h-6" />
                 </div>
                 <div>
                   <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Liquidity</p>
-                  <p className="text-xs md:text-sm font-bold text-gray-900">SUI Mainnet Wallet</p>
+                  <p className="text-xs md:text-sm font-bold text-gray-900">Institutional NGN Vault</p>
                 </div>
               </div>
               <button 
@@ -130,9 +136,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               </p>
               <div className="flex items-baseline gap-2 md:gap-4 overflow-hidden">
                 <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-none truncate">
-                  {hideBalance ? "••••••" : `$${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+                  {hideBalance ? "••••••" : `₦${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                 </span>
-                <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono uppercase shrink-0">USD</span>
+                <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono uppercase shrink-0">NGN</span>
               </div>
             </div>
           </div>
@@ -167,7 +173,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               <span className="text-xl md:text-2xl font-black tracking-tighter italic">OBEY</span>
               <p className="text-[9px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">Platinum Elite</p>
             </div>
-            <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-xl rounded-[20px] md:rounded-[24px] flex items-center justify-center border border-white/10 group-hover:bg-primary transition-colors">
+            <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-xl rounded-[20px] md:rounded-[24px] flex items-center justify-center border border-white/10 group-hover:bg-primary transition-colors shadow-lg">
               <CreditCard size={24} className="md:w-7 md:h-7" />
             </div>
           </div>
@@ -185,8 +191,8 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <p className="text-xs md:text-sm font-bold uppercase tracking-tight">JUNE 2026</p>
               </div>
               <div className="flex gap-2">
-                <div className="w-8 h-5 md:w-10 md:h-7 bg-red-500/60 rounded-md md:rounded-lg"></div>
-                <div className="w-8 h-5 md:w-10 md:h-7 bg-amber-500/60 rounded-md md:rounded-lg -ml-4"></div>
+                <div className="w-8 h-5 md:w-10 md:h-7 bg-red-500/60 rounded-md md:rounded-lg shadow-sm"></div>
+                <div className="w-8 h-5 md:w-10 md:h-7 bg-amber-500/60 rounded-md md:rounded-lg -ml-4 shadow-sm"></div>
               </div>
             </div>
           </div>
@@ -197,8 +203,8 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       {/* Quick Actions Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
         {[
-          { id: "buy-airtime", label: "Airtime", desc: "Global Top-up", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50" },
-          { id: "buy-data", label: "Network", desc: "Data Bundles", icon: Zap, color: "text-amber-500", bg: "bg-amber-50" },
+          { id: "buy-airtime", label: "Airtime", desc: "Network Node", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50" },
+          { id: "buy-data", label: "Data", desc: "Institutional Bundles", icon: Zap, color: "text-amber-500", bg: "bg-amber-50" },
           { id: "buy-giftcard", label: "Buy Gifts", desc: "Digital Market", icon: Gift, color: "text-purple-500", bg: "bg-purple-50" },
           { id: "sell-giftcard", label: "Sell Card", desc: "Fast Liquidity", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50" }
         ].map((action) => (
@@ -207,7 +213,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             onClick={() => onSelectAction(action.id)}
             className="bento-card p-5 md:p-8 flex flex-col justify-between gap-4 md:gap-6 hover:border-primary/40 group active-press text-left"
           >
-            <div className={`w-12 h-12 md:w-14 md:h-14 ${action.bg} ${action.color} rounded-[18px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform`}>
+            <div className={`w-12 h-12 md:w-14 md:h-14 ${action.bg} ${action.color} rounded-[18px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
               <action.icon size={22} className="md:w-7 md:h-7" />
             </div>
             <div>
@@ -259,7 +265,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
 
                 <div className="text-right shrink-0">
                   <p className={`text-base md:text-xl font-mono font-black ${tx.type === "Credit" ? "text-emerald-600" : "text-gray-900"}`}>
-                    {tx.type === "Credit" ? "+" : "-"}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {tx.type === "Credit" ? "+" : "-"}₦{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </p>
                   <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-1.5 md:mt-2 ${
                     tx.status === "Success" ? "bg-emerald-50 text-emerald-600" : "bg-amber-50 text-amber-600"
@@ -271,7 +277,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             ))}
             {transactions.length === 0 && (
               <div className="py-20 text-center space-y-4">
-                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
+                 <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300 shadow-inner">
                     <Activity size={32} />
                  </div>
                  <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">No sequential ledger entries found.</p>
@@ -295,13 +301,13 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
 
             <div className="space-y-3 md:space-y-4">
               {[
-                { name: "Bitcoin", symbol: "BTC", price: "64,231.80", change: "+2.4%", icon: Star, color: "text-amber-500", bg: "bg-amber-50" },
-                { name: "Ethereum", symbol: "ETH", price: "3,452.12", change: "-0.8%", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50" },
-                { name: "Solana", symbol: "SOL", price: "145.67", change: "+5.2%", icon: Zap, color: "text-purple-500", bg: "bg-purple-50" }
+                { name: "Bitcoin", symbol: "BTC", price: prices.BTC.toLocaleString(), change: "+2.4%", icon: Star, color: "text-amber-500", bg: "bg-amber-50" },
+                { name: "Ethereum", symbol: "ETH", price: prices.ETH.toLocaleString(), change: "-0.8%", icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
+                { name: "Solana", symbol: "SOL", price: prices.SOL.toLocaleString(), change: "+5.2%", icon: Activity, color: "text-purple-500", bg: "bg-purple-50" }
               ].map((coin) => (
-                <div key={coin.symbol} className="flex items-center justify-between p-4 md:p-5 bg-white border border-gray-100 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all cursor-pointer group">
+                <div key={coin.symbol} className="flex items-center justify-between p-4 md:p-5 bg-white border border-gray-100 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all cursor-pointer group shadow-sm">
                   <div className="flex items-center gap-3 md:gap-4">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform shrink-0`}>
+                    <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform shrink-0 shadow-sm`}>
                       <coin.icon size={18} fill={coin.symbol === "BTC" ? "currentColor" : "none"} className="md:w-5 md:h-5" />
                     </div>
                     <div>
@@ -310,7 +316,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm md:text-base font-black text-gray-900 font-mono tracking-tighter">${coin.price}</p>
+                    <p className="text-sm md:text-base font-black text-gray-900 font-mono tracking-tighter">₦{coin.price}</p>
                     <p className={`text-[9px] md:text-[10px] font-black font-mono ${coin.change.startsWith("+") ? "text-emerald-500" : "text-red-500"}`}>
                       {coin.change}
                     </p>
@@ -321,7 +327,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             
             <button 
               onClick={() => onNavigateTab(AppTab.TRADE)}
-              className="w-full py-4 md:py-5 bg-primary/5 hover:bg-primary/10 text-primary rounded-[18px] md:rounded-[22px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all active-press"
+              className="w-full py-4 md:py-5 bg-primary/5 hover:bg-primary/10 text-primary rounded-[18px] md:rounded-[22px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all active-press border border-primary/10"
             >
               Open Trading Desk
             </button>
@@ -331,7 +337,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <div className="bg-accent-yellow/80 border border-yellow-200 rounded-[35px] md:rounded-[45px] p-8 md:p-10 relative overflow-hidden group shadow-xl">
              <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>
              <div className="relative z-10 space-y-5 md:space-y-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-[18px] md:rounded-[24px] flex items-center justify-center text-yellow-600 shadow-sm">
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-[18px] md:rounded-[24px] flex items-center justify-center text-yellow-600 shadow-sm border border-yellow-100">
                 <Sparkles size={24} className="md:w-8 md:h-8" />
               </div>
               <h4 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter leading-tight">Master your <br /> wealth flow.</h4>

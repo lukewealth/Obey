@@ -58,64 +58,77 @@ export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState<any>(null);
 
-  // --- React Query Hybrid Hooks (Full-Stack Caching) ---
-  const { 
-    data: cachedProfile, 
-    syncProfile, 
-    isLoading: profileLoading 
-  } = useUserProfile(currentUser?.id || currentUser?.uid);
-
-  const { 
-    data: cachedTransactions = [], 
-    syncTransactions, 
-    isLoading: txLoading 
-  } = useTransactions(currentUser?.id || currentUser?.uid);
-
   // --- Real-Time Initialization & Database Wakeup ---
   const [isInitializing, setIsInitializing] = useState(false);
 
+  // Cookie Utility for Hybrid Tracking
+  const getCookie = (name: string) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()?.split(';').shift();
+  };
+
   useEffect(() => {
     const wakeupDatabase = async () => {
-      if (!currentUser || !supabase) return;
+      // Allow wakeup via current user OR tracked cookie for fast-fetch optimization
+      const trackedEmail = getCookie('obey_user_email');
+      const trackedId = getCookie('obey_user_id');
+      const identifier = currentUser?.id || currentUser?.uid || trackedId || trackedEmail;
+      
+      if (!identifier || !supabase) return;
       
       setIsInitializing(true);
-      console.log("[WAKEUP] Initializing cross-chain depth nodes...");
+      console.log("[WAKEUP] Initializing cross-chain depth nodes for:", identifier);
       
       try {
-        // 1. Fetch Master Profile from Supabase
-        const { data: sbProfile, error: sbError } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", currentUser.id || currentUser.uid)
-          .single();
-
-        if (sbError && sbError.code !== 'PGRST116') {
-          console.error("[WAKEUP_ERROR] Supabase retrieval failed:", sbError);
+        // 1. Fetch Master Profile from Ecosystem Depth (Hybrid: Supabase -> MongoDB Fallback)
+        let sbProfile: any = null;
+        if (currentUser?.id || currentUser?.uid || trackedId) {
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", currentUser?.id || currentUser?.uid || trackedId)
+            .single();
+          if (!error) sbProfile = data;
         }
 
-        // 2. Determine Source of Truth
+        // 2. Determine Source of Truth & Align Metadata
         let finalProfile: UserProfile;
         if (sbProfile) {
           finalProfile = {
             ...profile,
             ...sbProfile,
-            // Map Supabase snake_case to local camelCase if necessary
+            id: sbProfile.id,
             kycStatus: sbProfile.kyc_status || profile.kycStatus,
+            currency: sbProfile.currency || "NGN",
           };
-          console.log("[WAKEUP] Master profile retrieved from Supabase");
-        } else if (cachedProfile) {
-          finalProfile = cachedProfile;
-          console.log("[WAKEUP] Reverting to MongoDB fallback node");
+          console.log("[WAKEUP] Master profile retrieved from Supabase node");
         } else {
-          finalProfile = profile; // Default ELITE profile
-          console.log("[WAKEUP] No existing node found. Using ELITE defaults.");
+          // Fallback to MongoDB Node via Fast-Fetch API
+          try {
+            const res = await api.get(`/sync/user/${identifier}`);
+            if (res.data) {
+              finalProfile = {
+                ...profile,
+                ...res.data,
+                id: res.data.supabaseId || res.data._id,
+                currency: res.data.currency || "NGN",
+              };
+              console.log("[WAKEUP] Reverting to MongoDB depth node");
+            } else {
+              throw new Error("No node found");
+            }
+          } catch (err) {
+            finalProfile = profile; // Default ELITE profile
+            console.log("[WAKEUP] No existing node found. Using institutional defaults.");
+          }
         }
 
-        // 3. Synchronize All Endpoints
+        // 3. Synchronize All Global States
         setProfile(finalProfile);
-        await syncProfile({ id: currentUser.id || currentUser.uid, profile: finalProfile });
+        await syncProfile({ id: finalProfile.id || identifier, profile: finalProfile });
         
-        notify("success", "Nodes Synchronized", "Ecosystem data has been successfully re-aligned.");
+        notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
       } catch (err) {
         console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
         notify("error", "Sync Failure", "Failed to synchronize ledger nodes. Operating in local mode.");
@@ -124,7 +137,7 @@ export default function App() {
       }
     };
 
-    if (currentUser) {
+    if (currentUser || getCookie('obey_user_email')) {
       wakeupDatabase();
     }
   }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
@@ -136,8 +149,10 @@ export default function App() {
     role: "user",
     phone: "+234 809 102 8824",
     avatar: "FA",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     kycStatus: "Verified",
-    balance: 142580.42,
+    balance: 228128672.00, // Balanced in NGN magnitude
+    currency: "NGN",
     promoCode: "OBEY-ELITE",
     twoFactorEnabled: true
   }));
@@ -164,8 +179,8 @@ export default function App() {
   const handleProfileUpdate = (updated: Partial<UserProfile>) => {
     const nextProfile = { ...profile, ...updated };
     setProfile(nextProfile);
-    if (currentUser) {
-      syncProfile({ id: currentUser.id || currentUser.uid, profile: nextProfile });
+    if (currentUser || nextProfile.id) {
+      syncProfile({ id: nextProfile.id || currentUser.id || currentUser.uid, profile: nextProfile });
     }
   };
 
@@ -178,21 +193,23 @@ export default function App() {
     type: "system" as any
   });
 
-  const [btcPrice, setBtcPrice] = useState(64231.80);
-  const [ethPrice, setEthPrice] = useState(3452.12);
-  const [solPrice, setSolPrice] = useState(145.67);
-  const [suiPrice, setSuiPrice] = useState(3.25);
+  const [btcPrice, setBtcPrice] = useState(96000000); // Default to NGN
+  const [ethPrice, setEthPrice] = useState(5200000);
+  const [solPrice, setSolPrice] = useState(245000);
+  const [suiPrice, setSuiPrice] = useState(5200);
 
-  // Fetch Live Market Data Node
+  // Fetch Live Market Data Node (NGN Optimized)
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await api.get('/market/prices');
+        const response = await api.get('/market/prices?symbols=BTC,ETH,SOL,SUI');
         if (response.data) {
-          if (response.data.BTC) setBtcPrice(response.data.BTC);
-          if (response.data.ETH) setEthPrice(response.data.ETH);
-          if (response.data.SOL) setSolPrice(response.data.SOL);
-          if (response.data.SUI) setSuiPrice(response.data.SUI);
+          // Convert USD results to NGN using our institutional peg (approx 1600)
+          const peg = 1600; 
+          if (response.data.BTC) setBtcPrice(response.data.BTC * peg);
+          if (response.data.ETH) setEthPrice(response.data.ETH * peg);
+          if (response.data.SOL) setSolPrice(response.data.SOL * peg);
+          if (response.data.SUI) setSuiPrice(response.data.SUI * peg);
         }
       } catch (error) {
         console.error('[MARKET_ERROR] Failed to synchronize live depth node:', error);
@@ -452,6 +469,12 @@ export default function App() {
                             setActiveTab(AppTab.SERVICES);
                           }
                         }} 
+                        prices={{
+                          BTC: btcPrice,
+                          ETH: ethPrice,
+                          SOL: solPrice,
+                          SUI: suiPrice
+                        }}
                       />
                     )}
                     {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} onWithdrawWallet={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} onTransfer={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}

@@ -2,35 +2,35 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api, { syncUserWithMongoDB, syncTransactionsWithMongoDB, fetchUserFallback, fetchTransactionsFallback } from './api';
 import { UserProfile, Transaction } from '../types';
 
-// Keys for caching
+// Keys for institutional caching
 export const QUERY_KEYS = {
   USER_PROFILE: 'user_profile',
   TRANSACTIONS: 'transactions',
   ADMIN_METRICS: 'admin_metrics'
 };
 
-// --- Hooks for Full-Stack UI/UX Caching ---
+// --- Hooks for Full-Stack UI/UX Caching & Node Alignment ---
 
 /**
- * Hook to manage user profile with caching and hybrid sync.
+ * Hook to manage user profile with hybrid identifier mesh (Email/ID).
  */
-export function useUserProfile(supabaseId: string | undefined) {
+export function useUserProfile(identifier: string | undefined) {
   const queryClient = useQueryClient();
 
-  // Fetch with fallback logic
+  // Fetch with institutional fallback logic
   const query = useQuery({
-    queryKey: [QUERY_KEYS.USER_PROFILE, supabaseId],
+    queryKey: [QUERY_KEYS.USER_PROFILE, identifier],
     queryFn: async () => {
-      if (!supabaseId) return null;
-      // Try to get from local cache first, then fallback to MongoDB if Supabase is "assumed" to be updated via App.tsx logic
-      const fallback = await fetchUserFallback(supabaseId);
+      if (!identifier) return null;
+      // Try to get from ecosystem depth (Hybrid: MongoDB -> Real-Time Nodes)
+      const fallback = await fetchUserFallback(identifier);
       return fallback;
     },
-    enabled: !!supabaseId,
-    staleTime: 1000 * 60 * 5, // 5 minutes cache
+    enabled: !!identifier,
+    staleTime: 1000 * 60 * 10, // 10 minutes institutional cache
   });
 
-  // Mutation to sync/update
+  // Mutation to sync/update with ecosystem alignment
   const syncMutation = useMutation({
     mutationFn: ({ id, profile }: { id: string, profile: UserProfile }) => syncUserWithMongoDB(id, profile),
     onSuccess: () => {
@@ -38,11 +38,11 @@ export function useUserProfile(supabaseId: string | undefined) {
     }
   });
 
-  return { ...query, syncProfile: syncMutation.mutate };
+  return { ...query, syncProfile: syncMutation.mutateAsync };
 }
 
 /**
- * Hook to manage transactions with caching and hybrid sync.
+ * Hook to manage transactions with high-fidelity depth caching.
  */
 export function useTransactions(userId: string | undefined) {
   const queryClient = useQueryClient();
@@ -54,7 +54,7 @@ export function useTransactions(userId: string | undefined) {
       return await fetchTransactionsFallback(userId);
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 2, // 2 minutes cache
+    staleTime: 1000 * 60 * 5, // 5 minutes depth cache
   });
 
   const syncMutation = useMutation({
@@ -64,11 +64,11 @@ export function useTransactions(userId: string | undefined) {
     }
   });
 
-  return { ...query, syncTransactions: syncMutation.mutate };
+  return { ...query, syncTransactions: syncMutation.mutateAsync };
 }
 
 /**
- * Hook to fetch health status (example of generic API caching)
+ * Hook to fetch health status with real-time node monitoring.
  */
 export function useSystemHealth() {
   return useQuery({
@@ -77,6 +77,6 @@ export function useSystemHealth() {
       const response = await api.get('/health');
       return response.data;
     },
-    refetchInterval: 30000, // Refetch every 30 seconds
+    refetchInterval: 15000, // Real-time pulse every 15 seconds
   });
 }

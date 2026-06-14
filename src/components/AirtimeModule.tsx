@@ -5,7 +5,7 @@ import { z } from "zod";
 import { 
   Smartphone, Wifi, Check, RefreshCw, ChevronRight, 
   AlertTriangle, ShieldCheck, Download, Zap, Search,
-  ArrowRight, Landmark, CreditCard, Star, Activity, DollarSign
+  ArrowRight, Landmark, CreditCard, Star, Activity, Coins
 } from "lucide-react";
 import api from "../services/api";
 
@@ -28,6 +28,7 @@ interface NetworkProvider {
   textColor: string;
   logoChar: string;
   paymentCode: string;
+  symbolColor: string;
 }
 
 interface DataPlan {
@@ -51,27 +52,27 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const [successReceipt, setSuccessReceipt] = useState<any | null>(null);
 
   const providers: NetworkProvider[] = [
-    { id: "mtn", name: "MTN", color: "bg-[#FFCC00]", textColor: "text-black", logoChar: "M", paymentCode: "10101" },
-    { id: "airtel", name: "Airtel", color: "bg-[#E50914]", textColor: "text-white", logoChar: "A", paymentCode: "10201" },
-    { id: "glo", name: "Glo", color: "bg-[#339933]", textColor: "text-white", logoChar: "G", paymentCode: "10301" },
-    { id: "9mobile", name: "9mobile", color: "bg-[#015249]", textColor: "text-white", logoChar: "9", paymentCode: "10401" },
+    { id: "mtn", name: "MTN", color: "bg-[#FFCC00]", textColor: "text-black", logoChar: "M", paymentCode: "10101", symbolColor: "#FFCC00" },
+    { id: "airtel", name: "Airtel", color: "bg-[#E50914]", textColor: "text-white", logoChar: "A", paymentCode: "10201", symbolColor: "#E50914" },
+    { id: "glo", name: "Glo", color: "bg-[#339933]", textColor: "text-white", logoChar: "G", paymentCode: "10301", symbolColor: "#339933" },
+    { id: "9mobile", name: "9mobile", color: "bg-[#015249]", textColor: "text-white", logoChar: "9", paymentCode: "10401", symbolColor: "#015249" },
   ];
 
   const dataPlans: Record<string, DataPlan[]> = {
     mtn: [
-      { id: "m1", name: "Daily Value", price: 1.0, dataAmount: "1.5GB", validity: "24 Hours", paymentCode: "10102" },
-      { id: "m2", name: "Weekly Mega", price: 5.0, dataAmount: "10GB", validity: "7 Days", paymentCode: "10103" },
-      { id: "m3", name: "Monthly Pro", price: 15.0, dataAmount: "40GB", validity: "30 Days", paymentCode: "10104" },
+      { id: "m1", name: "Daily Value", price: 100, dataAmount: "1.5GB", validity: "24 Hours", paymentCode: "10102" },
+      { id: "m2", name: "Weekly Mega", price: 1500, dataAmount: "10GB", validity: "7 Days", paymentCode: "10103" },
+      { id: "m3", name: "Monthly Pro", price: 5000, dataAmount: "40GB", validity: "30 Days", paymentCode: "10104" },
     ],
     airtel: [
-      { id: "a1", name: "Binge Plan", price: 1.5, dataAmount: "2.5GB", validity: "24 Hours", paymentCode: "10202" },
-      { id: "a2", name: "Work Force", price: 8.0, dataAmount: "15GB", validity: "7 Days", paymentCode: "10203" },
+      { id: "a1", name: "Binge Plan", price: 300, dataAmount: "2.5GB", validity: "24 Hours", paymentCode: "10202" },
+      { id: "a2", name: "Work Force", price: 3000, dataAmount: "15GB", validity: "7 Days", paymentCode: "10203" },
     ],
     glo: [
-      { id: "g1", name: "Glo Special", price: 1.0, dataAmount: "2GB", validity: "24 Hours", paymentCode: "10302" },
+      { id: "g1", name: "Glo Special", price: 200, dataAmount: "2GB", validity: "24 Hours", paymentCode: "10302" },
     ],
     "9mobile": [
-      { id: "n1", name: "Smart Plan", price: 2.0, dataAmount: "3GB", validity: "48 Hours", paymentCode: "10402" },
+      { id: "n1", name: "Smart Plan", price: 500, dataAmount: "3GB", validity: "48 Hours", paymentCode: "10402" },
     ]
   };
 
@@ -133,7 +134,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       const response = await api.post('/vtu/recharge', {
         paymentCode: pCode,
         customerId: `234${phoneNo}`,
-        amount: price * 100,
+        amount: price * 100, // Amount in kobo for API
         requestReference: `VTU-${Date.now()}`
       });
 
@@ -171,7 +172,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
           <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Utility Hub</h2>
           <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Refill assets and subscribe to network nodes instantly.</p>
         </div>
-        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto">
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[
             { id: "airtime", label: "Airtime", icon: Smartphone },
             { id: "data", label: "Data Bundles", icon: Wifi }
@@ -179,7 +180,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
             <button
               key={tab.id}
               onClick={() => setActiveSegment(tab.id as any)}
-              className={`px-6 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial ${
+              className={`px-6 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
                 activeSegment === tab.id 
                   ? "bg-primary text-white shadow-lg shadow-primary/20" 
                   : "text-gray-400 hover:text-gray-900"
@@ -187,6 +188,9 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
             >
               <tab.icon size={16} />
               {tab.label}
+              {activeSegment === tab.id && (
+                <motion.div layoutId="utility-tab" className="absolute inset-0 bg-primary rounded-[14px] md:rounded-[18px] -z-10" />
+              )}
             </button>
           ))}
         </div>
@@ -208,11 +212,11 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
               <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <Check size={32} className="md:w-12 md:h-12" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">Dispatch Successful</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Dispatch Successful</h2>
               <p className="text-sm md:text-base text-gray-500 font-medium leading-relaxed">Your mobile bundle has been delivered instantly to the target node.</p>
             </div>
 
-            <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-10 space-y-6 md:space-y-8 text-left border border-gray-100">
+            <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-10 space-y-6 md:space-y-8 text-left border border-gray-100 shadow-inner">
               <div className="flex justify-between items-center gap-4">
                 <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest shrink-0">Target Node</span>
                 <span className="text-lg md:text-2xl font-black text-gray-900 font-mono tracking-widest truncate">+234 {phoneNo}</span>
@@ -225,13 +229,13 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                 </div>
                 <div className="space-y-1 text-right">
                   <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Magnitude</p>
-                  <p className="text-base md:text-lg font-black text-gray-900">${successReceipt.amount.toFixed(2)}</p>
+                  <p className="text-base md:text-lg font-black text-primary font-mono tracking-tighter">₦{successReceipt.amount.toLocaleString()}</p>
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 md:gap-4">
-              <button className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl shadow-primary/20 active-press">
+              <button className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
                 Download Receipt
               </button>
               <button onClick={() => setSuccessReceipt(null)} className="text-xs md:text-sm font-black text-gray-400 hover:text-gray-900 tracking-widest uppercase py-2">
@@ -254,7 +258,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                   <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Configuration Terminal</h3>
                   <p className="text-xs md:text-sm text-gray-500 font-medium">Select provider and specify target node.</p>
                 </div>
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-primary/10 rounded-[16px] md:rounded-[22px] flex items-center justify-center text-primary">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-primary/10 rounded-[16px] md:rounded-[22px] flex items-center justify-center text-primary shadow-inner">
                   {activeSegment === "airtime" ? <Smartphone size={24} className="md:w-7 md:h-7" /> : <Wifi size={24} className="md:w-7 md:h-7" />}
                 </div>
               </div>
@@ -269,16 +273,19 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         key={p.id}
                         type="button"
                         onClick={() => setSelectedProvider(p.id)}
-                        className={`flex flex-col items-center justify-center p-6 md:p-8 rounded-[24px] md:rounded-[32px] border transition-all duration-400 group/p ${
+                        className={`flex flex-col items-center justify-center p-6 md:p-8 rounded-[24px] md:rounded-[32px] border transition-all duration-400 group/p relative overflow-hidden ${
                           selectedProvider === p.id
                             ? "border-primary bg-white shadow-xl shadow-primary/10"
                             : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
                         }`}
                       >
-                        <div className={`w-12 h-12 md:w-16 md:h-16 ${p.color} ${p.textColor} rounded-[14px] md:rounded-[22px] flex items-center justify-center font-black text-xl md:text-2xl mb-3 md:mb-4 shadow-sm group-hover/p:scale-110 transition-transform shrink-0`}>
+                        <div className={`w-12 h-12 md:w-16 md:h-16 ${p.color} ${p.textColor} rounded-[14px] md:rounded-[22px] flex items-center justify-center font-black text-xl md:text-2xl mb-3 md:mb-4 shadow-lg group-hover/p:scale-110 transition-transform shrink-0 relative z-10`}>
                           {p.logoChar}
                         </div>
-                        <span className="text-xs md:text-sm font-black text-gray-900 tracking-tight uppercase">{p.name}</span>
+                        <span className="text-xs md:text-sm font-black text-gray-900 tracking-tight uppercase relative z-10">{p.name}</span>
+                        {selectedProvider === p.id && (
+                          <motion.div layoutId="provider-accent" className="absolute inset-0 bg-primary/5 -z-0" />
+                        )}
                       </button>
                     ))}
                   </div>
@@ -298,23 +305,23 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         value={phoneNo}
                         onChange={(e) => setPhoneNo(e.target.value.replace(/[^0-9]/g, ""))}
                         placeholder="809 102 8824"
-                        className="w-full h-14 md:h-16 px-4 md:px-6 bg-gray-50 border border-gray-100 rounded-r-[16px] md:rounded-r-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+                        className="w-full h-14 md:h-16 px-4 md:px-6 bg-gray-50 border border-gray-100 rounded-r-[16px] md:rounded-r-[22px] text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner"
                       />
                     </div>
                   </div>
 
                   {activeSegment === "airtime" && (
                     <div className="space-y-3">
-                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-2 md:pl-4">Amount (USD)</label>
-                      <div className="relative">
-                        <DollarSign className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary md:w-6 md:h-6" size={20} />
+                      <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-2 md:pl-4">Amount (NGN)</label>
+                      <div className="relative group">
+                        <span className="absolute left-4 md:left-6 top-1/2 -translate-y-1/2 text-primary font-black text-lg md:text-xl">₦</span>
                         <input
                           type="number"
                           required
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full h-14 md:h-16 pl-12 md:pl-16 pr-6 md:pr-8 bg-gray-50 border border-gray-100 rounded-[16px] md:rounded-[22px] text-base md:text-lg font-black focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+                          className="w-full h-14 md:h-16 pl-12 md:pl-14 pr-6 md:pr-8 bg-gray-50 border border-gray-100 rounded-[16px] md:rounded-[22px] text-base md:text-lg font-black focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner"
                         />
                       </div>
                     </div>
@@ -330,13 +337,13 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         <div
                           key={plan.id}
                           onClick={() => setSelectedDataPlan(plan.id)}
-                          className={`p-6 md:p-8 bg-white border rounded-[24px] md:rounded-[32px] flex items-center justify-between cursor-pointer transition-all duration-400 group/d ${
+                          className={`p-6 md:p-8 bg-white border rounded-[24px] md:rounded-[32px] flex items-center justify-between cursor-pointer transition-all duration-400 group/d relative overflow-hidden ${
                             selectedDataPlan === plan.id
                               ? "border-primary shadow-xl shadow-primary/10"
                               : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
                           }`}
                         >
-                          <div className="flex items-center gap-4 md:gap-5">
+                          <div className="flex items-center gap-4 md:gap-5 relative z-10">
                             <div className={`w-6 h-6 md:w-8 md:h-8 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${selectedDataPlan === plan.id ? 'border-primary' : 'border-gray-200'}`}>
                               {selectedDataPlan === plan.id && <div className="w-3 h-3 md:w-4 md:h-4 bg-primary rounded-full shadow-lg shadow-primary/40 animate-fade-in"></div>}
                             </div>
@@ -345,8 +352,8 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                               <p className="text-[9px] md:text-[11px] text-gray-400 font-black uppercase tracking-[0.1em] md:tracking-[0.2em]">{plan.validity}</p>
                             </div>
                           </div>
-                          <div className="text-right shrink-0">
-                            <p className="text-lg md:text-xl font-black text-gray-900 font-mono tracking-tighter">${plan.price.toFixed(2)}</p>
+                          <div className="text-right shrink-0 relative z-10">
+                            <p className="text-lg md:text-xl font-black text-gray-900 font-mono tracking-tighter">₦{plan.price.toLocaleString()}</p>
                             <p className="text-[8px] md:text-[10px] text-emerald-500 font-black uppercase tracking-widest mt-1">OPTIMIZED</p>
                           </div>
                         </div>
@@ -425,7 +432,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                 <p className="text-xs md:text-sm text-gray-500 font-medium uppercase tracking-widest">Verify and Authorize Settlement</p>
               </div>
 
-              <div className="bg-gray-50/50 rounded-[24px] md:rounded-[40px] p-6 md:p-10 space-y-6 md:space-y-8 border border-gray-100">
+              <div className="bg-gray-50/50 rounded-[24px] md:rounded-[40px] p-6 md:p-10 space-y-6 md:space-y-8 border border-gray-100 shadow-inner">
                 <div className="flex justify-between items-center gap-4">
                   <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest shrink-0">Target Node</span>
                   <span className="text-lg md:text-xl font-black text-gray-900 font-mono tracking-[0.1em] truncate">+234 {phoneNo}</span>
@@ -453,11 +460,11 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
               <div className="flex justify-between items-end px-2 md:px-4">
                 <div className="space-y-0.5 md:space-y-1">
                    <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Authorized Magnitude</p>
-                   <p className="text-xs md:text-sm font-black text-primary uppercase tracking-widest">Primary USD Vault</p>
+                   <p className="text-xs md:text-sm font-black text-primary uppercase tracking-widest">Primary NGN Vault</p>
                 </div>
                 <div className="text-right shrink-0">
                   <p className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-none font-mono">
-                    ${activeSegment === "airtime" ? parseFloat(amount || "0").toFixed(2) : activePlans.find((p) => p.id === selectedDataPlan)?.price.toFixed(2)}
+                    ₦{activeSegment === "airtime" ? parseFloat(amount || "0").toLocaleString() : activePlans.find((p) => p.id === selectedDataPlan)?.price.toLocaleString()}
                   </p>
                 </div>
               </div>

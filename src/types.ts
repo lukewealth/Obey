@@ -27,13 +27,16 @@ export enum GiftCardTab {
 }
 
 export interface UserProfile {
+  id?: string;
   name: string;
   email: string;
   role: "user" | "admin";
   phone: string;
   avatar: string;
+  avatarUrl?: string; // Support for official avatar icons
   kycStatus: "Unverified" | "Pending" | "Verified";
   balance: number;
+  currency: "NGN" | "USD"; // Official currency support
   promoCode: string;
   twoFactorEnabled: boolean;
 }
@@ -44,6 +47,7 @@ export interface Transaction {
   category: "Electronics" | "Transfer" | "Dining" | "Travel" | "Food" | "Crypto" | "Airtime" | "Data" | "GiftCard";
   type: "Debit" | "Credit";
   amount: number;
+  currency: "NGN" | "USD"; // Transaction specific currency
   fee: number;
   date: string;
   time: string;
@@ -58,10 +62,12 @@ export interface Transaction {
 export interface CryptoAsset {
   symbol: string;
   name: string;
-  price: number;
+  price: number; // Price in NGN by default in the new node
+  priceUSD?: number;
   prevPrice: number;
   priceChangePercent: number;
   logo: string;
+  logoUrl?: string; // Official symbol URL
   balance: number;
   history: number[];
 }
@@ -72,6 +78,7 @@ export interface GiftCardAsset {
   buyRate: number; 
   sellRate: number;
   logo: string;
+  logoUrl?: string;
   popularity: number;
   trending: boolean;
 }
