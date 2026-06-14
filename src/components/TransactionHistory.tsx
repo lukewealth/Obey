@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Transaction } from "../types";
 import { 
   Search, SlidersHorizontal, ArrowDownLeft, ArrowUpRight, Check, X, 
-  Clock, Download, Share2, CornerDownRight, ExternalLink, Calendar, HelpCircle, ArrowRight
+  Clock, Download, Share2, CornerDownRight, ExternalLink, Calendar, HelpCircle, ArrowRight,
+  CheckCircle2, ShieldCheck
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 

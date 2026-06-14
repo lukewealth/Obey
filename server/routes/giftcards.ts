@@ -56,7 +56,7 @@ router.post('/list', marketLimiter, async (req, res) => {
     await listing.save();
     res.json({ success: true, listing });
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: 'Invalid listing data.', details: error.errors });
+    if (error instanceof z.ZodError) return res.status(400).json({ error: 'Invalid listing data.', details: error.issues });
     res.status(500).json({ error: 'Listing terminal failure.' });
   }
 });

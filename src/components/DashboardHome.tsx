@@ -5,8 +5,9 @@ import {
   ArrowUpRight, ArrowDownLeft, Wallet, Send, RefreshCw, Smartphone, 
   Gift, Eye, EyeOff, ShoppingBag, ArrowDown, Utensils, Plane, Coffee, 
   ChevronRight, CreditCard, Bell, Sparkles, TrendingUp, Search,
-  ArrowRight, ShieldCheck, Zap, BarChart3, Star, CheckCircle2
+  ArrowRight, ShieldCheck, Zap, BarChart3, Star, CheckCircle2, Activity
 } from "lucide-react";
+
 
 interface DashboardHomeProps {
   profile: UserProfile;

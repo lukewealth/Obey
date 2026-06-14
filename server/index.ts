@@ -36,8 +36,9 @@ app.use(cors({
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
     
+    // Check if origin is in the allowed list or is a Vercel preview URL
     const isAllowed = allowedOrigins.includes(origin) || 
-                     origin.endsWith('.vercel.app'); // Allow all Vercel previews
+                     origin.endsWith('.vercel.app');
     
     if (isAllowed) {
       callback(null, true);
@@ -48,7 +49,8 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Access-Control-Allow-Origin']
 }));
 
 // Rate Limiting: 100 requests per 15 minutes per IP
