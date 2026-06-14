@@ -74,6 +74,7 @@ export default function App() {
   // --- Real-Time Initialization & Database Wakeup ---
   const [isInitializing, setIsInitializing] = useState(false);
   const [showGatedModal, setShowGatedModal] = useState(false);
+  const wakeupRef = React.useRef<string | null>(null);
 
   // Cookie Utility for Hybrid Tracking
   const getCookie = (name: string) => {
@@ -91,6 +92,10 @@ export default function App() {
       
       if (!identifier || !supabase) return;
       
+      // Prevent redundant wakeup for the same identifier in a single session
+      if (wakeupRef.current === identifier) return;
+      wakeupRef.current = identifier;
+      
       setIsInitializing(true);
       console.log("[WAKEUP] Initializing cross-chain depth nodes for:", identifier);
       
@@ -102,7 +107,7 @@ export default function App() {
             .from("profiles")
             .select("*")
             .eq("id", currentUser?.id || currentUser?.uid || trackedId)
-            .single();
+            .maybeSingle(); // Use maybeSingle to prevent 404 console noise
           if (!error) sbProfile = data;
         }
 
@@ -158,7 +163,7 @@ export default function App() {
     if (currentUser || getCookie('obey_user_email')) {
       wakeupDatabase();
     }
-  }, [currentUser?.id, currentUser?.uid, syncProfile, notify, currentScreen]);
+  }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
 
   // Local state for profile
   const [profile, setProfile] = useState<UserProfile>(() => ({
