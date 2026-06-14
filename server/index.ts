@@ -21,10 +21,9 @@ const port = process.env.PORT || 5001;
 // --- Security Middleware ---
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
-})); // Enhanced security headers
-app.use(cookieParser()); // Cookie support
+})); 
+app.use(cookieParser());
 
-// Enhanced CORS: Allow local dev and Vercel production/previews
 const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
@@ -33,17 +32,11 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    
-    // Check if origin is in the allowed list or is a Vercel preview URL
-    const isAllowed = allowedOrigins.includes(origin) || 
-                     origin.endsWith('.vercel.app');
-    
+    const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
     if (isAllowed) {
       callback(null, true);
     } else {
-      console.warn(`[CORS_BLOCK] Request from blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS policy'));
     }
   },
@@ -53,7 +46,6 @@ app.use(cors({
   exposedHeaders: ['Access-Control-Allow-Origin']
 }));
 
-// Rate Limiting: 1000 requests per 15 minutes per IP (Relaxed for development/prototype sync nodes)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000, 
@@ -63,35 +55,7 @@ const limiter = rateLimit({
 });
 app.use('/api/', limiter);
 
-app.use(express.json({ limit: '10kb' })); // Body limit to prevent large payload attacks
-
-// --- Prompt Injection Prevention Middleware ---
-const sanitizeInput = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  const injectionPatterns = [
-    /ignore previous instructions/i,
-    /system prompt/i,
-    /you are now/i,
-    /DAN mode/i,
-    /jailbreak/i
-  ];
-
-  const check = (val: any): boolean => {
-    if (typeof val === 'string') {
-      return injectionPatterns.some(pattern => pattern.test(val));
-    }
-    if (typeof val === 'object' && val !== null) {
-      return Object.values(val).some(check);
-    }
-    return false;
-  };
-
-  if (check(req.body) || check(req.query)) {
-    return res.status(400).json({ error: 'Potential malicious activity detected.' });
-  }
-  next();
-};
-
-app.use('/api/ai', sanitizeInput); // Apply only to AI endpoints if they exist
+app.use(express.json({ limit: '10kb' }));
 
 // Routes
 app.use('/api/vtu', vtuRoutes);
@@ -102,7 +66,7 @@ app.use('/api/market', marketRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
 
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ 
     status: 'healthy', 
     database: 'MongoDB Atlas Fallback Ready',
@@ -110,14 +74,18 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Connect to MongoDB and THEN Start Server
-connectDB().then(() => {
-  app.listen(port, () => {
-    console.log(`OBEY Backend listening on port ${port}`);
+// For Vercel, we export the app. For local, we listen.
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  connectDB().then(() => {
+    app.listen(port, () => {
+      console.log(`OBEY Backend listening on port ${port}`);
+    });
+  }).catch(err => {
+    console.error('Failed to connect to MongoDB:', err);
   });
-}).catch(err => {
-  console.error('Failed to connect to MongoDB, but starting server anyway:', err);
-  app.listen(port, () => {
-    console.log(`OBEY Backend listening on port ${port} (DB FAILED)`);
-  });
-});
+} else {
+  // Ensure DB connection is handled for serverless
+  connectDB();
+}
+
+export default app;

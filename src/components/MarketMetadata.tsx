@@ -91,21 +91,27 @@ export default function MarketMetadata({ symbol }: MarketMetadataProps) {
            </div>
            
            <div className="h-32 w-full flex items-end justify-between gap-1 md:gap-1.5 px-1">
-              {details.history.slice(0, 24).map((h: any, i: number) => {
-                const height = ((h.price_close - Math.min(...details.history.map((x:any) => x.price_close))) / (Math.max(...details.history.map((x:any) => x.price_close)) - Math.min(...details.history.map((x:any) => x.price_close)))) * 100;
-                return (
-                  <motion.div 
-                    key={i} 
-                    initial={{ height: 0 }}
-                    animate={{ height: `${Math.max(height, 10)}%` }}
-                    className={`flex-1 rounded-t-md ${h.price_close >= h.price_open ? 'bg-emerald-500/20 hover:bg-emerald-500' : 'bg-red-500/20 hover:bg-red-500'} transition-all cursor-pointer relative group/bar`}
-                  >
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-gray-900 text-white text-[7px] font-black rounded opacity-0 group-hover/bar:opacity-100 whitespace-nowrap z-20">
-                      ₦{(h.price_close * NGN_PEG).toLocaleString()}
-                    </div>
-                  </motion.div>
-                );
-              })}
+              {Array.isArray(details.history) ? (
+                details.history.slice(0, 24).map((h: any, i: number) => {
+                  const height = ((h.price_close - Math.min(...details.history.map((x:any) => x.price_close))) / (Math.max(...details.history.map((x:any) => x.price_close)) - Math.min(...details.history.map((x:any) => x.price_close)))) * 100;
+                  return (
+                    <motion.div 
+                      key={i} 
+                      initial={{ height: 0 }}
+                      animate={{ height: `${Math.max(height, 10)}%` }}
+                      className={`flex-1 rounded-t-md ${h.price_close >= h.price_open ? 'bg-emerald-500/20 hover:bg-emerald-500' : 'bg-red-500/20 hover:bg-red-500'} transition-all cursor-pointer relative group/bar`}
+                    >
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-1.5 py-0.5 bg-gray-900 text-white text-[7px] font-black rounded opacity-0 group-hover/bar:opacity-100 whitespace-nowrap z-20">
+                        ₦{(h.price_close * NGN_PEG).toLocaleString()}
+                      </div>
+                    </motion.div>
+                  );
+                })
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Awaiting Historical Node Feed</p>
+                </div>
+              )}
            </div>
         </div>
       )}

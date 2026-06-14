@@ -246,7 +246,8 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </div>
 
           <div className="space-y-1">
-            {transactions.slice(0, 5).map((tx) => (
+            {Array.isArray(transactions) && transactions.length > 0 ? (
+              transactions.slice(0, 5).map((tx) => (
               <div 
                 key={tx.id} 
                 className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 transition-all rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 cursor-pointer"

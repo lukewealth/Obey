@@ -202,7 +202,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
               <MarketMetadata symbol={selectedSymbol} />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {assets.slice(0, 3).map((asset) => (
+                 {Array.isArray(assets) && assets.slice(0, 3).map((asset) => (
                    <div key={asset.symbol} className="bg-white border border-gray-100 rounded-[30px] p-8 space-y-6 shadow-xl hover:shadow-2xl transition-all cursor-pointer group" onClick={() => setSelectedSymbol(asset.symbol)}>
                       <div className="flex justify-between items-start">
                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center font-black text-gray-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-gray-100 shadow-sm">
