@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Shield, BadgeCheck, User, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, Lock, Upload, Camera, Loader2, Sparkles, ArrowRight, AlertTriangle } from "lucide-react";
+import { Shield, BadgeCheck, User, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, Lock, Upload, Camera, Loader2, Sparkles, ArrowRight, AlertTriangle, Zap, Star, RefreshCw, Activity } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 import { UserProfile } from "../types";

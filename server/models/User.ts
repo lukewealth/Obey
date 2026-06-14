@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save hook to generate obeyId if it doesn't exist
-UserSchema.pre('save', function(next) {
+UserSchema.pre('save', function(this: any, next: any) {
   if (!this.obeyId) {
     const randomHex = Math.random().toString(16).substring(2, 7).toUpperCase();
     this.obeyId = `OBEY-${randomHex}`;

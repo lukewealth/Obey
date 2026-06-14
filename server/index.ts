@@ -57,6 +57,16 @@ app.use('/api/', limiter);
 
 app.use(express.json({ limit: '10kb' }));
 
+// --- Institutional Database Guard ---
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ error: 'Institutional database node unavailable.' });
+  }
+});
+
 // --- Dual-Path Routing Alignment ---
 // This ensures routes work both with and without /api prefix for Vercel/Local compatibility.
 const router = express.Router();

@@ -5,14 +5,25 @@ dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://Vercel-Admin-atlas-sky-yacht:StwR1ECXbmmYy0YQ@atlas-sky-yacht.d5yxhii.mongodb.net/?retryWrites=true&w=majority";
 
+/**
+ * Institutional Database Mesh Connector
+ * Ensures single connection pool in serverless environments.
+ */
 export const connectDB = async () => {
   try {
-    if (mongoose.connection.readyState >= 1) return;
+    if (mongoose.connection.readyState >= 1) {
+      console.log('🔄 Reusing existing institutional database node');
+      return;
+    }
     
-    await mongoose.connect(MONGODB_URI);
-    console.log('✅ MongoDB connected successfully');
+    console.log('🛰️ Establishing institutional database connection...');
+    await mongoose.connect(MONGODB_URI, {
+      bufferCommands: false, // Disable buffering to fail fast if connection drops
+    });
+    console.log('✅ Institutional database node online');
   } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    // Continue running as Supabase might still be available
+    console.error('❌ Institutional database node failure:', error);
+    // In production, we want to know why it's failing
+    throw error; 
   }
 };
