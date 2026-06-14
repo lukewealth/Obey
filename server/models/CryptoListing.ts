@@ -17,4 +17,4 @@ const CryptoListingSchema = new mongoose.Schema({
   transactionId: { type: String }, // Reference to the Escrow Transaction
 }, { timestamps: true });
 
-export const CryptoListing = mongoose.model('CryptoListing', CryptoListingSchema);
+export const CryptoListing = mongoose.models.CryptoListing || mongoose.model('CryptoListing', CryptoListingSchema);
