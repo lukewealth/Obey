@@ -510,7 +510,23 @@ export default function App() {
                         }}
                       />
                     )}
-                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} onWithdrawWallet={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} onTransfer={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
+                    {activeTab === AppTab.WALLET && (
+                      <WalletSystem 
+                        profile={profile} 
+                        transactions={cachedTransactions} 
+                        onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} 
+                        onWithdrawWallet={async (amt, details) => { 
+                          handleProfileUpdate({ balance: profile.balance - amt }); 
+                          notify("info", "Withdrawal Dispatched", `₦${amt.toLocaleString()} routed to external node.`);
+                          return true; 
+                        }} 
+                        onTransfer={async (amt, recipient) => { 
+                          handleProfileUpdate({ balance: profile.balance - amt }); 
+                          notify("success", "Peer Transfer Settled", `₦${amt.toLocaleString()} moved to ${recipient}.`);
+                          return true; 
+                        }} 
+                      />
+                    )}
                     
                     {activeTab === AppTab.TRADE && (
                       <div className="space-y-8">

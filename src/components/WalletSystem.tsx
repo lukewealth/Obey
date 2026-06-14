@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserProfile, Transaction } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Copy, Check, DollarSign, ArrowDownLeft, ArrowUpRight, Send, 
   HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
-  CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp
+  CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp,
+  Activity, ShieldCheck, ArrowRight, Loader2, Sparkles, X, Eye, EyeOff
 } from "lucide-react";
 import api from "../services/api";
 
@@ -17,7 +18,7 @@ interface WalletSystemProps {
 }
 
 export default function WalletSystem({ profile, transactions, onFundWallet, onWithdrawWallet, onTransfer }: WalletSystemProps) {
-  const [activeSubTab, setActiveSubState] = useState<"overview" | "fund" | "withdraw" | "transfer">("overview");
+  const [activeSubTab, setActiveSubState] = useState<"overview" | "fund" | "withdraw" | "transfer" | "card">("overview");
   
   // Funding state
   const [fundMethod, setFundMethod] = useState<"bank" | "card">("bank");
@@ -41,6 +42,11 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
   const [transferProcessing, setTransferProcessing] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
 
+  // Virtual Card State
+  const [cardProvisioning, setCardProvisioning] = useState(false);
+  const [activeVirtualCard, setActiveVirtualCard] = useState<any>(null);
+  const [showCardDetails, setShowCardDetails] = useState(false);
+
   // Copy helper
   const [copiedText, setCopiedText] = useState(false);
   const triggerCopyAccount = () => {
@@ -59,7 +65,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
       if (fundMethod === "card") {
         const [month, year] = expiry.split("/");
         const response = await api.post('/payments/topup-card', {
-          userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id", // Should be real user ID
+          userId: profile.id || profile.email,
           amount: amountVal,
           cardNumber: cardNumber.replace(/\s/g, ""),
           expiryMonth: month,
@@ -105,7 +111,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setWithdrawProcessing(true);
     try {
       const response = await api.post('/payments/withdraw', {
-        userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        userId: profile.id || profile.email,
         amount: amountVal,
         bankName,
         accountNumber
@@ -122,16 +128,44 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     }
   };
 
-  const handleTransferSubmit = (e: React.FormEvent) => {
+  const handleTransferSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const amountVal = parseFloat(transferAmount);
     if (!amountVal || amountVal <= 0 || amountVal > profile.balance) return;
+    
     setTransferProcessing(true);
-    setTimeout(async () => {
-      const isSuccess = await onTransfer(amountVal, recipientEmail);
+    try {
+      const response = await api.post('/payments/transfer', {
+        senderId: profile.id || profile.email,
+        recipientEmail,
+        amount: amountVal
+      });
+
+      if (response.data.success) {
+        await onTransfer(amountVal, recipientEmail);
+        setTransferSuccess(true);
+      }
+    } catch (error: any) {
+      console.error('Transfer failed:', error);
+      alert(error.response?.data?.error || "Transfer failed.");
+    } finally {
       setTransferProcessing(false);
-      if (isSuccess) setTransferSuccess(true);
-    }, 1500);
+    }
+  };
+
+  const handleProvisionCard = () => {
+    setCardProvisioning(true);
+    // Simulate Interswitch Virtual Card API sequence
+    setTimeout(() => {
+      setActiveVirtualCard({
+        number: "4422 8812 9010 4422",
+        expiry: "06/29",
+        cvv: "882",
+        holder: profile.name.toUpperCase(),
+        brand: "Visa Platinum"
+      });
+      setCardProvisioning(false);
+    }, 3200);
   };
 
   const resetAllSubFlows = () => {
@@ -155,11 +189,11 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
       {/* Header & Tab Selector */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Treasury Operations</h2>
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left uppercase italic">Treasury Operations</h2>
           <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Manage your institutional liquidity nodes.</p>
         </div>
         
-        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto">
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[
             { id: "overview", label: "Dashboard", icon: LayoutDashboard },
             { id: "fund", label: "Fund", icon: ArrowDownLeft },
@@ -169,7 +203,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             <button
               key={tab.id}
               onClick={() => { resetAllSubFlows(); setActiveSubState(tab.id as any); }}
-              className={`px-4 md:px-6 py-2.5 md:py-3 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial ${
+              className={`px-4 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
                 activeSubTab === tab.id 
                   ? "bg-primary text-white shadow-lg shadow-primary/20" 
                   : "text-gray-400 hover:text-gray-900"
@@ -177,6 +211,9 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             >
               <tab.icon size={16} />
               {tab.label}
+              {activeSubTab === tab.id && (
+                <motion.div layoutId="treasury-tab" className="absolute inset-0 bg-primary rounded-[14px] md:rounded-[18px] -z-10" />
+              )}
             </button>
           ))}
         </div>
@@ -199,20 +236,20 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                 
                 <div className="space-y-4 md:space-y-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center shadow-inner">
                       <Wallet size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
                       <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Treasury Balance</p>
-                      <p className="text-xs md:text-sm font-bold text-gray-900">Primary USD Liquidity Node</p>
+                      <p className="text-xs md:text-sm font-bold text-gray-900">Institutional NGN Liquidity Node</p>
                     </div>
                   </div>
                   
                   <div className="flex items-baseline gap-2 md:gap-4 overflow-hidden">
                     <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-none truncate">
-                      ${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      ₦{profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </span>
-                    <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono shrink-0">USD</span>
+                    <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono shrink-0">NGN</span>
                   </div>
                 </div>
 
@@ -239,7 +276,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                  
                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-[18px] md:rounded-[22px] flex items-center justify-center text-gray-400 border border-gray-100 group-hover:border-primary/20 group-hover:text-primary transition-all shrink-0">
+                      <div className="w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-[18px] md:rounded-[22px] flex items-center justify-center text-gray-400 border border-gray-100 group-hover:border-primary/20 group-hover:text-primary transition-all shrink-0 shadow-sm">
                         <Landmark size={24} className="md:w-7 md:h-7" />
                       </div>
                       <div>
@@ -247,18 +284,18 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                         <p className="text-xs md:text-sm text-gray-400 font-medium">Auto-settlement account ID</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 self-start sm:self-auto">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 self-start sm:self-auto shadow-sm">
                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
                        Operational
                     </div>
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 relative z-10">
-                    <div className="p-5 md:p-6 bg-gray-50/50 rounded-[20px] md:rounded-[24px] border border-gray-100 space-y-2">
+                    <div className="p-5 md:p-6 bg-gray-50/50 rounded-[20px] md:rounded-[24px] border border-gray-100 space-y-2 shadow-inner">
                        <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Clearing Bank</p>
                        <p className="text-base md:text-lg font-black text-gray-900">OBEY Global Settlement</p>
                     </div>
-                    <div className="p-5 md:p-6 bg-accent-blue/40 rounded-[20px] md:rounded-[24px] border border-blue-100 space-y-2 group/acc">
+                    <div className="p-5 md:p-6 bg-accent-blue/40 rounded-[20px] md:rounded-[24px] border border-blue-100 space-y-2 group/acc shadow-inner">
                        <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Number</p>
                        <div className="flex items-center justify-between">
                           <p className="text-xl md:text-2xl font-mono font-black text-primary tracking-widest leading-none pt-1">8829104422</p>
@@ -272,8 +309,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     </div>
                  </div>
 
-                 <div className="p-4 md:p-5 bg-white/40 backdrop-blur-md rounded-[20px] md:rounded-[24px] border border-white flex items-center gap-4 md:gap-5">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 text-amber-600 rounded-[14px] md:rounded-2xl flex items-center justify-center shrink-0">
+                 <div className="p-4 md:p-5 bg-white/40 backdrop-blur-md rounded-[20px] md:rounded-[24px] border border-white flex items-center gap-4 md:gap-5 shadow-sm">
+                    <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-100 text-amber-600 rounded-[14px] md:rounded-[22px] flex items-center justify-center shrink-0 shadow-inner">
                        <Shield size={20} className="md:w-6 md:h-6" />
                     </div>
                     <p className="text-[11px] md:text-xs text-gray-500 font-medium leading-relaxed">
@@ -285,48 +322,89 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
             {/* Side Content */}
             <div className="lg:col-span-4 space-y-6 md:space-y-8">
-               <div className="bento-card p-8 md:p-10 space-y-8 md:space-y-10">
-                  <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] md:tracking-[0.3em]">Node Allocation</h4>
-                  <div className="space-y-6 md:space-y-8">
-                    {[
-                      { label: "Fiat Reserves", val: 65, color: "bg-primary", text: "text-primary" },
-                      { label: "Digital Assets", val: 35, color: "bg-secondary", text: "text-secondary" }
-                    ].map((node) => (
-                      <div key={node.label} className="space-y-3">
-                        <div className="flex justify-between items-end">
-                          <p className="text-xs md:text-sm font-black text-gray-900">{node.label}</p>
-                          <p className={`text-xs md:text-sm font-mono font-black ${node.text}`}>{node.val}%</p>
-                        </div>
-                        <div className="w-full h-2 md:h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                           <motion.div 
-                            initial={{ width: 0 }}
-                            animate={{ width: `${node.val}%` }}
-                            transition={{ duration: 1.5, ease: "easeOut" }}
-                            className={`${node.color} h-full rounded-full shadow-lg shadow-black/5`}
-                           ></motion.div>
-                        </div>
-                      </div>
-                    ))}
+               {/* Virtual Card Node */}
+               <div className="bento-card p-6 md:p-8 space-y-6 relative overflow-hidden group">
+                  <div className="flex items-center justify-between">
+                     <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Institutional Card</h4>
+                     <CreditCard size={16} className="text-primary" />
                   </div>
-                  <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
-                     <span className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Index</span>
-                     <div className="flex items-center gap-1.5 text-emerald-600 font-black text-[12px] md:text-[13px]">
-                        <TrendingUp size={14} /> +12.4%
-                     </div>
-                  </div>
+
+                  <AnimatePresence mode="wait">
+                    {activeVirtualCard ? (
+                      <motion.div 
+                        key="card-active"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="space-y-6"
+                      >
+                         <div className="aspect-[1.586/1] w-full bg-gradient-to-br from-gray-900 to-[#0b0e14] rounded-[24px] p-6 text-white flex flex-col justify-between shadow-2xl relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-4 opacity-20"><Zap size={40} /></div>
+                            <div className="flex justify-between items-start">
+                               <span className="text-lg font-black italic tracking-tighter">OBEY</span>
+                               <ShieldCheck size={20} className="text-emerald-500" />
+                            </div>
+                            <div className="space-y-4">
+                               <p className="font-mono text-lg md:text-xl tracking-[0.2em] font-black truncate">
+                                  {showCardDetails ? activeVirtualCard.number : "•••• •••• •••• 4422"}
+                                </p>
+                                <div className="flex justify-between items-end">
+                                   <div className="space-y-1">
+                                      <p className="text-[7px] uppercase tracking-widest text-white/40 font-black">HOLDER</p>
+                                      <p className="text-[10px] font-bold">{activeVirtualCard.holder}</p>
+                                   </div>
+                                   <div className="text-right space-y-1">
+                                      <p className="text-[7px] uppercase tracking-widest text-white/40 font-black">EXPIRY / CVV</p>
+                                      <p className="text-[10px] font-bold">{activeVirtualCard.expiry} / {showCardDetails ? activeVirtualCard.cvv : "•••"}</p>
+                                   </div>
+                                </div>
+                            </div>
+                         </div>
+                         <button 
+                          onClick={() => setShowCardDetails(!showCardDetails)}
+                          className="w-full h-12 bg-gray-50 border border-gray-100 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white transition-all shadow-sm"
+                         >
+                           {showCardDetails ? <EyeOff size={14} /> : <Eye size={14} />} {showCardDetails ? "Obfuscate Details" : "Reveal Credentials"}
+                         </button>
+                      </motion.div>
+                    ) : (
+                      <motion.div 
+                        key="card-empty"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="space-y-6 py-4 text-center"
+                      >
+                         <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300 shadow-inner">
+                            <CreditCard size={32} />
+                         </div>
+                         <div className="space-y-1">
+                            <p className="text-sm font-black text-gray-900 uppercase tracking-tight">Convert to Virtual Node</p>
+                            <p className="text-[10px] text-gray-400 font-medium px-4">Instant Visa Platinum provisioning via Interswitch Mesh.</p>
+                         </div>
+                         <button 
+                          onClick={handleProvisionCard}
+                          disabled={cardProvisioning}
+                          className="w-full h-14 bg-primary text-white rounded-[18px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 flex items-center justify-center gap-3 active-press"
+                         >
+                            {cardProvisioning ? <Loader2 className="animate-spin" size={18} /> : <>Provision Card <ArrowRight size={16} /></>}
+                         </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                </div>
 
-               <div className="bg-primary rounded-[35px] md:rounded-[45px] p-8 md:p-10 text-white relative overflow-hidden shadow-2xl shadow-primary/30 group">
+               <div className="bg-gray-900 rounded-[35px] md:rounded-[45px] p-8 md:p-10 text-white relative overflow-hidden shadow-2xl group">
                   <div className="absolute inset-0 shimmer opacity-10"></div>
-                  <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
-                  <div className="relative z-10 space-y-4 md:space-y-6">
-                    <Shield size={28} className="text-white/80 md:w-8 md:h-8" />
-                    <h5 className="text-xl md:text-2xl font-black tracking-tight leading-tight">Institutional <br /> Protection.</h5>
+                  <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-primary/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
+                  <div className="relative z-10 space-y-4 md:space-y-6 text-center sm:text-left">
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-[20px] md:rounded-[24px] flex items-center justify-center text-white border border-white/10 backdrop-blur-md mx-auto sm:mx-0 shadow-lg">
+                       <ShieldCheck size={28} className="text-white md:w-8 md:h-8" />
+                    </div>
+                    <h5 className="text-xl md:text-2xl font-black tracking-tight leading-tight uppercase italic">Vault Guard</h5>
                     <p className="text-white/60 font-medium text-xs md:text-sm leading-relaxed">
-                       Your assets are backed by multi-signature cold storage and bank-grade insurance policies.
+                       Your assets are backed by multi-signature cold storage and institutional insurance policies.
                     </p>
                     <button className="text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em] border-b-2 border-white/20 hover:border-white transition-all pb-1.5">
-                       VIEW POLICY
+                       Audit Certificate
                     </button>
                   </div>
                </div>
@@ -353,18 +431,18 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                       <Check size={32} className="md:w-12 md:h-12" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">Settlement Successful</h2>
+                      <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Settlement Successful</h2>
                       <p className="text-sm md:text-base text-gray-500 font-medium">Your treasury balance has been updated via {fundMethod.toUpperCase()} node.</p>
                     </div>
-                    <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-8 space-y-6 text-left border border-gray-100">
+                    <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-8 space-y-6 text-left border border-gray-100 shadow-inner">
                       <div className="flex justify-between items-center">
-                        <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
-                        <span className="text-2xl md:text-3xl font-black text-gray-900">${fundReceipt.amount.toLocaleString()}</span>
+                        <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Magnitude</span>
+                        <span className="text-2xl md:text-3xl font-black text-gray-900">₦{fundReceipt.amount.toLocaleString()}</span>
                       </div>
                       <div className="h-px bg-gray-200"></div>
                       <div className="grid grid-cols-2 gap-4 md:gap-8">
                          <div className="space-y-1">
-                          <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">ID Reference</p>
+                          <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Node ID</p>
                           <p className="text-[11px] md:text-sm font-bold text-gray-900 font-mono uppercase truncate">{fundReceipt.id}</p>
                         </div>
                         <div className="space-y-1 text-right">
@@ -374,19 +452,19 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                       </div>
                     </div>
                     <div className="flex flex-col gap-3 md:gap-4">
-                      <button className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl shadow-primary/20 active-press">
-                        Download Report
+                      <button className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
+                        Download PDF Receipt
                       </button>
                       <button onClick={resetAllSubFlows} className="text-xs md:text-sm font-black text-gray-400 hover:text-gray-900 tracking-widest uppercase py-2">
-                        Dismiss
+                        Dismiss Operations
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                     <div className="space-y-2 text-center md:text-left">
-                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Node Funding</h3>
-                       <p className="text-sm md:text-lg text-gray-500 font-medium">Inject liquidity into your USD treasury.</p>
+                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Node Funding</h3>
+                       <p className="text-sm md:text-lg text-gray-500 font-medium">Inject liquidity into your NGN treasury.</p>
                     </div>
 
                     <div className="flex bg-gray-100 p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200/50">
@@ -410,7 +488,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                     <form onSubmit={handleFundSubmit} className="space-y-8">
                        {fundMethod === "bank" ? (
-                          <div className="bg-accent-blue/30 border border-blue-100 p-6 md:p-8 rounded-[24px] md:rounded-[32px] space-y-6">
+                          <div className="bg-accent-blue/30 border border-blue-100 p-6 md:p-8 rounded-[24px] md:rounded-[32px] space-y-6 shadow-inner">
                              <div className="flex items-center gap-4">
                                 <Landmark size={20} className="text-primary md:w-6 md:h-6" />
                                 <span className="text-base md:text-lg font-black text-primary tracking-tight">Direct Settlement</span>
@@ -427,14 +505,14 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <div className="space-y-5 md:space-y-6">
                              <div className="space-y-2 md:space-y-3">
                                 <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account Holder</label>
-                                <input type="text" required placeholder="Felix Anderson" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                                <input type="text" required placeholder="Felix Anderson" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" />
                              </div>
                              <div className="space-y-2 md:space-y-3">
                                 <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Card Identifier</label>
                                 <input 
                                   type="text" required 
                                   value={cardNumber} onChange={(e) => setCardNumber(e.target.value)}
-                                  placeholder="•••• •••• •••• 8824" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                  placeholder="•••• •••• •••• 8824" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" 
                                 />
                              </div>
                              <div className="grid grid-cols-2 gap-4 md:gap-6">
@@ -443,7 +521,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                                    <input 
                                       type="text" required 
                                       value={expiry} onChange={(e) => setExpiry(e.target.value)}
-                                      placeholder="06/28" className="w-full h-14 md:h-16 px-4 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-center text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                      placeholder="06/28" className="w-full h-14 md:h-16 px-4 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-center text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" 
                                    />
                                 </div>
                                 <div className="space-y-2 md:space-y-3">
@@ -451,7 +529,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                                    <input 
                                       type="password" required 
                                       value={cvc} onChange={(e) => setCvc(e.target.value)}
-                                      placeholder="•••" className="w-full h-14 md:h-16 px-4 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-center text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                      placeholder="•••" className="w-full h-14 md:h-16 px-4 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-center text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" 
                                    />
                                 </div>
                              </div>
@@ -459,16 +537,16 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        )}
 
                        <div className="space-y-3 md:space-y-4">
-                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center block">Funding Magnitude (USD)</label>
+                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] text-center block">Funding Magnitude (NGN)</label>
                           <div className="relative">
-                            <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
+                            <span className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary font-black text-2xl md:text-4xl">₦</span>
                             <input
                               type="number"
                               required
                               value={fundAmount}
                               onChange={(e) => setFundAmount(e.target.value)}
                               placeholder="0.00"
-                              className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                              className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none tracking-tighter transition-all shadow-inner"
                             />
                           </div>
                        </div>
@@ -476,9 +554,9 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        <button
                         type="submit"
                         disabled={paymentProcessing || !fundAmount}
-                        className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                        className="w-full h-16 md:h-20 bg-primary hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
                       >
-                        {paymentProcessing ? <RefreshCw className="animate-spin" size={24} /> : "Authorize Settlement"}
+                        {paymentProcessing ? <Loader2 className="animate-spin" size={24} /> : "Authorize Settlement"}
                       </button>
                     </form>
                   </div>
@@ -490,21 +568,21 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                 withdrawSuccess ? (
                   <div className="bg-white border border-gray-100 rounded-[35px] md:rounded-[45px] p-8 md:p-12 text-center shadow-2xl space-y-8 md:space-y-10 relative overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-2 bg-primary"></div>
-                    <div className="w-16 h-16 md:w-24 md:h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
-                      <ArrowUpRight size={32} className="md:w-12 md:h-12" />
+                    <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                      <Check size={32} className="md:w-12 md:h-12" />
                     </div>
                     <div className="space-y-2">
                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Liquidity Dispatched</h2>
                        <p className="text-sm md:text-lg text-gray-500 font-medium">Funds have been routed to your external clearing node via Interswitch Payout.</p>
                     </div>
-                    <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
+                    <button onClick={resetAllSubFlows} className="w-full bg-[#0b0e14] text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press hover:bg-black transition-all">
                       Return to Treasury
                     </button>
                   </div>
                 ) : (
                   <form onSubmit={handleWithdrawalSubmit} className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                     <div className="space-y-2 text-center md:text-left">
-                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Withdrawal Dispatch</h3>
+                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Withdrawal Dispatch</h3>
                        <p className="text-sm md:text-lg text-gray-500 font-medium">Send assets to your external bank clearing account.</p>
                     </div>
 
@@ -513,8 +591,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Destination Bank</label>
                           <input 
                             type="text" required value={bankName} onChange={(e) => setBankName(e.target.value)} 
-                            placeholder="Chase, Wells Fargo, etc." 
-                            className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                            placeholder="Zenith, GTBank, Kuda, etc." 
+                            className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" 
                           />
                        </div>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -523,23 +601,23 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                              <input 
                                 type="text" required 
                                 value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)}
-                                placeholder="•••• •••• ••••" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                                placeholder="•••• •••• ••••" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" 
                              />
                           </div>
                           <div className="space-y-2 md:space-y-3">
-                             <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Routing Node</label>
-                             <input type="text" placeholder="012345678" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" />
+                             <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Bank Code</label>
+                             <input type="text" placeholder="044" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-mono font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" />
                           </div>
                        </div>
                     </div>
 
                     <div className="space-y-4">
                        <div className="flex justify-between items-center px-4">
-                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (USD)</label>
-                          <span className="text-[9px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
+                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (NGN)</label>
+                          <span className="text-[9px] md:text-[11px] font-black text-primary">AVAIL: ₦{profile.balance.toLocaleString()}</span>
                        </div>
                        <div className="relative">
-                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
+                          <span className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary font-black text-2xl md:text-4xl">₦</span>
                           <input
                             type="number"
                             required
@@ -547,7 +625,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                             value={withdrawAmount}
                             onChange={(e) => setWithdrawAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                            className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none tracking-tighter transition-all shadow-inner"
                           />
                        </div>
                     </div>
@@ -555,9 +633,9 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     <button
                       type="submit"
                       disabled={withdrawProcessing || !withdrawAmount}
-                      className="w-full h-16 md:h-20 bg-gray-900 hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press"
+                      className="w-full h-16 md:h-20 bg-[#0b0e14] hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press"
                     >
-                      {withdrawProcessing ? <RefreshCw className="animate-spin" size={24} /> : "Initiate Cashout"}
+                      {withdrawProcessing ? <Loader2 className="animate-spin" size={24} /> : "Initiate Cashout"}
                     </button>
                   </form>
                 )
@@ -582,22 +660,22 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                 ) : (
                   <form onSubmit={handleTransferSubmit} className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                     <div className="space-y-2 text-center md:text-left">
-                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Peer Transfer</h3>
+                       <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Peer Transfer</h3>
                        <p className="text-sm md:text-lg text-gray-500 font-medium">Internal settlement between high-fidelity nodes.</p>
                     </div>
 
                     <div className="space-y-3">
                        <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Target Node (Email)</label>
-                       <div className="relative">
+                       <div className="relative group">
                           <input
                             type="email"
                             required
                             value={recipientEmail}
                             onChange={(e) => setRecipientEmail(e.target.value)}
                             placeholder="hello@obey.finance"
-                            className="w-full h-16 md:h-20 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-lg md:text-xl font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+                            className="w-full h-16 md:h-20 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-lg md:text-xl font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner"
                           />
-                          <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-accent-blue rounded-lg md:rounded-xl flex items-center justify-center text-primary shadow-sm">
+                          <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-accent-blue rounded-lg md:rounded-xl flex items-center justify-center text-primary shadow-sm group-focus-within:bg-primary group-focus-within:text-white transition-all">
                              <Check size={16} className="md:w-5 md:h-5" />
                           </div>
                        </div>
@@ -605,11 +683,11 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                     <div className="space-y-4">
                        <div className="flex justify-between items-center px-4">
-                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (USD)</label>
-                          <span className="text-[9px] md:text-[11px] font-black text-primary">LIMIT: $50,000.00</span>
+                          <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (NGN)</label>
+                          <span className="text-[9px] md:text-[11px] font-black text-primary">LIMIT: ₦1,000,000.00</span>
                        </div>
                        <div className="relative">
-                          <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
+                          <span className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary font-black text-2xl md:text-4xl">₦</span>
                           <input
                             type="number"
                             required
@@ -617,7 +695,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                             value={transferAmount}
                             onChange={(e) => setTransferAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-2 focus:ring-primary/10 outline-none tracking-tighter transition-all"
+                            className="w-full h-20 md:h-24 pl-16 md:pl-20 pr-6 md:pr-10 bg-gray-50 border border-gray-100 rounded-[28px] md:rounded-[35px] text-3xl md:text-5xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none tracking-tighter transition-all shadow-inner"
                           />
                        </div>
                     </div>
@@ -625,9 +703,9 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     <button
                       type="submit"
                       disabled={transferProcessing || !transferAmount}
-                      className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                      className="w-full h-16 md:h-20 bg-primary hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
                     >
-                      {transferProcessing ? <RefreshCw className="animate-spin" size={24} /> : "Confirm Dispatch"}
+                      {transferProcessing ? <Loader2 className="animate-spin" size={24} /> : "Confirm Dispatch"}
                     </button>
                   </form>
                 )

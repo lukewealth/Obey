@@ -21,7 +21,8 @@ const TransactionSchema = new mongoose.Schema({
   },
   recipientWallet: { type: String },
   network: { type: String },
-  brand: { type: String }
+  brand: { type: String },
+  requestReference: { type: String }
 }, { timestamps: true });
 
 export const Transaction = mongoose.model('Transaction', TransactionSchema);

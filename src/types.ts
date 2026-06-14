@@ -57,6 +57,7 @@ export interface Transaction {
   brand?: string;
   assetName?: string;
   faceValue?: number;
+  requestReference?: string;
 }
 
 export interface CryptoAsset {
