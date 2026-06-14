@@ -4,8 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ArrowDownLeft, Check, RefreshCw, DollarSign, 
   TrendingUp, TrendingDown, Coins, HelpCircle, ShieldAlert, Award,
-  ChevronRight, BarChart3, Search, Zap, Star, Activity, ArrowRight, ShieldCheck
+  ChevronRight, BarChart3, Search, Zap, Star, Activity, ArrowRight, ShieldCheck,
+  ShoppingCart, X, Loader2, Play, LayoutGrid, List, CheckCircle2, Lock
 } from "lucide-react";
+import api from "../services/api";
+import { useNotification } from "./NotificationSystem";
 
 interface CryptoSystemProps {
   profile: UserProfile;
@@ -15,6 +18,8 @@ interface CryptoSystemProps {
 }
 
 export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompleted }: CryptoSystemProps) {
+  const { notify } = useNotification();
+  const [activeTab, setActiveTab] = useState<"PLATFORM" | "P2P">("PLATFORM");
   const [assets, setAssets] = useState<CryptoAsset[]>([
     { symbol: 'BTC', name: 'Bitcoin', price: btcPrice, prevPrice: btcPrice, priceChangePercent: 2.45, logo: '₿', balance: 0.045, history: [62000, 62150, 62400, 62300, 63100, 64231] },
     { symbol: 'ETH', name: 'Ethereum', price: ethPrice, prevPrice: ethPrice, priceChangePercent: 1.82, logo: 'E', balance: 0.85, history: [3380, 3400, 3390, 3420, 3460, 3452] },
@@ -28,7 +33,29 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
   const [processing, setProcessing] = useState(false);
   const [orderReceipt, setOrderReceipt] = useState<any | null>(null);
 
+  // P2P State
+  const [marketListings, setMarketListings] = useState<any[]>([]);
+  const [loadingMarket, setLoadingMarket] = useState(false);
+  const [showListingModal, setShowListingModal] = useState(false);
+  const [listingForm, setListingForm] = useState({ amount: "", price: "" });
+
   const activeAsset = assets.find(a => a.symbol === selectedSymbol) || assets[0];
+
+  const fetchMarketListings = async () => {
+    setLoadingMarket(true);
+    try {
+      const res = await api.get('/crypto-market/market');
+      setMarketListings(res.data);
+    } catch (error) {
+      console.error("Crypto market fetch error:", error);
+    } finally {
+      setLoadingMarket(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'P2P') fetchMarketListings();
+  }, [activeTab]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -54,21 +81,13 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    setAssets(prev => prev.map(a => {
-      if (a.symbol === 'BTC') return { ...a, price: btcPrice };
-      if (a.symbol === 'ETH') return { ...a, price: ethPrice };
-      return a;
-    }));
-  }, [btcPrice, ethPrice]);
-
   const executeTrade = (e: React.FormEvent) => {
     e.preventDefault();
     const val = parseFloat(fiatValue);
     if (!val || val <= 0) return;
 
     if (tradeType === "buy" && val > profile.balance) {
-      alert("Insufficient capital reserves.");
+      notify("error", "Insufficient Reserves", "Vault balance too low.");
       return;
     }
 
@@ -93,6 +112,51 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
     }, 1500);
   };
 
+  const handleListCrypto = async () => {
+    if (!listingForm.amount || !listingForm.price) {
+      notify("error", "Parameters Required", "Specify amount and price node.");
+      return;
+    }
+    setProcessing(true);
+    try {
+      const res = await api.post('/crypto-market/list', {
+        sellerId: "user-id",
+        sellerName: profile.name,
+        assetSymbol: selectedSymbol,
+        amount: parseFloat(listingForm.amount),
+        priceInUSD: parseFloat(listingForm.price)
+      });
+      if (res.data.success) {
+        notify("success", "Liquidity Locked", "Asset node broadcasted to marketplace.");
+        setShowListingModal(false);
+        fetchMarketListings();
+      }
+    } catch (error) {
+      notify("error", "Broadcast Failed", "Network terminal failure.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handlePurchaseListing = async (listingId: string) => {
+    setProcessing(true);
+    try {
+      const res = await api.post('/crypto-market/purchase', {
+        buyerId: "user-id",
+        listingId
+      });
+      if (res.data.success) {
+        notify("success", "Acquisition Authorized", "Funds locked in escrow node.");
+        setOrderReceipt(res.data.transaction);
+        fetchMarketListings();
+      }
+    } catch (error) {
+      notify("error", "Acquisition Failed", "Insufficient reserves or node filled.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const generateSparklineSvg = (history: number[]) => {
     const min = Math.min(...history);
     const max = Math.max(...history);
@@ -113,6 +177,12 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
     exit: { opacity: 0, scale: 0.98 }
   };
 
+  const containerVariants = {
+    initial: { opacity: 0, y: 10 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -10 }
+  };
+
   return (
     <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       {/* Page Header */}
@@ -121,9 +191,25 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
           <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Trading Terminal</h2>
           <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Institutional market access with sub-second settlement.</p>
         </div>
-        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-100 rounded-full text-emerald-600 self-center md:self-auto">
-           <Activity size={16} className="animate-pulse" />
-           <span className="text-[10px] font-black uppercase tracking-widest">Global liquidity node active</span>
+        
+        <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm self-center md:self-auto">
+          {[
+            { id: "PLATFORM", label: "Instant Swap", icon: Zap },
+            { id: "P2P", label: "P2P Market", icon: ShoppingCart }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => { setOrderReceipt(null); setActiveTab(tab.id as any); }}
+              className={`px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
+                activeTab === tab.id 
+                  ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                  : "text-gray-400 hover:text-gray-900"
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -141,9 +227,9 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
             
             <div className="space-y-4">
               <div className="w-16 h-16 md:w-24 md:h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
-                <Check size={32} className="md:w-12 md:h-12" />
+                <CheckCircle2 size={48} className="md:w-12 md:h-12" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">Order Executed</h2>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Order Executed</h2>
               <p className="text-sm md:text-base text-gray-500 font-medium leading-relaxed">Your digital assets have been settled into your vault node.</p>
             </div>
 
@@ -151,18 +237,18 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
               <div className="flex justify-between items-center gap-4">
                 <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Volume Settled</span>
                 <span className={`text-xl md:text-3xl font-black ${orderReceipt.type === "buy" ? "text-emerald-600" : "text-red-500"}`}>
-                  {orderReceipt.type === "buy" ? "+" : "-"}{orderReceipt.cryptoAmount.toFixed(5)} {orderReceipt.symbol}
+                   {orderReceipt.cryptoAmount?.toFixed(5) || orderReceipt.amount} {orderReceipt.symbol || orderReceipt.brand}
                 </span>
               </div>
               <div className="h-px bg-gray-200"></div>
               <div className="grid grid-cols-2 gap-8 md:gap-12">
                 <div className="space-y-1">
                   <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Fiat Value</p>
-                  <p className="text-base md:text-lg font-black text-gray-900">${orderReceipt.fiatAmount.toLocaleString()}</p>
+                  <p className="text-base md:text-lg font-black text-gray-900">${orderReceipt.fiatAmount?.toLocaleString() || orderReceipt.amount.toLocaleString()}</p>
                 </div>
                 <div className="space-y-1 text-right">
-                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Execution Rate</p>
-                  <p className="text-base md:text-lg font-black text-gray-900 font-mono tracking-tighter">${orderReceipt.executionPrice.toLocaleString()}</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Node Reference</p>
+                  <p className="text-base md:text-lg font-black text-gray-900 font-mono tracking-tighter truncate max-w-[150px]">{orderReceipt.id}</p>
                 </div>
               </div>
             </div>
@@ -170,6 +256,89 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
             <button onClick={() => setOrderReceipt(null)} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
               Return to Terminal
             </button>
+          </motion.div>
+        ) : activeTab === "P2P" ? (
+          <motion.div key="p2p-market" variants={containerVariants} initial="initial" animate="animate" exit="exit" className="space-y-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+               <div className="relative group w-full md:w-96">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                  <input type="text" placeholder="Search crypto nodes..." className="w-full h-14 pl-12 pr-6 bg-white border border-gray-200 rounded-2xl font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all" />
+               </div>
+               <button onClick={() => setShowListingModal(true)} className="w-full md:w-auto px-10 h-14 bg-black text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl active-press">
+                 <Lock size={18} /> Sell to Marketplace
+               </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+               {loadingMarket ? Array(6).fill(0).map((_, i) => <div key={i} className="h-64 bg-gray-100 animate-pulse rounded-[32px]"></div>) : marketListings.length > 0 ? (
+                 marketListings.map((listing) => (
+                   <motion.div key={listing.id} whileHover={{ y: -5 }} className="bg-white border border-gray-100 p-8 rounded-[35px] shadow-xl hover:shadow-2xl transition-all group relative overflow-hidden">
+                     <div className="flex justify-between items-start mb-6">
+                        <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-primary text-2xl shadow-inner group-hover:bg-primary/5 transition-colors">
+                           {listing.assetSymbol === 'BTC' ? <Star /> : <Zap />}
+                        </div>
+                        <div className="text-right">
+                           <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Rate</p>
+                           <p className="text-lg font-black text-gray-900">${listing.rate.toLocaleString()}</p>
+                        </div>
+                     </div>
+                     <div className="space-y-1 mb-8">
+                        <h4 className="text-2xl font-black text-gray-900 tracking-tight">{listing.amount} {listing.assetSymbol}</h4>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Listed by {listing.sellerName}</p>
+                     </div>
+                     <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+                        <div>
+                           <p className="text-[9px] font-black text-primary uppercase tracking-widest mb-1">Magnitude</p>
+                           <p className="text-2xl font-black text-primary font-mono tracking-tighter">${listing.priceInUSD.toLocaleString()}</p>
+                        </div>
+                        <button onClick={() => handlePurchaseListing(listing.id)} className="h-14 px-6 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all active-press shadow-lg shadow-primary/20">
+                          Buy <ArrowRight size={14} />
+                        </button>
+                     </div>
+                   </motion.div>
+                 ))
+               ) : (
+                 <div className="col-span-full py-32 text-center space-y-4">
+                    <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto"><ShoppingCart size={40} /></div>
+                    <p className="text-sm font-black text-gray-400 uppercase tracking-widest">No active liquidity nodes</p>
+                 </div>
+               )}
+            </div>
+
+            <AnimatePresence>
+               {showListingModal && (
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/80 backdrop-blur-xl z-[100] flex items-center justify-center p-6">
+                    <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }} className="bg-white w-full max-w-xl rounded-[45px] p-8 md:p-12 space-y-8 relative overflow-hidden">
+                       <button onClick={() => setShowListingModal(false)} className="absolute top-8 right-8 text-gray-400 hover:text-black transition-colors"><X size={24} /></button>
+                       <div className="space-y-1">
+                          <h3 className="text-3xl font-black text-gray-900 tracking-tighter uppercase">List Liquidity</h3>
+                          <p className="text-gray-500 font-medium">Define your asset node parameters.</p>
+                       </div>
+                       <div className="space-y-6">
+                          <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Select Asset</label>
+                                <select value={selectedSymbol} onChange={(e) => setSelectedSymbol(e.target.value)} className="w-full h-14 px-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none">
+                                   {assets.map(a => <option key={a.symbol} value={a.symbol}>{a.name}</option>)}
+                                </select>
+                             </div>
+                             <div className="space-y-2">
+                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Amount</label>
+                                <input type="number" placeholder="0.00" value={listingForm.amount} onChange={(e) => setListingForm({...listingForm, amount: e.target.value})} className="w-full h-14 px-4 bg-gray-50 border border-gray-100 rounded-2xl font-bold outline-none" />
+                             </div>
+                          </div>
+                          <div className="space-y-2">
+                             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Target Price ($)</label>
+                             <input type="number" placeholder="0.00" value={listingForm.price} onChange={(e) => setListingForm({...listingForm, price: e.target.value})} className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-[22px] text-2xl font-black text-primary outline-none" />
+                          </div>
+                       </div>
+                       <button onClick={handleListCrypto} className="w-full h-18 bg-primary hover:bg-black text-white rounded-[25px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all active-press flex items-center justify-center gap-3">
+                         {processing ? <Loader2 className="animate-spin" /> : <>Lock and Broadcast <ArrowRight size={20} /></>}
+                       </button>
+                    </motion.div>
+                 </motion.div>
+               )}
+            </AnimatePresence>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start">
@@ -215,7 +384,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                     >
                       <div className="flex items-center gap-3 md:gap-6 shrink-0">
                         <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[14px] md:rounded-[22px] ${isSelected ? 'bg-primary text-white' : 'bg-gray-50 text-gray-400 border border-gray-100'} flex items-center justify-center font-black text-xl md:text-2xl transition-colors shadow-sm`}>
-                          {asset.logo === '₿' ? <Star size={20} fill="currentColor" className="md:w-6 md:h-6" /> : asset.logo === 'E' ? <Zap size={20} fill="currentColor" className="md:w-6 md:h-6" /> : asset.logo}
+                          {asset.symbol === 'BTC' ? <Star size={20} fill="currentColor" className="md:w-6 md:h-6" /> : asset.symbol === 'ETH' ? <Zap size={20} fill="currentColor" className="md:w-6 md:h-6" /> : <Coins size={20} className="md:w-6 md:h-6" />}
                         </div>
                         <div className="overflow-hidden">
                           <p className="text-sm md:text-lg font-black text-gray-900 tracking-tight truncate">{asset.name}</p>
@@ -334,7 +503,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                   type="submit"
                   disabled={processing || !fiatValue}
                   className={`w-full h-16 md:h-20 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center active-press ${
-                    tradeType === "buy" ? "bg-primary shadow-primary/20" : "bg-red-500 shadow-red-500/20"
+                    tradeType === "buy" ? "bg-primary shadow-primary/20" : "bg-red-50 shadow-red-500/20"
                   } disabled:opacity-50`}
                 >
                   {processing ? <RefreshCw className="animate-spin md:w-7 md:h-7" size={24} /> : (
@@ -345,8 +514,8 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, onTradeCompl
                 </button>
               </form>
 
-              <div className="p-5 md:p-6 bg-gray-900 rounded-[24px] md:rounded-[32px] flex gap-4 md:gap-5 relative z-10 text-white">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary shrink-0">
+              <div className="p-5 md:p-6 bg-gray-900 rounded-[24px] md:rounded-[32px] flex gap-4 md:gap-5 relative z-10 text-white shadow-xl">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-white/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary shrink-0 shadow-lg">
                   <ShieldCheck size={20} className="md:w-6 md:h-6" />
                 </div>
                 <div className="space-y-0.5 md:space-y-1">

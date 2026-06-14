@@ -29,11 +29,11 @@ To ensure 100% uptime and data integrity, OBEY utilizes a dual-sync strategy:
   - [x] Motion Animation Hooks: Pass
   - [x] Institutional Branding Consistency: Pass
 
-## 6. GiftCard Marketplace Node (P2P)
-Implemented as a decentralized escrow node within the GiftCard module.
-- **Protocol:** P2P Listing -> Buyer Lock (Escrow) -> Admin Release.
-- **Security:** Secured via `marketLimiter` (10 actions/5m) and Zod-enforced schema validation.
-- **High-Fidelity UI:** Utilizes "Execution Desk" pattern for transactions and "Node Broadcast" for listings.
+## 6. GiftCard & Crypto Marketplace Node (P2P)
+Implemented as decentralized escrow nodes within the Trade module.
+- **Protocol:** P2P Listing (Locking) -> Buyer Lock (Escrow) -> Admin Audit -> Release.
+- **Security:** Secured via `marketLimiter` and Zod-enforced schema validation. Multi-step "Lock for Sell" flow ensures data integrity before broadcast.
+- **High-Fidelity UI:** Utilizes "Execution Desk" pattern for transactions and "Node Broadcast" for P2P liquidity listings.
 
 ## 7. Future Expansion Node
 The architecture supports the addition of **Cross-Chain Yield Aggregators** and **Institutional Liquidity Bridges** by extending the `AppTab` enum and adding corresponding components to the dashboard mesh.

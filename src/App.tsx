@@ -50,6 +50,7 @@ export default function App() {
   const { notify } = useNotification();
   const [currentScreen, setCurrentScreen] = useState<AppScreen>(AppScreen.MARKETING);
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.HOME);
+  const [tradeSubTab, setTradeSubTab] = useState<'crypto' | 'giftcard'>('crypto');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   
@@ -336,9 +337,56 @@ export default function App() {
             <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
-                    {activeTab === AppTab.HOME && <DashboardHome profile={profile} transactions={cachedTransactions} onNavigateTab={setActiveTab} onSelectAction={(action) => { if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET); else setActiveTab(AppTab.SERVICES); }} />}
+                    {activeTab === AppTab.HOME && (
+                      <DashboardHome 
+                        profile={profile} 
+                        transactions={cachedTransactions} 
+                        onNavigateTab={setActiveTab} 
+                        onSelectAction={(action) => { 
+                          if (action === "fund" || action === "withdraw" || action === "transfer") {
+                            setActiveTab(AppTab.WALLET);
+                          } else if (action === "buy-giftcard" || action === "sell-giftcard") {
+                            setActiveTab(AppTab.TRADE);
+                            // We can use a local state to pass down sub-tab preference if needed
+                          } else {
+                            setActiveTab(AppTab.SERVICES);
+                          }
+                        }} 
+                      />
+                    )}
                     {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} onWithdrawWallet={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} onTransfer={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
-                    {activeTab === AppTab.TRADE && <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />}
+                    
+                    {activeTab === AppTab.TRADE && (
+                      <div className="space-y-8">
+                        <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-gray-100 w-fit mx-auto md:mx-0">
+                           <button 
+                            onClick={() => (window as any).setTradeSubTab?.('crypto')}
+                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${(!activeTab || (window as any).tradeSubTab !== 'giftcard') ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                           >
+                             Digital Assets
+                           </button>
+                           <button 
+                            onClick={() => (window as any).setTradeSubTab?.('giftcard')}
+                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${(window as any).tradeSubTab === 'giftcard' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                           >
+                             Gift Cards
+                           </button>
+                        </div>
+                        
+                        <AnimatePresence mode="wait">
+                          {(window as any).tradeSubTab === 'giftcard' ? (
+                            <motion.div key="giftcard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                              <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
+                            </motion.div>
+                          ) : (
+                            <motion.div key="crypto" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+
                     {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
                     {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (

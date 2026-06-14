@@ -166,16 +166,23 @@ router.post('/admin/settle', async (req, res) => {
       tx.status = 'Success';
       await tx.save();
 
-      // Find associated listing if P2P
+      // Find associated listing if P2P GiftCard
       const listing = await GiftCardListing.findOne({ transactionId: txId });
       if (listing) {
         listing.status = 'COMPLETED';
         await listing.save();
-        // Credit the seller
         await User.findOneAndUpdate({ supabaseId: listing.sellerId }, { $inc: { balance: listing.price } });
-      } else if (tx.type === 'Credit') {
-        // Centralized SELL: credit the user
-        await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+      } else {
+        // Check if it's a Crypto P2P Listing
+        const cryptoListing = await CryptoListing.findOne({ transactionId: txId });
+        if (cryptoListing) {
+          cryptoListing.status = 'COMPLETED';
+          await cryptoListing.save();
+          await User.findOneAndUpdate({ supabaseId: cryptoListing.sellerId }, { $inc: { balance: cryptoListing.priceInUSD } });
+        } else if (tx.type === 'Credit') {
+           // Centralized SELL: credit the user
+           await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+        }
       }
     } else if (action === 'REJECT') {
       tx.status = 'Failed';
@@ -187,11 +194,19 @@ router.post('/admin/settle', async (req, res) => {
         listing.buyerId = undefined;
         listing.transactionId = undefined;
         await listing.save();
-        // Refund the buyer
         await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
-      } else if (tx.type === 'Debit') {
-        // Centralized BUY: refund the user
-        await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+      } else {
+        const cryptoListing = await CryptoListing.findOne({ transactionId: txId });
+        if (cryptoListing) {
+          cryptoListing.status = 'OPEN';
+          cryptoListing.buyerId = undefined;
+          cryptoListing.transactionId = undefined;
+          await cryptoListing.save();
+          await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+        } else if (tx.type === 'Debit') {
+           // Centralized BUY: refund the user
+           await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+        }
       }
     }
 

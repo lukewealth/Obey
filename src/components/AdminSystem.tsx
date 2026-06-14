@@ -35,7 +35,7 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
     try {
       const response = await api.get('/sync/transactions/admin-all'); 
       const trades = response.data.filter((tx: any) => 
-        tx.category === 'GiftCard' && 
+        (tx.category === 'GiftCard' || tx.category === 'Crypto') && 
         ['Awaiting Audit', 'Processing', 'Escrow', 'Disputed'].includes(tx.status)
       );
       setEscrowTrades(trades);

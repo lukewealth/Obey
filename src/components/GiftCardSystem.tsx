@@ -34,7 +34,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
   const [marketListings, setMarketListings] = useState<any[]>([]);
   const [loadingMarket, setLoadingMarket] = useState(false);
   const [showListingModal, setShowListingModal] = useState(false);
-  const [listingForm, setListingForm] = useState({ faceValue: "", price: "" });
+  const [listingForm, setListingForm] = useState({ faceValue: "", price: "", rate: "" });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,82 +46,23 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     { id: "5", name: "Razer Gold", buyRate: 880, sellRate: 760, logo: "Razer", icon: Zap, popularity: 85, trending: false }
   ];
 
-  const fetchMarketListings = async () => {
-    setLoadingMarket(true);
-    try {
-      const res = await api.get('/giftcards/market');
-      setMarketListings(res.data);
-    } catch (error) {
-      console.error("Market fetch error:", error);
-    } finally {
-      setLoadingMarket(false);
-    }
+  // Enhanced Sell Logic: Lock for Sell with custom rate
+  const [lockingStep, setLockingStep] = useState<"select" | "rate" | "confirm">("select");
+
+  const handleSelectAssetForLock = (assetName: string) => {
+    setSelectedAsset(assetName);
+    setLockingStep("rate");
   };
 
-  useEffect(() => {
-    if (activeTab === 'P2P') {
-      fetchMarketListings();
-    }
-  }, [activeTab]);
-
-  const handleTrade = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const val = parseFloat(cardValue);
-    if (!val || val <= 0) {
-      notify("error", "Invalid Magnitude", "Please specify a positive asset volume.");
-      return;
-    }
-
-    if (activeTab === GiftCardTab.BUY) {
-      const acquisitionCost = (val * (assets.find(a => a.name === selectedAsset)?.buyRate || 0)) / 1000;
-      if (acquisitionCost > profile.balance) {
-        notify("error", "Insufficient Reserves", "Primary vault liquidity too low for this acquisition.");
-        return;
-      }
-    }
-
-    setProcessing(true);
-    try {
-      const type = activeTab === GiftCardTab.BUY ? "BUY" : "SELL";
-      const activeCardDetails = assets.find(a => a.name === selectedAsset) || assets[0];
-      const totalAmount = activeTab === GiftCardTab.BUY ? (val * activeCardDetails.buyRate / 1000) : (val * activeCardDetails.sellRate / 1000); 
-      
-      const response = await api.post('/giftcards/trade', {
-        userId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
-        type,
-        assetName: selectedAsset,
-        faceValue: val,
-        totalAmount,
-        claimCode: activeTab === GiftCardTab.SELL ? claimCode : null
-      });
-
-      if (response.data.success) {
-        notify("success", "Node Request Logged", response.data.message || "Trade executed successfully.");
-        onTradeCompleted(totalAmount, `${type} ${selectedAsset} Card ($${val})`, type === "SELL");
-        setTradeReceipt({
-          ...response.data.transaction,
-          asset: selectedAsset,
-          faceValue: val,
-          type
-        });
-      }
-    } catch (error: any) {
-      const msg = error.response?.data?.error || "Institutional terminal failure.";
-      notify("error", "Execution Failed", msg);
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const handleListCard = async () => {
+  const handleLockForSell = async () => {
     if (!listingForm.faceValue || !listingForm.price) {
-      notify("error", "Incomplete Data", "Please define all node parameters.");
+      notify("error", "Parameters Required", "Specify face value and target liquidity.");
       return;
     }
     setProcessing(true);
     try {
       const res = await api.post('/giftcards/list', {
-        sellerId: "user-id", // Should be from context
+        sellerId: "user-id",
         sellerName: profile.name,
         assetName: selectedAsset,
         faceValue: parseFloat(listingForm.faceValue),
@@ -129,12 +70,13 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
         claimCode: claimCode
       });
       if (res.data.success) {
-        notify("success", "Node Listed", "Asset broadcasted to the global marketplace.");
-        setShowListingModal(false);
+        notify("success", "Asset Node Locked", "Digital node broadcasted and locked for sell.");
+        setLockingStep("select");
+        setActiveTab('P2P');
         fetchMarketListings();
       }
     } catch (error: any) {
-      notify("error", "Listing Failed", error.response?.data?.error || "Failed to broadcast node.");
+      notify("error", "Broadcast Failed", "Network terminal failure.");
     } finally {
       setProcessing(false);
     }
@@ -267,6 +209,85 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
             >
               Back to Terminal
             </button>
+          </motion.div>
+        ) : activeTab === GiftCardTab.SELL ? (
+          <motion.div 
+            key="sell-lock-flow"
+            variants={containerVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="space-y-10"
+          >
+            <div className="text-center space-y-2">
+               <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tighter uppercase">Lock for Sale</h3>
+               <p className="text-gray-500 font-medium max-w-lg mx-auto">Select a digital asset and define your liquidation parameters.</p>
+            </div>
+
+            <AnimatePresence mode="wait">
+               {lockingStep === "select" && (
+                 <motion.div key="step-1" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    {assets.map((asset) => (
+                      <motion.button
+                        key={asset.id}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        onClick={() => handleSelectAssetForLock(asset.name)}
+                        className="bg-white border border-gray-100 p-8 rounded-[35px] flex flex-col items-center justify-center gap-6 shadow-xl hover:shadow-2xl transition-all"
+                      >
+                         <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center text-primary text-3xl shrink-0"><asset.icon size={32} /></div>
+                         <span className="font-black text-gray-900 uppercase text-xs tracking-widest">{asset.name}</span>
+                      </motion.button>
+                    ))}
+                 </motion.div>
+               )}
+
+               {lockingStep === "rate" && (
+                 <motion.div key="step-2" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="max-w-xl mx-auto bento-card p-8 md:p-12 space-y-8">
+                    <div className="flex items-center gap-4 border-b border-gray-100 pb-8">
+                       <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary"><Tag size={24} /></div>
+                       <h4 className="text-xl font-black text-gray-900 tracking-tight">{selectedAsset} Parameters</h4>
+                    </div>
+
+                    <div className="space-y-6">
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Asset Magnitude ($)</label>
+                          <input 
+                            type="number" 
+                            value={listingForm.faceValue} 
+                            onChange={(e) => setListingForm({...listingForm, faceValue: e.target.value})}
+                            placeholder="0.00" 
+                            className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-2xl text-2xl font-black focus:ring-4 focus:ring-primary/5 outline-none transition-all" 
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Liquidation Rate (₦)</label>
+                          <input 
+                            type="number" 
+                            value={listingForm.price} 
+                            onChange={(e) => setListingForm({...listingForm, price: e.target.value})}
+                            placeholder="Total price for the card" 
+                            className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-2xl text-2xl font-black text-primary focus:ring-4 focus:ring-primary/5 outline-none transition-all" 
+                          />
+                       </div>
+                       <div className="space-y-2">
+                          <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Claim Node Secret</label>
+                          <input 
+                            type="text" 
+                            value={claimCode} 
+                            onChange={(e) => setClaimCode(e.target.value)}
+                            placeholder="XXXX-XXXX-XXXX" 
+                            className="w-full h-14 px-6 bg-gray-50 border border-gray-100 rounded-2xl font-mono font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all" 
+                          />
+                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                       <button onClick={() => setLockingStep("select")} className="h-16 bg-gray-50 text-gray-500 font-black uppercase text-xs tracking-widest rounded-2xl hover:bg-gray-100 active-press">Cancel</button>
+                       <button onClick={handleLockForSell} className="h-16 bg-primary text-white font-black uppercase text-xs tracking-widest rounded-2xl shadow-xl shadow-primary/20 active-press">Lock Node</button>
+                    </div>
+                 </motion.div>
+               )}
+            </AnimatePresence>
           </motion.div>
         ) : activeTab === 'P2P' ? (
           <motion.div 

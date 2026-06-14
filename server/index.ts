@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import vtuRoutes from './routes/vtu';
 import syncRoutes from './routes/sync';
 import giftCardRoutes from './routes/giftcards';
+import cryptoMarketRoutes from './routes/crypto_market';
 import paymentRoutes from './routes/payments';
 import { connectDB } from './db';
 
