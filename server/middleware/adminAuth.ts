@@ -3,7 +3,7 @@ import { User } from '../models/User';
 
 export const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const identifier = req.headers['x-admin-id'] || req.query.adminId;
+    const identifier = (req.headers['x-admin-id'] || req.query.adminId) as string;
     
     if (!identifier) {
       return res.status(401).json({ error: 'Authentication required for institutional access.' });
@@ -11,7 +11,7 @@ export const adminAuth = async (req: Request, res: Response, next: NextFunction)
 
     const user = await User.findOne({ 
       $or: [{ supabaseId: identifier }, { email: identifier }] 
-    });
+    } as any);
 
     if (!user) {
       return res.status(403).json({ error: 'Node not found in administrative mesh.' });

@@ -1,9 +1,31 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from "../services/api";
 
 export default function PuppyLoading() {
+  const [livePrices, setLivePrices] = useState<any>(null);
+  const [loadingError, setLoadingError] = useState(false);
+
+  useEffect(() => {
+    const fetchLiveContext = async () => {
+      try {
+        const res = await api.get('/market/prices?symbols=BTC,ETH,SOL,SUI');
+        if (res.data) {
+          setLivePrices(res.data);
+        }
+      } catch (err) {
+        console.warn("[LOADER_SYNC] Failed to fetch real-time context nodes.");
+        setLoadingError(true);
+      }
+    };
+
+    fetchLiveContext();
+    const interval = setInterval(fetchLiveContext, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center space-y-10 py-12 md:py-24">
+    <div className="flex flex-col items-center justify-center space-y-12 py-12 md:py-24">
       <div className="relative w-48 h-48 md:w-64 md:h-64">
         {/* High-Fidelity Puppy Image Design Container */}
         <motion.div
@@ -81,22 +103,58 @@ export default function PuppyLoading() {
         />
       </div>
 
-      <div className="text-center space-y-3 relative">
-        <motion.div
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <h3 className="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter italic">
-            Synchronizing <span className="text-primary">Ecosystem...</span>
-          </h3>
-        </motion.div>
+      <div className="text-center space-y-6 relative max-w-sm">
+        <div className="space-y-2">
+          <motion.div
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            <h3 className="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tighter italic">
+              Synchronizing <span className="text-primary">Ecosystem...</span>
+            </h3>
+          </motion.div>
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.5em]">Institutional Node Discovery</p>
+        </div>
+
+        {/* Live Context Data (CoinAPI Integration) */}
+        <div className="bg-white/50 backdrop-blur-md rounded-3xl p-6 border border-gray-100 shadow-xl space-y-4">
+           <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Live Market Parameters</p>
+           <div className="grid grid-cols-2 gap-4">
+              <AnimatePresence mode="wait">
+                 {livePrices ? (
+                   <>
+                    {[
+                      { sym: 'BTC', price: livePrices.BTC },
+                      { sym: 'ETH', price: livePrices.ETH },
+                      { sym: 'SOL', price: livePrices.SOL },
+                      { sym: 'SUI', price: livePrices.SUI }
+                    ].map((p) => (
+                      <motion.div 
+                        key={p.sym}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-50 shadow-sm"
+                      >
+                        <span className="text-[10px] font-black text-gray-900">{p.sym}</span>
+                        <span className="text-[10px] font-mono font-black text-primary">${p.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                      </motion.div>
+                    ))}
+                   </>
+                 ) : (
+                   <div className="col-span-2 flex justify-center py-4">
+                      <div className="w-5 h-5 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                   </div>
+                 )}
+              </AnimatePresence>
+           </div>
+        </div>
+
         <div className="flex flex-col items-center gap-2">
-           <p className="text-[11px] font-black text-gray-400 uppercase tracking-[0.5em] pl-2">Institutional Node Discovery</p>
-           <div className="w-48 h-1 bg-gray-100 rounded-full overflow-hidden relative">
+           <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden relative shadow-inner">
               <motion.div 
                 animate={{ left: ["-100%", "100%"] }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute top-0 bottom-0 w-1/2 bg-primary"
+                className="absolute top-0 bottom-0 w-1/2 bg-primary shadow-[0_0_15px_rgba(var(--color-primary-rgb),0.5)]"
               />
            </div>
         </div>
