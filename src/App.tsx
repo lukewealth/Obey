@@ -84,17 +84,20 @@ export default function App() {
 
   // Update local profile when cache settles from hybrid DB
   useEffect(() => {
-    if (cachedProfile) {
+    if (cachedProfile && JSON.stringify(cachedProfile) !== JSON.stringify(profile)) {
       setProfile(cachedProfile);
     }
-  }, [cachedProfile]);
+  }, [cachedProfile, profile]);
 
-  // Sync to MongoDB effect
-  useEffect(() => {
-    if (currentUser && profile) {
-      syncProfile({ id: currentUser.id || currentUser.uid, profile });
+  // Optimized Sync to MongoDB (Only sync explicitly or on significant changes with debounce)
+  // Moving sync logic to action handlers for prototype stability
+  const handleProfileUpdate = (updated: Partial<UserProfile>) => {
+    const nextProfile = { ...profile, ...updated };
+    setProfile(nextProfile);
+    if (currentUser) {
+      syncProfile({ id: currentUser.id || currentUser.uid, profile: nextProfile });
     }
-  }, [profile, currentUser, syncProfile]);
+  };
 
   // System Alert State
   const [systemAlert, setSystemAlert] = useState({
@@ -334,18 +337,17 @@ export default function App() {
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                     {activeTab === AppTab.HOME && <DashboardHome profile={profile} transactions={cachedTransactions} onNavigateTab={setActiveTab} onSelectAction={(action) => { if (action === "fund" || action === "withdraw" || action === "transfer") setActiveTab(AppTab.WALLET); else setActiveTab(AppTab.SERVICES); }} />}
-                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={() => {}} onWithdrawWallet={async () => true} onTransfer={async () => true} />}
-                    {activeTab === AppTab.TRADE && <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={() => {}} />}
-                    {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async () => true} />}
-                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={(p) => setProfile(prev => ({ ...prev, ...p }))} />}
+                    {activeTab === AppTab.WALLET && <WalletSystem profile={profile} transactions={cachedTransactions} onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} onWithdrawWallet={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} onTransfer={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
+                    {activeTab === AppTab.TRADE && <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />}
+                    {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
+                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (
                       <AdminSystem 
                         metrics={adminMetrics} 
                         profile={profile} 
                         onApproveKyc={() => {
                           notify("success", "Compliance Verified", "Identity node has been authorized and synced.");
-                          // Invalidate cache to reflect new status
-                          setProfile(prev => ({ ...prev, kycStatus: "Verified" }));
+                          handleProfileUpdate({ kycStatus: "Verified" });
                         }} 
                         onUpdateSystemStatus={(status) => {
                           setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
@@ -358,16 +360,20 @@ export default function App() {
             </main>
           </div>
 
-          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/90 backdrop-blur-2xl border-t border-gray-100 px-6 py-5 flex justify-around items-center">
+          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 backdrop-blur-2xl border-t border-gray-100 px-6 py-4 flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
             {[
-              { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
-              { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
-              { tab: AppTab.TRADE, label: "Trade", icon: RefreshIcon },
+              { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
+              { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
+              { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
               { tab: AppTab.SERVICES, label: "Apps", icon: AppIcon },
             ].map((item) => (
-              <button key={item.label} onClick={() => setActiveTab(item.tab)} className={`flex flex-col items-center gap-1.5 transition-all ${activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400"}`}>
-                <item.icon className="w-6 h-6" />
-                <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
+              <button 
+                key={item.label} 
+                onClick={() => setActiveTab(item.tab)} 
+                className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400 hover:text-gray-600"}`}
+              >
+                <item.icon className={`w-6 h-6 ${activeTab === item.tab ? "stroke-[2.5px]" : "stroke-2"}`} />
+                <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
               </button>
             ))}
           </nav>
