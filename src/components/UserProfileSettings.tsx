@@ -100,7 +100,15 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
               </div>
               <div className="space-y-0.5 md:space-y-1">
                 <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Identity Hub</h3>
-                <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest truncate max-w-[240px] sm:max-w-none">Node ID: <span className="text-primary">{profile.id || "GUEST-NODE"}</span></p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest truncate">Node ID: <span className="text-primary">{profile.id || "GUEST-NODE"}</span></p>
+                  {profile.obeyId && (
+                    <div className="px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-md flex items-center gap-1.5 shadow-sm">
+                       <Zap size={10} className="text-primary" />
+                       <span className="text-[10px] font-black text-primary tracking-tighter uppercase">{profile.obeyId}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

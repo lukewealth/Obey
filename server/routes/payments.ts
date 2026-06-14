@@ -26,13 +26,13 @@ const withdrawalSchema = z.object({
 
 const transferSchema = z.object({
   senderId: z.string(),
-  recipientEmail: z.string().email(),
+  recipientIdentifier: z.string(), // Obey ID or Email
   amount: z.number().positive(),
 });
 
 /**
  * Peer-to-Peer (P2P) Asset Transfer Node
- * Enables Obey-2-Obey internal settlement via email target.
+ * Enables Obey-2-Obey internal settlement via Obey ID or Email target.
  */
 router.post('/transfer', async (req: Request, res: Response) => {
   try {
@@ -41,19 +41,22 @@ router.post('/transfer', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid transfer parameters', details: validation.error.flatten().fieldErrors });
     }
 
-    const { senderId, recipientEmail, amount } = validation.data;
+    const { senderId, recipientIdentifier, amount } = validation.data;
     const requestReference = `P2P-${uuidv4().substring(0, 8).toUpperCase()}`;
 
     // 1. Locate nodes in the mesh
-    const [sender, recipient] = await Promise.all([
-      User.findOne({ $or: [{ supabaseId: senderId }, { email: senderId }] }),
-      User.findOne({ email: recipientEmail })
-    ]);
+    const sender = await User.findOne({ $or: [{ supabaseId: senderId }, { email: senderId }] });
+    const recipient = await User.findOne({ 
+      $or: [
+        { email: recipientIdentifier.toLowerCase() }, 
+        { obeyId: recipientIdentifier.toUpperCase() }
+      ] 
+    });
 
     if (!sender) return res.status(404).json({ error: 'Sender node not found.' });
-    if (!recipient) return res.status(404).json({ error: 'Target node (recipient email) not found.' });
+    if (!recipient) return res.status(404).json({ error: 'Target node (Obey ID/Email) not found.' });
     if (sender.balance < amount) return res.status(400).json({ error: 'Insufficient liquidity in sender node.' });
-    if (sender.email === recipientEmail) return res.status(400).json({ error: 'Self-transfer protocol blocked.' });
+    if (sender.id === recipient.id) return res.status(400).json({ error: 'Self-transfer protocol blocked.' });
 
     // 2. Atomic Settlement
     sender.balance -= amount;
@@ -63,7 +66,7 @@ router.post('/transfer', async (req: Request, res: Response) => {
     const senderTx = new Transaction({
       id: txId,
       userId: sender.supabaseId,
-      title: `Transfer to ${recipientEmail}`,
+      title: `Transfer to ${recipient.name}`,
       category: "Transfer",
       type: "Debit",
       amount,
@@ -76,7 +79,7 @@ router.post('/transfer', async (req: Request, res: Response) => {
     const recipientTx = new Transaction({
       id: uuidv4(),
       userId: recipient.supabaseId,
-      title: `Transfer from ${sender.email}`,
+      title: `Transfer from ${sender.name}`,
       category: "Transfer",
       type: "Credit",
       amount,
@@ -88,7 +91,11 @@ router.post('/transfer', async (req: Request, res: Response) => {
 
     await Promise.all([sender.save(), recipient.save(), senderTx.save(), recipientTx.save()]);
 
-    res.json({ success: true, transaction: senderTx });
+    res.json({ 
+      success: true, 
+      transaction: senderTx,
+      recipientName: recipient.name
+    });
   } catch (error) {
     console.error('[P2P_ERROR] Settlement failed:', error);
     res.status(500).json({ error: 'Internal mesh settlement failure.' });

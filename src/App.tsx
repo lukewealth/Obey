@@ -186,26 +186,27 @@ export default function App() {
     }
   }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
 
-  // Local state for profile
+  // Local state for profile (Default placeholder removed for dynamic institutional alignment)
   const [profile, setProfile] = useState<UserProfile>(() => ({
-    name: "Felix Anderson",
-    email: "felix@obey.finance",
+    name: "Authorized Node",
+    email: "node@obey.finance",
     role: "user",
-    phone: "+234 809 102 8824",
-    avatar: "FA",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
-    kycStatus: "Verified",
-    balance: 228128672.00,
+    phone: "+234 000 000 0000",
+    avatar: "OB",
+    avatarUrl: "",
+    kycStatus: "Unverified",
+    balance: 0,
     currency: "NGN",
-    promoCode: "OBEY-ELITE",
-    isEmailVerified: true,
-    kycLevel: 2,
-    twoFactorEnabled: true
+    promoCode: "",
+    isEmailVerified: false,
+    kycLevel: 0,
+    tierLevel: 1,
+    twoFactorEnabled: false
   }));
 
   const handleVerificationComplete = () => {
     setShowGatedModal(false);
-    const updatedProfile: UserProfile = { ...profile, kycStatus: "Verified" };
+    const updatedProfile: UserProfile = { ...profile, kycStatus: "Verified", kycLevel: 2 };
     setProfile(updatedProfile);
     notify("success", "Node Authorized", "Institutional access levels established.");
     if (currentUser || profile.id) {

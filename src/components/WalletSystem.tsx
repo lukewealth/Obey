@@ -5,9 +5,10 @@ import {
   Copy, Check, DollarSign, ArrowDownLeft, ArrowUpRight, Send, 
   HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
   CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp,
-  Activity, ShieldCheck, ArrowRight, Loader2, Sparkles, X, Eye, EyeOff
+  Activity, ShieldCheck, ArrowRight, Loader2, Sparkles, X, Eye, EyeOff, UserCheck
 } from "lucide-react";
 import api from "../services/api";
+import { useNotification } from "./NotificationSystem";
 
 interface WalletSystemProps {
   profile: UserProfile;
@@ -18,6 +19,7 @@ interface WalletSystemProps {
 }
 
 export default function WalletSystem({ profile, transactions, onFundWallet, onWithdrawWallet, onTransfer }: WalletSystemProps) {
+  const { notify } = useNotification();
   const [activeSubTab, setActiveSubState] = useState<"overview" | "fund" | "withdraw" | "transfer" | "card">("overview");
   
   // Funding state
@@ -38,9 +40,10 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
   // Transfer state
   const [transferAmount, setTransferAmount] = useState("");
-  const [recipientEmail, setRecipientEmail] = useState("");
+  const [recipientIdentifier, setRecipientIdentifier] = useState("");
   const [transferProcessing, setTransferProcessing] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
+  const [confirmedRecipient, setConfirmedRecipient] = useState<string | null>(null);
 
   // Virtual Card State
   const [cardProvisioning, setCardProvisioning] = useState(false);
@@ -76,6 +79,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         if (response.data.success) {
           onFundWallet(amountVal, "Interswitch Card Top-Up");
           setFundReceipt(response.data.transaction);
+          notify("success", "Settlement Successful", `₦${amountVal.toLocaleString()} added to treasury.`);
         }
       } else {
         // Bank transfer simulation
@@ -93,11 +97,12 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             status: "Success"
           } as Transaction);
           setPaymentStatus(false);
+          notify("success", "Ledger Updated", "Institutional wire recognized.");
         }, 1500);
         return;
       }
     } catch (error) {
-      console.error('Funding failed:', error);
+      notify("error", "Settlement Failure", "Node clearance error.");
     } finally {
       setPaymentStatus(false);
     }
@@ -120,9 +125,10 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
       if (response.data.success) {
         await onWithdrawWallet(amountVal, `Withdrawal to ${bankName}`);
         setWithdrawSuccess(true);
+        notify("info", "Liquidity Dispatched", `₦${amountVal.toLocaleString()} routed to external node.`);
       }
     } catch (error) {
-      console.error('Withdrawal failed:', error);
+      notify("error", "Dispatch Failure", "Cross-chain payout error.");
     } finally {
       setWithdrawProcessing(false);
     }
@@ -137,17 +143,18 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     try {
       const response = await api.post('/payments/transfer', {
         senderId: profile.id || profile.email,
-        recipientEmail,
+        recipientIdentifier,
         amount: amountVal
       });
 
       if (response.data.success) {
-        await onTransfer(amountVal, recipientEmail);
+        setConfirmedRecipient(response.data.recipientName);
+        await onTransfer(amountVal, recipientIdentifier);
         setTransferSuccess(true);
+        notify("success", "Peer Transfer Settled", `Node alignment complete with ${response.data.recipientName}.`);
       }
     } catch (error: any) {
-      console.error('Transfer failed:', error);
-      alert(error.response?.data?.error || "Transfer failed.");
+      notify("error", "Protocol Blocked", error.response?.data?.error || "Transfer failed.");
     } finally {
       setTransferProcessing(false);
     }
@@ -165,6 +172,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         brand: "Visa Platinum"
       });
       setCardProvisioning(false);
+      notify("success", "Virtual Node Provisioned", "Institutional card active.");
     }, 3200);
   };
 
@@ -176,6 +184,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     setFundAmount("");
     setWithdrawAmount("");
     setTransferAmount("");
+    setRecipientIdentifier("");
+    setConfirmedRecipient(null);
   };
 
   const tabVariants = {
@@ -505,7 +515,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                           <div className="space-y-5 md:space-y-6">
                              <div className="space-y-2 md:space-y-3">
                                 <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Account Holder</label>
-                                <input type="text" required placeholder="Felix Anderson" className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" />
+                                <input type="text" required placeholder={profile.name} className="w-full h-14 md:h-16 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner" />
                              </div>
                              <div className="space-y-2 md:space-y-3">
                                 <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Card Identifier</label>
@@ -651,7 +661,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     </div>
                     <div className="space-y-2">
                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Peer Transfer Sent</h2>
-                       <p className="text-sm md:text-lg text-gray-500 font-medium">Liquidity has been moved to the target OBEY node instantly.</p>
+                       <p className="text-sm md:text-lg text-gray-500 font-medium">Liquidity has been moved to <span className="font-black text-primary">{confirmedRecipient || "target node"}</span> instantly.</p>
                     </div>
                     <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
                       Return to Dashboard
@@ -665,18 +675,18 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     </div>
 
                     <div className="space-y-3">
-                       <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Target Node (Email)</label>
+                       <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Target Node (Obey ID or Email)</label>
                        <div className="relative group">
                           <input
-                            type="email"
+                            type="text"
                             required
-                            value={recipientEmail}
-                            onChange={(e) => setRecipientEmail(e.target.value)}
-                            placeholder="hello@obey.finance"
+                            value={recipientIdentifier}
+                            onChange={(e) => setRecipientIdentifier(e.target.value)}
+                            placeholder="OBEY-XXXXX or hello@obey.finance"
                             className="w-full h-16 md:h-20 px-6 md:px-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-lg md:text-xl font-bold focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner"
                           />
                           <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 w-8 h-8 md:w-10 md:h-10 bg-accent-blue rounded-lg md:rounded-xl flex items-center justify-center text-primary shadow-sm group-focus-within:bg-primary group-focus-within:text-white transition-all">
-                             <Check size={16} className="md:w-5 md:h-5" />
+                             <UserCheck size={16} className="md:w-5 md:h-5" />
                           </div>
                        </div>
                     </div>
@@ -684,7 +694,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     <div className="space-y-4">
                        <div className="flex justify-between items-center px-4">
                           <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (NGN)</label>
-                          <span className="text-[9px] md:text-[11px] font-black text-primary">LIMIT: ₦1,000,000.00</span>
+                          <span className="text-[9px] md:text-[11px] font-black text-primary">AVAIL: ₦{profile.balance.toLocaleString()}</span>
                        </div>
                        <div className="relative">
                           <span className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary font-black text-2xl md:text-4xl">₦</span>
@@ -702,7 +712,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                     <button
                       type="submit"
-                      disabled={transferProcessing || !transferAmount}
+                      disabled={transferProcessing || !transferAmount || !recipientIdentifier}
                       className="w-full h-16 md:h-20 bg-primary hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
                     >
                       {transferProcessing ? <Loader2 className="animate-spin" size={24} /> : "Confirm Dispatch"}
