@@ -48,19 +48,27 @@ router.post('/transactions', async (req, res) => {
 // Fallback: Get data from MongoDB if Supabase fails
 router.get('/user/:supabaseId', async (req, res) => {
   try {
+    console.log(`[FALLBACK] Fetching user: ${req.params.supabaseId}`);
     const user = await User.findOne({ supabaseId: req.params.supabaseId });
-    if (!user) return res.status(404).json({ error: 'User not found in fallback' });
+    if (!user) {
+      console.warn(`[FALLBACK_WARN] User not found: ${req.params.supabaseId}`);
+      return res.status(404).json({ error: 'User not found in fallback' });
+    }
     res.json(user);
   } catch (error) {
+    console.error(`[FALLBACK_ERROR] User fetch failed:`, error);
     res.status(500).json({ error: 'Fallback fetch failed' });
   }
 });
 
 router.get('/transactions/:userId', async (req, res) => {
   try {
+    console.log(`[FALLBACK] Fetching transactions for: ${req.params.userId}`);
     const transactions = await Transaction.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    console.log(`[FALLBACK] Found ${transactions.length} transactions`);
     res.json(transactions);
   } catch (error) {
+    console.error(`[FALLBACK_ERROR] Transactions fetch failed:`, error);
     res.status(500).json({ error: 'Fallback fetch failed' });
   }
 });

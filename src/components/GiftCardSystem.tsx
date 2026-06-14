@@ -46,13 +46,30 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     { id: "5", name: "Razer Gold", buyRate: 880, sellRate: 760, logo: "Razer", icon: Zap, popularity: 85, trending: false }
   ];
 
-  // Enhanced Sell Logic: Lock for Sell with custom rate
-  const [lockingStep, setLockingStep] = useState<"select" | "rate" | "confirm">("select");
+  const fetchMarketListings = async () => {
+    setLoadingMarket(true);
+    try {
+      const res = await api.get('/giftcards/market');
+      setMarketListings(res.data);
+    } catch (error) {
+      console.error("Failed to fetch listings:", error);
+    } finally {
+      setLoadingMarket(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'P2P') {
+      fetchMarketListings();
+    }
+  }, [activeTab]);
 
   const handleSelectAssetForLock = (assetName: string) => {
     setSelectedAsset(assetName);
     setLockingStep("rate");
   };
+
+  const [lockingStep, setLockingStep] = useState<"select" | "rate" | "confirm">("select");
 
   const handleLockForSell = async () => {
     if (!listingForm.faceValue || !listingForm.price) {
@@ -62,7 +79,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     setProcessing(true);
     try {
       const res = await api.post('/giftcards/list', {
-        sellerId: "user-id",
+        sellerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
         sellerName: profile.name,
         assetName: selectedAsset,
         faceValue: parseFloat(listingForm.faceValue),
@@ -82,11 +99,13 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     }
   };
 
+  const handleListCard = handleLockForSell;
+
   const handlePurchaseListing = async (listingId: string) => {
     setProcessing(true);
     try {
       const res = await api.post('/giftcards/purchase', {
-        buyerId: "user-id", // Should be from context
+        buyerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
         listingId
       });
       if (res.data.success) {
@@ -96,6 +115,40 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
       }
     } catch (error: any) {
       notify("error", "Purchase Failed", error.response?.data?.error || "Failed to acquire node.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleTrade = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (activeTab === GiftCardTab.SELL) {
+      handleLockForSell();
+      return;
+    }
+
+    if (!cardValue || parseFloat(cardValue) <= 0) {
+      notify("error", "Invalid Magnitude", "Please specify a valid trade amount.");
+      return;
+    }
+
+    setProcessing(true);
+    try {
+      const selectedAssetObj = assets.find(a => a.name === selectedAsset);
+      const res = await api.post('/giftcards/purchase', {
+        buyerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        assetName: selectedAsset,
+        amount: parseFloat(cardValue),
+        rate: selectedAssetObj?.buyRate || 0
+      });
+
+      if (res.data.success) {
+        notify("success", "Acquisition Authorized", "Digital node secured in escrow.");
+        setTradeReceipt(res.data.transaction);
+        onTradeCompleted(parseFloat(cardValue), `Acquisition of ${selectedAsset} Node`, false);
+      }
+    } catch (error: any) {
+      notify("error", "Acquisition Failed", error.response?.data?.error || "Network terminal failure.");
     } finally {
       setProcessing(false);
     }

@@ -17,9 +17,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 5001;
 
-// Connect to MongoDB
-connectDB();
-
 // --- Security Middleware ---
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
@@ -111,6 +108,14 @@ app.get('/health', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`OBEY Backend listening on port ${port}`);
+// Connect to MongoDB and THEN Start Server
+connectDB().then(() => {
+  app.listen(port, () => {
+    console.log(`OBEY Backend listening on port ${port}`);
+  });
+}).catch(err => {
+  console.error('Failed to connect to MongoDB, but starting server anyway:', err);
+  app.listen(port, () => {
+    console.log(`OBEY Backend listening on port ${port} (DB FAILED)`);
+  });
 });

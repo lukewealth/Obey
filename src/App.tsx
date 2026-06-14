@@ -19,6 +19,7 @@ import LegalContent from "./components/LegalContent";
 import SystemAlert from "./components/SystemAlert";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
+import api from "./services/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   HomeIcon, 

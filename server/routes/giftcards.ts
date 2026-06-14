@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { Transaction } from '../models/Transaction';
 import { User } from '../models/User';
 import { GiftCardListing } from '../models/GiftCardListing';
+import { CryptoListing } from '../models/CryptoListing';
 import { v4 as uuidv4 } from 'uuid';
 import rateLimit from 'express-rate-limit';
 
