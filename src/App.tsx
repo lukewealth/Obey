@@ -120,6 +120,7 @@ export default function App() {
             ...sbProfile,
             id: sbProfile.id,
             kycStatus: sbProfile.kyc_status || profile.kycStatus,
+            isEmailVerified: !!sbProfile.email_confirmed_at,
             currency: sbProfile.currency || "NGN",
           };
           console.log("[WAKEUP] Master profile retrieved from Supabase node");
@@ -132,6 +133,7 @@ export default function App() {
                 ...profile,
                 ...res.data,
                 id: res.data.supabaseId || res.data._id,
+                isEmailVerified: res.data.isEmailVerified,
                 currency: res.data.currency || "NGN",
               };
               console.log("[WAKEUP] Reverting to MongoDB depth node");
@@ -150,6 +152,13 @@ export default function App() {
 
         // 3. Synchronize All Global States
         setProfile(finalProfile);
+        
+        // Final Security Check: Ensure email is verified for dashboard access
+        if (!finalProfile.isEmailVerified && currentScreen === AppScreen.DASHBOARD) {
+           setCurrentScreen(AppScreen.LOGIN);
+           notify("error", "Access Blocked", "Institutional email verification required.");
+        }
+
         await syncProfile({ id: finalProfile.id || identifier, profile: finalProfile });
         
         notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");

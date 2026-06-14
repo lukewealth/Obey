@@ -36,6 +36,7 @@ export interface UserProfile {
   avatarUrl?: string; // Support for official avatar icons
   kycStatus: "Unverified" | "Pending" | "Verified";
   kycLevel: 0 | 1 | 2; // Support for tiered verification levels
+  isEmailVerified: boolean;
   balance: number;
   currency: "NGN" | "USD"; // Official currency support
   promoCode: string;

@@ -10,6 +10,7 @@ import giftCardRoutes from './routes/giftcards';
 import cryptoMarketRoutes from './routes/crypto_market';
 import marketRoutes from './routes/market';
 import paymentRoutes from './routes/payments';
+import adminRoutes from './routes/admin';
 import { connectDB } from './db';
 
 dotenv.config();
@@ -99,6 +100,7 @@ app.use('/api/giftcards', giftCardRoutes);
 app.use('/api/crypto-market', cryptoMarketRoutes);
 app.use('/api/market', marketRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/admin', adminRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ 

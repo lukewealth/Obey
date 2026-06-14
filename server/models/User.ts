@@ -12,6 +12,8 @@ const UserSchema = new mongoose.Schema({
     enum: ["Unverified", "Pending", "Verified"],
     default: "Unverified"
   },
+  kycLevel: { type: Number, default: 0 },
+  isEmailVerified: { type: Boolean, default: false },
   balance: { type: Number, default: 0 },
   promoCode: { type: String },
   twoFactorEnabled: { type: Boolean, default: false },

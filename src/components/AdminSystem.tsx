@@ -5,7 +5,7 @@ import {
   Users, DollarSign, Activity, AlertCircle, Check, X, 
   TrendingUp, RefreshCw, BarChart2, ShieldAlert, CheckCircle2, UserCheck, Settings,
   Zap, Shield, Server, ArrowUpRight, ShoppingCart, Lock, Trash2, Loader2,
-  ChevronRight, ArrowRight, Search, Plus, Minus, Bell, CreditCard
+  ChevronRight, ArrowRight, Search, Plus, Minus, Bell, CreditCard, Send, ShieldCheck
 } from "lucide-react";
 import api, { settleEscrowTrade, adjustUserBalance } from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -19,17 +19,26 @@ interface AdminSystemProps {
 
 export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSystemStatus }: AdminSystemProps) {
   const { notify } = useNotification();
-  const [activeAdminTab, setActiveAdminTab] = useState<"monitoring" | "users" | "marketplace" | "ledger">("monitoring");
+  const [activeAdminTab, setActiveAdminTab] = useState<"monitoring" | "users" | "marketplace" | "notifications">("monitoring");
   
-  const [kycQueue, setKycQueue] = useState([
-    { id: "usr_2", name: "David Alao", email: "david@co-tech.com", documentType: "Passport Card", fileAttached: "illustrations.jpg", phone: "+234 802 991 2024", date: "June 09, 2026", status: "Pending", balance: 5200 },
-    { id: "usr_3", name: "Sarah Williams", email: "sarah.will@fintech.io", documentType: "National ID", fileAttached: "illustrations.jpg", phone: "+234 811 445 1022", date: "June 08, 2026", status: "Pending", balance: 12500 }
-  ]);
-
+  const [kycQueue, setKycQueue] = useState<any[]>([]);
   const [escrowTrades, setEscrowTrades] = useState<any[]>([]);
   const [loadingTrades, setLoadingTrades] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
   const [activeStatus, setActiveStatus] = useState(metrics.systemStatus);
   const [settlingId, setSettlingId] = useState<string | null>(null);
+
+  // Push Notification State
+  const [pushTitle, setPushTitle] = useState("");
+  const [pushMessage, setPushMessage] = useState("");
+  const [pushTarget, setPushTarget] = useState("all");
+  const [sendingPush, setSendingPush] = useState(false);
+
+  // Vault Metrics State
+  const [vaultMetrics, setVaultMetrics] = useState({
+    lockedReserves: 0,
+    activeNodes: 0
+  });
 
   // Account Credit Management State
   const [showCreditModal, setShowCreditModal] = useState(false);
@@ -37,34 +46,53 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
   const [creditAmount, setCreditAmount] = useState("");
   const [creditType, setCreditType] = useState<"ADD" | "SUB">("ADD");
 
-  // Fetch Escrow Trades from MongoDB via fallback API
-  const fetchEscrowTrades = async () => {
+  const fetchAdminData = async () => {
+    setLoadingUsers(true);
     setLoadingTrades(true);
     try {
-      const response = await api.get('/sync/transactions/admin-all'); 
-      const trades = response.data.filter((tx: any) => 
-        (tx.category === 'GiftCard' || tx.category === 'Crypto') && 
-        ['Awaiting Audit', 'Processing', 'Escrow', 'Disputed'].includes(tx.status)
-      );
-      setEscrowTrades(trades);
+      const [usersRes, vaultRes] = await Promise.all([
+        api.get(`/admin/users?adminId=${profile.id}`),
+        api.get(`/admin/vault-metrics?adminId=${profile.id}`)
+      ]);
+      
+      setKycQueue(usersRes.data.filter((u: any) => u.kycStatus === 'Pending' || u.kycStatus === 'Unverified'));
+      setVaultMetrics({
+        lockedReserves: vaultRes.data.lockedReserves,
+        activeNodes: vaultRes.data.activeNodes
+      });
+      setEscrowTrades(vaultRes.data.escrowTransactions);
     } catch (error) {
-      setEscrowTrades([
-        { id: "OBY-ESC-AF82D1X", assetName: "Amazon Card $500", userId: "buyer@obey.finance", amount: 725000, status: "Escrow", type: "Debit", date: "June 14, 2026" },
-        { id: "OBY-GC-99E2A2Z", assetName: "Apple Card $200", userId: "user@obey.finance", amount: 170000, status: "Awaiting Audit", type: "Credit", date: "June 14, 2026" }
+      console.error("Failed to fetch admin data:", error);
+      // Fallback for prototype
+      setKycQueue([
+        { id: "usr_2", name: "David Alao", email: "david@co-tech.com", documentType: "Passport Card", kycStatus: "Pending", balance: 5200 },
+        { id: "usr_3", name: "Sarah Williams", email: "sarah.will@fintech.io", documentType: "National ID", kycStatus: "Pending", balance: 12500 }
       ]);
     } finally {
+      setLoadingUsers(false);
       setLoadingTrades(false);
     }
   };
 
   useEffect(() => {
-    fetchEscrowTrades();
-  }, []);
+    fetchAdminData();
+  }, [activeAdminTab]);
 
-  const handleApproveQueueItem = (id: string) => {
-    setKycQueue(prev => prev.filter(item => item.id !== id));
-    onApproveKyc();
-    notify("success", "Profile Authorized", "Institutional KYC node settled.");
+  const handleApproveKycNode = async (userId: string, action: 'APPROVE' | 'REJECT') => {
+    try {
+      const res = await api.post(`/admin/approve-kyc`, { 
+        userId, 
+        action, 
+        adminId: profile.id 
+      });
+      if (res.data.success) {
+        setKycQueue(prev => prev.filter(item => (item.supabaseId || item.id) !== userId));
+        notify("success", action === 'APPROVE' ? "Identity Authorized" : "Identity Rejected", res.data.message);
+        if (action === 'APPROVE') onApproveKyc();
+      }
+    } catch (error) {
+      notify("error", "Protocol Failure", "Failed to settle identity node.");
+    }
   };
 
   const handleSettleEscrow = async (txId: string, action: 'RELEASE' | 'REJECT') => {
@@ -82,21 +110,38 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
     }
   };
 
+  const handleSendPush = async () => {
+    if (!pushTitle || !pushMessage) return;
+    setSendingPush(true);
+    try {
+      await api.post(`/admin/push-notification`, {
+        title: pushTitle,
+        message: pushMessage,
+        target: pushTarget,
+        adminId: profile.id
+      });
+      notify("success", "Broadcast Dispatched", "Push notification mesh active.");
+      setPushTitle("");
+      setPushMessage("");
+    } catch (error) {
+      notify("error", "Broadcast Failure", "Signal propagation error.");
+    } finally {
+      setSendingPush(false);
+    }
+  };
+
   const handleCreditAdjustment = async () => {
     if (!selectedUser || !creditAmount) return;
     const amount = parseFloat(creditAmount);
     if (isNaN(amount) || amount <= 0) return;
 
     try {
-      await adjustUserBalance(selectedUser.id, amount, creditType);
+      await adjustUserBalance(selectedUser.supabaseId || selectedUser.id, amount, creditType);
       notify("success", "Ledger Updated", `Successfully ${creditType === 'ADD' ? 'credited' : 'debited'} ${selectedUser.name}'s account.`);
       setShowCreditModal(false);
       setCreditAmount("");
     } catch (err) {
-      // Simulation for prototype if endpoint not yet in backend
-      notify("success", "Ledger Updated (Simulated)", `Successfully ${creditType === 'ADD' ? 'credited' : 'debited'} ${selectedUser.name}'s account.`);
-      setShowCreditModal(false);
-      setCreditAmount("");
+      notify("error", "Ledger Error", "Failed to update node balance.");
     }
   };
 
@@ -119,6 +164,7 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
             { id: "monitoring", label: "Nodes", icon: Activity },
             { id: "users", label: "Ledger", icon: Users },
             { id: "marketplace", label: "Treasury", icon: ShoppingCart },
+            { id: "notifications", label: "Broadcast", icon: Bell },
            ].map(t => (
              <button 
               key={t.id}
@@ -161,18 +207,20 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                    <ShieldCheck className="text-primary" /> Compliance Queue
                  </h3>
                  <div className="space-y-4">
-                    {kycQueue.map(item => (
-                      <div key={item.id} className="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-between gap-4">
+                    {loadingUsers ? <div className="flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div> : 
+                    kycQueue.length === 0 ? <p className="text-center py-12 text-gray-400 font-bold">No pending identity nodes.</p> :
+                    kycQueue.map(item => (
+                      <div key={item.id || item.supabaseId} className="p-5 bg-gray-50 border border-gray-100 rounded-2xl flex items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center font-black text-primary border border-gray-100">{item.name[0]}</div>
                           <div>
                             <p className="text-sm font-black text-gray-900">{item.name}</p>
-                            <p className="text-[10px] text-gray-400 uppercase font-bold">{item.documentType}</p>
+                            <p className="text-[10px] text-gray-400 uppercase font-bold">{item.documentType || "Verification Node"}</p>
                           </div>
                         </div>
                         <div className="flex gap-2">
-                           <button onClick={() => handleApproveQueueItem(item.id)} className="h-10 px-4 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-lg">Approve</button>
-                           <button className="h-10 w-10 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><X size={16} /></button>
+                           <button onClick={() => handleApproveKycNode(item.supabaseId || item.id, 'APPROVE')} className="h-10 px-4 bg-emerald-500 text-white text-[10px] font-black uppercase rounded-lg">Approve</button>
+                           <button onClick={() => handleApproveKycNode(item.supabaseId || item.id, 'REJECT')} className="h-10 w-10 flex items-center justify-center bg-red-50 text-red-500 rounded-lg"><X size={16} /></button>
                         </div>
                       </div>
                     ))}
@@ -219,8 +267,9 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                          </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
-                         {kycQueue.map(u => (
-                           <tr key={u.id} className="group hover:bg-gray-50/50 transition-colors">
+                         {loadingUsers ? <tr><td colSpan={4} className="py-12 text-center"><Loader2 className="animate-spin inline-block text-primary" /></td></tr> :
+                         kycQueue.map(u => (
+                           <tr key={u.id || u.supabaseId} className="group hover:bg-gray-50/50 transition-colors">
                               <td className="py-5">
                                  <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center font-black text-gray-400">{u.name[0]}</div>
@@ -234,7 +283,9 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                                  <p className="text-sm font-mono font-black text-[#0b0e14]">₦{u.balance.toLocaleString()}</p>
                               </td>
                               <td className="py-5">
-                                 <span className="px-2 py-1 bg-amber-50 text-amber-600 rounded-lg text-[8px] font-black uppercase tracking-widest">Pending KYC</span>
+                                 <span className={`px-2 py-1 ${u.kycStatus === 'Verified' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'} rounded-lg text-[8px] font-black uppercase tracking-widest`}>
+                                    {u.kycStatus}
+                                 </span>
                               </td>
                               <td className="py-5 text-right">
                                  <button onClick={() => { setSelectedUser(u); setShowCreditModal(true); }} className="px-4 py-2 bg-[#0b0e14] text-white text-[10px] font-black uppercase rounded-lg hover:bg-primary transition-all">
@@ -266,12 +317,14 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                    </div>
                    <div className="px-8 py-5 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-xl">
                       <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Locked reserves</p>
-                      <p className="text-2xl font-black font-space text-primary">₦5,575,000.00</p>
+                      <p className="text-2xl font-black font-space text-primary">₦{vaultMetrics.lockedReserves.toLocaleString()}</p>
                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 relative z-10">
-                   {escrowTrades.map(t => (
+                   {loadingTrades ? <div className="col-span-2 flex justify-center py-12"><Loader2 className="animate-spin text-primary" /></div> :
+                   escrowTrades.length === 0 ? <p className="col-span-2 text-center py-12 text-gray-500 font-bold uppercase tracking-widest">No active escrow nodes.</p> :
+                   escrowTrades.map(t => (
                      <div key={t.id} className="p-8 bg-white/5 border border-white/10 rounded-[2rem] flex flex-col justify-between gap-10 hover:border-primary/50 transition-all">
                         <div className="flex justify-between items-start">
                            <div>
@@ -286,13 +339,51 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                               <p className="text-3xl font-black font-space text-white">₦{t.amount.toLocaleString()}</p>
                            </div>
                            <div className="flex gap-2">
-                              <button onClick={() => handleSettleEscrow(t.id, 'REJECT')} className="h-12 w-12 flex items-center justify-center bg-white/5 text-red-500 rounded-xl"><Trash2 size={18} /></button>
-                              <button onClick={() => handleSettleEscrow(t.id, 'RELEASE')} className="h-12 px-6 bg-white text-[#0b0e14] text-[10px] font-black uppercase rounded-xl hover:bg-primary hover:text-white transition-all">Release Funds</button>
+                              <button disabled={settlingId === t.id} onClick={() => handleSettleEscrow(t.id, 'REJECT')} className="h-12 w-12 flex items-center justify-center bg-white/5 text-red-500 rounded-xl hover:bg-red-500/10 transition-all disabled:opacity-50"><Trash2 size={18} /></button>
+                              <button disabled={settlingId === t.id} onClick={() => handleSettleEscrow(t.id, 'RELEASE')} className="h-12 px-6 bg-white text-[#0b0e14] text-[10px] font-black uppercase rounded-xl hover:bg-primary hover:text-white transition-all disabled:opacity-50 flex items-center gap-2">
+                                 {settlingId === t.id ? <Loader2 size={14} className="animate-spin" /> : "Release Funds"}
+                              </button>
                            </div>
                         </div>
                      </div>
                    ))}
                 </div>
+             </div>
+          </motion.div>
+        )}
+
+        {activeAdminTab === "notifications" && (
+          <motion.div key="notifications" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="space-y-8">
+             <div className="bento-card p-8 md:p-12 space-y-10">
+                <div className="space-y-2">
+                   <h3 className="text-3xl font-black text-gray-900 tracking-tighter uppercase italic">Institutional Broadcast</h3>
+                   <p className="text-gray-500 font-medium">Dispatch global push notifications across the OBEY mesh nodes.</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                   <div className="space-y-6">
+                      <div className="space-y-3">
+                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Signal Heading</label>
+                         <input type="text" value={pushTitle} onChange={(e) => setPushTitle(e.target.value)} placeholder="System Maintenance..." className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none" />
+                      </div>
+                      <div className="space-y-3">
+                         <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Magnitude Target</label>
+                         <select value={pushTarget} onChange={(e) => setPushTarget(e.target.value)} className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none">
+                            <option value="all">Global Mesh (All Users)</option>
+                            <option value="verified">Tier 2 Verified Only</option>
+                            <option value="admin">Institutional Nodes Only</option>
+                         </select>
+                      </div>
+                   </div>
+                   <div className="space-y-3">
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-4">Signal Payload</label>
+                      <textarea value={pushMessage} onChange={(e) => setPushMessage(e.target.value)} placeholder="Enter protocol details..." className="w-full h-44 p-6 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none resize-none" />
+                   </div>
+                </div>
+
+                <button onClick={handleSendPush} disabled={sendingPush || !pushTitle || !pushMessage} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-xs tracking-widest shadow-2xl shadow-primary/30 active-press flex items-center justify-center gap-3 disabled:opacity-50">
+                   {sendingPush ? <Loader2 className="animate-spin" size={18} /> : <><Send size={18} /> Dispatch Broadcast</>}
+                </button>
              </div>
           </motion.div>
         )}

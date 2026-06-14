@@ -77,6 +77,11 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
       }
 
       if (userCredential) {
+        if (!userCredential.user.emailVerified) {
+          setErrorMsg("Institutional email verification required. Please check your inbox.");
+          setLoading(false);
+          return;
+        }
         // Success via Firebase - the App.tsx listener will handle navigation
         return;
       }
@@ -86,8 +91,14 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       
+      if (!data.user.email_confirmed_at) {
+        setErrorMsg("Email node not yet authorized. Please verify your email.");
+        setLoading(false);
+        return;
+      }
+
       const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
-      onSuccess(profile || { id: data.user.id, email });
+      onSuccess(profile || { id: data.user.id, email, isEmailVerified: !!data.user.email_confirmed_at });
       onNavigate(AppScreen.DASHBOARD);
     } catch (error: any) {
       setErrorMsg(error.message || "Authentication failed");
