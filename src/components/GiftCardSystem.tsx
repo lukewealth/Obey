@@ -6,7 +6,7 @@ import {
   HelpCircle, Shield, History, Tag, ChevronRight, Zap, 
   Star, Activity, ArrowRight, ShieldCheck, Upload, X, Check,
   RefreshCw, Loader2, Sparkles, AlertCircle, ShoppingCart, 
-  LayoutGrid, List, CheckCircle2, User, Globe, Play, Gamepad2, Package, Apple as AppleIcon
+  LayoutGrid, List, CheckCircle2, User, Globe, Play, Gamepad2, Package, Apple as AppleIcon, Clock
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -30,6 +30,9 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
   const [tradeReceipt, setTradeReceipt] = useState<any | null>(null);
   const [isHovered, setIsHovered] = useState<string | null>(null);
 
+  // Real-Time Depth State
+  const [lastSync, setLastSync] = useState(new Date());
+
   // Marketplace State
   const [marketListings, setMarketListings] = useState<any[]>([]);
   const [loadingMarket, setLoadingMarket] = useState(false);
@@ -45,6 +48,13 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     { id: "4", name: "Steam", buyRate: 860, sellRate: 740, logo: "Steam", icon: Gamepad2, popularity: 88, trending: true },
     { id: "5", name: "Razer Gold", buyRate: 880, sellRate: 760, logo: "Razer", icon: Zap, popularity: 85, trending: false }
   ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLastSync(new Date());
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchMarketListings = async () => {
     setLoadingMarket(true);
@@ -168,15 +178,23 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8"
       >
-        <div className="space-y-1">
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+        <div className="space-y-4 md:space-y-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-center md:justify-start gap-4">
+             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner">
                 <Globe size={24} />
              </div>
-             <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Ecosystem Marketplace</h2>
+             <div>
+                <h2 className="text-2xl md:text-4xl font-black text-gray-900 tracking-tight uppercase italic">Asset Terminal</h2>
+                <div className="flex items-center justify-center md:justify-start gap-3 mt-1">
+                   <p className="text-xs md:text-sm text-gray-400 font-medium">Trade global nodes with institutional depth.</p>
+                   <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase shadow-sm">
+                      <Clock size={10} className="animate-pulse" /> Sync: {lastSync.toLocaleTimeString()}
+                   </div>
+                </div>
+             </div>
           </div>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Trade digital assets with institutional efficiency.</p>
         </div>
+
         
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[

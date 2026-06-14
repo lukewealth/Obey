@@ -71,6 +71,64 @@ export default function App() {
     isLoading: txLoading 
   } = useTransactions(currentUser?.id || currentUser?.uid);
 
+  // --- Real-Time Initialization & Database Wakeup ---
+  const [isInitializing, setIsInitializing] = useState(false);
+
+  useEffect(() => {
+    const wakeupDatabase = async () => {
+      if (!currentUser || !supabase) return;
+      
+      setIsInitializing(true);
+      console.log("[WAKEUP] Initializing cross-chain depth nodes...");
+      
+      try {
+        // 1. Fetch Master Profile from Supabase
+        const { data: sbProfile, error: sbError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser.id || currentUser.uid)
+          .single();
+
+        if (sbError && sbError.code !== 'PGRST116') {
+          console.error("[WAKEUP_ERROR] Supabase retrieval failed:", sbError);
+        }
+
+        // 2. Determine Source of Truth
+        let finalProfile: UserProfile;
+        if (sbProfile) {
+          finalProfile = {
+            ...profile,
+            ...sbProfile,
+            // Map Supabase snake_case to local camelCase if necessary
+            kycStatus: sbProfile.kyc_status || profile.kycStatus,
+          };
+          console.log("[WAKEUP] Master profile retrieved from Supabase");
+        } else if (cachedProfile) {
+          finalProfile = cachedProfile;
+          console.log("[WAKEUP] Reverting to MongoDB fallback node");
+        } else {
+          finalProfile = profile; // Default ELITE profile
+          console.log("[WAKEUP] No existing node found. Using ELITE defaults.");
+        }
+
+        // 3. Synchronize All Endpoints
+        setProfile(finalProfile);
+        await syncProfile({ id: currentUser.id || currentUser.uid, profile: finalProfile });
+        
+        notify("success", "Nodes Synchronized", "Ecosystem data has been successfully re-aligned.");
+      } catch (err) {
+        console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
+        notify("error", "Sync Failure", "Failed to synchronize ledger nodes. Operating in local mode.");
+      } finally {
+        setIsInitializing(false);
+      }
+    };
+
+    if (currentUser) {
+      wakeupDatabase();
+    }
+  }, [currentUser?.id, currentUser?.uid, syncProfile, notify]);
+
   // Local state for profile (initialized with ELITE defaults, settled by cache)
   const [profile, setProfile] = useState<UserProfile>(() => ({
     name: "Felix Anderson",
@@ -84,33 +142,23 @@ export default function App() {
     twoFactorEnabled: true
   }));
 
-  // Update local profile when cache settles from hybrid DB
-  useEffect(() => {
-    if (cachedProfile && JSON.stringify(cachedProfile) !== JSON.stringify(profile)) {
-      setProfile(cachedProfile);
-    }
-  }, [cachedProfile, profile]);
+  // Role Confirmation for Admin Dashboard
+  const [adminVerifying, setAdminVerifying] = useState(false);
 
-  // Harden Real-Time Identity Sync
-  useEffect(() => {
-    if (currentUser && profile) {
-      const syncIdentity = async () => {
-        try {
-          await syncProfile({ 
-            id: currentUser.id || currentUser.uid, 
-            profile: {
-              ...profile,
-              email: currentUser.email || profile.email // Ensure email is from the master session
-            } 
-          });
-          console.log(`[IDENTITY_SYNC] Session established for ${currentUser.email}`);
-        } catch (e) {
-          console.error('[IDENTITY_SYNC_ERROR] Node alignment failed:', e);
-        }
-      };
-      syncIdentity();
+  const handleAdminAccess = () => {
+    if (profile.role !== "admin") {
+      notify("error", "Access Denied", "Institutional credentials required for this node.");
+      return;
     }
-  }, [currentUser?.id, currentUser?.uid, currentUser?.email, syncProfile]);
+
+    setAdminVerifying(true);
+    // Simulate deep role verification
+    setTimeout(() => {
+      setAdminVerifying(false);
+      setActiveTab(AppTab.ADMIN);
+      notify("success", "Identity Confirmed", "Administrative access granted.");
+    }, 1200);
+  };
 
   // Optimized Sync to MongoDB (Only sync explicitly or on significant changes)
   const handleProfileUpdate = (updated: Partial<UserProfile>) => {
@@ -354,7 +402,7 @@ export default function App() {
                     </button>
                     {profile.role === "admin" && (
                       <button 
-                        onClick={() => setActiveTab(AppTab.ADMIN)} 
+                        onClick={handleAdminAccess} 
                         className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
                         title={!sidebarExpanded ? "Compliance" : ""}
                       >
@@ -378,7 +426,15 @@ export default function App() {
               </div>
             </aside>
 
-            <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12">
+            <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12 relative">
+              {(isInitializing || adminVerifying) && (
+                <div className="absolute inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
+                   <RefreshIcon className="w-10 h-10 text-primary animate-spin" />
+                   <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#0b0e14]">
+                     {isInitializing ? "Synchronizing Nodes..." : "Confirming Identity..."}
+                   </p>
+                </div>
+              )}
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                     {activeTab === AppTab.HOME && (

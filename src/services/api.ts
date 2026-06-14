@@ -51,4 +51,14 @@ export const fetchTransactionsFallback = async (userId: string): Promise<Transac
   }
 };
 
+// --- Admin Helper Node Endpoints ---
+
+export const settleEscrowTrade = async (txId: string, action: 'RELEASE' | 'REJECT') => {
+  return api.post('/giftcards/admin/settle', { txId, action });
+};
+
+export const adjustUserBalance = async (userId: string, amount: number, type: 'ADD' | 'SUB') => {
+  return api.post('/sync/admin/adjust-balance', { userId, amount, type });
+};
+
 export default api;
