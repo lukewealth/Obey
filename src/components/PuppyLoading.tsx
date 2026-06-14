@@ -20,229 +20,239 @@ export default function PuppyLoading() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- High-Detail Animation Variants ---
-  const bodyVariants = {
-    animate: {
-      y: [0, -15, 0],
-      rotate: [-1, 1, -1],
-      scale: [1, 1.02, 1], // Breathing effect
-      transition: { duration: 0.6, repeat: Infinity, ease: "easeInOut" }
-    }
-  };
-
-  const headVariants = {
+  // --- Ultra-Smooth & Slow Animation Variants ---
+  const puppyVariants = {
     animate: {
       y: [0, -8, 0],
-      rotate: [-3, 3, -3],
-      transition: { duration: 0.6, repeat: Infinity, ease: "easeInOut", delay: 0.05 }
-    }
-  };
-
-  const earVariants = (isLeft: boolean) => ({
-    animate: {
-      rotate: isLeft ? [-25, 5, -25] : [25, -5, 25],
-      scaleY: [1, 1.1, 1],
-      transition: { duration: 0.4, repeat: Infinity, ease: "easeInOut" }
-    }
-  });
-
-  const blinkVariants = {
-    animate: {
-      scaleY: [1, 1, 0.1, 1, 1],
-      transition: { duration: 3, repeat: Infinity, times: [0, 0.9, 0.95, 1], ease: "easeInOut" }
+      scale: [1, 1.01, 1],
+      transition: {
+        duration: 3.0,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
     }
   };
 
   const tailVariants = {
     animate: {
-      rotate: [-40, 40, -40],
-      transition: { duration: 0.15, repeat: Infinity, ease: "linear" }
+      rotate: [-10, 10, -10],
+      transition: {
+        duration: 1.5,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
     }
   };
 
-  const legVariants = (delay: number) => ({
+  const earVariants = (isLeft: boolean) => ({
     animate: {
-      y: [0, -12, 0],
-      scaleY: [1, 0.9, 1],
-      transition: { duration: 0.3, repeat: Infinity, delay, ease: "easeInOut" }
+      rotate: isLeft ? [-8, 4, -8] : [8, -4, 8],
+      transition: {
+        duration: 2.5,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
     }
   });
 
+  const blinkVariants = {
+    animate: {
+      scaleY: [1, 1, 0, 1, 1],
+      transition: {
+        duration: 5,
+        repeat: Infinity,
+        times: [0, 0.9, 0.93, 0.96, 1],
+        ease: "easeInOut"
+      }
+    }
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center space-y-16 py-12 md:py-24 overflow-hidden">
-      <div className="relative w-64 h-80 md:w-80 md:h-[400px]">
+    <div className="flex flex-col items-center justify-center space-y-16 py-12 md:py-24 overflow-hidden bg-gradient-to-b from-slate-50/50 to-white">
+      <div className="relative w-80 h-80 md:w-[450px] md:h-[450px] flex items-center justify-center">
         
-        {/* Dynamic Floor Shadow */}
+        {/* Institutional Ambient Glow */}
+        <div className="absolute inset-0 bg-blue-400/5 rounded-full blur-[120px] animate-pulse" />
+
+        {/* Dynamic Floor Shadow (Slow Bloom) */}
         <motion.div 
-          animate={{ scale: [1, 0.8, 1], opacity: [0.25, 0.1, 0.25] }}
-          transition={{ duration: 0.6, repeat: Infinity }}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-40 h-8 bg-black/10 rounded-[100%] blur-2xl"
+          animate={{ scale: [1, 1.05, 1], opacity: [0.15, 0.1, 0.15] }}
+          transition={{ duration: 3.0, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-12 left-1/2 -translate-x-1/2 w-56 h-12 bg-slate-900/10 rounded-[100%] blur-3xl"
         />
 
-        {/* --- 2D High-Detail Drawing Mesh --- */}
-        <div className="relative z-10 w-full h-full flex flex-col items-center pt-20">
-          
-          {/* Main Body Node */}
-          <motion.div variants={bodyVariants} animate="animate" className="relative w-40 h-44">
-             {/* Core Torso with Gradient Depth */}
-             <div className="absolute inset-0 bg-gradient-to-b from-amber-400 to-amber-600 rounded-[55px] shadow-2xl overflow-hidden border-b-4 border-amber-700/30">
-                {/* Fur Patch Detailing */}
-                <div className="absolute -left-4 top-10 w-20 h-20 bg-white/20 rounded-full blur-xl" />
-                <div className="absolute -right-2 top-4 w-12 h-12 bg-amber-700/20 rounded-full blur-lg" />
-             </div>
+        {/* --- Perfectly Joined SVG Dog Illustration (Standing Boy Dog) --- */}
+        <motion.div 
+          variants={puppyVariants}
+          animate="animate"
+          className="relative z-10 w-full h-full"
+        >
+          <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full drop-shadow-[0_20px_40px_rgba(0,0,0,0.1)]">
+            <defs>
+              <linearGradient id="furGradientMain" x1="120" y1="40" x2="120" y2="200" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stopColor="#FBBD23" />
+                <stop offset="50%" stopColor="#F59E0B" />
+                <stop offset="100%" stopColor="#D97706" />
+              </linearGradient>
+              <linearGradient id="earGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#D97706" />
+                <stop offset="100%" stopColor="#92400E" />
+              </linearGradient>
+              <radialGradient id="eyeShine" cx="30%" cy="30%" r="50%">
+                <stop offset="0%" stopColor="white" stopOpacity="0.9" />
+                <stop offset="100%" stopColor="white" stopOpacity="0" />
+              </radialGradient>
+            </defs>
 
-             {/* Tail Node */}
-             <motion.div 
-                variants={tailVariants}
-                animate="animate"
-                className="absolute -right-4 top-1/2 w-20 h-7 bg-amber-700 rounded-full origin-left shadow-lg flex items-center justify-end px-2"
-             >
-                <div className="w-6 h-full bg-amber-400 rounded-full blur-[2px] opacity-40" />
-             </motion.div>
-
-             {/* Premium Collar Node */}
-             <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-32 h-6 bg-red-600 rounded-full shadow-lg border-b-2 border-red-800 flex items-center justify-center">
-                <div className="w-4 h-4 bg-yellow-400 rounded-full shadow-inner border border-yellow-200" />
-             </div>
-          </motion.div>
-
-          {/* Head Node (Higher Detailing) */}
-          <motion.div
-            variants={headVariants}
-            animate="animate"
-            className="absolute top-4 w-52 h-48 flex flex-col items-center"
-          >
-             {/* Cranium Mesh */}
-             <div className="relative w-full h-full bg-gradient-to-b from-amber-300 to-amber-500 rounded-[75px] shadow-2xl border-b-4 border-amber-600/40 overflow-hidden">
-                {/* Fur Detail Spots */}
-                <div className="absolute top-2 left-10 w-12 h-8 bg-amber-700/20 rounded-full blur-md" />
-                
-                {/* Ears Node */}
-                <motion.div variants={earVariants(true)} animate="animate" className="absolute -top-2 -left-4 w-16 h-28 bg-amber-800 rounded-full origin-bottom shadow-lg" />
-                <motion.div variants={earVariants(false)} animate="animate" className="absolute -top-2 -right-4 w-16 h-28 bg-amber-800 rounded-full origin-bottom shadow-lg" />
-
-                {/* Face Components Mesh */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center pt-8">
-                   {/* Ocular Mesh (Sparkling Blue Eyes) */}
-                   <div className="flex gap-8">
-                      {[1, 2].map(i => (
-                        <div key={i} className="relative w-14 h-14 bg-gray-950 rounded-full border-[4px] border-white shadow-2xl overflow-hidden">
-                           {/* Iris Gradient */}
-                           <div className="absolute inset-0 bg-gradient-to-tr from-blue-700 via-blue-400 to-cyan-200 opacity-60" />
-                           {/* Animated Pupil */}
-                           <motion.div variants={blinkVariants} animate="animate" className="absolute inset-0 bg-black flex items-center justify-center">
-                              <div className="w-10 h-10 bg-gray-900 rounded-full" />
-                           </motion.div>
-                           {/* Light Reflections */}
-                           <div className="absolute top-2 left-2 w-5 h-5 bg-white rounded-full opacity-90 blur-[0.5px]" />
-                           <div className="absolute bottom-3 right-3 w-2 h-2 bg-white rounded-full opacity-60" />
-                        </div>
-                      ))}
-                   </div>
-
-                   {/* Muzzle Mesh (High Detail) */}
-                   <div className="mt-2 w-32 h-24 bg-white/90 rounded-[50px] shadow-inner border border-gray-100 flex flex-col items-center pt-4">
-                      {/* Nose Node */}
-                      <div className="w-8 h-5 bg-gray-950 rounded-full shadow-lg flex flex-col items-center">
-                         <div className="w-2 h-1 bg-white/20 rounded-full mt-1" />
-                      </div>
-                      {/* Mouth & Tongue Node */}
-                      <div className="mt-1 flex flex-col items-center">
-                         <div className="w-10 h-2 border-b-2 border-gray-300 rounded-full" />
-                         <motion.div 
-                           animate={{ scaleY: [1, 1.3, 1], rotate: [-2, 2, -2] }}
-                           transition={{ duration: 0.3, repeat: Infinity }}
-                           className="w-8 h-12 bg-gradient-to-b from-red-400 to-pink-500 rounded-b-full border-2 border-red-600/20 shadow-md"
-                         />
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </motion.div>
-
-          {/* Detailed Walking Paws Node */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-between px-6">
-             {[0, 0.15, 0.3, 0.45].map((delay, idx) => (
-               <motion.div 
-                key={idx}
-                variants={legVariants(delay)} 
+            {/* Complete Illustration Mesh */}
+            <g id="dog-illustration">
+              {/* Tail Node (High Detail) */}
+              <motion.g 
+                variants={tailVariants} 
                 animate="animate" 
-                className="w-12 h-16 flex flex-col items-center"
-               >
-                  <div className="w-full h-full bg-amber-600 rounded-b-3xl shadow-xl border-t-2 border-amber-700/20">
-                     {/* Toe Detailing */}
-                     <div className="mt-auto h-4 flex justify-around px-1 pb-1">
-                        <div className="w-2 h-2 bg-amber-700/30 rounded-full" />
-                        <div className="w-2 h-2 bg-amber-700/30 rounded-full" />
-                        <div className="w-2 h-2 bg-amber-700/30 rounded-full" />
-                     </div>
-                  </div>
-               </motion.div>
-             ))}
-          </div>
-        </div>
+                style={{ originX: "170px", originY: "130px" }}
+              >
+                <path d="M170 130C190 100 215 110 220 135C215 150 185 155 170 130Z" fill="#D97706" />
+                <path d="M175 132C190 110 205 115 210 130C205 140 185 142 175 132Z" fill="#F59E0B" opacity="0.6" />
+              </motion.g>
 
-        {/* Global Particle Mesh */}
-        {[...Array(6)].map((_, i) => (
+              {/* Back Legs (Far Side) */}
+              <path d="M150 160C150 185 140 205 130 205H145C155 205 165 185 165 160V140H150V160Z" fill="#B45309" />
+              <path d="M70 160C70 185 60 205 50 205H65C75 205 85 185 85 160V140H70V160Z" fill="#B45309" />
+
+              {/* Integrated Torso Node (Stand Look) */}
+              <path d="M55 90C55 70 160 70 175 120C185 160 165 185 140 185H80C55 185 50 160 55 90Z" fill="url(#furGradientMain)" />
+              
+              {/* Chest Detail */}
+              <path d="M55 100C55 120 75 145 95 145C115 145 125 120 125 100" stroke="white" strokeOpacity="0.1" strokeWidth="4" strokeLinecap="round" />
+
+              {/* Front Legs (Near Side) */}
+              <motion.path 
+                animate={{ scaleY: [1, 0.99, 1] }}
+                transition={{ duration: 3.0, repeat: Infinity, ease: "easeInOut" }}
+                d="M85 160C85 190 75 210 65 210H85C95 210 105 190 105 160V135H85V160Z" 
+                fill="#F59E0B" 
+              />
+              <motion.path 
+                animate={{ scaleY: [1, 0.99, 1] }}
+                transition={{ duration: 3.0, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                d="M135 160C135 190 125 210 115 210H135C145 210 155 190 155 160V135H135V160Z" 
+                fill="#F59E0B" 
+              />
+
+              {/* Head Unit (High-Fidelity) */}
+              <g transform="translate(45, 45)">
+                {/* Long Droopy Ears (Boy Dog aesthetic) */}
+                <motion.path 
+                  variants={earVariants(true)}
+                  animate="animate"
+                  style={{ originX: "15px", originY: "15px" }}
+                  d="M5 15C-5 15 -15 60 -10 90C0 105 20 80 20 15Z" 
+                  fill="url(#earGradient)" 
+                />
+                <motion.path 
+                  variants={earVariants(false)}
+                  animate="animate"
+                  style={{ originX: "65px", originY: "15px" }}
+                  d="M75 15C85 15 95 60 90 90C80 105 60 80 60 15Z" 
+                  fill="url(#earGradient)" 
+                />
+
+                {/* Main Skull Path */}
+                <path d="M10 50C10 15 70 15 70 50C70 85 60 105 40 105C20 105 10 85 10 50Z" fill="url(#furGradientMain)" />
+                
+                {/* Refined Muzzle */}
+                <path d="M22 75C22 65 58 65 58 75C58 98 48 108 40 108C32 108 22 98 22 75Z" fill="#FFFBEB" />
+                <path d="M35 82C35 79 45 79 45 82C45 88 40 92 40 92C40 92 35 88 35 82Z" fill="#0F172A" />
+
+                {/* Eyes Mesh (Sparkling Deep Blue) */}
+                <g transform="translate(22, 42)">
+                   <circle cx="6" cy="6" r="9" fill="white" />
+                   <motion.g variants={blinkVariants} animate="animate" style={{ originX: "6px", originY: "6px" }}>
+                      <circle cx="6" cy="6" r="7" fill="#1D4ED8" />
+                      <circle cx="6" cy="6" r="4" fill="#1E3A8A" />
+                      <circle cx="4" cy="4" r="3" fill="url(#eyeShine)" />
+                   </motion.g>
+                </g>
+                <g transform="translate(48, 42)">
+                   <circle cx="6" cy="6" r="9" fill="white" />
+                   <motion.g variants={blinkVariants} animate="animate" style={{ originX: "6px", originY: "6px" }}>
+                      <circle cx="6" cy="6" r="7" fill="#1D4ED8" />
+                      <circle cx="6" cy="6" r="4" fill="#1E3A8A" />
+                      <circle cx="4" cy="4" r="3" fill="url(#eyeShine)" />
+                   </motion.g>
+                </g>
+
+                {/* Institutional Blue Mesh Collar */}
+                <path d="M15 95C15 92 65 92 65 95C65 100 15 100 15 95Z" fill="#2563EB" stroke="#1E3A8A" strokeWidth="1" />
+                <circle cx="40" cy="100" r="4" fill="#FBBF24" />
+                <path d="M38 100L42 100" stroke="#B45309" strokeWidth="0.5" />
+              </g>
+            </g>
+          </svg>
+        </motion.div>
+
+        {/* Institutional Particle Mesh (Slow & Graceful) */}
+        {[...Array(10)].map((_, i) => (
           <motion.div
             key={i}
             animate={{
-              y: [0, -150],
-              x: Math.sin(i) * 80,
-              opacity: [0, 1, 0],
+              y: [0, -250],
+              x: Math.cos(i) * 150,
+              opacity: [0, 0.6, 0],
               scale: [0, 1.5, 0]
             }}
-            transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-            className="absolute left-1/2 bottom-1/3 w-2 h-2 bg-primary rounded-full blur-[1px] shadow-[0_0_10px_rgba(var(--color-primary-rgb),0.5)]"
+            transition={{ duration: 4.5, repeat: Infinity, delay: i * 0.5, ease: "circOut" }}
+            className="absolute left-1/2 bottom-1/4 w-1 h-1 bg-blue-600 rounded-full blur-[1px] opacity-20"
           />
         ))}
       </div>
 
       {/* Institutional Progress Mesh */}
-      <div className="text-center space-y-8 relative max-w-sm">
-        <div className="space-y-3">
+      <div className="text-center space-y-12 relative max-w-sm">
+        <div className="space-y-4">
           <motion.div
-            animate={{ opacity: [0.7, 1, 0.7], scale: [0.99, 1, 0.99] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 3.0, repeat: Infinity }}
           >
-            <h3 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tighter italic">
-              Mesh <span className="text-primary">Alignment...</span>
+            <h3 className="text-5xl md:text-6xl font-black text-slate-900 uppercase tracking-tighter italic">
+              Mesh <span className="text-blue-600">Sync...</span>
             </h3>
           </motion.div>
-          <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.6em] animate-pulse">Syncing institutional node depth</p>
+          <p className="text-[12px] font-black text-slate-400 uppercase tracking-[0.9em] animate-pulse">Institutional alignment in progress</p>
         </div>
 
         {/* Live Context UI */}
-        <div className="bg-white/70 backdrop-blur-2xl rounded-[45px] p-8 border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] space-y-6 relative overflow-hidden">
-           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-transparent via-primary to-transparent opacity-40 animate-pulse" />
-           <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] text-center flex items-center justify-center gap-3">
-              <Sparkles size={14} className="text-primary" /> Real-Time Asset Node Feed
+        <div className="bg-white/90 backdrop-blur-3xl rounded-[60px] p-12 border border-white/80 shadow-[0_40px_80px_rgba(0,0,0,0.06)] space-y-10 relative overflow-hidden">
+           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-500/40 to-transparent animate-pulse" />
+           <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] text-center flex items-center justify-center gap-3">
+              <Sparkles size={18} className="text-blue-500" /> Real-Time Asset Node Mesh
            </p>
-           <div className="grid grid-cols-2 gap-4">
+           <div className="grid grid-cols-2 gap-6">
               <AnimatePresence mode="wait">
                  {livePrices ? (
                    <>
                     {[
-                      { sym: 'BTC', price: livePrices.BTC, color: 'text-orange-500', bg: 'bg-orange-50' },
-                      { sym: 'ETH', price: livePrices.ETH, color: 'text-blue-500', bg: 'bg-blue-50' },
-                      { sym: 'SOL', price: livePrices.SOL, color: 'text-purple-500', bg: 'bg-purple-50' },
-                      { sym: 'SUI', price: livePrices.SUI, color: 'text-cyan-500', bg: 'bg-cyan-50' }
+                      { sym: 'BTC', price: livePrices.BTC, color: 'text-orange-600', bg: 'bg-orange-50/70' },
+                      { sym: 'ETH', price: livePrices.ETH, color: 'text-blue-600', bg: 'bg-blue-50/70' },
+                      { sym: 'SOL', price: livePrices.SOL, color: 'text-purple-600', bg: 'bg-purple-50/70' },
+                      { sym: 'SUI', price: livePrices.SUI, color: 'text-cyan-600', bg: 'bg-cyan-50/70' }
                     ].map((p) => (
                       <motion.div 
                         key={p.sym}
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className={`flex flex-col items-center justify-center p-4 ${p.bg} rounded-[32px] border border-white shadow-sm hover:scale-105 transition-transform duration-300 group`}
+                        className={`flex flex-col items-center justify-center p-6 ${p.bg} rounded-[40px] border border-white/50 shadow-sm hover:shadow-md transition-all duration-700`}
                       >
-                        <span className={`text-[10px] font-black ${p.color} uppercase mb-1 tracking-widest`}>{p.sym}</span>
-                        <span className="text-[13px] font-mono font-black text-gray-900">${p.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                        <span className={`text-[11px] font-black ${p.color} uppercase mb-2 tracking-widest`}>{p.sym}</span>
+                        <span className="text-[15px] font-mono font-black text-slate-900">${p.price?.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                       </motion.div>
                     ))}
                    </>
                  ) : (
-                   <div className="col-span-2 flex flex-col items-center justify-center py-8 space-y-4">
-                      <div className="w-10 h-10 border-4 border-primary/10 border-t-primary rounded-full animate-spin shadow-lg" />
-                      <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.3em]">Establishing Data Tunnel</p>
+                   <div className="col-span-2 flex flex-col items-center justify-center py-12 space-y-6">
+                      <div className="w-14 h-14 border-4 border-blue-50 border-t-blue-600 rounded-full animate-spin shadow-lg" />
+                      <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.5em]">Establishing Secure Tunnel</p>
                    </div>
                  )}
               </AnimatePresence>
@@ -250,15 +260,15 @@ export default function PuppyLoading() {
         </div>
 
         {/* Institutional Progress Bar */}
-        <div className="flex flex-col items-center gap-5">
-           <div className="w-64 h-2.5 bg-gray-100 rounded-full overflow-hidden relative shadow-inner border border-gray-50">
+        <div className="flex flex-col items-center gap-8">
+           <div className="w-80 h-4 bg-slate-100/50 rounded-full overflow-hidden relative shadow-inner border border-white">
               <motion.div 
                 animate={{ left: ["-100%", "100%"] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: "linear" }}
-                className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-primary/60 via-primary to-primary/60 shadow-[0_0_25px_rgba(var(--color-primary-rgb),1)]"
+                transition={{ duration: 4.0, repeat: Infinity, ease: "linear" }}
+                className="absolute top-0 bottom-0 w-1/2 bg-gradient-to-r from-blue-400/20 via-blue-500/60 to-blue-400/20 shadow-[0_0_40px_rgba(59,130,246,0.3)]"
               />
            </div>
-           <p className="text-[9px] font-black text-gray-300 uppercase tracking-[0.4em]">Integrity Level: 100%</p>
+           <p className="text-[11px] font-black text-slate-300 uppercase tracking-[0.6em]">Verification Status: Optimal</p>
         </div>
       </div>
     </div>
