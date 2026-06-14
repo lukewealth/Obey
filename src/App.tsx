@@ -58,6 +58,18 @@ export default function App() {
   // Auth state
   const [currentUser, setCurrentUser] = useState<any>(null);
 
+  // --- React Query Hybrid Hooks (Full-Stack Caching) ---
+  const { 
+    syncProfile, 
+    isLoading: profileLoading 
+  } = useUserProfile(currentUser?.id || currentUser?.uid);
+
+  const { 
+    data: cachedTransactions = [], 
+    syncTransactions, 
+    isLoading: txLoading 
+  } = useTransactions(currentUser?.id || currentUser?.uid);
+
   // --- Real-Time Initialization & Database Wakeup ---
   const [isInitializing, setIsInitializing] = useState(false);
 
