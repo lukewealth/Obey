@@ -563,16 +563,16 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
            </motion.div>
 
            <motion.div 
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-8 md:space-y-12 relative z-10 mt-24 md:mt-48 px-4"
+            className="space-y-4 md:space-y-6 relative z-10 mt-8 md:mt-12 px-4"
            >
-              <h2 className="text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter dark:text-white leading-[0.85] md:leading-[0.8]">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter dark:text-white leading-tight">
                 Institutional-grade <br className="hidden sm:block" /> 
                 nodes trust OBEY
               </h2>
-              <p className="text-lg md:text-2xl lg:text-3xl text-gray-500 dark:text-gray-400 font-medium max-w-4xl mx-auto leading-relaxed">
+              <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 font-medium max-w-3xl mx-auto leading-relaxed">
                 Many companies have settled using OBEY and they trust <br className="hidden md:block" /> the safety of their digital assets.
               </p>
            </motion.div>
