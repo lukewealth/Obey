@@ -31,37 +31,50 @@
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.3);
   --color-text-muted: #6B7280;
+  --border-color: #F3F4F6;
 }
 
 .dark {
-  --app-bg: #0b0e14;
-  --app-accent-blue: #1a1e26;
-  --app-accent-yellow: #2d240b;
-  --app-primary: #8b5cf6;
-  --app-secondary: #3b82f6;
-  --app-text: #f3f4f6;
-  --glass-bg: rgba(11, 14, 20, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.05);
-  --color-text-muted: #9ca3af;
-  --color-bg-white: #111827;
-  --color-text-dark: #f9fafb;
+  --app-bg: #121212; /* Deep Grey */
+  --app-accent-blue: #1E1E1E; /* Lighter Grey */
+  --app-accent-yellow: #2D240B;
+  --app-primary: #A78BFA;
+  --app-secondary: #60A5FA;
+  --app-text: #F3F4F6;
+  --glass-bg: rgba(18, 18, 18, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --color-text-muted: #9CA3AF;
+  --color-bg-white: #1E1E1E;
+  --color-text-dark: #F9FAF6;
+  --border-color: #2D2D2D;
 }
 
 body {
   font-family: var(--font-sans);
-  background: linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 50%, #FEF9C3 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #F9FAFB 50%, #F3F4F6 100%);
   background-attachment: fixed;
   color: var(--app-text);
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.5s ease, color 0.5s ease;
+  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
 }
 
 .dark body {
-  background: linear-gradient(135deg, #0b0e14 0%, #1a1e26 50%, #0b0e14 100%);
+  background: linear-gradient(135deg, #121212 0%, #1A1A1A 50%, #121212 100%);
 }
+
+/* Global Dark Mode Overrides */
+.dark .text-gray-900 { color: #F9FAFB !important; }
+.dark .text-gray-700 { color: #E5E7EB !important; }
+.dark .text-gray-600 { color: #D1D5DB !important; }
+.dark .text-gray-400 { color: #9CA3AF !important; }
+.dark .bg-white { background-color: #1E1E1E !important; }
+.dark .bg-gray-50 { background-color: #1A1A1A !important; }
+.dark .border-gray-100 { border-color: #2D2D2D !important; }
+.dark .border-gray-200 { border-color: #3D3D3D !important; }
+.dark .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.5) !important; }
 
 /* Apple-style Bento Cards */
 .bento-card {
