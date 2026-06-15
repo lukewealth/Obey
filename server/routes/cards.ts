@@ -1,8 +1,8 @@
 import express from 'express';
 import { createVirtualCard, rotateCVV } from '../services/interswitch';
 import VirtualCard from '../models/VirtualCard';
-import Transaction from '../models/Transaction';
-import User from '../models/User';
+import { Transaction } from '../models/Transaction';
+import { User } from '../models/User';
 
 const router = express.Router();
 
