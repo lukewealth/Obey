@@ -527,39 +527,41 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               {/* The Line - Centered Vertically */}
               <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
 
-              {/* Bird Animation - flying Right side top extreme corner toward Left */}
+              {/* Cat Animation - walking Right side top extreme corner toward Left */}
               <motion.div
                 animate={{ 
                   x: ["100%", "-120%"],
-                  opacity: [0, 0.6, 0.6, 0]
-                }}
-                transition={{ 
-                  duration: 35, repeat: Infinity, ease: "linear" 
-                }}
-                className="w-32 h-32 md:w-48 md:h-48 absolute top-4 right-0 z-10 filter grayscale dark:invert"
-              >
-                <DotLottieReact
-                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
-                  loop
-                  autoplay
-                />
-              </motion.div>
-
-              {/* Cat Animation - Walking from extreme Left side toward Right on top of line */}
-              <motion.div
-                animate={{ 
-                  x: ["-100%", "120%"],
                   opacity: [0, 1, 1, 0]
                 }}
                 transition={{ 
                   duration: 25, repeat: Infinity, ease: "linear" 
                 }}
-                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-0 -translate-y-[65%] z-10"
+                className="w-48 h-48 md:w-64 md:h-64 absolute top-4 right-0 z-10"
               >
                 <DotLottieReact
                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
                   loop
                   autoplay
+                  style={{ transform: 'scaleX(-1)' }}
+                />
+              </motion.div>
+
+              {/* Bird Animation - flying from extreme Left side toward Right on top of line */}
+              <motion.div
+                animate={{ 
+                  x: ["-100%", "120%"],
+                  opacity: [0, 0.6, 0.6, 0]
+                }}
+                transition={{ 
+                  duration: 35, repeat: Infinity, ease: "linear" 
+                }}
+                className="w-32 h-32 md:w-48 md:h-48 absolute top-1/2 left-0 -translate-y-[65%] z-10 filter grayscale dark:invert"
+              >
+                <DotLottieReact
+                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
+                  loop
+                  autoplay
+                  style={{ transform: 'scaleX(-1)' }}
                 />
               </motion.div>
            </motion.div>
