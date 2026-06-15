@@ -80,12 +80,14 @@ export default function App() {
   const [utilitySegment, setUtilitySegment] = useState<"airtime" | "data">("airtime");
   const wakeupRef = React.useRef<string | null>(null);
 
-  // Cookie Utility for Hybrid Tracking
+  // Utility for Hybrid Tracking
   const getCookie = (name: string) => {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop()?.split(';').shift();
   };
+
+  const [successTransaction, setSuccessTransaction] = useState<{ amount: number | string; type: string; id: string } | null>(null);
 
   useEffect(() => {
     const wakeupDatabase = async () => {
@@ -239,6 +241,14 @@ export default function App() {
     }
   };
 
+  const triggerSuccess = (amount: number | string, type: string) => {
+    setSuccessTransaction({
+      amount,
+      type,
+      id: `OBY-${Math.floor(Math.random() * 899999) + 100000}X`
+    });
+  };
+
   const [systemAlert, setSystemAlert] = useState({
     isOpen: false,
     title: "",
@@ -370,6 +380,20 @@ export default function App() {
         }}
         profile={profile}
       />
+
+      <AnimatePresence>
+        {successTransaction && (
+          <TransactionSuccess
+            amount={successTransaction.amount}
+            type={successTransaction.type}
+            id={successTransaction.id}
+            onClose={() => {
+              setSuccessTransaction(null);
+              setActiveTab(AppTab.HISTORY);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {currentScreen === AppScreen.MARKETING && (
         <MarketingPage 
@@ -549,6 +573,8 @@ export default function App() {
                             } else if (action === "data" || action === "buy-data") {
                               setUtilitySegment("data");
                               setActiveTab(AppTab.SERVICES);
+                            } else if (action === "history") {
+                              setActiveTab(AppTab.HISTORY);
                             } else {
                               setActiveTab(AppTab.SERVICES);
                             }
@@ -563,19 +589,25 @@ export default function App() {
                         }}
                       />
                     )}
+                    {activeTab === AppTab.HISTORY && (
+                      <TransactionHistory transactions={cachedTransactions} />
+                    )}
                     {activeTab === AppTab.WALLET && (
                       <WalletSystem 
                         profile={profile} 
                         transactions={cachedTransactions} 
-                        onFundWallet={(amt, details) => handleProfileUpdate({ balance: profile.balance + amt })} 
+                        onFundWallet={(amt, details) => {
+                          handleProfileUpdate({ balance: profile.balance + amt });
+                          triggerSuccess(amt, "Deposit Protocol");
+                        }} 
                         onWithdrawWallet={async (amt, details) => { 
                           handleProfileUpdate({ balance: profile.balance - amt }); 
-                          notify("info", "Withdrawal Dispatched", `₦${amt.toLocaleString()} routed to external node.`);
+                          triggerSuccess(amt, "Withdrawal Dispatch");
                           return true; 
                         }} 
                         onTransfer={async (amt, recipient) => { 
                           handleProfileUpdate({ balance: profile.balance - amt }); 
-                          notify("success", "Peer Transfer Settled", `₦${amt.toLocaleString()} moved to ${recipient}.`);
+                          triggerSuccess(amt, `Transfer to ${recipient}`);
                           return true; 
                         }} 
                       />
@@ -584,7 +616,10 @@ export default function App() {
                     {activeTab === AppTab.CARDS && (
                       <VirtualCardSystem 
                         profile={profile} 
-                        onUpdateBalance={(amt) => handleProfileUpdate({ balance: profile.balance + amt })}
+                        onUpdateBalance={(amt) => {
+                          handleProfileUpdate({ balance: profile.balance + amt });
+                          triggerSuccess(amt, amt > 0 ? "Card Funding" : "Card Unloading");
+                        }}
                       />
                     )}
                     
@@ -608,11 +643,17 @@ export default function App() {
                         <AnimatePresence mode="wait">
                           {tradeSubTab === 'giftcard' ? (
                             <motion.div key="giftcard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                              <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
+                              <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => {
+                                handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
+                                triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
+                              }} />
                             </motion.div>
                           ) : (
                             <motion.div key="crypto" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} solPrice={solPrice} suiPrice={suiPrice} onTradeCompleted={(amt, details, isSell) => handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt })} />
+                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} solPrice={solPrice} suiPrice={suiPrice} onTradeCompleted={(amt, details, isSell) => {
+                                handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
+                                triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
+                              }} />
                             </motion.div>
                           )}
                         </AnimatePresence>
@@ -623,7 +664,11 @@ export default function App() {
                       <AirtimeModule 
                         profile={profile} 
                         initialSegment={utilitySegment}
-                        onPurchase={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} 
+                        onPurchase={async (amt) => { 
+                          handleProfileUpdate({ balance: profile.balance - amt }); 
+                          triggerSuccess(amt, "Service Settlement");
+                          return true; 
+                        }} 
                       />
                     )}
                     {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />}

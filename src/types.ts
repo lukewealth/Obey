@@ -19,7 +19,8 @@ export enum AppTab {
   SERVICES = "SERVICES",
   PROFILE = "PROFILE",
   ADMIN = "ADMIN",
-  CARDS = "CARDS"
+  CARDS = "CARDS",
+  HISTORY = "HISTORY"
 }
 
 export enum GiftCardTab {

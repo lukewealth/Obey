@@ -1,6 +1,7 @@
-import React from "react";
-import { CheckCircle2, Download, Share2, X, Activity, ShieldCheck } from "lucide-react";
-import { motion } from "framer-motion";
+import React, { useEffect } from "react";
+import { Download, Share2, X, Activity, ShieldCheck } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 interface TransactionSuccessProps {
   amount: string | number;
@@ -12,8 +13,21 @@ interface TransactionSuccessProps {
 export default function TransactionSuccess({ amount, type, id, onClose }: TransactionSuccessProps) {
   const formattedAmount = typeof amount === 'number' ? `₦${amount.toLocaleString()}` : amount;
 
+  // Auto-close after 5 seconds to transition to history
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[100] bg-white/90 backdrop-blur-3xl flex flex-col overflow-y-auto">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-3xl flex flex-col overflow-y-auto"
+    >
       <header className="h-16 md:h-20 px-6 md:px-8 flex items-center justify-between max-w-7xl mx-auto w-full shrink-0">
         <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] uppercase italic">OBEY</span>
         <button onClick={onClose} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-full flex items-center justify-center bg-gray-50 text-gray-400 hover:text-gray-900 transition-all active-press">
@@ -23,12 +37,15 @@ export default function TransactionSuccess({ amount, type, id, onClose }: Transa
 
       <main className="flex-grow flex flex-col items-center justify-center p-6 md:p-8">
         <motion.div 
-          initial={{ scale: 0.5, opacity: 0, rotate: -20 }}
-          animate={{ scale: 1, opacity: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          className="w-20 h-20 md:w-28 md:h-24 bg-emerald-50 text-emerald-500 rounded-[30px] md:rounded-[40px] flex items-center justify-center mb-6 md:mb-10 shadow-2xl shadow-emerald-500/10 shrink-0"
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          className="w-48 h-48 md:w-64 md:h-64 flex items-center justify-center mb-2 shrink-0"
         >
-          <CheckCircle2 size={48} className="md:w-16 md:h-16" />
+          <DotLottieReact
+            src="https://lottie.host/0414325b-916f-4152-8885-0f8e46d384e0/YdBGp1N4qJ.lottie"
+            loop={false}
+            autoplay
+          />
         </motion.div>
 
         <motion.div 
@@ -84,6 +101,6 @@ export default function TransactionSuccess({ amount, type, id, onClose }: Transa
           Return to Console
         </button>
       </main>
-    </div>
+    </motion.div>
   );
 }

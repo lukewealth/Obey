@@ -59,7 +59,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } }
   };
 
   return (
@@ -238,7 +238,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               <p className="text-xs md:text-sm text-gray-400 font-medium">Real-time settlement history.</p>
             </div>
             <button 
-              onClick={() => onNavigateTab(AppTab.WALLET)}
+              onClick={() => onNavigateTab(AppTab.HISTORY)}
               className="text-primary text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:gap-3 flex items-center gap-1.5 md:gap-2 transition-all border-b-2 border-primary/10 pb-1"
             >
               Full History <ArrowRight size={12} className="md:w-3.5 md:h-3.5" />
