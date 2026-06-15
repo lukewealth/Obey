@@ -513,21 +513,16 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         {/* 4. LOGO CLOUD */}
         <section id="compliance" className="py-24 md:py-32 px-4 md:px-6 bg-white dark:bg-[#121212] text-center space-y-16 md:space-y-20 relative overflow-hidden transition-colors duration-500">
            
-           {/* Graceful Moving Lottie Decoration */}
-           <div className="absolute inset-x-0 top-0 bottom-0 pointer-events-none z-20 flex items-center overflow-hidden">
+           {/* Walking Cat Decoration */}
+           <div className="max-w-4xl mx-auto relative h-20 md:h-24 overflow-hidden mb-[-2rem] md:mb-[-4rem]">
+              <div className="absolute bottom-4 left-0 right-0 h-[1px] bg-gray-100 dark:bg-white/10 z-0"></div>
               <motion.div
-                animate={{ 
-                  x: ["-20%", "120%"],
-                  y: [0, -20, 0]
-                }}
-                transition={{ 
-                  x: { duration: 25, repeat: Infinity, ease: "linear" },
-                  y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
-                }}
-                className="w-40 h-40 md:w-48 md:h-48 opacity-[0.15] mix-blend-darken dark:mix-blend-lighten"
+                animate={{ x: ["-10%", "110%"] }}
+                transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                className="w-24 h-24 md:w-28 md:h-28 relative z-10 -mb-4"
               >
                 <DotLottieReact
-                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
+                  src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
                   loop
                   autoplay
                 />
