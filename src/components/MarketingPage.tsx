@@ -511,15 +511,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         </section>
 
         {/* 4. LOGO CLOUD */}
-        <section id="compliance" className="pt-48 pb-24 md:pt-64 md:pb-40 px-4 md:px-6 bg-white dark:bg-[#121212] text-center space-y-24 md:space-y-32 relative overflow-hidden transition-colors duration-500">
+        <section id="compliance" className="pt-32 pb-32 md:pt-48 md:pb-64 bg-white dark:bg-[#121212] text-center relative overflow-hidden transition-colors duration-500">
 
-           {/* Fade-out Blend Effect */}
-           <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-gray-50 dark:from-black/20 to-transparent pointer-events-none z-20"></div>
+           {/* Pervasive Grey Fadeout Effect */}
+           <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 via-transparent to-gray-50/50 dark:from-black/10 dark:via-transparent dark:to-black/10 pointer-events-none z-0"></div>
 
            {/* Walking Animations on Grey Line */}
-           <div className="max-w-[1400px] mx-auto relative h-24 md:h-32 overflow-hidden mb-[-4rem] md:mb-[-6rem]">
+           <div className="max-w-[1400px] mx-auto relative h-24 md:h-32 overflow-hidden z-10">
               {/* The Line */}
-              <div className="absolute bottom-6 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/5 z-0"></div>
+              <div className="absolute bottom-6 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 z-0"></div>
 
               {/* Original Cat - Faster */}
               <motion.div
@@ -549,23 +549,23 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
            </div>
 
            <motion.div 
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-6 md:space-y-8 relative z-10"
+            className="space-y-8 md:space-y-12 relative z-10 mt-24 md:mt-48 px-4"
            >
-              <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-black tracking-tighter px-2 dark:text-white leading-[0.9]">
+              <h2 className="text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter dark:text-white leading-[0.85] md:leading-[0.8]">
                 Institutional-grade <br className="hidden sm:block" /> 
                 nodes trust OBEY
               </h2>
-              <p className="text-base md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 font-medium px-4 max-w-3xl mx-auto">
-                Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.
+              <p className="text-lg md:text-2xl lg:text-3xl text-gray-500 dark:text-gray-400 font-medium max-w-4xl mx-auto leading-relaxed">
+                Many companies have settled using OBEY and they trust <br className="hidden md:block" /> the safety of their digital assets.
               </p>
            </motion.div>
 
-           <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 grayscale opacity-30 group px-4 relative z-10">
+           <div className="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-24 grayscale opacity-20 group px-4 relative z-10 mt-24 md:mt-40">
               {['Airbnb', 'Slack', 'Stripe', 'Airwallex', 'Spotify', 'Booking', 'Gusto', 'Coinbase'].map(c => (
-                <div key={c} className="h-10 md:h-12 flex items-center justify-center font-black text-2xl md:text-3xl tracking-tighter hover:text-black dark:hover:text-white transition-all cursor-pointer truncate dark:text-white/40">{c}</div>
+                <div key={c} className="h-10 md:h-12 flex items-center justify-center font-black text-2xl md:text-4xl tracking-tighter hover:text-black dark:hover:text-white transition-all cursor-pointer truncate dark:text-white/40">{c}</div>
               ))}
            </div>
         </section>
