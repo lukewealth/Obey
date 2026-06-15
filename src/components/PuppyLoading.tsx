@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import api from "../services/api";
-import RealisticDogLoader from "./RealisticDogLoader";
+import DogRigSVG from "./DogRigSVG";
 
 export default function PuppyLoading() {
   const [livePrices, setLivePrices] = useState<any>(null);
@@ -21,53 +21,6 @@ export default function PuppyLoading() {
     return () => clearInterval(interval);
   }, []);
 
-  // --- Ultra-Smooth & Slow Animation Variants ---
-  const puppyVariants = {
-    animate: {
-      y: [0, -8, 0],
-      scale: [1, 1.01, 1],
-      transition: {
-        duration: 3.0,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const tailVariants = {
-    animate: {
-      rotate: [-10, 10, -10],
-      transition: {
-        duration: 1.5,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  };
-
-  const earVariants = (isLeft: boolean) => ({
-    animate: {
-      rotate: isLeft ? [-8, 4, -8] : [8, -4, 8],
-      transition: {
-        duration: 2.5,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }
-    }
-  });
-
-  const blinkVariants = {
-    animate: {
-      scaleY: [1, 1, 0, 1, 1],
-      transition: {
-        duration: 5,
-        repeat: Infinity,
-        times: [0, 0.9, 0.93, 0.96, 1],
-        ease: "easeInOut"
-      }
-    }
-  };
-
   return (
     <div className="flex flex-col items-center justify-center space-y-16 py-12 md:py-24 overflow-hidden bg-gradient-to-b from-slate-50/50 to-white">
       <div className="relative w-80 h-80 md:w-[450px] md:h-[450px] flex items-center justify-center">
@@ -75,21 +28,14 @@ export default function PuppyLoading() {
         {/* Institutional Ambient Glow */}
         <div className="absolute inset-0 bg-blue-400/5 rounded-full blur-[120px] animate-pulse" />
 
-        {/* Dynamic Floor Shadow (Slow Bloom) */}
-        <motion.div 
-          animate={{ scale: [1, 1.05, 1], opacity: [0.15, 0.1, 0.15] }}
-          transition={{ duration: 3.0, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 w-56 h-12 bg-slate-900/10 rounded-[100%] blur-3xl"
-        />
-
-        {/* --- 3D R3F Dog Loader --- */}
+        {/* --- High-Fidelity Dog SVG Rig --- */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
           className="relative z-10 w-full h-full flex items-center justify-center"
         >
-          <RealisticDogLoader title="" subtitle="" />
+          <DogRigSVG />
         </motion.div>
 
         {/* Institutional Particle Mesh (Slow & Graceful) */}
