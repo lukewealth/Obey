@@ -3,6 +3,7 @@ import { AppScreen } from "../types";
 import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
 import LandingLoader from "./LandingLoader";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
   Bars3Icon as MenuIcon, 
@@ -508,11 +509,33 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         </section>
 
         {/* 4. LOGO CLOUD */}
-        <section id="compliance" className="py-24 md:py-32 px-4 md:px-6 bg-white text-center space-y-16 md:space-y-20">
+        <section id="compliance" className="py-24 md:py-32 px-4 md:px-6 bg-white text-center space-y-16 md:space-y-20 relative overflow-hidden">
+           
+           {/* Graceful Moving Lottie Decoration */}
+           <div className="absolute inset-x-0 top-0 bottom-0 pointer-events-none z-20 flex items-center overflow-hidden">
+              <motion.div
+                animate={{ 
+                  x: ["-20%", "120%"],
+                  y: [0, -20, 0]
+                }}
+                transition={{ 
+                  x: { duration: 25, repeat: Infinity, ease: "linear" },
+                  y: { duration: 5, repeat: Infinity, ease: "easeInOut" }
+                }}
+                className="w-40 h-40 md:w-48 md:h-48 opacity-[0.15] mix-blend-darken"
+              >
+                <DotLottieReact
+                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
+                  loop
+                  autoplay
+                />
+              </motion.div>
+           </div>
+
            <motion.div 
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            className="space-y-4 md:space-y-6"
+            className="space-y-4 md:space-y-6 relative z-10"
            >
               <h2 className="text-4xl sm:text-5xl font-black tracking-tighter px-2">Institutional-grade <br className="hidden sm:block" /> nodes trust OBEY</h2>
               <p className="text-sm md:text-base text-gray-400 font-medium px-4">Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.</p>
