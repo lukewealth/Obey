@@ -62,6 +62,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } }
   };
 
+
   return (
     <motion.div 
       variants={containerVariants}
