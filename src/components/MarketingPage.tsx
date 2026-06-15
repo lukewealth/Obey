@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AppScreen } from "../types";
 import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
+import LandingLoader from "./LandingLoader";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
   Bars3Icon as MenuIcon, 
@@ -187,38 +188,9 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             <motion.div 
                exit={{ opacity: 0, scale: 1.1 }}
                transition={{ duration: 0.8, ease: "easeInOut" }}
-               className="fixed inset-0 z-[100] bg-[#0b0e14] flex flex-col items-center justify-center p-6 text-center"
+               className="fixed inset-0 z-[100]"
             >
-               <div className="relative">
-                  <motion.div 
-                     initial={{ scale: 0.8, opacity: 0 }}
-                     animate={{ scale: 1, opacity: 1 }}
-                     className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-[28px] md:rounded-[32px] flex items-center justify-center shadow-2xl mb-6 md:mb-8"
-                  >
-                     <span className="text-[#0b0e14] font-black text-3xl md:text-4xl uppercase">O</span>
-                  </motion.div>
-                  <motion.div 
-                     animate={{ rotate: 360 }}
-                     transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                     className="absolute -inset-3 md:-inset-4 border-2 border-white/10 border-t-yellow-400 rounded-[38px] md:rounded-[44px]"
-                  />
-               </div>
-               <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="space-y-2 md:space-y-3"
-               >
-                  <p className="text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.5em] ml-2">Synchronizing Nodes</p>
-                  <div className="w-40 md:w-48 h-1 bg-white/5 rounded-full overflow-hidden mx-auto">
-                     <motion.div 
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 2, ease: "easeInOut" }}
-                        className="h-full bg-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.5)]"
-                     />
-                  </div>
-               </motion.div>
+               <LandingLoader />
             </motion.div>
          )}
       </AnimatePresence>
