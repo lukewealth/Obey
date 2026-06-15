@@ -511,15 +511,21 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
         </section>
 
         {/* 4. LOGO CLOUD */}
-        <section id="compliance" className="py-24 md:py-32 px-4 md:px-6 bg-white dark:bg-[#121212] text-center space-y-16 md:space-y-20 relative overflow-hidden transition-colors duration-500">
-           
-           {/* Walking Cat Decoration */}
-           <div className="max-w-4xl mx-auto relative h-20 md:h-24 overflow-hidden mb-[-2rem] md:mb-[-4rem]">
-              <div className="absolute bottom-4 left-0 right-0 h-[1px] bg-gray-100 dark:bg-white/10 z-0"></div>
+        <section id="compliance" className="pt-48 pb-24 md:pt-64 md:pb-40 px-4 md:px-6 bg-white dark:bg-[#121212] text-center space-y-24 md:space-y-32 relative overflow-hidden transition-colors duration-500">
+
+           {/* Fade-out Blend Effect */}
+           <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-gray-50 dark:from-black/20 to-transparent pointer-events-none z-20"></div>
+
+           {/* Walking Animations on Grey Line */}
+           <div className="max-w-[1400px] mx-auto relative h-24 md:h-32 overflow-hidden mb-[-4rem] md:mb-[-6rem]">
+              {/* The Line */}
+              <div className="absolute bottom-6 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/5 z-0"></div>
+
+              {/* Original Cat - Faster */}
               <motion.div
                 animate={{ x: ["-10%", "110%"] }}
                 transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-                className="w-24 h-24 md:w-28 md:h-28 relative z-10 -mb-4"
+                className="w-20 h-20 md:w-24 md:h-24 absolute bottom-0 z-10"
               >
                 <DotLottieReact
                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
@@ -527,22 +533,43 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   autoplay
                 />
               </motion.div>
+
+              {/* Second Animation - Slower */}
+              <motion.div
+                animate={{ x: ["110%", "-10%"] }}
+                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                className="w-16 h-16 md:w-20 md:h-20 absolute bottom-0 z-10 opacity-60 filter grayscale dark:invert"
+              >
+                <DotLottieReact
+                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
+                  loop
+                  autoplay
+                />
+              </motion.div>
            </div>
 
            <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            className="space-y-4 md:space-y-6 relative z-10"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="space-y-6 md:space-y-8 relative z-10"
            >
-              <h2 className="text-4xl sm:text-5xl font-black tracking-tighter px-2 dark:text-white">Institutional-grade <br className="hidden sm:block" /> nodes trust OBEY</h2>
-              <p className="text-sm md:text-base text-gray-400 dark:text-gray-500 font-medium px-4">Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.</p>
+              <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-black tracking-tighter px-2 dark:text-white leading-[0.9]">
+                Institutional-grade <br className="hidden sm:block" /> 
+                nodes trust OBEY
+              </h2>
+              <p className="text-base md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 font-medium px-4 max-w-3xl mx-auto">
+                Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.
+              </p>
            </motion.div>
-           <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 grayscale opacity-30 group px-4">
+
+           <div className="max-w-[1200px] mx-auto grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16 grayscale opacity-30 group px-4 relative z-10">
               {['Airbnb', 'Slack', 'Stripe', 'Airwallex', 'Spotify', 'Booking', 'Gusto', 'Coinbase'].map(c => (
-                <div key={c} className="h-10 md:h-12 flex items-center justify-center font-black text-xl md:text-2xl tracking-tighter hover:text-black dark:hover:text-white transition-all cursor-pointer truncate dark:text-white/40">{c}</div>
+                <div key={c} className="h-10 md:h-12 flex items-center justify-center font-black text-2xl md:text-3xl tracking-tighter hover:text-black dark:hover:text-white transition-all cursor-pointer truncate dark:text-white/40">{c}</div>
               ))}
            </div>
         </section>
+
 
         {/* 5. JOIN TRUST SECTION */}
         <section id="institutional" className="py-24 md:py-56 px-4 md:px-6 bg-gray-50 dark:bg-white/5 overflow-hidden relative transition-colors duration-500">
