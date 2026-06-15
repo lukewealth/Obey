@@ -542,6 +542,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
                   loop
                   autoplay
+                  style={{ transform: 'scaleX(-1)' }}
                 />
               </motion.div>
 
