@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles } from "lucide-react";
 import api from "../services/api";
-import DogRigSVG from "./DogRigSVG";
+import HighFidelityPuppy from "./HighFidelityPuppy";
 
 export default function PuppyLoading() {
   const [livePrices, setLivePrices] = useState<any>(null);
@@ -28,14 +28,14 @@ export default function PuppyLoading() {
         {/* Institutional Ambient Glow */}
         <div className="absolute inset-0 bg-blue-400/5 rounded-full blur-[120px] animate-pulse" />
 
-        {/* --- High-Fidelity Dog SVG Rig --- */}
+        {/* --- High-Fidelity 2D Dog Animation --- */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1 }}
           className="relative z-10 w-full h-full flex items-center justify-center"
         >
-          <DogRigSVG />
+          <HighFidelityPuppy />
         </motion.div>
 
         {/* Institutional Particle Mesh (Slow & Graceful) */}
