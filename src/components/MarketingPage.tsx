@@ -3,6 +3,7 @@ import { AppScreen } from "../types";
 import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
 import LandingLoader from "./LandingLoader";
+import ThemeToggle from "./ThemeToggle";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { 
@@ -229,9 +230,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
           </nav>
 
           <div className="flex items-center gap-3 md:gap-4">
+            <ThemeToggle />
             <button
               onClick={() => onNavigate(AppScreen.LOGIN)}
-              className="hidden sm:block text-[11px] md:text-[13px] font-black text-[#0b0e14] hover:opacity-60 transition-all uppercase tracking-[0.2em]"
+              className="hidden sm:block text-[11px] md:text-[13px] font-black text-[#0b0e14] dark:text-white hover:opacity-60 transition-all uppercase tracking-[0.2em]"
             >
               Login
             </button>

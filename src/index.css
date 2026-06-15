@@ -30,6 +30,21 @@
   --app-text: #111827;
   --glass-bg: rgba(255, 255, 255, 0.7);
   --glass-border: rgba(255, 255, 255, 0.3);
+  --color-text-muted: #6B7280;
+}
+
+.dark {
+  --app-bg: #0b0e14;
+  --app-accent-blue: #1a1e26;
+  --app-accent-yellow: #2d240b;
+  --app-primary: #8b5cf6;
+  --app-secondary: #3b82f6;
+  --app-text: #f3f4f6;
+  --glass-bg: rgba(11, 14, 20, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --color-text-muted: #9ca3af;
+  --color-bg-white: #111827;
+  --color-text-dark: #f9fafb;
 }
 
 body {
@@ -41,6 +56,11 @@ body {
   margin: 0;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.5s ease, color 0.5s ease;
+}
+
+.dark body {
+  background: linear-gradient(135deg, #0b0e14 0%, #1a1e26 50%, #0b0e14 100%);
 }
 
 /* Apple-style Bento Cards */

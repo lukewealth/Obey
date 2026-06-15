@@ -108,9 +108,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         {/* Main Balance Card */}
         <motion.div 
           variants={itemVariants}
-          className="lg:col-span-8 bento-card min-h-[340px] md:min-h-[400px] p-6 md:p-12 flex flex-col justify-between group overflow-hidden"
+          className="lg:col-span-8 bento-card min-h-[340px] md:min-h-[400px] p-6 md:p-12 flex flex-col justify-between group overflow-hidden bg-white/70 dark:bg-white/5"
         >
-          <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/40 rounded-full blur-[60px] md:blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-1000"></div>
+          <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/40 dark:bg-primary/10 rounded-full blur-[60px] md:blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-1000"></div>
           
           <div className="space-y-6 md:space-y-8">
             <div className="flex justify-between items-center">
@@ -119,13 +119,13 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                   <Wallet size={20} className="md:w-6 md:h-6" />
                 </div>
                 <div>
-                  <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Liquidity</p>
-                  <p className="text-xs md:text-sm font-bold text-gray-900">Institutional NGN Vault</p>
+                  <p className="text-[10px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Total Liquidity</p>
+                  <p className="text-xs md:text-sm font-bold text-gray-900 dark:text-white">Institutional NGN Vault</p>
                 </div>
               </div>
               <button 
                 onClick={() => setHideBalance(!hideBalance)}
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-accent-blue rounded-[16px] md:rounded-[20px] transition-all active-press"
+                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-accent-blue dark:hover:bg-white/5 rounded-[16px] md:rounded-[20px] transition-all active-press"
               >
                 {hideBalance ? <EyeOff size={20} className="md:w-5 md:h-5" /> : <Eye size={20} className="md:w-5 md:h-5" />}
               </button>
@@ -136,10 +136,10 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <TrendingUp size={12} className="md:w-3.5 md:h-3.5" /> +2.48% Performance
               </p>
               <div className="flex items-baseline gap-2 md:gap-4 overflow-hidden">
-                <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-none truncate">
+                <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none truncate">
                   {hideBalance ? "••••••" : `₦${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
                 </span>
-                <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono uppercase shrink-0">NGN</span>
+                <span className="text-lg md:text-2xl text-gray-400 dark:text-gray-600 font-bold font-mono uppercase shrink-0">NGN</span>
               </div>
             </div>
           </div>
@@ -147,15 +147,15 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 mt-8 md:mt-12">
             {[
               { id: "fund", label: "Fund", icon: ArrowDownLeft, bg: "bg-primary text-white shadow-primary/20" },
-              { id: "withdraw", label: "Withdraw", icon: ArrowUpRight, bg: "bg-accent-blue text-primary border border-blue-200/50 shadow-blue-500/10" },
-              { id: "transfer", label: "Transfer", icon: Send, bg: "bg-white text-gray-700 border border-gray-200 shadow-gray-200/50" }
+              { id: "withdraw", label: "Withdraw", icon: "bg-accent-blue dark:bg-white/10 text-primary dark:text-white border border-blue-200/50 dark:border-white/10 shadow-blue-500/10" },
+              { id: "transfer", label: "Transfer", icon: Send, bg: "bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 shadow-gray-200/50" }
             ].map((btn) => (
               <button
                 key={btn.id}
                 onClick={() => onSelectAction(btn.id)}
-                className={`${btn.bg} py-4 md:py-5 px-4 md:px-6 rounded-[18px] md:rounded-[24px] text-sm md:text-base font-black flex items-center justify-center gap-2 md:gap-3 active-press transition-all shadow-lg hover:-translate-y-1`}
+                className={`${typeof btn.icon === 'string' ? btn.icon : btn.bg} py-4 md:py-5 px-4 md:px-6 rounded-[18px] md:rounded-[24px] text-sm md:text-base font-black flex items-center justify-center gap-2 md:gap-3 active-press transition-all shadow-lg hover:-translate-y-1`}
               >
-                <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
+                {typeof btn.icon !== 'string' && <btn.icon size={18} className="md:w-5 md:h-5" />} {btn.label}
               </button>
             ))}
           </div>

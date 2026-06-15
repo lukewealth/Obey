@@ -13,6 +13,7 @@ import AdminSystem from "./components/AdminSystem";
 import IdentityVerification from "./components/IdentityVerification";
 import OtpVerification from "./components/OtpVerification";
 import TransactionSuccess from "./components/TransactionSuccess";
+import ThemeToggle from "./components/ThemeToggle";
 import UserProfileSettings from "./components/UserProfileSettings";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
@@ -449,7 +450,8 @@ export default function App() {
             </div>
 
             <div className="flex items-center gap-3 md:gap-6">
-              <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 cursor-pointer hover:opacity-60 transition-opacity">
+              <ThemeToggle />
+              <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 dark:border-white/10 cursor-pointer hover:opacity-60 transition-opacity">
                 <div className="text-right">
                   <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Master Ledger</p>
                   <p className="text-[13px] font-bold text-[#0b0e14]">Verified On-Chain</p>
