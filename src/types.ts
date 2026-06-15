@@ -18,7 +18,8 @@ export enum AppTab {
   TRADE = "TRADE",
   SERVICES = "SERVICES",
   PROFILE = "PROFILE",
-  ADMIN = "ADMIN"
+  ADMIN = "ADMIN",
+  CARDS = "CARDS"
 }
 
 export enum GiftCardTab {

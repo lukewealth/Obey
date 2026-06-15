@@ -7,6 +7,7 @@ import WalletSystem from "./components/WalletSystem";
 import AirtimeModule from "./components/AirtimeModule";
 import GiftCardSystem from "./components/GiftCardSystem";
 import CryptoSystem from "./components/CryptoSystem";
+import VirtualCardSystem from "./components/VirtualCardSystem";
 import TransactionHistory from "./components/TransactionHistory";
 import AdminSystem from "./components/AdminSystem";
 import IdentityVerification from "./components/IdentityVerification";
@@ -42,7 +43,8 @@ import {
   GlobeAltIcon as GlobeIcon, 
   ShieldCheckIcon as ShieldCheck, 
   BoltIcon as ZapIcon,
-  ArrowPathIcon as RefreshIcon
+  ArrowPathIcon as RefreshIcon,
+  CreditCardIcon
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
@@ -75,6 +77,7 @@ export default function App() {
   // --- Real-Time Initialization & Database Wakeup ---
   const [isInitializing, setIsInitializing] = useState(false);
   const [showGatedModal, setShowGatedModal] = useState(false);
+  const [utilitySegment, setUtilitySegment] = useState<"airtime" | "data">("airtime");
   const wakeupRef = React.useRef<string | null>(null);
 
   // Cookie Utility for Hybrid Tracking
@@ -324,6 +327,8 @@ export default function App() {
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
     setMobileMenuOpen(false);
+    setShowGatedModal(false);
+    wakeupRef.current = null;
   };
 
   const triggerDiagnostic = () => {
@@ -358,6 +363,11 @@ export default function App() {
         isOpen={showGatedModal}
         onClose={() => setShowGatedModal(false)}
         onVerify={handleVerificationComplete}
+        onLogout={handleLogout}
+        onRefresh={() => {
+           wakeupRef.current = null;
+           setProfile(prev => ({ ...prev }));
+        }}
         profile={profile}
       />
 
@@ -455,6 +465,7 @@ export default function App() {
                     {[
                       { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
                       { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
+                      { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                       { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
                       { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                     ].map((item) => (
@@ -522,13 +533,27 @@ export default function App() {
                         transactions={cachedTransactions} 
                         onNavigateTab={setActiveTab} 
                         onSelectAction={(action) => { 
-                          if (action === "fund" || action === "withdraw" || action === "transfer") {
-                            setActiveTab(AppTab.WALLET);
-                          } else if (action === "buy-giftcard" || action === "sell-giftcard") {
-                            setActiveTab(AppTab.TRADE);
-                          } else {
-                            setActiveTab(AppTab.SERVICES);
-                          }
+                          setIsInitializing(true);
+                          setTimeout(() => {
+                            if (action === "fund" || action === "withdraw" || action === "transfer") {
+                              setActiveTab(AppTab.WALLET);
+                            } else if (action === "buy-giftcard" || action === "sell-giftcard" || action === "Giftcard") {
+                              setTradeSubTab('giftcard');
+                              setActiveTab(AppTab.TRADE);
+                            } else if (action === "Crypto") {
+                              setTradeSubTab('crypto');
+                              setActiveTab(AppTab.TRADE);
+                            } else if (action === "airtime" || action === "buy-airtime") {
+                              setUtilitySegment("airtime");
+                              setActiveTab(AppTab.SERVICES);
+                            } else if (action === "data" || action === "buy-data") {
+                              setUtilitySegment("data");
+                              setActiveTab(AppTab.SERVICES);
+                            } else {
+                              setActiveTab(AppTab.SERVICES);
+                            }
+                            setIsInitializing(false);
+                          }, 1200);
                         }} 
                         prices={{
                           BTC: btcPrice,
@@ -553,6 +578,13 @@ export default function App() {
                           notify("success", "Peer Transfer Settled", `₦${amt.toLocaleString()} moved to ${recipient}.`);
                           return true; 
                         }} 
+                      />
+                    )}
+
+                    {activeTab === AppTab.CARDS && (
+                      <VirtualCardSystem 
+                        profile={profile} 
+                        onUpdateBalance={(amt) => handleProfileUpdate({ balance: profile.balance + amt })}
                       />
                     )}
                     
@@ -587,7 +619,13 @@ export default function App() {
                       </div>
                     )}
 
-                    {activeTab === AppTab.SERVICES && <AirtimeModule profile={profile} onPurchase={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} />}
+                    {activeTab === AppTab.SERVICES && (
+                      <AirtimeModule 
+                        profile={profile} 
+                        initialSegment={utilitySegment}
+                        onPurchase={async (amt) => { handleProfileUpdate({ balance: profile.balance - amt }); return true; }} 
+                      />
+                    )}
                     {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (
                       <AdminSystem 
@@ -612,6 +650,7 @@ export default function App() {
             {[
               { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
               { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
+              { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
               { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
               { tab: AppTab.SERVICES, label: "Apps", icon: AppIcon },
             ].map((item) => (

@@ -19,6 +19,7 @@ const rechargeSchema = z.object({
 interface AirtimeModuleProps {
   profile: UserProfile;
   onPurchase: (amount: number, description: string) => Promise<boolean> | boolean;
+  initialSegment?: "airtime" | "data";
 }
 
 interface NetworkProvider {

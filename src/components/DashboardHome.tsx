@@ -306,7 +306,11 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 { name: "Ethereum", symbol: "ETH", price: prices.ETH.toLocaleString(), change: "-0.8%", icon: Zap, color: "text-blue-500", bg: "bg-blue-50" },
                 { name: "Solana", symbol: "SOL", price: prices.SOL.toLocaleString(), change: "+5.2%", icon: Activity, color: "text-purple-500", bg: "bg-purple-50" }
               ].map((coin) => (
-                <div key={coin.symbol} className="flex items-center justify-between p-4 md:p-5 bg-white border border-gray-100 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all cursor-pointer group shadow-sm">
+                <div 
+                  key={coin.symbol} 
+                  onClick={() => onSelectAction("Crypto")}
+                  className="flex items-center justify-between p-4 md:p-5 bg-white border border-gray-100 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all cursor-pointer group shadow-sm"
+                >
                   <div className="flex items-center gap-3 md:gap-4">
                     <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform shrink-0 shadow-sm`}>
                       <coin.icon size={18} fill={coin.symbol === "BTC" ? "currentColor" : "none"} className="md:w-5 md:h-5" />

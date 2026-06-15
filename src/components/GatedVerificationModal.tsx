@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Loader2, ArrowRight, CheckCircle2, ShieldAlert, X } from "lucide-react";
+import { 
+  ShieldCheck, Loader2, ArrowRight, CheckCircle2, 
+  ShieldAlert, X, LogOut as LogOutIcon, RefreshCw 
+} from "lucide-react";
 import { UserProfile } from "../types";
 
 interface GatedVerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
   onVerify: () => void;
+  onLogout?: () => void;
+  onRefresh?: () => void;
   profile: UserProfile;
 }
 
-export default function GatedVerificationModal({ isOpen, onClose, onVerify, profile }: GatedVerificationModalProps) {
+export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLogout, onRefresh, profile }: GatedVerificationModalProps) {
   const [status, setStatus] = useState<"initial" | "analyzing" | "complete">("initial");
 
   useEffect(() => {
@@ -94,12 +99,28 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, prof
                              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">Cross-Chain AML Analysis</p>
                           </div>
                        </div>
+                       
                        <button 
                         onClick={handleStartAnalysis}
                         className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press flex items-center justify-center gap-3"
                        >
                           Initialize Protocol <ArrowRight size={20} />
                        </button>
+
+                       <div className="flex items-center gap-4 pt-2">
+                          <button 
+                            onClick={onRefresh}
+                            className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-200 transition-all flex items-center justify-center gap-2 active-press"
+                          >
+                             <RefreshCw size={14} /> Retry Refresh
+                          </button>
+                          <button 
+                            onClick={onLogout}
+                            className="flex-1 py-4 border border-red-100 text-red-500 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all flex items-center justify-center gap-2 active-press"
+                          >
+                             <LogOutIcon size={14} /> Secure Signout
+                          </button>
+                       </div>
                     </motion.div>
                   )}
 

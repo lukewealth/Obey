@@ -1,5 +1,5 @@
 {
-  "name": "OBEY Fintech Platform",
+  "name": "Obey Node",
   "description": "A high-fidelity digital financial platform featuring airtime and data modules, a gift card marketplace, cryptocurrency exchange, multi-asset wallet system, identity verification, onboarding, and an admin monitoring dashboard.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

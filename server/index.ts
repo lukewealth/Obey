@@ -11,6 +11,7 @@ import cryptoMarketRoutes from './routes/crypto_market';
 import marketRoutes from './routes/market';
 import paymentRoutes from './routes/payments';
 import adminRoutes from './routes/admin';
+import cardRoutes from './routes/cards';
 import { connectDB } from './db';
 
 dotenv.config();
@@ -78,6 +79,7 @@ router.use('/crypto-market', cryptoMarketRoutes);
 router.use('/market', marketRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/admin', adminRoutes);
+router.use('/cards', cardRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ 
