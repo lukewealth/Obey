@@ -521,21 +521,22 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ amount: 0.3, margin: "-100px" }}
-              transition={{ duration: 1.2 }}
+              transition={{ duration: 1.5 }}
               className="max-w-[1400px] mx-auto relative h-[450px] md:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
            >
               {/* The Line - Centered Vertically */}
               <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
 
-              {/* Bird Animation - Left to Right, High Top Level */}
+              {/* Bird Animation - flying Right side top extreme corner toward Left */}
               <motion.div
                 animate={{ 
-                  x: ["-20%", "120%"] 
+                  x: ["100%", "-120%"],
+                  opacity: [0, 0.6, 0.6, 0]
                 }}
                 transition={{ 
-                  duration: 25, repeat: Infinity, ease: "linear" 
+                  duration: 35, repeat: Infinity, ease: "linear" 
                 }}
-                className="w-32 h-32 md:w-48 md:h-48 absolute top-8 left-0 z-10 opacity-60 filter grayscale dark:invert"
+                className="w-32 h-32 md:w-48 md:h-48 absolute top-4 right-0 z-10 filter grayscale dark:invert"
               >
                 <DotLottieReact
                   src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
@@ -544,15 +545,16 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 />
               </motion.div>
 
-              {/* Cat Animation - 2X Size, Centered on Line, Right to Left (Opposite) */}
+              {/* Cat Animation - Walking from extreme Left side toward Right on top of line */}
               <motion.div
                 animate={{ 
-                  x: ["50%", "-50%"] 
+                  x: ["-100%", "120%"],
+                  opacity: [0, 1, 1, 0]
                 }}
                 transition={{ 
-                  duration: 18, repeat: Infinity, ease: "linear" 
+                  duration: 25, repeat: Infinity, ease: "linear" 
                 }}
-                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[65%] z-10"
+                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-0 -translate-y-[65%] z-10"
               >
                 <DotLottieReact
                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
@@ -573,7 +575,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 nodes trust OBEY
               </h2>
               <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 font-medium max-w-3xl mx-auto leading-relaxed">
-                Many companies have settled using OBEY and they trust <br className="hidden md:block" /> the safety of their digital assets.
+                Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.
               </p>
            </motion.div>
 
