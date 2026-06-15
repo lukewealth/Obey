@@ -516,24 +516,26 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
            {/* Pervasive Grey Fadeout Effect */}
            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 via-transparent to-gray-50/50 dark:from-black/10 dark:via-transparent dark:to-black/10 pointer-events-none z-0"></div>
 
-           {/* Walking Animations on Grey Line */}
-           <div className="max-w-[1400px] mx-auto relative h-80 md:h-[400px] overflow-hidden z-10 flex flex-col justify-end">
-              {/* The Line */}
-              <div className="absolute bottom-32 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 z-0"></div>
+           {/* Walking Animations Container */}
+           <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ amount: 0.3, margin: "-100px" }}
+              transition={{ duration: 1.2 }}
+              className="max-w-[1400px] mx-auto relative h-[450px] md:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
+           >
+              {/* The Line - Centered Vertically */}
+              <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
 
-              {/* Second Animation (Bird) - Flying Right, Top Level */}
+              {/* Bird Animation - Left to Right, High Top Level */}
               <motion.div
-                initial={{ opacity: 0, x: "-20%" }}
-                whileInView={{ 
-                  opacity: 1, 
+                animate={{ 
                   x: ["-20%", "120%"] 
                 }}
-                viewport={{ amount: 0.3 }}
                 transition={{ 
-                  opacity: { duration: 1 },
-                  x: { duration: 25, repeat: Infinity, ease: "linear" }
+                  duration: 25, repeat: Infinity, ease: "linear" 
                 }}
-                className="w-32 h-32 md:w-40 md:h-40 absolute bottom-64 left-0 z-10 opacity-60 filter grayscale dark:invert"
+                className="w-32 h-32 md:w-48 md:h-48 absolute top-8 left-0 z-10 opacity-60 filter grayscale dark:invert"
               >
                 <DotLottieReact
                   src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
@@ -542,19 +544,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 />
               </motion.div>
 
-              {/* Original Cat - 2X Bigger, Walking Left on Line */}
+              {/* Cat Animation - 2X Size, Centered on Line, Right to Left (Opposite) */}
               <motion.div
-                initial={{ opacity: 0, x: "120%" }}
-                whileInView={{ 
-                  opacity: 1, 
-                  x: ["120%", "-20%"] 
+                animate={{ 
+                  x: ["50%", "-50%"] 
                 }}
-                viewport={{ amount: 0.3 }}
                 transition={{ 
-                  opacity: { duration: 1 },
-                  x: { duration: 18, repeat: Infinity, ease: "linear" }
+                  duration: 18, repeat: Infinity, ease: "linear" 
                 }}
-                className="w-40 h-40 md:w-48 md:h-48 absolute bottom-32 left-0 z-10"
+                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[65%] z-10"
               >
                 <DotLottieReact
                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
@@ -562,7 +560,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   autoplay
                 />
               </motion.div>
-           </div>
+           </motion.div>
 
            <motion.div 
             initial={{ opacity: 0, y: 50 }}
