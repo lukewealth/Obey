@@ -291,11 +291,11 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
       <main>
         {/* 2. HIGH-FIDELITY HERO */}
-        <section className="relative pt-32 pb-16 md:pt-48 md:pb-40 px-4 md:px-12 overflow-hidden flex items-center min-h-[90vh]">
-          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24 w-full">
+        <section className="relative pt-32 pb-16 md:pt-48 md:pb-40 px-6 md:px-16 lg:px-24 overflow-hidden flex items-center min-h-[90vh]">
+          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-20 md:gap-32 lg:gap-40 w-full">
             
             {/* Phone Mockup Section */}
-            <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-75 sm:scale-90 md:scale-100 lg:scale-110">
+            <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-75 sm:scale-90 md:scale-100 lg:scale-105">
                <motion.div 
                   initial={{ rotateX: 20, rotateY: -10, y: 100, opacity: 0 }}
                   whileInView={{ rotateX: 0, rotateY: 0, y: 0, opacity: 1 }}
@@ -309,39 +309,39 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   <MobileAppMockup />
                </motion.div>
 
-               {/* Floating Feature Cards */}
+               {/* Floating Feature Cards - Positioned to avoid overlay */}
                <motion.div 
-                 animate={{ y: [0, -15, 0], rotate: [0, 3, 0] }}
+                 animate={{ y: [0, -10, 0], rotate: [0, 2, 0] }}
                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                 className="absolute top-10 -left-8 sm:-left-12 md:-left-24 p-5 md:p-6 bg-white dark:bg-[#1E1E1E] rounded-[2rem] md:rounded-[2.5rem] shadow-[0_40px_80px_-10px_rgba(0,0,0,0.08)] border border-gray-100 dark:border-white/10 space-y-3 md:space-y-4 hidden sm:block z-20"
+                 className="absolute -top-12 -left-12 sm:-left-16 md:-left-32 p-6 md:p-8 bg-white dark:bg-[#1E1E1E] rounded-[2rem] md:rounded-[2.5rem] shadow-[0_40px_80px_-10px_rgba(0,0,0,0.08)] border border-gray-100 dark:border-white/10 space-y-4 md:space-y-5 hidden lg:block z-20"
                >
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-400 rounded-xl md:rounded-2xl flex items-center justify-center text-[#0b0e14] shadow-xl"><AppIcon className="w-5 h-5 md:w-6 md:h-6" /></div>
-                  <p className="text-[10px] md:text-xs font-black uppercase tracking-widest leading-relaxed">One app <br /> for all</p>
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-yellow-400 rounded-xl md:rounded-2xl flex items-center justify-center text-[#0b0e14] shadow-xl"><AppIcon className="w-6 h-6 md:w-7 md:h-7" /></div>
+                  <p className="text-[11px] md:text-xs font-black uppercase tracking-widest leading-relaxed">One app <br /> for all</p>
                </motion.div>
 
-               {/* Virtual Card Overlay */}
+               {/* Virtual Card Overlay - Positioned to avoid overlay */}
                <motion.div 
-                 animate={{ y: [0, 15, 0], rotate: [0, -3, 0] }}
+                 animate={{ y: [0, 10, 0], rotate: [0, -2, 0] }}
                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                 className="absolute top-[35%] -right-8 sm:-right-12 md:-right-24 p-6 md:p-8 bg-[#0b0e14] dark:bg-primary text-white rounded-[2.5rem] md:rounded-[3rem] shadow-[0_60px_100px_-20px_rgba(0,0,0,0.3)] space-y-5 md:space-y-6 hidden sm:block w-60 md:w-72 z-20 overflow-hidden"
+                 className="absolute top-[45%] -right-12 sm:-right-16 md:-right-32 p-7 md:p-10 bg-[#0b0e14] dark:bg-primary text-white rounded-[2.5rem] md:rounded-[3rem] shadow-[0_60px_100px_-20px_rgba(0,0,0,0.3)] space-y-6 md:space-y-8 hidden lg:block w-64 md:w-80 z-20 overflow-hidden"
                >
-                  <div className="absolute top-0 right-0 w-24 md:w-32 h-24 md:h-32 bg-primary/20 rounded-full blur-3xl"></div>
+                  <div className="absolute top-0 right-0 w-32 md:w-40 h-32 md:h-40 bg-primary/20 rounded-full blur-3xl"></div>
                   <div className="flex justify-between items-center relative z-10">
-                     <span className="text-[9px] md:text-[11px] font-black uppercase tracking-widest opacity-40 italic">Obey</span>
-                     <span className="text-[10px] md:text-[12px] font-black italic">VISA</span>
+                     <span className="text-[10px] md:text-[12px] font-black uppercase tracking-widest opacity-40 italic">Obey</span>
+                     <span className="text-[11px] md:text-[13px] font-black italic">VISA</span>
                   </div>
-                  <div className="space-y-0.5 md:space-y-1 relative z-10 pt-2 md:pt-4">
-                     <p className="text-[8px] md:text-[10px] font-bold uppercase opacity-30 tracking-widest">Card holder</p>
-                     <p className="text-base md:text-lg font-black tracking-tighter uppercase whitespace-nowrap">Luke Okagha</p>
+                  <div className="space-y-1 md:space-y-2 relative z-10 pt-3 md:pt-5">
+                     <p className="text-[9px] md:text-[11px] font-bold uppercase opacity-30 tracking-widest">Card holder</p>
+                     <p className="text-lg md:text-xl font-black tracking-tighter uppercase whitespace-nowrap">Luke Okagha</p>
                   </div>
                   <div className="flex justify-between items-end relative z-10">
-                     <div className="space-y-0.5 md:space-y-1">
-                        <p className="text-[8px] md:text-[10px] font-bold uppercase opacity-30 tracking-widest">Account ID</p>
-                        <p className="text-xs md:text-sm font-black font-mono">**** 9934</p>
+                     <div className="space-y-1 md:space-y-2">
+                        <p className="text-[9px] md:text-[11px] font-bold uppercase opacity-30 tracking-widest">Account ID</p>
+                        <p className="text-sm md:text-base font-black font-mono">**** 9934</p>
                      </div>
                      <div className="text-right">
-                        <p className="text-[8px] md:text-[10px] font-bold uppercase opacity-30 tracking-widest">VALID</p>
-                        <p className="text-xs md:text-sm font-black font-mono">05/28</p>
+                        <p className="text-[9px] md:text-[11px] font-bold uppercase opacity-30 tracking-widest">VALID</p>
+                        <p className="text-sm md:text-base font-black font-mono">05/28</p>
                      </div>
                   </div>
                </motion.div>
@@ -353,20 +353,19 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="lg:w-1/2 space-y-8 md:space-y-12 text-center lg:text-left order-1 lg:order-2 px-4 md:px-0 relative z-30"
+              className="lg:w-1/2 space-y-12 md:space-y-16 lg:space-y-20 text-center lg:text-left order-1 lg:order-2 px-4 md:px-0 relative z-30"
             >
-              <div className="relative min-h-[350px] md:min-h-[450px] lg:min-h-[500px] flex items-center justify-center lg:justify-start">
-                 {/* Lottie Background - Cycles prominence with text */}
+              <div className="flex flex-col gap-10 md:gap-14">
+                 {/* Lottie Visual Element - Reduced size and separated to avoid overlay */}
                  <motion.div 
                    animate={{ 
-                     opacity: showHeroText ? 0.4 : 1,
-                     scale: showHeroText ? 1.25 : 1.4,
-                     filter: showHeroText ? "blur(4px)" : "blur(0px)"
+                     opacity: showHeroText ? 0.7 : 1,
+                     scale: showHeroText ? 0.95 : 1,
                    }}
                    transition={{ duration: 1.5, ease: "easeInOut" }}
-                   className="absolute inset-0 z-0 flex items-center justify-center lg:justify-start overflow-hidden pointer-events-none"
+                   className="w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 self-center lg:self-start overflow-hidden pointer-events-none"
                  >
-                    <div className="w-full h-full max-w-[600px] lg:max-w-[800px]">
+                    <div className="w-full h-full">
                       <DotLottieReact
                         src="https://lottie.host/f250630d-88e1-4c6e-8381-3112de2d11c1/edAMqSiTOM.lottie"
                         loop
@@ -375,22 +374,24 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     </div>
                  </motion.div>
 
-                 <AnimatePresence mode="wait">
-                    {showHeroText && (
-                      <motion.h1 
-                        key="hero-text"
-                        initial={{ opacity: 0, y: 30, filter: "blur(20px)" }}
-                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        exit={{ opacity: 0, y: -30, filter: "blur(20px)" }}
-                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10"
-                      >
-                        Control your <br className="hidden sm:block" />
-                        financial <br className="hidden sm:block" />
-                        future with <span className="text-primary italic">OBEY.</span>
-                      </motion.h1>
-                    )}
-                 </AnimatePresence>
+                 <div className="relative min-h-[280px] md:min-h-[380px] lg:min-h-[420px] flex items-center justify-center lg:justify-start">
+                    <AnimatePresence mode="wait">
+                       {showHeroText && (
+                         <motion.h1 
+                           key="hero-text"
+                           initial={{ opacity: 0, y: 30, filter: "blur(20px)" }}
+                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                           exit={{ opacity: 0, y: -30, filter: "blur(20px)" }}
+                           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                           className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10"
+                         >
+                           Control your <br className="hidden sm:block" />
+                           financial <br className="hidden sm:block" />
+                           future with <span className="text-primary italic">OBEY.</span>
+                         </motion.h1>
+                       )}
+                    </AnimatePresence>
+                 </div>
               </div>
 
               <motion.p 
@@ -399,7 +400,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   opacity: subtitleOpacity,
                   scale: useTransform(scrollYProgress, [0, 0.1], [1, 0.95])
                 }}
-                className="text-[13px] md:text-sm lg:text-base text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed opacity-80"
+                className="text-[14px] md:text-base lg:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed opacity-90 px-2 lg:px-0"
               >
                 Next-generation digital asset management and institutional liquidity infrastructure. 
                 Unified wallet, utility recharge, and digital marketplaces.
@@ -407,35 +408,35 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
               <motion.div 
                 variants={itemVariants}
-                className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center lg:justify-start pt-2 md:pt-4"
+                className="flex flex-col sm:flex-row gap-6 md:gap-8 justify-center lg:justify-start pt-4 md:pt-6"
               >
                 <button
                   onClick={() => onNavigate(AppScreen.REGISTER)}
-                  className="bg-yellow-400 text-[#0b0e14] font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:bg-black dark:hover:bg-primary hover:text-white transition-all shadow-[0_30px_60px_-10px_rgba(250,204,21,0.5)] active-press"
+                  className="bg-yellow-400 text-[#0b0e14] font-black text-[14px] md:text-[16px] uppercase tracking-widest px-12 md:px-16 py-6 md:py-8 rounded-full hover:bg-black dark:hover:bg-primary hover:text-white transition-all shadow-[0_30px_60px_-10px_rgba(250,204,21,0.5)] active-press"
                 >
                   Open account
                 </button>
                 <button
-                  className="bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 text-[#0b0e14] dark:text-white font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:border-black dark:hover:border-primary transition-all active-press"
+                  className="bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 text-[#0b0e14] dark:text-white font-black text-[14px] md:text-[16px] uppercase tracking-widest px-12 md:px-16 py-6 md:py-8 rounded-full hover:border-black dark:hover:border-primary transition-all active-press"
                 >
                   Request card
                 </button>
               </motion.div>
 
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-8 md:pt-10">
-                 <div className="flex -space-x-3 md:-space-x-4">
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-8 pt-10 md:pt-14">
+                 <div className="flex -space-x-4 md:-space-x-5">
                     {[1, 2, 3].map(i => (
-                      <div key={i} className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-gray-100 dark:bg-white/10 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
+                      <div key={i} className="w-14 h-14 md:w-16 md:h-16 rounded-full border-[5px] md:border-[7px] border-white dark:border-[#121212] bg-gray-100 dark:bg-white/10 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
                          <img src={`https://i.pravatar.cc/100?img=${i+15}`} alt="user" className="w-full h-full object-cover" />
                       </div>
                     ))}
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-primary flex items-center justify-center text-white text-xs font-black shadow-sm shrink-0">+</div>
+                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-[5px] md:border-[7px] border-white dark:border-[#121212] bg-primary flex items-center justify-center text-white text-sm font-black shadow-sm shrink-0">+</div>
                  </div>
-                 <div className="space-y-1 text-center sm:text-left">
-                    <p className="text-3xl md:text-4xl font-black tracking-tighter leading-none flex items-center justify-center sm:justify-start gap-2 md:gap-3 dark:text-white">
-                       <ZapIcon className="w-5 h-5 md:w-6 md:h-6 text-primary fill-primary" /> 15M+
+                 <div className="space-y-2 text-center sm:text-left">
+                    <p className="text-3xl md:text-4xl font-black tracking-tighter leading-none flex items-center justify-center sm:justify-start gap-3 md:gap-4 dark:text-white">
+                       <ZapIcon className="w-6 h-6 md:w-7 md:h-7 text-primary fill-primary" /> 15M+
                     </p>
-                    <p className="text-[9px] md:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Trusted by satisfied global node users</p>
+                    <p className="text-[10px] md:text-[12px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Trusted by satisfied global node users</p>
                  </div>
               </motion.div>
             </motion.div>

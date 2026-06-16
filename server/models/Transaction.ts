@@ -6,7 +6,7 @@ const TransactionSchema = new mongoose.Schema({
   title: { type: String, required: true },
   category: { 
     type: String, 
-    enum: ["Electronics", "Transfer", "Dining", "Travel", "Food", "Crypto", "Airtime", "Data", "GiftCard"],
+    enum: ["Electronics", "Transfer", "Dining", "Travel", "Food", "Crypto", "Airtime", "Data", "GiftCard", "System"],
     required: true 
   },
   type: { type: String, enum: ["Debit", "Credit"], required: true },
@@ -22,7 +22,10 @@ const TransactionSchema = new mongoose.Schema({
   recipientWallet: { type: String },
   network: { type: String },
   brand: { type: String },
-  requestReference: { type: String }
+  requestReference: { type: String },
+  riskScore: { type: Number, default: 0 }, // 0-100 institutional risk index
+  executionNode: { type: String }, // e.g. OBEY-SUI-01
+  auditHash: { type: String } // Blockchain verification hash
 }, { timestamps: true });
 
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

@@ -3,7 +3,8 @@ import { Transaction } from "../types";
 import { 
   Search, SlidersHorizontal, ArrowDownLeft, ArrowUpRight, Check, X, 
   Clock, Download, Share2, CornerDownRight, ExternalLink, Calendar, HelpCircle, ArrowRight,
-  CheckCircle2, ShieldCheck
+  CheckCircle2, ShieldCheck, PieChart, BarChart3, FileSpreadsheet, FileText, ChevronDown,
+  Info, AlertTriangle
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -34,78 +35,78 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
     return matchesSearch && matchesType && matchesStatus;
   });
 
+  const totalVolume = filteredTx.reduce((acc, tx) => acc + tx.amount, 0);
+
   return (
-    <div className="space-y-6 md:space-y-10 pb-24 px-1 md:px-0">
+    <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Audit Log</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Sequential record of all institutional settlements.</p>
+          <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase italic text-center md:text-left">Settlement Ledger</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Institutional-grade asset movements and execution logs.</p>
         </div>
-        <div className="flex items-center justify-center gap-2 px-4 py-2 bg-primary/10 border border-primary/20 rounded-full text-primary self-center md:self-auto">
-           <Clock size={16} />
-           <span className="text-[10px] font-black uppercase tracking-widest">Real-time ledger sync active</span>
-        </div>
-      </div>
-
-      {/* Filter Options Control Panel */}
-      <div className="bento-card p-4 md:p-6 flex flex-col lg:flex-row gap-4 md:gap-6 items-center justify-between shadow-xl">
-        {/* Search bar */}
-        <div className="relative w-full lg:max-w-md group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={18} />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Ledger (e.g. Card, Crypto)..."
-            className="w-full h-12 md:h-14 pl-12 pr-6 bg-gray-50 border border-gray-100 rounded-[16px] md:rounded-[20px] text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
-          />
-        </div>
-
-        {/* Filters Selectors */}
-        <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
-          {/* Credit vs Debit togglers */}
-          <div className="flex bg-gray-100 p-1 rounded-[14px] md:rounded-[18px] w-full sm:w-auto">
-            {(["All", "Credit", "Debit"] as const).map((type) => (
-              <button
-                key={type}
-                onClick={() => setFilterType(type)}
-                className={`px-4 md:px-6 py-2 md:py-2.5 text-[11px] md:text-xs font-black rounded-[11px] md:rounded-[15px] transition-all flex-1 sm:flex-none ${
-                  filterType === type ? "bg-white text-primary shadow-sm" : "text-gray-400 hover:text-gray-600"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-
-          {/* Status Selectors */}
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="h-12 md:h-14 px-4 md:px-6 bg-white border border-gray-100 focus:ring-2 focus:ring-primary/10 rounded-[16px] md:rounded-[20px] text-xs md:text-sm font-bold text-gray-900 outline-none w-full sm:w-auto transition-all"
-          >
-            <option value="All">All Statuses</option>
-            <option value="Success">Success Only</option>
-            <option value="Processing">Processing Only</option>
-            <option value="Failed">Failed Only</option>
-          </select>
+        <div className="flex items-center justify-center gap-3 px-5 py-2.5 bg-emerald-50 border border-emerald-100 rounded-full text-emerald-600 self-center md:self-auto">
+           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Sui Mainnet Node: Active</span>
         </div>
       </div>
 
-      {/* Audit List of Rows */}
-      <div className="bento-card overflow-hidden shadow-2xl">
+      {/* Top Bento Row: Filters & Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+         {/* Filter Options */}
+         <div className="lg:col-span-8 bento-card p-6 md:p-8 flex flex-col sm:flex-row gap-6 items-center justify-between shadow-xl">
+            <div className="relative w-full group">
+               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={18} />
+               <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search Recipient, ID, or Protocol..."
+                  className="w-full h-12 md:h-14 pl-12 pr-6 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all"
+               />
+            </div>
+            <div className="flex items-center gap-4 w-full sm:w-auto">
+               <div className="flex bg-gray-100 p-1.5 rounded-xl w-full sm:w-auto">
+                  {(["All", "Credit", "Debit"] as const).map((type) => (
+                    <button
+                        key={type}
+                        onClick={() => setFilterType(type)}
+                        className={`px-6 py-2.5 text-[11px] font-black rounded-lg transition-all flex-1 sm:flex-none ${
+                        filterType === type ? "bg-white text-primary shadow-md" : "text-gray-400 hover:text-gray-600"
+                        }`}
+                    >
+                        {type}
+                    </button>
+                  ))}
+               </div>
+               <button className="p-4 bg-primary text-white rounded-xl shadow-lg active-press shrink-0"><SlidersHorizontal size={18} /></button>
+            </div>
+         </div>
+
+         {/* Stats Card */}
+         <div className="lg:col-span-4 bento-card p-6 md:p-8 space-y-2 flex flex-col justify-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -z-10 group-hover:bg-primary/10 transition-all" />
+            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Sourced Magnitude</p>
+            <div className="flex items-baseline gap-2">
+               <h3 className="text-3xl md:text-4xl font-black text-gray-900 font-space tracking-tight">₦{totalVolume.toLocaleString()}</h3>
+               <span className="text-emerald-500 font-black text-xs uppercase tracking-widest">+12.4%</span>
+            </div>
+         </div>
+      </div>
+
+      {/* Transaction Table */}
+      <div className="bento-card overflow-hidden shadow-2xl border border-gray-100">
         {!Array.isArray(transactions) || filteredTx.length === 0 ? (
-          <div className="py-24 text-center space-y-4">
-             <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-300">
-                <SlidersHorizontal size={40} />
+          <div className="py-32 text-center space-y-6">
+             <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-200">
+                <PieChart size={48} />
              </div>
              <div className="space-y-1">
-                <p className="text-sm font-black text-gray-900 uppercase tracking-widest">No matching indexes</p>
-                <p className="text-xs text-gray-400 font-medium">Refine your search parameters.</p>
+                <p className="text-lg font-black text-gray-900 uppercase italic tracking-tighter">Zero Nodes Found</p>
+                <p className="text-sm text-gray-400 font-medium">Reset filters to align with ecosystem data.</p>
              </div>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-50">
             {filteredTx.map((tx) => {
               const isExpanded = expandedId === tx.id;
               const isCredit = tx.type === "Credit";
@@ -114,49 +115,38 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                 <div key={tx.id} className="transition-all">
                   <div
                     onClick={() => toggleExpandRow(tx.id)}
-                    className={`flex items-center justify-between p-5 md:p-8 hover:bg-accent-blue/40 cursor-pointer select-none transition-all border-l-8 ${
+                    className={`flex flex-col md:flex-row md:items-center justify-between p-6 md:p-8 hover:bg-gray-50/50 cursor-pointer select-none transition-all border-l-8 ${
                       isExpanded ? "bg-accent-blue/20 border-primary" : "border-transparent"
                     }`}
                   >
-                    <div className="flex items-center gap-4 md:gap-6">
-                      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[22px] flex items-center justify-center shrink-0 shadow-sm ${
+                    <div className="flex items-center gap-6">
+                      <div className={`w-12 h-12 md:w-16 md:h-16 rounded-[20px] md:rounded-[24px] flex items-center justify-center shrink-0 shadow-inner ${
                         isCredit 
                           ? "bg-emerald-50 text-emerald-600" 
                           : "bg-red-50 text-red-600"
                       }`}>
-                        {isCredit ? <ArrowDownLeft size={22} className="md:w-7 md:h-7" /> : <ArrowUpRight size={22} className="md:w-7 md:h-7" />}
+                        {isCredit ? <ArrowDownLeft size={24} className="md:w-8 md:h-8" /> : <ArrowUpRight size={24} className="md:w-8 md:h-8" />}
                       </div>
                       <div className="overflow-hidden">
-                        <p className="text-sm md:text-xl font-black text-gray-900 tracking-tight truncate">{tx.title}</p>
-                        <p className="text-[9px] md:text-[11px] text-gray-400 font-black uppercase tracking-widest mt-1 truncate">
-                          {tx.id} • {tx.category} • {tx.time}
-                        </p>
+                        <p className="text-base md:text-xl font-black text-gray-900 tracking-tight truncate uppercase italic">{tx.title}</p>
+                        <div className="flex items-center gap-3 mt-1.5">
+                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{tx.date} • {tx.time}</span>
+                           <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase tracking-widest ${isCredit ? 'bg-emerald-100/50 text-emerald-600' : 'bg-red-100/50 text-red-600'}`}>{tx.category} Node</span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="text-right flex items-center gap-4 md:gap-8 shrink-0">
-                      <div>
-                        <p className={`text-base md:text-2xl font-mono font-black ${isCredit ? "text-emerald-600" : "text-gray-900"}`}>
-                          {isCredit ? "+" : "-"}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </p>
-                        <p className="text-[9px] md:text-[11px] text-gray-400 font-black mt-1 uppercase tracking-widest">{tx.date}</p>
-                      </div>
-                      
-                      <div className="shrink-0" title={tx.status}>
-                        {tx.status === "Success" ? (
-                          <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shadow-sm">
-                            <CheckCircle2 size={18} className="md:w-5 md:h-5" />
+                    <div className="mt-6 md:mt-0 flex items-center justify-between md:justify-end gap-10">
+                       <div className="text-right">
+                          <p className={`text-xl md:text-3xl font-black font-space tracking-tight ${isCredit ? "text-emerald-600" : "text-gray-900"}`}>
+                            {isCredit ? "+" : "-"}₦{tx.amount.toLocaleString()}
+                          </p>
+                          <div className="flex items-center justify-end gap-2 mt-1">
+                             <div className={`w-1.5 h-1.5 rounded-full ${tx.status === 'Success' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
+                             <span className={`text-[10px] font-black uppercase tracking-widest ${tx.status === 'Success' ? 'text-emerald-600' : 'text-amber-600'}`}>{tx.status}</span>
                           </div>
-                        ) : tx.status === "Processing" || tx.status === "Escrow" || tx.status === "Awaiting Audit" ? (
-                          <div className="w-8 h-8 md:w-10 md:h-10 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center shadow-sm">
-                            <Clock size={18} className="md:w-5 md:h-5 animate-pulse" />
-                          </div>
-                        ) : (
-                          <div className="w-8 h-8 md:w-10 md:h-10 bg-red-50 text-red-500 rounded-full flex items-center justify-center shadow-sm">
-                            <X size={18} className="md:w-5 md:h-5" />
-                          </div>
-                        )}
-                      </div>
+                       </div>
+                       <ChevronDown className={`text-gray-300 transition-transform duration-500 ${isExpanded ? 'rotate-180 text-primary' : ''}`} size={24} />
                     </div>
                   </div>
 
@@ -166,68 +156,68 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="bg-gray-50/50 border-y border-gray-100 overflow-hidden"
+                        className="bg-gray-50 border-y border-gray-100 overflow-hidden"
                       >
-                        <div className="p-6 md:p-10 space-y-8 md:space-y-12">
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                        <div className="p-8 md:p-12 space-y-10">
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
                             
-                            {/* Summary Column */}
-                            <div className="space-y-4 md:space-y-6">
-                              <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Audit Parameters</p>
-                              <div className="space-y-3 md:space-y-4">
-                                <div className="flex justify-between">
-                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Node Reference</span>
-                                  <span className="text-[11px] md:text-xs font-mono text-gray-900 font-black select-all uppercase">{tx.id}</span>
+                            {/* Forensic Column */}
+                            <div className="space-y-6">
+                              <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] flex items-center gap-2"><Info size={12} /> Forensic ID</p>
+                              <div className="space-y-4">
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-bold text-gray-400 uppercase">Execution Node</p>
+                                  <p className="text-xs font-mono font-black text-gray-900 uppercase">OBEY-NODE-0{Math.floor(Math.random()*9)+1}</p>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Protocol Cluster</span>
-                                  <span className="text-[11px] md:text-xs text-gray-900 font-bold uppercase">{tx.category} Hub</span>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-bold text-gray-400 uppercase">Reference Hash</p>
+                                  <p className="text-xs font-mono font-black text-primary select-all">TXN-{tx.id.substring(0, 12)}</p>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Execution Node</span>
-                                  <span className="text-[11px] md:text-xs text-gray-900 font-bold">OBEY-SUI-0{Math.floor(Math.random()*9)+1}</span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Charges breakdown Column */}
-                            <div className="space-y-4 md:space-y-6">
-                              <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Settlement Ledger</p>
-                              <div className="space-y-3 md:space-y-4">
-                                <div className="flex justify-between">
-                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Gross Magnitude</span>
-                                  <span className="text-[11px] md:text-xs text-gray-900 font-mono font-bold">${tx.amount.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-[11px] md:text-xs text-gray-500 font-medium">Protocol Surcharge</span>
-                                  <span className="text-[11px] md:text-xs text-gray-900 font-mono font-bold">${tx.fee.toFixed(2)}</span>
-                                </div>
-                                <div className="h-px bg-gray-200 my-2"></div>
-                                <div className="flex justify-between font-black">
-                                  <span className="text-[11px] md:text-xs text-primary uppercase">Total Authorised</span>
-                                  <span className="text-[13px] md:text-base text-primary font-mono">${(tx.amount + tx.fee).toFixed(2)}</span>
+                                <div className="space-y-1">
+                                  <p className="text-[10px] font-bold text-gray-400 uppercase">Gateway</p>
+                                  <p className="text-xs font-bold text-gray-900 italic">Institutional Treasury (Main)</p>
                                 </div>
                               </div>
                             </div>
 
-                            {/* System Status column */}
-                            <div className="space-y-6 flex flex-col justify-between">
-                              <div className="space-y-3">
-                                <p className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Institutional Clearing</p>
-                                <div className="p-4 bg-white border border-gray-100 rounded-2xl flex items-center gap-3">
-                                   <ShieldCheck size={18} className="text-emerald-500 shrink-0" />
-                                   <p className="text-[10px] md:text-xs text-gray-500 font-medium leading-relaxed">
-                                     Processed on decentralized OBEY settlement pipeline. Secure record verified on chain.
-                                   </p>
+                            {/* Ledger Breakdown */}
+                            <div className="space-y-6">
+                              <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] flex items-center gap-2"><PieChart size={12} /> Ledger Alignment</p>
+                              <div className="space-y-4">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase">Base Magnitude</span>
+                                  <span className="text-xs font-mono font-black text-gray-900">₦{tx.amount.toLocaleString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[10px] font-bold text-gray-500 uppercase">Protocol Surcharge</span>
+                                  <span className="text-xs font-mono font-black text-gray-900">₦{(tx.fee || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="h-px bg-gray-200" />
+                                <div className="flex justify-between items-center pt-2">
+                                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Settled Sum</span>
+                                  <span className="text-lg font-mono font-black text-primary">₦{(tx.amount + (tx.fee || 0)).toLocaleString()}</span>
                                 </div>
                               </div>
+                            </div>
 
-                              <div className="grid grid-cols-2 gap-3 md:gap-4">
-                                <button className="h-12 bg-white border border-gray-200 hover:border-primary/20 hover:bg-gray-50 active-press rounded-[14px] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-gray-700 transition-all shadow-sm">
-                                  <Download size={16} /> PDF
+                            {/* Verification & Actions */}
+                            <div className="space-y-8 flex flex-col justify-between">
+                              <div className="p-6 bg-white border border-gray-100 rounded-3xl space-y-3">
+                                 <div className="flex items-center gap-2 text-emerald-500">
+                                    <ShieldCheck size={16} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest">Verified Integrity</span>
+                                 </div>
+                                 <p className="text-[10px] text-gray-500 font-medium leading-relaxed">
+                                   This settlement has been cross-verified by the Sentinel Mesh and anchored on-chain for institutional transparency.
+                                 </p>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4">
+                                <button className="h-14 bg-white border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-gray-700 hover:bg-gray-50 active-press shadow-sm">
+                                  <FileText size={16} /> Receipt
                                 </button>
-                                <button className="h-12 bg-white border border-gray-200 hover:border-primary/20 hover:bg-gray-50 active-press rounded-[14px] text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 text-gray-700 transition-all shadow-sm">
-                                  <Share2 size={16} /> Share
+                                <button className="h-14 bg-[#0b0e14] text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-primary transition-all active-press shadow-xl">
+                                  <Share2 size={16} /> Relay
                                 </button>
                               </div>
                             </div>
@@ -242,6 +232,51 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
             })}
           </div>
         )}
+      </div>
+
+      {/* Insights Section: Institutional Analytics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+         <div className="bento-card p-8 space-y-6 relative overflow-hidden group">
+            <BarChart3 className="absolute -right-4 -bottom-4 text-gray-50 w-32 h-32 group-hover:scale-110 transition-transform" />
+            <h4 className="text-lg font-black text-gray-900 uppercase italic tracking-tighter relative z-10">Flow Analysis</h4>
+            <div className="space-y-5 relative z-10">
+               {[
+                  { label: "Institutional Cards", val: "₦142,500", p: 75, c: "bg-primary" },
+                  { label: "Digital Assets", val: "₦42,200", p: 45, c: "bg-emerald-500" }
+               ].map(m => (
+                 <div key={m.label} className="space-y-2">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                       <span className="text-gray-400">{m.label}</span>
+                       <span className="text-gray-900">{m.val}</span>
+                    </div>
+                    <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                       <motion.div initial={{ width: 0 }} whileInView={{ width: `${m.p}%` }} className={`h-full ${m.c}`} />
+                    </div>
+                 </div>
+               ))}
+            </div>
+         </div>
+
+         <div className="bento-card p-8 space-y-8 flex flex-col justify-between">
+            <div className="space-y-2">
+               <h4 className="text-lg font-black text-gray-900 uppercase italic tracking-tighter">Export Node Data</h4>
+               <p className="text-xs text-gray-400 font-medium leading-relaxed">Generate high-fidelity forensic reports for tax and institutional auditing.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+               <button className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press"><FileSpreadsheet size={16} /> CSV</button>
+               <button className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press"><FileText size={16} /> PDF</button>
+            </div>
+            <button className="h-14 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active-press">Schedule Auto-Export</button>
+         </div>
+
+         <div className="bg-[#0b0e14] p-8 rounded-[2.5rem] space-y-8 flex flex-col justify-between relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -z-10 group-hover:bg-primary/30 transition-all" />
+            <div className="space-y-4">
+               <h4 className="text-xl font-black text-white uppercase italic tracking-tighter">Institutional Support</h4>
+               <p className="text-xs text-gray-500 font-medium leading-relaxed">Our execution specialists are available 24/7 for manual ledger reconciliation.</p>
+            </div>
+            <button className="h-14 bg-white text-[#0b0e14] rounded-2xl text-[10px] font-black uppercase tracking-widest active-press flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all">Contact Specialist <ArrowRight size={14} /></button>
+         </div>
       </div>
     </div>
   );
