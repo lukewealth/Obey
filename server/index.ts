@@ -60,6 +60,12 @@ app.use(express.json({ limit: '10kb' }));
 
 // --- Institutional Database Guard ---
 app.use(async (req, res, next) => {
+  // Market and Health routes do not require the institutional database mesh
+  const bypassRoutes = ['/api/market', '/market', '/api/health', '/health'];
+  if (bypassRoutes.some(route => req.path.startsWith(route))) {
+    return next();
+  }
+
   try {
     await connectDB();
     next();
@@ -68,7 +74,7 @@ app.use(async (req, res, next) => {
   }
 });
 
-// --- Dual-Path Routing Alignment ---
+// ... Dual-Path Routing Alignment ...
 // This ensures routes work both with and without /api prefix for Vercel/Local compatibility.
 const router = express.Router();
 
@@ -103,8 +109,8 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     console.error('Failed to connect to MongoDB:', err);
   });
 } else {
-  // Ensure DB connection is handled for serverless
-  connectDB();
+  // Ensure DB connection is handled for serverless without crashing on cold starts
+  connectDB().catch(err => console.error('Early database connection failure:', err));
 }
 
 export default app;

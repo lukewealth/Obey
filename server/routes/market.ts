@@ -68,7 +68,9 @@ router.get('/prices', async (req, res) => {
 
   try {
     console.log(`[MARKET_NODE] Synchronizing prices for: ${symbols.join(', ')}`);
-    for (const symbol of symbols) {
+    
+    // Parallelize price fetching to respect Vercel's 10s execution limit
+    await Promise.all(symbols.map(async (symbol) => {
       const cached = priceCache[symbol];
       if (cached && (Date.now() - cached.timestamp < PRICE_TTL)) {
         results[symbol] = cached.price;
@@ -78,23 +80,25 @@ router.get('/prices', async (req, res) => {
           if (data && data.rate) {
             results[symbol] = data.rate;
             priceCache[symbol] = { price: data.rate, timestamp: Date.now() };
-          } else {
-            // Fallback to cached even if expired if we can't get new data
-            if (cached) results[symbol] = cached.price;
+          } else if (cached) {
+            // Fallback to expired cache if we can't get new data
+            results[symbol] = cached.price;
           }
         } catch (e) {
           console.error(`[MARKET_NODE] Individual symbol sync failed: ${symbol}`, e);
           if (cached) results[symbol] = cached.price;
         }
       }
-    }
+    }));
     
-    // If we still have missing essential symbols, use the institutional pegs as last resort
+    // Institutional Pegs: Final safety layer for prototype stability
     const simulatedPegs: Record<string, number> = {
       'BTC': 95000000 / 1600,
       'ETH': 5000000 / 1600,
       'SOL': 250000 / 1600,
-      'SUI': 5000 / 1600
+      'SUI': 5000 / 1600,
+      'USDT': 1,
+      'NGN': 1/1600
     };
 
     for (const symbol of symbols) {
