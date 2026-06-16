@@ -60,19 +60,21 @@ app.use(express.json({ limit: '10kb' }));
 
 // --- Institutional Database Guard ---
 app.use(async (req, res, next) => {
+  // Normalize path and remove leading/trailing slashes for precise mesh matching
+  const path = req.path.toLowerCase().replace(/^\/+|\/+$/g, '');
+  
   // Market and Health routes do not require the institutional database mesh
-  const normalizedPath = req.path.toLowerCase();
   const bypassRoutes = [
-    '/api/market', 
-    '/market', 
-    '/api/health', 
-    '/health',
-    '/api/sync/asset-sync', // This one uses CoinAPI directly
-    '/sync/asset-sync'
+    'api/market', 
+    'market', 
+    'api/health', 
+    'health',
+    'api/sync/asset-sync',
+    'sync/asset-sync'
   ];
   
   const shouldBypass = bypassRoutes.some(route => 
-    normalizedPath === route || normalizedPath.startsWith(route + '/')
+    path === route || path.startsWith(route + '/')
   );
 
   if (shouldBypass) {
@@ -84,10 +86,14 @@ app.use(async (req, res, next) => {
     next();
   } catch (err: any) {
     console.error(`[DB_GUARD_CRITICAL] Node connectivity failure for ${req.method} ${req.path}:`, err.message);
-    res.status(500).json({ 
+    
+    // In institutional mode, we return a structured error node
+    res.status(503).json({ 
       error: 'Institutional database node unavailable.',
+      mesh_status: 're-routing',
       path: req.path,
-      message: process.env.NODE_ENV === 'development' ? err.message : 'The data mesh is currently offline.'
+      timestamp: new Date().toISOString(),
+      message: process.env.NODE_ENV === 'development' ? err.message : 'The institutional data mesh is currently synchronizing or offline.'
     });
   }
 });
@@ -116,6 +122,19 @@ router.get('/health', (req, res) => {
 // Mount router on both root and /api for institutional redundancy
 app.use('/api', router);
 app.use('/', router);
+
+// --- Institutional Global Error Mesh ---
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(`[MESH_CRITICAL_ERROR] Node crash on ${req.method} ${req.path}:`, err);
+  
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({
+    error: 'Institutional node failure',
+    path: req.path,
+    message: process.env.NODE_ENV === 'development' ? err.message : 'A critical failure occurred in the data mesh.',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // For Vercel, we export the app. For local, we listen.
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {

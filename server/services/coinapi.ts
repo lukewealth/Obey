@@ -11,7 +11,7 @@ const coinApi = axios.create({
   headers: {
     'X-CoinAPI-Key': API_KEY
   },
-  timeout: 8000 // 8 second timeout to stay within Vercel execution limits
+  timeout: 4000 // Reduced to 4 seconds for institutional mesh speed
 });
 
 /**
