@@ -160,7 +160,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
     const heroCycle = setInterval(() => {
       setShowHeroText(prev => !prev);
-    }, 6000);
+    }, 16000);
     
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -359,11 +359,11 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  {/* Lottie Visual Element - Background Node (Increased 2X) */}
                  <motion.div 
                    animate={{ 
-                     opacity: showHeroText ? 0.3 : 0.6,
-                     scale: showHeroText ? 0.95 : 1.1,
+                     opacity: showHeroText ? 0 : 0.6,
+                     scale: showHeroText ? 0.9 : 1.1,
                    }}
-                   transition={{ duration: 1.5, ease: "easeInOut" }}
-                   className="absolute top-1/2 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 overflow-hidden pointer-events-none -z-10 opacity-40"
+                   transition={{ duration: 6.5, ease: "easeInOut" }}
+                   className="absolute top-1/2 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 overflow-hidden pointer-events-none -z-10"
                  >
                     <div className="w-full h-full">
                       <DotLottieReact
@@ -382,7 +382,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                            initial={{ opacity: 0, y: 20, filter: "blur(15px)" }}
                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                            exit={{ opacity: 0, y: -20, filter: "blur(15px)" }}
-                           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                           transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
                            className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10 px-2 lg:px-0"
                          >
                            Control your <br className="hidden sm:block" />

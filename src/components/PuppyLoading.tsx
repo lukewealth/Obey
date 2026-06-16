@@ -36,7 +36,7 @@ export default function PuppyLoading() {
           className="relative z-10 w-full h-full flex items-center justify-center"
         >
           <DotLottieReact
-            src="https://lottie.host/04486930-15fb-48bd-bc7e-261c7765c50b/lnr6pi3iR4.lottie"
+            src="/assets/lottie/happy_dog.lottie"
             loop
             autoplay
           />
