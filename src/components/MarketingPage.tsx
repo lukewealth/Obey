@@ -569,7 +569,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               {/* The Line - Centered Vertically */}
               <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
 
-              {/* Original Bird Animation - Restored Motion from Extreme Edges */}
+              {/* Tree Animation - Moving Left to Right */}
               <motion.div
                 animate={{ 
                   x: ["-120%", "120%"],
@@ -584,7 +584,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-0 -translate-y-1/2 z-10"
               >
                 <DotLottieReact
-                  src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie"
+                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
                   loop
                   autoplay
                 />
