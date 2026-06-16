@@ -11,8 +11,12 @@ const MONGODB_OPTIONS = {
   socketTimeoutMS: 45000,
 };
 
-// Fixed connection string with explicit database name 'obey_ecosystem' for reliability
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://Vercel-Admin-atlas-sky-yacht:StwR1ECXbmmYy0YQ@atlas-sky-yacht.d5yxhii.mongodb.net/obey_ecosystem?retryWrites=true&w=majority";
+// Institutional Database Connection Node
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.warn('⚠️ [DB_MESH_WARN] MONGODB_URI not found in environment. Data mesh may be offline.');
+}
 
 let cachedConnection: any = null;
 
