@@ -81,6 +81,28 @@ export default function App() {
   const [utilitySegment, setUtilitySegment] = useState<"airtime" | "data">("airtime");
   const wakeupRef = React.useRef<string | null>(null);
 
+  // Metadata Capture Node
+  const captureMetadata = () => {
+    return {
+      agent: navigator.userAgent,
+      platform: navigator.platform,
+      language: navigator.language,
+      screen: `${window.screen.width}x${window.screen.height}`,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      timestamp: new Date().toISOString()
+    };
+  };
+
+  const syncMetadata = async (userId: string) => {
+    try {
+      const metadata = captureMetadata();
+      await api.post('/sync/metadata', { userId, metadata });
+      console.log("[SYNC] Institutional metadata node settled.");
+    } catch (err) {
+      console.warn("[SYNC_WARN] Metadata synchronization delayed.");
+    }
+  };
+
   // Utility for Hybrid Tracking
   const getCookie = (name: string) => {
     const value = `; ${document.cookie}`;
@@ -90,102 +112,115 @@ export default function App() {
 
   const [successTransaction, setSuccessTransaction] = useState<{ amount: number | string; type: string; id: string } | null>(null);
 
-  useEffect(() => {
-    const wakeupDatabase = async () => {
-      // Allow wakeup via current user OR tracked cookie for fast-fetch optimization
-      const trackedEmail = getCookie('obey_user_email');
-      const trackedId = getCookie('obey_user_id');
-      const identifier = currentUser?.id || currentUser?.uid || trackedId || trackedEmail;
-      
-      if (!identifier || !supabase) return;
-      
-      // Prevent redundant wakeup for the same identifier in a single session
-      if (wakeupRef.current === identifier) return;
-      wakeupRef.current = identifier;
-      
-      setIsInitializing(true);
-      console.log("[WAKEUP] Initializing cross-chain depth nodes for:", identifier);
-      
-      try {
-        // 1. Fetch Master Profile from Ecosystem Depth (Hybrid: Supabase -> MongoDB Fallback)
-        let sbProfile: any = null;
-        if (currentUser?.id || currentUser?.uid || trackedId) {
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("*")
-            .eq("id", currentUser?.id || currentUser?.uid || trackedId)
-            .maybeSingle(); 
-          if (!error) sbProfile = data;
-        }
+  const wakeupDatabase = async (force: boolean = false) => {
+    // Allow wakeup via current user OR tracked cookie for fast-fetch optimization
+    const trackedEmail = getCookie('obey_user_email');
+    const trackedId = getCookie('obey_user_id');
+    const identifier = currentUser?.id || currentUser?.uid || trackedId || trackedEmail;
+    
+    if (!identifier || !supabase) return;
+    
+    // Prevent redundant wakeup for the same identifier in a single session unless forced
+    if (!force && wakeupRef.current === identifier) return;
+    wakeupRef.current = identifier;
+    
+    setIsInitializing(true);
+    console.log("[WAKEUP] Initializing cross-chain depth nodes for:", identifier);
+    
+    try {
+      // 1. Fetch Master Profile from Ecosystem Depth (Hybrid: Supabase -> MongoDB Fallback)
+      let sbProfile: any = null;
+      if (currentUser?.id || currentUser?.uid || trackedId) {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", currentUser?.id || currentUser?.uid || trackedId)
+          .maybeSingle(); 
+        if (!error) sbProfile = data;
+      }
 
-        // 2. Determine Source of Truth & Align Metadata
-        let finalProfile: UserProfile;
-        if (sbProfile) {
-          finalProfile = {
-            ...profile,
-            ...sbProfile,
-            id: sbProfile.id,
-            kycStatus: sbProfile.kyc_status || profile.kycStatus,
-            isEmailVerified: !!sbProfile.email_confirmed_at,
-            currency: sbProfile.currency || "NGN",
-          };
-          console.log("[WAKEUP] Master profile retrieved from Supabase node");
-        } else {
-          // Fallback to MongoDB Node via Fast-Fetch API
-          try {
-            const res = await api.get(`/sync/user/${identifier}`);
-            if (res.data) {
-              finalProfile = {
-                ...profile,
-                ...res.data,
-                id: res.data.supabaseId || res.data._id,
-                isEmailVerified: res.data.isEmailVerified,
-                currency: res.data.currency || "NGN",
-              };
-              console.log("[WAKEUP] Reverting to MongoDB depth node");
-            } else {
-              throw new Error("No node found");
-            }
-          } catch (err) {
-            finalProfile = { ...profile, email: trackedEmail || profile.email };
-            console.log("[WAKEUP] No existing node found. Using defaults.");
-            // Trigger gated verification for new or un-synced users
-            if (currentScreen === AppScreen.DASHBOARD) {
-               setShowGatedModal(true);
-            }
+      // 2. Determine Source of Truth & Align Metadata
+      let finalProfile: UserProfile;
+      if (sbProfile) {
+        finalProfile = {
+          ...profile,
+          ...sbProfile,
+          id: sbProfile.id,
+          kycStatus: sbProfile.kyc_status || profile.kycStatus,
+          isEmailVerified: !!sbProfile.email_confirmed_at,
+          currency: sbProfile.currency || "NGN",
+        };
+        console.log("[WAKEUP] Master profile retrieved from Supabase node");
+      } else {
+        // Fallback to MongoDB Node via Fast-Fetch API
+        try {
+          const res = await api.get(`/sync/user/${identifier}`);
+          if (res.data) {
+            finalProfile = {
+              ...profile,
+              ...res.data,
+              id: res.data.supabaseId || res.data._id,
+              isEmailVerified: res.data.isEmailVerified,
+              currency: res.data.currency || "NGN",
+            };
+            console.log("[WAKEUP] Reverting to MongoDB depth node");
+          } else {
+            throw new Error("No node found");
+          }
+        } catch (err) {
+          finalProfile = { ...profile, email: trackedEmail || profile.email };
+          console.log("[WAKEUP] No existing node found. Using defaults.");
+          // Trigger gated verification for new or un-synced users
+          if (currentScreen === AppScreen.DASHBOARD) {
+             setShowGatedModal(true);
           }
         }
-
-        // 3. Synchronize All Global States
-        setProfile(finalProfile);
-        
-        // Role-Based Tab Initialization
-        if (finalProfile.role === "admin") {
-           setActiveTab(AppTab.ADMIN);
-           notify("info", "Institutional Entry", "Administrative console initialized.");
-        } else {
-           setActiveTab(AppTab.HOME);
-        }
-
-        // Final Security Check: Ensure email is verified for dashboard access
-        if (!finalProfile.isEmailVerified && currentScreen === AppScreen.DASHBOARD) {
-           setCurrentScreen(AppScreen.LOGIN);
-           notify("error", "Access Blocked", "Institutional email verification required.");
-        }
-
-        await syncProfile({ id: finalProfile.id || identifier, profile: finalProfile });
-        
-        notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
-      } catch (err) {
-        console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
-      } finally {
-        // Institutional delay for high-fidelity discovery animation
-        setTimeout(() => {
-          setIsInitializing(false);
-        }, 2200);
       }
-    };
 
+      // 3. Metadata Node Alignment
+      await syncMetadata(finalProfile.id || identifier);
+
+      // 4. Verification Check: Confirm Email or User ID / Admin ID
+      const isVerifiedId = finalProfile.id && finalProfile.id.length > 5;
+      const isVerifiedEmail = finalProfile.email && finalProfile.email.includes("@");
+      
+      if ((!isVerifiedId || !isVerifiedEmail) && currentScreen === AppScreen.DASHBOARD) {
+        setCurrentScreen(AppScreen.LOGIN);
+        notify("error", "Verification Required", "Valid institutional identity not confirmed.");
+        return;
+      }
+
+      // 5. Synchronize All Global States
+      setProfile(finalProfile);
+      
+      // Role-Based Tab Initialization
+      if (finalProfile.role === "admin") {
+         setActiveTab(AppTab.ADMIN);
+         notify("info", "Institutional Entry", "Administrative console initialized.");
+      } else {
+         setActiveTab(AppTab.HOME);
+      }
+
+      // Final Security Check: Ensure email is verified for dashboard access
+      if (!finalProfile.isEmailVerified && currentScreen === AppScreen.DASHBOARD) {
+         setCurrentScreen(AppScreen.LOGIN);
+         notify("error", "Access Blocked", "Institutional email verification required.");
+      }
+
+      await syncProfile({ id: finalProfile.id || identifier, profile: finalProfile });
+      
+      notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
+    } catch (err) {
+      console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
+    } finally {
+      // Institutional delay for high-fidelity discovery animation
+      setTimeout(() => {
+        setIsInitializing(false);
+      }, 2200);
+    }
+  };
+
+  useEffect(() => {
     wakeupDatabase();
   }, [currentUser?.id, currentUser?.uid, currentScreen, syncProfile, notify]);
 
@@ -558,6 +593,9 @@ export default function App() {
                         profile={profile} 
                         transactions={cachedTransactions} 
                         onNavigateTab={setActiveTab} 
+                        onRefreshData={async () => {
+                           await wakeupDatabase(true);
+                        }}
                         onSelectAction={(action) => { 
                           setIsInitializing(true);
                           setTimeout(() => {

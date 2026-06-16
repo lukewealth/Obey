@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema({
   balance: { type: Number, default: 0 },
   promoCode: { type: String },
   twoFactorEnabled: { type: Boolean, default: false },
+  metadata: { type: mongoose.Schema.Types.Mixed },
   lastSync: { type: Date, default: Date.now }
 }, { timestamps: true });
 

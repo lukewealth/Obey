@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ShieldCheck, Loader2, ArrowRight, CheckCircle2, 
-  ShieldAlert, X, LogOut as LogOutIcon, RefreshCw 
+  ShieldAlert, X, LogOut as LogOutIcon, RefreshCw,
+  Mail, Fingerprint, Wallet, Activity
 } from "lucide-react";
 import { UserProfile } from "../types";
 
@@ -17,19 +18,38 @@ interface GatedVerificationModalProps {
 
 export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLogout, onRefresh, profile }: GatedVerificationModalProps) {
   const [status, setStatus] = useState<"initial" | "analyzing" | "complete">("initial");
+  const [checklist, setChecklist] = useState({
+    email: false,
+    id: false,
+    wallet: false,
+    metadata: false
+  });
 
   useEffect(() => {
     if (isOpen) {
       setStatus("initial");
+      setChecklist({
+        email: profile.isEmailVerified,
+        id: !!profile.id,
+        wallet: profile.balance >= 0,
+        metadata: false
+      });
     }
-  }, [isOpen]);
+  }, [isOpen, profile]);
 
   const handleStartAnalysis = () => {
     setStatus("analyzing");
-    // Simulate institutional KYC node analysis
-    setTimeout(() => {
-      setStatus("complete");
-    }, 2400);
+    
+    // Step-by-step checklist animation
+    const steps = ['email', 'id', 'wallet', 'metadata'];
+    steps.forEach((step, index) => {
+      setTimeout(() => {
+        setChecklist(prev => ({ ...prev, [step]: true }));
+        if (index === steps.length - 1) {
+          setStatus("complete");
+        }
+      }, (index + 1) * 800);
+    });
   };
 
   return (
@@ -82,29 +102,34 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                           <ShieldAlert size={40} />
                        </div>
                        <div className="space-y-2">
-                          <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Verification Required</h3>
-                          <p className="text-gray-500 font-medium">Identity node not found for <b>{profile.name}</b>. Institutional access is gated.</p>
+                          <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Identity Checkpoint</h3>
+                          <p className="text-gray-500 font-medium">Verify your institutional parameters to access the OBEY node.</p>
                        </div>
+
                        <div className="bg-gray-50 rounded-3xl p-6 space-y-4 border border-gray-100">
-                          <div className="flex items-center gap-4 text-left">
-                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                                <CheckCircle2 size={18} className="text-gray-300" />
-                             </div>
-                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">Tier 2 Real-Time Monitoring</p>
-                          </div>
-                          <div className="flex items-center gap-4 text-left">
-                             <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm shrink-0">
-                                <CheckCircle2 size={18} className="text-gray-300" />
-                             </div>
-                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">Cross-Chain AML Analysis</p>
-                          </div>
+                          {[
+                            { id: 'email', label: 'Email Node Alignment', icon: Mail, checked: profile.isEmailVerified },
+                            { id: 'id', label: 'Institutional ID Sync', icon: Fingerprint, checked: !!profile.id },
+                            { id: 'wallet', label: 'Core Wallet Integration', icon: Wallet, checked: true },
+                            { id: 'metadata', label: 'Verified Metadata Mesh', icon: Activity, checked: false }
+                          ].map((item) => (
+                            <div key={item.id} className="flex items-center justify-between">
+                               <div className="flex items-center gap-4">
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm shrink-0 ${item.checked ? 'bg-emerald-50 text-emerald-500' : 'bg-white text-gray-300'}`}>
+                                     <item.icon size={18} />
+                                  </div>
+                                  <p className={`text-xs font-black uppercase tracking-widest ${item.checked ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
+                               </div>
+                               {item.checked && <CheckCircle2 size={18} className="text-emerald-500" />}
+                            </div>
+                          ))}
                        </div>
                        
                        <button 
                         onClick={handleStartAnalysis}
                         className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press flex items-center justify-center gap-3"
                        >
-                          Initialize Protocol <ArrowRight size={20} />
+                          Synchronize Nodes <ArrowRight size={20} />
                        </button>
 
                        <div className="flex items-center gap-4 pt-2">
@@ -112,13 +137,13 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                             onClick={onRefresh}
                             className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-gray-200 transition-all flex items-center justify-center gap-2 active-press"
                           >
-                             <RefreshCw size={14} /> Retry Refresh
+                             <RefreshCw size={14} /> ID Refresh
                           </button>
                           <button 
                             onClick={onLogout}
                             className="flex-1 py-4 border border-red-100 text-red-500 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all flex items-center justify-center gap-2 active-press"
                           >
-                             <LogOutIcon size={14} /> Secure Signout
+                             <LogOutIcon size={14} /> Exit Node
                           </button>
                        </div>
                     </motion.div>
@@ -130,7 +155,7 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="space-y-8 py-12"
+                      className="space-y-8 py-6"
                     >
                        <div className="relative w-32 h-32 mx-auto">
                           <motion.div 
@@ -142,18 +167,28 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                              <Loader2 size={32} className="animate-spin" />
                           </div>
                        </div>
-                       <div className="space-y-3">
-                          <h3 className="text-2xl font-black text-gray-900 uppercase tracking-widest">Analyzing Mesh</h3>
-                          <div className="flex flex-col gap-1.5 items-center">
-                             <motion.p 
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
-                              className="text-[10px] font-black text-primary uppercase tracking-[0.3em]"
-                             >
-                               Fetching Sui Ledger Entries...
-                             </motion.p>
-                             <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Node ID: {profile.id?.substring(0, 12)}</p>
+                       
+                       <div className="space-y-6">
+                          <h3 className="text-2xl font-black text-gray-900 uppercase tracking-widest">Alignment in Progress</h3>
+                          <div className="bg-gray-50 rounded-3xl p-6 space-y-4 border border-gray-100 max-w-sm mx-auto">
+                            {[
+                              { id: 'email', label: 'Email Node Alignment', icon: Mail },
+                              { id: 'id', label: 'Institutional ID Sync', icon: Fingerprint },
+                              { id: 'wallet', label: 'Core Wallet Integration', icon: Wallet },
+                              { id: 'metadata', label: 'Verified Metadata Mesh', icon: Activity }
+                            ].map((item) => (
+                              <div key={item.id} className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                   <item.icon size={16} className={checklist[item.id as keyof typeof checklist] ? 'text-emerald-500' : 'text-gray-300'} />
+                                   <p className={`text-[10px] font-black uppercase tracking-widest ${checklist[item.id as keyof typeof checklist] ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
+                                </div>
+                                {checklist[item.id as keyof typeof checklist] ? (
+                                  <CheckCircle2 size={14} className="text-emerald-500" />
+                                ) : (
+                                  <Loader2 size={14} className="text-primary animate-spin" />
+                                )}
+                              </div>
+                            ))}
                           </div>
                        </div>
                     </motion.div>
@@ -176,20 +211,20 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                        </motion.div>
                        <div className="space-y-2">
                           <h3 className="text-4xl font-black text-gray-900 tracking-tighter uppercase">Integrity Verified</h3>
-                          <p className="text-gray-500 font-medium">Protocol sequence complete. Institutional nodes operational.</p>
+                          <p className="text-gray-500 font-medium">Identity nodes synchronized. Secure session established.</p>
                        </div>
                        <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 flex items-center gap-4 text-left">
                           <ShieldCheck className="text-emerald-500 shrink-0" size={28} />
                           <div>
                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Authentication Pulse</p>
-                             <p className="text-base font-bold text-emerald-900">Success Code: OBY-8824-SEC</p>
+                             <p className="text-base font-bold text-emerald-900">Success Code: OBY-SYNC-SEC</p>
                           </div>
                        </div>
                        <button 
                         onClick={onVerify}
                         className="w-full h-18 bg-[#0b0e14] text-white rounded-[25px] font-black uppercase text-sm tracking-[0.2em] shadow-2xl active-press hover:bg-primary transition-all flex items-center justify-center gap-3"
                        >
-                          Enter Dashboard <ArrowRight size={20} />
+                          Enter Console <ArrowRight size={20} />
                        </button>
                     </motion.div>
                   )}

@@ -148,6 +148,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
   const [activeHeader, setActiveHeader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showHeroText, setShowHeroText] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -156,10 +157,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
     window.addEventListener("scroll", handleScroll);
     
     const timer = setTimeout(() => setIsLoaded(true), 2400);
+
+    const heroCycle = setInterval(() => {
+      setShowHeroText(prev => !prev);
+    }, 6000);
     
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(timer);
+      clearInterval(heroCycle);
     };
   }, []);
 
@@ -181,6 +187,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
   };
 
   const { scrollYProgress } = useScroll();
+  const subtitleY = useTransform(scrollYProgress, [0, 0.1], [0, -30]);
+  const subtitleOpacity = useTransform(scrollYProgress, [0, 0.08, 0.15], [1, 1, 0]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#121212] text-[#0b0e14] dark:text-white selection:bg-primary/10 selection:text-primary overflow-x-hidden font-inter transition-colors duration-500">
@@ -283,11 +291,11 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
       <main>
         {/* 2. HIGH-FIDELITY HERO */}
-        <section className="relative pt-32 pb-16 md:pt-48 md:pb-40 px-4 md:px-6 overflow-hidden">
-          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-20">
+        <section className="relative pt-32 pb-16 md:pt-48 md:pb-40 px-4 md:px-12 overflow-hidden flex items-center min-h-[90vh]">
+          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24 w-full">
             
             {/* Phone Mockup Section */}
-            <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-75 sm:scale-90 md:scale-100">
+            <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-75 sm:scale-90 md:scale-100 lg:scale-110">
                <motion.div 
                   initial={{ rotateX: 20, rotateY: -10, y: 100, opacity: 0 }}
                   whileInView={{ rotateX: 0, rotateY: 0, y: 0, opacity: 1 }}
@@ -345,20 +353,53 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="lg:w-1/2 space-y-10 md:space-y-14 text-center lg:text-left order-1 lg:order-2 px-2 md:px-0"
+              className="lg:w-1/2 space-y-8 md:space-y-12 text-center lg:text-left order-1 lg:order-2 px-4 md:px-0 relative z-30"
             >
-              <motion.h1 
-                variants={itemVariants}
-                className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white"
-              >
-                Control your <br className="hidden sm:block" />
-                financial <br className="hidden sm:block" />
-                future with <span className="text-primary italic">OBEY.</span>
-              </motion.h1>
+              <div className="relative min-h-[350px] md:min-h-[450px] lg:min-h-[500px] flex items-center justify-center lg:justify-start">
+                 {/* Lottie Background - Cycles prominence with text */}
+                 <motion.div 
+                   animate={{ 
+                     opacity: showHeroText ? 0.4 : 1,
+                     scale: showHeroText ? 1.25 : 1.4,
+                     filter: showHeroText ? "blur(4px)" : "blur(0px)"
+                   }}
+                   transition={{ duration: 1.5, ease: "easeInOut" }}
+                   className="absolute inset-0 z-0 flex items-center justify-center lg:justify-start overflow-hidden pointer-events-none"
+                 >
+                    <div className="w-full h-full max-w-[600px] lg:max-w-[800px]">
+                      <DotLottieReact
+                        src="https://lottie.host/f250630d-88e1-4c6e-8381-3112de2d11c1/edAMqSiTOM.lottie"
+                        loop
+                        autoplay
+                      />
+                    </div>
+                 </motion.div>
+
+                 <AnimatePresence mode="wait">
+                    {showHeroText && (
+                      <motion.h1 
+                        key="hero-text"
+                        initial={{ opacity: 0, y: 30, filter: "blur(20px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -30, filter: "blur(20px)" }}
+                        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10"
+                      >
+                        Control your <br className="hidden sm:block" />
+                        financial <br className="hidden sm:block" />
+                        future with <span className="text-primary italic">OBEY.</span>
+                      </motion.h1>
+                    )}
+                 </AnimatePresence>
+              </div>
 
               <motion.p 
-                variants={itemVariants}
-                className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed"
+                style={{ 
+                  y: subtitleY, 
+                  opacity: subtitleOpacity,
+                  scale: useTransform(scrollYProgress, [0, 0.1], [1, 0.95])
+                }}
+                className="text-[13px] md:text-sm lg:text-base text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed opacity-80"
               >
                 Next-generation digital asset management and institutional liquidity infrastructure. 
                 Unified wallet, utility recharge, and digital marketplaces.

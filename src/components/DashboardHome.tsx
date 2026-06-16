@@ -1,11 +1,12 @@
 import React from "react";
 import { AppTab, UserProfile, Transaction } from "../types";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, ArrowDownLeft, Wallet, Send, RefreshCw, Smartphone, 
   Gift, Eye, EyeOff, ShoppingBag, ArrowDown, Utensils, Plane, Coffee, 
   ChevronRight, CreditCard, Bell, Sparkles, TrendingUp, Search,
-  ArrowRight, ShieldCheck, Zap, BarChart3, Star, CheckCircle2, Activity
+  ArrowRight, ShieldCheck, Zap, BarChart3, Star, CheckCircle2, Activity,
+  Cloud, DownloadCloud, RefreshCcw
 } from "lucide-react";
 
 
@@ -20,10 +21,22 @@ interface DashboardHomeProps {
     SOL: number;
     SUI: number;
   };
+  onRefreshData?: () => Promise<void>;
 }
 
-export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
+export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices, onRefreshData }: DashboardHomeProps) {
   const [hideBalance, setHideBalance] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
+  const handleRefresh = async () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    if (onRefreshData) {
+      await onRefreshData();
+    }
+    // Artificial delay for animation smoothness if refresh is too fast
+    setTimeout(() => setIsRefreshing(false), 1500);
+  };
 
   // Helper icons for categories
   const getCategoryIcon = (category: string) => {
@@ -81,9 +94,42 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
             System Live: v4.2.0-NGN
           </motion.div>
-          <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
-            Welcome back, <span className="gradient-text">{profile.name.split(" ")[0]}</span>.
-          </h1>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
+              Welcome back, <span className="gradient-text">{profile.name.split(" ")[0]}</span>.
+            </h1>
+            {/* Refresh Node Button */}
+            <button 
+              onClick={handleRefresh}
+              className={`relative p-2 rounded-xl transition-all duration-500 ${isRefreshing ? 'bg-primary text-white scale-90' : 'bg-gray-50 dark:bg-white/5 text-gray-400 hover:text-primary hover:bg-white dark:hover:bg-white/10 shadow-sm'}`}
+            >
+              <AnimatePresence mode="wait">
+                {isRefreshing ? (
+                  <motion.div
+                    key="syncing"
+                    initial={{ rotate: 0, scale: 0.5, opacity: 0 }}
+                    animate={{ rotate: 360, scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  >
+                    <RefreshCcw size={18} />
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="cloud"
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    whileHover={{ y: -2 }}
+                  >
+                    <Cloud size={18} />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              {isRefreshing && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full animate-ping"></span>
+              )}
+            </button>
+          </div>
           <p className="text-gray-500 dark:text-gray-400 font-medium text-base md:text-lg">Your financial ecosystem is performing optimally.</p>
         </div>
 

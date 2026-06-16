@@ -5,36 +5,47 @@ import * as interswitch from '../services/interswitch';
 import { syncUserNode } from '../mesh/id_user';
 import { saveTransactionNode } from '../mesh/save';
 import { syncCryptoAsset } from '../mesh/crypto';
+import { syncMetadataNode } from '../mesh/metadatabse';
 
 const router = express.Router();
 
 /**
  * Enhanced Sync Node: Handles cross-state management between Supabase, MongoDB, and local cookies.
- * Uses Institutional Mesh for real-time node alignment.
  */
 router.post('/user', async (req, res) => {
   try {
     const profile = req.body;
     
     if (!profile.supabaseId || !profile.email) {
-      console.warn('[SYNC_WARN] Missing required parameters in sync request');
-      return res.status(400).json({ error: 'Missing required sync parameters: supabaseId and email are required.' });
+      return res.status(400).json({ error: 'Missing required sync parameters.' });
     }
 
-    // 1. Synchronize with Modular Institutional Mesh
     const user = await syncUserNode(profile);
 
-    // 2. Set Tracking Cookies for Hybrid Load Optimization
     res.cookie('obey_user_email', user.email, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
     res.cookie('obey_user_id', user.supabaseId, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
 
     res.json({ success: true, user });
   } catch (error: any) {
-    console.error('Sync user error:', error.message);
-    res.status(500).json({ 
-      error: 'Failed to synchronize ecosystem nodes',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
+    res.status(500).json({ error: 'Failed to synchronize ecosystem nodes' });
+  }
+});
+
+/**
+ * Metadata Sync Node: Captures institutional metadata and aligns with user profile.
+ */
+router.post('/metadata', async (req, res) => {
+  try {
+    const { userId, metadata } = req.body;
+    
+    if (!userId || !metadata) {
+      return res.status(400).json({ error: 'Missing userId or metadata payload' });
+    }
+
+    const result = await syncMetadataNode(userId, metadata);
+    res.json({ success: true, node: result });
+  } catch (error) {
+    res.status(500).json({ error: 'Metadata node synchronization failed' });
   }
 });
 
