@@ -567,22 +567,24 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 />
               </motion.div>
 
-              {/* Bird Animation - flying from extreme Left side toward Right on top of line */}
+              {/* Walking Cat Animation - walking from extreme Left side toward Right middle */}
               <motion.div
                 animate={{ 
-                  x: ["-100%", "120%"],
-                  opacity: [0, 0.6, 0.6, 0]
+                  x: ["-100%", "75%"],
+                  opacity: [0, 1, 1, 0]
                 }}
                 transition={{ 
-                  duration: 35, repeat: Infinity, ease: "linear" 
+                  duration: 25, 
+                  times: [0, 0.1, 0.8, 1],
+                  repeat: Infinity, 
+                  ease: "linear" 
                 }}
-                className="w-32 h-32 md:w-48 md:h-48 absolute top-1/2 left-0 -translate-y-[65%] z-10 filter grayscale dark:invert"
+                className="w-32 h-32 md:w-48 md:h-48 absolute top-1/2 left-0 -translate-y-[65%] z-10"
               >
                 <DotLottieReact
                   src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
                   loop
                   autoplay
-                  style={{ transform: 'scaleX(-1)' }}
                 />
               </motion.div>
            </motion.div>
