@@ -61,16 +61,34 @@ app.use(express.json({ limit: '10kb' }));
 // --- Institutional Database Guard ---
 app.use(async (req, res, next) => {
   // Market and Health routes do not require the institutional database mesh
-  const bypassRoutes = ['/api/market', '/market', '/api/health', '/health'];
-  if (bypassRoutes.some(route => req.path.startsWith(route))) {
+  const normalizedPath = req.path.toLowerCase();
+  const bypassRoutes = [
+    '/api/market', 
+    '/market', 
+    '/api/health', 
+    '/health',
+    '/api/sync/asset-sync', // This one uses CoinAPI directly
+    '/sync/asset-sync'
+  ];
+  
+  const shouldBypass = bypassRoutes.some(route => 
+    normalizedPath === route || normalizedPath.startsWith(route + '/')
+  );
+
+  if (shouldBypass) {
     return next();
   }
 
   try {
     await connectDB();
     next();
-  } catch (err) {
-    res.status(500).json({ error: 'Institutional database node unavailable.' });
+  } catch (err: any) {
+    console.error(`[DB_GUARD_CRITICAL] Node connectivity failure for ${req.method} ${req.path}:`, err.message);
+    res.status(500).json({ 
+      error: 'Institutional database node unavailable.',
+      path: req.path,
+      message: process.env.NODE_ENV === 'development' ? err.message : 'The data mesh is currently offline.'
+    });
   }
 });
 

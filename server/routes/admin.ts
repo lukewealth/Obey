@@ -3,6 +3,7 @@ import { User } from '../models/User';
 import { Transaction } from '../models/Transaction';
 import { adminAuth } from '../middleware/adminAuth';
 import * as interswitch from '../services/interswitch';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 
@@ -48,6 +49,54 @@ router.post('/approve-kyc', adminAuth, async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: 'KYC approval protocol failure.' });
+  }
+});
+
+/**
+ * OBEY to OBEY Wallet Credit Management
+ * Direct adjustment of internal credit tokens.
+ */
+router.post('/adjust-balance', adminAuth, async (req, res) => {
+  try {
+    const { userId, amount, type, reason } = req.body;
+    
+    if (!userId || !amount || !['ADD', 'SUB'].includes(type)) {
+      return res.status(400).json({ error: 'Invalid adjustment parameters.' });
+    }
+
+    const adjustmentAmount = type === 'ADD' ? amount : -amount;
+    
+    const user = await User.findOneAndUpdate(
+      { $or: [{ supabaseId: userId }, { email: userId }] },
+      { $inc: { balance: adjustmentAmount } },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ error: 'User node not found.' });
+
+    // Create Audit Transaction
+    const auditTx = new Transaction({
+      id: `OBY-ADM-ADJ-${uuidv4().substring(0, 8).toUpperCase()}`,
+      userId: user.supabaseId,
+      title: `Admin Adjustment: ${reason || 'Institutional Balancing'}`,
+      category: 'System',
+      type: type === 'ADD' ? 'Credit' : 'Debit',
+      amount: amount,
+      date: new Date().toLocaleDateString(),
+      time: new Date().toLocaleTimeString(),
+      status: 'Completed',
+      brand: 'OBEY'
+    });
+    await auditTx.save();
+
+    res.json({ 
+      success: true, 
+      message: 'Institutional ledger adjusted.', 
+      newBalance: user.balance,
+      auditId: auditTx.id
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Balance adjustment protocol failure.' });
   }
 });
 

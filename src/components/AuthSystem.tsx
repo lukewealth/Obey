@@ -76,32 +76,60 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
         console.warn("Firebase email login failed, falling back to Supabase:", fbError.message);
       }
 
+      let userId = "";
+      let userEmail = "";
+
       if (userCredential) {
         if (!userCredential.user.emailVerified) {
           setErrorMsg("Institutional email verification required. Please check your inbox.");
           setLoading(false);
           return;
         }
-        // Success via Firebase - the App.tsx listener will handle navigation
-        return;
+        userId = userCredential.user.uid;
+        userEmail = userCredential.user.email || "";
+      } else {
+        // Fallback: Supabase Email/Password Login
+        if (!supabase) throw new Error("Supabase connection missing");
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        
+        if (!data.user.email_confirmed_at) {
+          setErrorMsg("Email node not yet authorized. Please verify your email.");
+          setLoading(false);
+          return;
+        }
+        userId = data.user.id;
+        userEmail = data.user.email || "";
       }
 
-      // Fallback: Supabase Email/Password Login
-      if (!supabase) throw new Error("Supabase connection missing");
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      
-      if (!data.user.email_confirmed_at) {
-        setErrorMsg("Email node not yet authorized. Please verify your email.");
-        setLoading(false);
-        return;
+      // --- Institutional Health Check & Node Warmup ---
+      // We verify the backend data mesh is operational before entering the dashboard
+      try {
+        const api = (await import("../services/api")).default;
+        const healthRes = await api.get('/health');
+        console.log("[AUTH_MESH] Node Health Checked:", healthRes.data.status);
+        
+        // Sync with MongoDB to fetch/initialize metadata
+        const syncRes = await api.post('/sync/user', {
+          supabaseId: userId,
+          email: userEmail
+        });
+        
+        if (syncRes.data.user) {
+          onSuccess(syncRes.data.user);
+        } else {
+          // If sync fails but login succeeded, we still proceed but with partial profile
+          onSuccess({ id: userId, email: userEmail });
+        }
+      } catch (meshError: any) {
+        console.warn("[AUTH_MESH_WARN] Institutional data mesh unreachable, proceeding with decentralized state:", meshError.message);
+        // We still allow access, as the dashboard has its own fallbacks
+        onSuccess({ id: userId, email: userEmail });
       }
 
-      const { data: profile } = await supabase.from("profiles").select("*").eq("id", data.user.id).single();
-      onSuccess(profile || { id: data.user.id, email, isEmailVerified: !!data.user.email_confirmed_at });
       onNavigate(AppScreen.DASHBOARD);
     } catch (error: any) {
-      setErrorMsg(error.message || "Authentication failed");
+      setErrorMsg(error.message || "Authentication failed. Institutional node timeout.");
     } finally {
       setLoading(false);
     }
