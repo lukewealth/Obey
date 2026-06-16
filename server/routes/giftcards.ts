@@ -9,16 +9,14 @@ import rateLimit from 'express-rate-limit';
 
 const router = express.Router();
 
-// Secure Rate Limit: 10 marketplace actions per 5 minutes
 const marketLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   max: 10,
-  message: { error: 'Marketplace rate limit exceeded. Please wait before next operation.' },
+  message: { error: 'Marketplace rate limit exceeded.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
-// Input Validation Schemas
 const listSchema = z.object({
   sellerId: z.string(),
   sellerName: z.string(),
@@ -33,19 +31,15 @@ const purchaseSchema = z.object({
   listingId: z.string(),
 });
 
-// --- P2P Marketplace Endpoints ---
-
-// Browse Active Listings
 router.get('/market', async (req, res) => {
   try {
-    const listings = await GiftCardListing.find({ status: 'OPEN' }).sort({ createdAt: -1 });
+    const listings = await GiftCardListing.find({ status: 'OPEN' } as any).sort({ createdAt: -1 });
     res.json(listings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch marketplace nodes.' });
   }
 });
 
-// Create a Listing
 router.post('/list', marketLimiter, async (req, res) => {
   try {
     const data = listSchema.parse(req.body);
@@ -57,29 +51,25 @@ router.post('/list', marketLimiter, async (req, res) => {
     await listing.save();
     res.json({ success: true, listing });
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: 'Invalid listing data.', details: error.issues });
     res.status(500).json({ error: 'Listing terminal failure.' });
   }
 });
 
-// Purchase a Listing (Escrow)
 router.post('/purchase', marketLimiter, async (req, res) => {
   try {
     const { buyerId, listingId } = purchaseSchema.parse(req.body);
-    const listing = await GiftCardListing.findOne({ id: listingId, status: 'OPEN' });
+    const listing = await GiftCardListing.findOne({ id: listingId, status: 'OPEN' } as any);
 
     if (!listing) return res.status(404).json({ error: 'Listing no longer available.' });
     if (listing.sellerId === buyerId) return res.status(400).json({ error: 'Cannot purchase your own asset node.' });
 
-    const buyer = await User.findOne({ supabaseId: buyerId });
+    const buyer = await User.findOne({ supabaseId: buyerId } as any);
     if (!buyer || buyer.balance < listing.price) {
-      return res.status(400).json({ error: 'Insufficient vault reserves for this acquisition.' });
+      return res.status(400).json({ error: 'Insufficient vault reserves.' });
     }
 
-    // 1. Lock Funds from Buyer
-    await User.findOneAndUpdate({ supabaseId: buyerId }, { $inc: { balance: -listing.price } });
+    await User.findOneAndUpdate({ supabaseId: buyerId } as any, { $inc: { balance: -listing.price } } as any, { new: true } as any);
 
-    // 2. Create Escrow Transaction
     const tx = new Transaction({
       id: `OBY-ESC-${uuidv4().substring(0, 8).toUpperCase()}`,
       userId: buyerId,
@@ -94,27 +84,17 @@ router.post('/purchase', marketLimiter, async (req, res) => {
     });
     await tx.save();
 
-    // 3. Update Listing Status
     listing.status = 'PENDING';
     listing.buyerId = buyerId;
     listing.transactionId = tx.id;
     await listing.save();
 
-    res.json({ 
-      success: true, 
-      message: 'Funds locked in high-fidelity escrow. Awaiting node verification.',
-      transaction: tx 
-    });
+    res.json({ success: true, transaction: tx });
   } catch (error) {
-    if (error instanceof z.ZodError) return res.status(400).json({ error: 'Invalid purchase request.' });
-    console.error('Purchase error:', error);
     res.status(500).json({ error: 'Purchase execution failed.' });
   }
 });
 
-// --- Legacy/Centralized Trade Endpoints ---
-
-// Existing trade schema for compatibility
 const tradeSchema = z.object({
   userId: z.string(),
   type: z.enum(['BUY', 'SELL']),
@@ -129,9 +109,9 @@ router.post('/trade', async (req, res) => {
     const { userId, type, assetName, faceValue, totalAmount, claimCode } = tradeSchema.parse(req.body);
     
     if (type === 'BUY') {
-      const user = await User.findOne({ supabaseId: userId });
+      const user = await User.findOne({ supabaseId: userId } as any);
       if (!user || user.balance < totalAmount) return res.status(400).json({ error: 'Insufficient liquidity.' });
-      await User.findOneAndUpdate({ supabaseId: userId }, { $inc: { balance: -totalAmount } });
+      await User.findOneAndUpdate({ supabaseId: userId } as any, { $inc: { balance: -totalAmount } } as any, { new: true } as any);
     }
 
     const tx = new Transaction({
@@ -156,57 +136,52 @@ router.post('/trade', async (req, res) => {
   }
 });
 
-// Admin Control: Release/Reject Escrow (Updated for P2P)
 router.post('/admin/settle', async (req, res) => {
   try {
     const { txId, action } = req.body;
-    const tx = await Transaction.findOne({ id: txId });
+    const tx = await Transaction.findOne({ id: txId } as any);
     if (!tx) return res.status(404).json({ error: 'Transaction node not found.' });
 
     if (action === 'RELEASE') {
       tx.status = 'Success';
       await tx.save();
 
-      // Find associated listing if P2P GiftCard
-      const listing = await GiftCardListing.findOne({ transactionId: txId });
+      const listing = await GiftCardListing.findOne({ transactionId: txId } as any);
       if (listing) {
         listing.status = 'COMPLETED';
         await listing.save();
-        await User.findOneAndUpdate({ supabaseId: listing.sellerId }, { $inc: { balance: listing.price } });
+        await User.findOneAndUpdate({ supabaseId: listing.sellerId } as any, { $inc: { balance: listing.price } } as any, { new: true } as any);
       } else {
-        // Check if it's a Crypto P2P Listing
-        const cryptoListing = await CryptoListing.findOne({ transactionId: txId });
+        const cryptoListing = await CryptoListing.findOne({ transactionId: txId } as any);
         if (cryptoListing) {
           cryptoListing.status = 'COMPLETED';
           await cryptoListing.save();
-          await User.findOneAndUpdate({ supabaseId: cryptoListing.sellerId }, { $inc: { balance: cryptoListing.priceInUSD } });
+          await User.findOneAndUpdate({ supabaseId: cryptoListing.sellerId } as any, { $inc: { balance: cryptoListing.priceInUSD } } as any, { new: true } as any);
         } else if (tx.type === 'Credit') {
-           // Centralized SELL: credit the user
-           await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+           await User.findOneAndUpdate({ supabaseId: tx.userId } as any, { $inc: { balance: tx.amount } } as any, { new: true } as any);
         }
       }
     } else if (action === 'REJECT') {
       tx.status = 'Failed';
       await tx.save();
 
-      const listing = await GiftCardListing.findOne({ transactionId: txId });
+      const listing = await GiftCardListing.findOne({ transactionId: txId } as any);
       if (listing) {
-        listing.status = 'OPEN'; // Return to market
+        listing.status = 'OPEN';
         listing.buyerId = undefined;
         listing.transactionId = undefined;
         await listing.save();
-        await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+        await User.findOneAndUpdate({ supabaseId: tx.userId } as any, { $inc: { balance: tx.amount } } as any, { new: true } as any);
       } else {
-        const cryptoListing = await CryptoListing.findOne({ transactionId: txId });
+        const cryptoListing = await CryptoListing.findOne({ transactionId: txId } as any);
         if (cryptoListing) {
           cryptoListing.status = 'OPEN';
           cryptoListing.buyerId = undefined;
           cryptoListing.transactionId = undefined;
           await cryptoListing.save();
-          await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+          await User.findOneAndUpdate({ supabaseId: tx.userId } as any, { $inc: { balance: tx.amount } } as any, { new: true } as any);
         } else if (tx.type === 'Debit') {
-           // Centralized BUY: refund the user
-           await User.findOneAndUpdate({ supabaseId: tx.userId }, { $inc: { balance: tx.amount } });
+           await User.findOneAndUpdate({ supabaseId: tx.userId } as any, { $inc: { balance: tx.amount } } as any, { new: true } as any);
         }
       }
     }

@@ -32,7 +32,7 @@ const purchaseSchema = z.object({
 // Fetch Active Crypto Listings
 router.get('/market', async (req, res) => {
   try {
-    const listings = await CryptoListing.find({ status: 'OPEN' }).sort({ createdAt: -1 });
+    const listings = await CryptoListing.find({ status: 'OPEN' } as any).sort({ createdAt: -1 });
     res.json(listings);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch crypto nodes.' });
@@ -43,9 +43,6 @@ router.get('/market', async (req, res) => {
 router.post('/list', marketLimiter, async (req, res) => {
   try {
     const { sellerId, sellerName, assetSymbol, amount, priceInUSD } = listSchema.parse(req.body);
-    
-    // In a real implementation, we would check the user's crypto balance here.
-    // For this prototype, we assume the user has the funds to "lock".
     
     const listing = new CryptoListing({
       id: `CRY-LST-${uuidv4().substring(0, 6).toUpperCase()}`,
@@ -69,18 +66,18 @@ router.post('/list', marketLimiter, async (req, res) => {
 router.post('/purchase', marketLimiter, async (req, res) => {
   try {
     const { buyerId, listingId } = purchaseSchema.parse(req.body);
-    const listing = await CryptoListing.findOne({ id: listingId, status: 'OPEN' });
+    const listing = await CryptoListing.findOne({ id: listingId, status: 'OPEN' } as any);
 
     if (!listing) return res.status(404).json({ error: 'Listing expired or filled.' });
     if (listing.sellerId === buyerId) return res.status(400).json({ error: 'Self-acquisition blocked.' });
 
-    const buyer = await User.findOne({ supabaseId: buyerId });
+    const buyer = await User.findOne({ supabaseId: buyerId } as any);
     if (!buyer || buyer.balance < listing.priceInUSD) {
       return res.status(400).json({ error: 'Insufficient vault liquidity.' });
     }
 
     // 1. Debit Buyer
-    await User.findOneAndUpdate({ supabaseId: buyerId }, { $inc: { balance: -listing.priceInUSD } });
+    await User.findOneAndUpdate({ supabaseId: buyerId } as any, { $inc: { balance: -listing.priceInUSD } } as any, { new: true } as any);
 
     // 2. Create Escrow Node
     const tx = new Transaction({

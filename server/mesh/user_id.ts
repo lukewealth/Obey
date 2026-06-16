@@ -11,7 +11,7 @@ export const resolveUserId = async (identifier: string) => {
         { email: identifier },
         { obeyId: identifier }
       ]
-    });
+    } as any);
     return user ? user.supabaseId : null;
   } catch (error) {
     console.error('[MESH_ERROR] Failed to resolve User ID:', error);

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Shield, BadgeCheck, User, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, Lock, Upload, Camera, Loader2, Sparkles, ArrowRight, AlertTriangle, Zap, Star, RefreshCw, Activity } from "lucide-react";
+import { Shield, BadgeCheck, User, CreditCard, ChevronRight, CheckCircle2, ShieldCheck, Lock, Upload, Camera, Loader2, Sparkles, ArrowRight, AlertTriangle, Zap, Star, RefreshCw, Activity, Globe as GlobeIcon, User as UserIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "../services/api";
 import { UserProfile } from "../types";
@@ -62,7 +62,7 @@ export default function IdentityVerification({ profile, onComplete }: IdentityVe
 
   const containerVariants = {
     hidden: { opacity: 0, scale: 0.98 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as any } }
   };
 
   return (
@@ -89,7 +89,7 @@ export default function IdentityVerification({ profile, onComplete }: IdentityVe
                  { title: "Escrow Access", desc: "Peer-to-Peer trading nodes.", icon: BadgeCheck },
                  { title: "No Limits", desc: "Unlimited magnitude routing.", icon: Zap },
                  { title: "Elite Status", desc: "Corporate clearing credentials.", icon: Star }
-               ].map((benefit, i) => (
+               ].map((benefit) => (
                  <div key={benefit.title} className="p-6 md:p-8 bg-white border border-gray-100 rounded-[28px] md:rounded-[32px] shadow-sm space-y-3 text-left group hover:border-primary/20 transition-all">
                     <benefit.icon className="text-primary" size={24} />
                     <h4 className="font-black text-gray-900 uppercase text-xs tracking-widest">{benefit.title}</h4>
@@ -126,7 +126,7 @@ export default function IdentityVerification({ profile, onComplete }: IdentityVe
                     className="p-8 md:p-10 bg-white border border-gray-100 rounded-[35px] flex items-center gap-6 hover:border-primary hover:shadow-2xl transition-all group active-press"
                   >
                      <div className="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <CreditCard size={28} />
+                        <type.icon size={28} />
                      </div>
                      <span className="text-lg font-black text-gray-900 uppercase tracking-tight">{type.label}</span>
                   </button>
@@ -257,7 +257,3 @@ export default function IdentityVerification({ profile, onComplete }: IdentityVe
     </div>
   );
 }
-
-// Internal icons not provided in the prompt but used for visual fidelity
-const GlobeIcon = ({ size, className }: any) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>;
-const UserIcon = ({ size, className }: any) => <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;

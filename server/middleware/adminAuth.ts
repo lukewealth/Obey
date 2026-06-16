@@ -1,8 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User';
 
+const ALLOWED_IPS = process.env.ALLOWED_ADMIN_IPS?.split(',') || [];
+
 export const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    // IP White-listing for production
+    if (process.env.NODE_ENV === 'production' && ALLOWED_IPS.length > 0) {
+      const clientIp = req.ip || req.socket.remoteAddress;
+      if (clientIp && !ALLOWED_IPS.includes(clientIp)) {
+        console.warn(`[SECURITY] Unauthorized IP attempt: ${clientIp}`);
+        return res.status(403).json({ error: 'Geospatial node rejected. Access restricted.' });
+      }
+    }
+
     const identifier = (req.headers['x-admin-id'] || req.query.adminId) as string;
     
     if (!identifier) {

@@ -6,7 +6,7 @@ import {
   HelpCircle, Shield, Download, Share2, RefreshCw, Landmark,
   CreditCard, History, LayoutDashboard, ChevronRight, Zap, Star, Wallet, TrendingUp,
   Activity, ShieldCheck, ArrowRight, Loader2, Sparkles, X, Eye, EyeOff, UserCheck,
-  Coins, Lock, Fingerprint, Banknote, Building
+  Coins, Lock, Fingerprint, Banknote, Building, FileText
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";

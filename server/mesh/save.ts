@@ -8,8 +8,8 @@ import { storeMetadata } from './metadatabse';
  */
 export const saveUserNode = async (userId: string, profile: any) => {
   const user = await User.findOneAndUpdate(
-    { supabaseId: userId },
-    { ...profile, lastSync: new Date() },
+    { supabaseId: userId } as any,
+    { ...profile, lastSync: new Date() } as any,
     { upsert: true, new: true }
   );
   

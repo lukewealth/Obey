@@ -163,7 +163,7 @@ router.get('/user/:identifier', async (req, res) => {
 router.get('/transactions/:userId', async (req, res) => {
   try {
     console.log(`[FALLBACK] Fetching transactions for: ${req.params.userId}`);
-    const transactions = await Transaction.find({ userId: req.params.userId }).sort({ createdAt: -1 });
+    const transactions = await Transaction.find({ userId: req.params.userId } as any).sort({ createdAt: -1 });
     console.log(`[FALLBACK] Found ${transactions.length} transactions`);
     res.json(transactions);
   } catch (error) {

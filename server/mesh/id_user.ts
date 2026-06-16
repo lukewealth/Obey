@@ -8,7 +8,7 @@ export const syncUserNode = async (profile: any) => {
   try {
     const { supabaseId, email } = profile;
     
-    let user = await User.findOne({ $or: [{ supabaseId }, { email }] });
+    let user = await User.findOne({ $or: [{ supabaseId }, { email }] } as any);
     
     if (!user) {
       user = new User({

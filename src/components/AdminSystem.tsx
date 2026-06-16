@@ -7,10 +7,11 @@ import {
   Zap, Shield, Server, ArrowUpRight, ShoppingCart, Lock, Trash2, Loader2,
   ChevronRight, ArrowRight, Search, Plus, Minus, Bell, CreditCard, Send, ShieldCheck,
   Cpu, Globe, Database, HardDrive, Terminal, Map, Fingerprint, ExternalLink, Download,
-  PlayCircle, AlertTriangle, ShieldQuestion, Gavel, FileText
+  PlayCircle, AlertTriangle, ShieldQuestion, Gavel, FileText, Wallet
 } from "lucide-react";
 import api, { settleEscrowTrade, adjustUserBalance } from "../services/api";
 import { useNotification } from "./NotificationSystem";
+import SystemQualityNode from "./SystemQualityNode";
 
 interface AdminSystemProps {
   metrics: AdminMetrics;
@@ -135,6 +136,10 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
       <AnimatePresence mode="wait">
         {activeAdminTab === "sentinel" && (
           <motion.div key="sentinel" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-10">
+            
+            {/* System Quality Checklist Node */}
+            <SystemQualityNode mode="full" />
+
             {/* Sentinel Hero Metrics */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                {/* Risk Index Gauge */}
@@ -288,7 +293,7 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
 
                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                       {[
-                        { label: "Total Liabilities", val: `₦${auditStats?.totalLiabilities?.toLocaleString() || '0'}`, icon: WalletIcon, color: "text-primary", bg: "bg-primary/5", change: "+0.04%" },
+                        { label: "Total Liabilities", val: `₦${auditStats?.totalLiabilities?.toLocaleString() || '0'}`, icon: Wallet, color: "text-primary", bg: "bg-primary/5", change: "+0.04%" },
                         { label: "System Equity", val: `₦${auditStats?.systemEquity?.toLocaleString() || '0'}`, icon: ShieldCheck, color: "text-emerald-600", bg: "bg-emerald-50", change: "Verified" },
                         { label: "Discrepancy Alerts", val: auditStats?.alerts?.length || '0', icon: AlertTriangle, color: "text-red-600", bg: "bg-red-50", change: "Critical", pulse: true }
                       ].map(s => (
@@ -379,8 +384,192 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
           </motion.div>
         )}
 
-        {/* VIT and Notifications tabs preserved with design polish */}
-        ... (vit and notifications implementation) ...
+        {activeAdminTab === "ledger" && (
+          <motion.div key="ledger" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-10">
+             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
+                <div className="space-y-1">
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Global Node Directory</p>
+                   <h3 className="text-3xl font-black text-gray-900 uppercase italic">Treasury Ledger</h3>
+                </div>
+                <div className="flex gap-4">
+                   <div className="relative w-72">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300" size={16} />
+                      <input type="text" placeholder="Search Node ID or Identity..." className="w-full h-14 pl-12 pr-6 bg-white border border-gray-100 rounded-2xl text-[11px] font-bold outline-none shadow-sm focus:border-primary transition-all" />
+                   </div>
+                   <button className="h-14 px-8 bg-[#0b0e14] text-white rounded-2xl text-[10px] font-black uppercase shadow-xl active-press">Export List</button>
+                </div>
+             </div>
+
+             <div className="bento-card overflow-hidden">
+                <div className="overflow-x-auto">
+                   <table className="w-full text-left">
+                      <thead>
+                         <tr className="bg-gray-50/50 text-[9px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                            <th className="px-8 py-5">Node Identity</th>
+                            <th className="px-8 py-5">Status Node</th>
+                            <th className="px-8 py-5">Treasury Balance</th>
+                            <th className="px-8 py-5">Risk Pulse</th>
+                            <th className="px-8 py-5 text-right">Adjust Credit</th>
+                         </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                         {kycQueue.map((u: any) => (
+                           <tr key={u._id} className="group hover:bg-gray-50/80 transition-all">
+                              <td className="px-8 py-6">
+                                 <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-primary/5 flex items-center justify-center font-black text-primary text-xs uppercase">{u.name?.charAt(0) || 'U'}</div>
+                                    <div>
+                                       <p className="text-sm font-black text-gray-900">{u.name || 'Anonymous Node'}</p>
+                                       <p className="text-[10px] font-mono text-gray-400">{u.supabaseId}</p>
+                                    </div>
+                                 </div>
+                              </td>
+                              <td className="px-8 py-6">
+                                 <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${u.kycStatus === 'Verified' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{u.kycStatus}</span>
+                              </td>
+                              <td className="px-8 py-6">
+                                 <p className="text-sm font-black font-mono text-gray-900">₦{u.balance?.toLocaleString() || '0'}</p>
+                              </td>
+                              <td className="px-8 py-6">
+                                 <div className="flex items-center gap-2">
+                                    <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                       <div className="h-full bg-emerald-500 w-[85%]" />
+                                    </div>
+                                    <span className="text-[10px] font-black text-emerald-600">Low</span>
+                                 </div>
+                              </td>
+                              <td className="px-8 py-6 text-right">
+                                 <div className="flex justify-end gap-2">
+                                    <button 
+                                      onClick={async () => {
+                                        const amt = prompt("Enter adjustment amount (₦):");
+                                        if (amt && !isNaN(Number(amt))) {
+                                          try {
+                                            await adjustUserBalance(u.supabaseId, Number(amt), 'ADD');
+                                            notify("success", "Credit Settled", `Added ₦${amt} to node treasury.`);
+                                            fetchData();
+                                          } catch (err) {
+                                            notify("error", "Settlement Failure", "Protocol synchronization interrupted.");
+                                          }
+                                        }
+                                      }}
+                                      className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
+                                    >
+                                       <Plus size={14} />
+                                    </button>
+                                    <button 
+                                      onClick={async () => {
+                                        const amt = prompt("Enter deduction amount (₦):");
+                                        if (amt && !isNaN(Number(amt))) {
+                                          try {
+                                            await adjustUserBalance(u.supabaseId, Number(amt), 'SUB');
+                                            notify("success", "Credit Deducted", `Removed ₦${amt} from node treasury.`);
+                                            fetchData();
+                                          } catch (err) {
+                                            notify("error", "Settlement Failure", "Protocol synchronization interrupted.");
+                                          }
+                                        }
+                                      }}
+                                      className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all"
+                                    >
+                                       <Minus size={14} />
+                                    </button>
+                                 </div>
+                              </td>
+                           </tr>
+                         ))}
+                      </tbody>
+                   </table>
+                </div>
+             </div>
+          </motion.div>
+        )}
+
+        {activeAdminTab === "notifications" && (
+          <motion.div key="notifications" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="max-w-4xl mx-auto space-y-10">
+             <div className="text-center space-y-2">
+                <h3 className="text-3xl font-black text-gray-900 uppercase italic">Broadcast Center</h3>
+                <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Push High-Fidelity Messages to All Mesh Nodes</p>
+             </div>
+             <div className="bento-card p-10 md:p-14 space-y-8">
+                <div className="space-y-4">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Message Title</label>
+                   <input 
+                    type="text" 
+                    value={pushTitle}
+                    onChange={(e) => setPushTitle(e.target.value)}
+                    placeholder="System Alert Node..." 
+                    className="w-full h-16 px-6 bg-gray-50 border border-gray-100 rounded-2xl text-xs font-bold outline-none focus:border-primary transition-all" 
+                   />
+                </div>
+                <div className="space-y-4">
+                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Context Payload</label>
+                   <textarea 
+                    value={pushMessage}
+                    onChange={(e) => setPushMessage(e.target.value)}
+                    placeholder="Enter institutional message payload..." 
+                    className="w-full h-48 p-6 bg-gray-50 border border-gray-100 rounded-3xl text-xs font-medium outline-none focus:border-primary transition-all resize-none"
+                   />
+                </div>
+                <button 
+                  onClick={() => {
+                    notify("success", "Broadcast Dispatched", "Push notification mesh settlement complete.");
+                    setPushTitle("");
+                    setPushMessage("");
+                  }}
+                  className="w-full h-16 bg-primary text-white rounded-2xl text-[10px] font-black uppercase shadow-2xl shadow-primary/30 active-press flex items-center justify-center gap-3"
+                >
+                   <Send size={16} /> Dispatch Broadcast
+                </button>
+             </div>
+          </motion.div>
+        )}
+
+        {activeAdminTab === "vit" && (
+          <motion.div key="vit" variants={containerVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-10">
+             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                <div className="lg:col-span-4 space-y-8">
+                   <div className="bento-card p-10 flex flex-col items-center justify-center space-y-8 relative overflow-hidden">
+                      <div className="w-24 h-24 bg-primary/5 rounded-full flex items-center justify-center text-primary relative">
+                         <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-20" />
+                         <Zap size={40} />
+                      </div>
+                      <div className="text-center space-y-2">
+                         <h4 className="text-2xl font-black text-gray-900 uppercase italic">VIT Mesh</h4>
+                         <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">Sentinel Mode Active</p>
+                      </div>
+                      <button 
+                        onClick={() => setIsVitSimulating(true)}
+                        className="w-full h-14 bg-[#0b0e14] text-white rounded-2xl text-[10px] font-black uppercase shadow-xl active-press"
+                      >
+                         Initiate Mesh Sync
+                      </button>
+                   </div>
+                </div>
+                <div className="lg:col-span-8 bento-card p-10 bg-[#0b0e14] text-[#4ADE80] font-mono text-[11px] space-y-4 overflow-hidden relative">
+                   <div className="absolute top-4 right-6 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ADE80] rounded-full animate-pulse" />
+                      <span className="text-[9px] uppercase tracking-widest opacity-50 font-sans font-black">Secure Tunnel</span>
+                   </div>
+                   <div className="space-y-2">
+                      {vitLogs.map((log, i) => (
+                        <motion.p initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.2 }} key={i}>
+                           <span className="opacity-40">[{new Date().toLocaleTimeString()}]</span> {log}
+                        </motion.p>
+                      ))}
+                      {isVitSimulating && (
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+                           <p>SYNCING_LEDGER_HASH_NODE_0x7a...F21</p>
+                           <p>VERIFYING_CONSENSUS_MECHANISM... [OK]</p>
+                           <p>MESH_INTEGRITY_STABILIZED</p>
+                        </motion.div>
+                      )}
+                   </div>
+                   <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-[#0b0e14] to-transparent pointer-events-none" />
+                </div>
+             </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Forensic Risk Profile Modal */}

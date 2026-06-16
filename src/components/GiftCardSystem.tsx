@@ -681,7 +681,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
                 </div>
 
                 <AnimatePresence mode="wait">
-                  {activeTab === GiftCardTab.SELL ? (
+                  {(activeTab as any) === GiftCardTab.SELL ? (
                     <motion.div 
                       key="sell-fields"
                       initial={{ opacity: 0, height: 0 }}

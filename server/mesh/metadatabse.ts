@@ -17,7 +17,7 @@ export const storeMetadata = async (nodeId: string, entityType: string, payload:
   return await Metadata.findOneAndUpdate(
     { nodeId } as any,
     { nodeId, entityType, payload, lastUpdated: new Date() } as any,
-    { upsert: true, new: true }
+    { upsert: true, new: true } as any
   );
 };
 
@@ -38,7 +38,7 @@ export const syncMetadataNode = async (userId: string, metadata: any) => {
           'lastSync': new Date()
         } 
       } as any,
-      { new: true }
+      { new: true } as any
     );
 
     return metadataNode;

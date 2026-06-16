@@ -13,7 +13,7 @@ const router = express.Router();
  */
 router.get('/users', adminAuth, async (req, res) => {
   try {
-    const users = await User.find({}).sort({ createdAt: -1 });
+    const users = await User.find({} as any).sort({ createdAt: -1 });
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve ledger participants.' });
@@ -25,7 +25,7 @@ router.get('/users', adminAuth, async (req, res) => {
  */
 router.get('/fraud-alerts', adminAuth, async (req, res) => {
   try {
-    const alerts = await FraudAlert.find({ status: { $in: ['Pending', 'Reviewing'] } }).sort({ timestamp: -1 });
+    const alerts = await FraudAlert.find({ status: { $in: ['Pending', 'Reviewing'] } } as any).sort({ timestamp: -1 });
 
     // Seed some mock alerts if none exist for prototype
     if (alerts.length === 0) {
@@ -64,7 +64,7 @@ router.post('/resolve-alert', adminAuth, async (req, res) => {
     const { alertId, action } = req.body;
     const status = action === 'RESOLVE' ? 'Resolved' : 'Dismissed';
 
-    await FraudAlert.findOneAndUpdate({ id: alertId }, { status });
+    await FraudAlert.findOneAndUpdate({ id: alertId } as any, { status } as any, { new: true } as any);
     res.json({ success: true, message: `Alert ${alertId} ${status.toLowerCase()}.` });
   } catch (error) {
     res.status(500).json({ error: 'Alert resolution protocol failure.' });
@@ -77,11 +77,11 @@ router.post('/resolve-alert', adminAuth, async (req, res) => {
 router.get('/risk-profile/:userId', adminAuth, async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] });
+    const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
 
     if (!user) return res.status(404).json({ error: 'User node not found.' });
 
-    const recentTransactions = await Transaction.find({ userId: user.supabaseId }).sort({ createdAt: -1 }).limit(10);
+    const recentTransactions = await Transaction.find({ userId: user.supabaseId } as any).sort({ createdAt: -1 }).limit(10);
 
     // Institutional composite risk calculation
     const riskScore = user.kycStatus === 'Verified' ? 12 : 65;
@@ -108,7 +108,7 @@ router.get('/risk-profile/:userId', adminAuth, async (req, res) => {
  */
 router.get('/audit-ledger', adminAuth, async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({} as any);
     const totalLiabilities = users.reduce((acc, u) => acc + (u.balance || 0), 0);
 
     // System Equity: Institutional liquidity pool (simulated)
@@ -130,19 +130,18 @@ router.get('/audit-ledger', adminAuth, async (req, res) => {
 });
 
 router.post('/approve-kyc', adminAuth, async (req, res) => {
-... (existing code) ...
-
+  try {
     const { userId, action } = req.body;
     
     if (action === 'APPROVE') {
       const user = await User.findOneAndUpdate(
-        { $or: [{ supabaseId: userId }, { email: userId }] },
+        { $or: [{ supabaseId: userId }, { email: userId }] } as any,
         { 
           kycStatus: 'Verified', 
           kycLevel: 2,
           lastSync: new Date()
-        },
-        { new: true }
+        } as any,
+        { new: true } as any
       );
       
       // Simulation of Interswitch Verified Badge approval
@@ -153,8 +152,9 @@ router.post('/approve-kyc', adminAuth, async (req, res) => {
       });
     } else {
       await User.findOneAndUpdate(
-        { $or: [{ supabaseId: userId }, { email: userId }] },
-        { kycStatus: 'Unverified', kycLevel: 0 }
+        { $or: [{ supabaseId: userId }, { email: userId }] } as any,
+        { kycStatus: 'Unverified', kycLevel: 0 } as any,
+        { new: true } as any
       );
       return res.json({ success: true, message: 'Identity node rejected.' });
     }
@@ -177,10 +177,10 @@ router.post('/adjust-balance', adminAuth, async (req, res) => {
 
     const adjustmentAmount = type === 'ADD' ? amount : -amount;
     
-    const user = await User.findOneAndUpdate(
-      { $or: [{ supabaseId: userId }, { email: userId }] },
-      { $inc: { balance: adjustmentAmount } },
-      { new: true }
+    const user: any = await User.findOneAndUpdate(
+      { $or: [{ supabaseId: userId }, { email: userId }] } as any,
+      { $inc: { balance: adjustmentAmount } } as any,
+      { new: true } as any
     );
 
     if (!user) return res.status(404).json({ error: 'User node not found.' });
@@ -232,7 +232,7 @@ router.get('/vault-metrics', adminAuth, async (req, res) => {
   try {
     const escrowTransactions = await Transaction.find({ 
       status: { $in: ['Escrow', 'Processing', 'Awaiting Audit'] } 
-    });
+    } as any);
     
     const totalLocked = escrowTransactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);
     

@@ -221,7 +221,7 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
 
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } }
   };
 
   return (
