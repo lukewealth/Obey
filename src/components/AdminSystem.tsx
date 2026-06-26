@@ -77,7 +77,7 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
   const handleResolveAlert = async (alertId: string, action: 'RESOLVE' | 'DISMISS') => {
     try {
       await api.post('/admin/resolve-alert', { alertId, action });
-      setFraudAlerts(prev => prev.filter(a => a.id !== alertId));
+      setFraudAlerts(prev => prev.filter(a => (a._id || a.id) !== alertId));
       notify("success", "Alert Resolved", `Sentinel status updated for node ${alertId}.`);
     } catch (err) {
       notify("error", "Protocol Error", "Failed to clear sentinel flag.");
@@ -189,9 +189,9 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                      <button className="text-primary text-[10px] font-black uppercase tracking-[0.2em] border-b border-primary/20 pb-1">View Full Queue</button>
                   </div>
                   <div className="flex gap-6 overflow-x-auto pb-4 hide-scrollbar">
-                     {fraudAlerts.map((alert, i) => (
+                      {fraudAlerts.map((alert, i) => (
                        <motion.div 
-                        key={alert.id} 
+                        key={alert._id || alert.id}
                         initial={{ opacity: 0, x: 20 }} 
                         animate={{ opacity: 1, x: 0 }} 
                         transition={{ delay: i * 0.1 }}
@@ -200,13 +200,13 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                           <div className="space-y-4">
                              <div className="flex justify-between items-start">
                                 <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${alert.severity === 'Critical' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'}`}>{alert.severity} PRIORITY</span>
-                                <span className="text-[10px] font-mono text-gray-400">{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                                 <span className="text-[10px] font-mono text-gray-400">{new Date(alert.createdAt || alert.timestamp).toLocaleTimeString()}</span>
                              </div>
                              <h4 className={`text-xl font-black ${alert.severity === 'Critical' ? 'text-red-900' : 'text-amber-900'}`}>{alert.type}</h4>
                              <p className="text-xs text-gray-500 font-medium leading-relaxed">{alert.description}</p>
                           </div>
                           <div className="flex gap-3">
-                             <button onClick={() => handleResolveAlert(alert.id, 'RESOLVE')} className={`flex-1 h-12 rounded-xl text-[10px] font-black uppercase shadow-lg transition-all active-press ${alert.severity === 'Critical' ? 'bg-red-600 text-white shadow-red-200' : 'bg-amber-600 text-white shadow-amber-200'}`}>Freeze Node</button>
+                                                           <button onClick={() => handleResolveAlert(alert._id || alert.id, 'RESOLVE')} className={`flex-1 h-12 rounded-xl text-[10px] font-black uppercase shadow-lg transition-all active-press ${alert.severity === 'Critical' ? 'bg-red-600 text-white shadow-red-200' : 'bg-amber-600 text-white shadow-amber-200'}`}>Freeze Node</button>
                              <button onClick={() => viewRiskProfile(alert.entityId)} className="flex-1 h-12 bg-white text-gray-700 rounded-xl text-[10px] font-black uppercase border border-gray-100 shadow-sm active-press">Review</button>
                           </div>
                        </motion.div>
@@ -241,9 +241,9 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                      </thead>
                      <tbody className="divide-y divide-gray-50">
                         {loading ? <tr><td colSpan={6} className="py-20 text-center"><Loader2 className="animate-spin inline-block text-primary" /></td></tr> :
-                        fraudAlerts.map(a => (
-                          <tr key={a.id} className="group hover:bg-gray-50 transition-colors">
-                             <td className="px-8 py-5 font-mono text-[11px] text-gray-500">{new Date(a.timestamp).toLocaleTimeString()}</td>
+                         fraudAlerts.map(a => (
+                           <tr key={a._id || a.id} className="group hover:bg-gray-50 transition-colors">
+                              <td className="px-8 py-5 font-mono text-[11px] text-gray-500">{new Date(a.createdAt || a.timestamp).toLocaleTimeString()}</td>
                              <td className="px-8 py-5">
                                 <div className="flex items-center gap-3">
                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${a.severity === 'Critical' ? 'bg-red-50 text-red-500' : 'bg-primary/5 text-primary'}`}>
@@ -262,7 +262,7 @@ export default function AdminSystem({ metrics, profile, onApproveKyc, onUpdateSy
                                 </div>
                              </td>
                              <td className="px-8 py-5">
-                                <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${a.status === 'Pending' ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>{a.status}</span>
+                                 <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest ${a.status === 'PENDING_REVIEW' || a.status === 'INVESTIGATING' ? 'bg-amber-50 text-amber-500' : 'bg-emerald-50 text-emerald-500'}`}>{a.status}</span>
                              </td>
                              <td className="px-8 py-5 text-right">
                                 <button className="p-2 text-gray-400 hover:text-primary hover:bg-primary/5 rounded-full transition-all"><ChevronRight size={18} /></button>

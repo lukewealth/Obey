@@ -74,9 +74,7 @@ app.use(async (req, res, next) => {
     'api/health', 
     'health',
     'api/sync/asset-sync',
-    'sync/asset-sync',
-    'api/webhooks',
-    'webhooks'
+    'sync/asset-sync'
   ];
   
   const shouldBypass = bypassRoutes.some(route => 

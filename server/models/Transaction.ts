@@ -41,4 +41,8 @@ const TransactionSchema = new mongoose.Schema({
   rewardsEarned: { type: Number, default: 0 }
 }, { timestamps: true });
 
+TransactionSchema.index({ userId: 1, createdAt: -1 });
+TransactionSchema.index({ status: 1, createdAt: -1 });
+TransactionSchema.index({ category: 1, createdAt: -1 });
+
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

@@ -64,30 +64,30 @@ router.post('/upgrade-tier', adminAuth, async (req, res) => {
  */
 router.get('/fraud-alerts', adminAuth, async (req, res) => {
   try {
-    const alerts = await FraudAlert.find({ status: { $in: ['Pending', 'Reviewing'] } } as any).sort({ timestamp: -1 });
+    const alerts = await FraudAlert.find({ status: { $in: ['PENDING_REVIEW', 'INVESTIGATING'] } } as any).sort({ createdAt: -1 });
 
     // Seed some mock alerts if none exist for prototype
     if (alerts.length === 0) {
       return res.json([
         {
-          id: "ALT-9821-X",
+          _id: "ALT-9821-X",
           type: "Bulk Transfer",
           severity: "High",
           entityId: "USR-8829-X",
           description: "Multiple high-value outgoing transactions detected within 4ms.",
           riskScore: 88,
-          status: "Pending",
-          timestamp: new Date()
+          status: "PENDING_REVIEW",
+          createdAt: new Date()
         },
         {
-          id: "ALT-7742-Z",
+          _id: "ALT-7742-Z",
           type: "Account Takeover",
           severity: "Critical",
           entityId: "USR-1044-K",
           description: "Suspicious login from unexpected IP (Lagos) followed by balance sweep attempt.",
           riskScore: 94,
-          status: "Pending",
-          timestamp: new Date()
+          status: "PENDING_REVIEW",
+          createdAt: new Date()
         }
       ]);
     }
@@ -101,9 +101,9 @@ router.get('/fraud-alerts', adminAuth, async (req, res) => {
 router.post('/resolve-alert', adminAuth, async (req, res) => {
   try {
     const { alertId, action } = req.body;
-    const status = action === 'RESOLVE' ? 'Resolved' : 'Dismissed';
+    const status = action === 'RESOLVE' ? 'RESOLVED' : 'FALSE_POSITIVE';
 
-    await FraudAlert.findOneAndUpdate({ id: alertId } as any, { status } as any, { new: true } as any);
+    await FraudAlert.findOneAndUpdate({ _id: alertId } as any, { status } as any, { new: true } as any);
     res.json({ success: true, message: `Alert ${alertId} ${status.toLowerCase()}.` });
   } catch (error) {
     res.status(500).json({ error: 'Alert resolution protocol failure.' });

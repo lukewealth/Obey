@@ -17,4 +17,4 @@ const GiftCardListingSchema = new mongoose.Schema({
   transactionId: { type: String }, // Reference to the Escrow Transaction
 }, { timestamps: true });
 
-export const GiftCardListing = mongoose.model('GiftCardListing', GiftCardListingSchema);
+export const GiftCardListing = mongoose.models.GiftCardListing || mongoose.model('GiftCardListing', GiftCardListingSchema);
