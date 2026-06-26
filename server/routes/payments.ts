@@ -33,7 +33,12 @@ const transferSchema = z.object({
 router.post('/transfer', async (req: Request, res: Response) => {
   try {
     const validation = transferSchema.safeParse(req.body);
-    if (!validation.success) return res.status(400).json({ error: 'Invalid transfer parameters' });
+    if (!validation.success) {
+      return res.status(400).json({ 
+        error: 'Invalid transfer parameters',
+        details: validation.error.flatten().fieldErrors 
+      });
+    }
 
     const { senderId, recipientIdentifier, amount } = validation.data;
     const requestReference = `P2P-${uuidv4().substring(0, 8).toUpperCase()}`;
@@ -46,8 +51,12 @@ router.post('/transfer', async (req: Request, res: Response) => {
       ] 
     } as any);
 
-    if (!sender || !recipient) return res.status(404).json({ error: 'Node not found.' });
-    if (sender.balance < amount) return res.status(400).json({ error: 'Insufficient liquidity.' });
+    if (!sender || !recipient) {
+      return res.status(404).json({ error: 'Sender or recipient node not found.' });
+    }
+    if (sender.balance < amount) {
+      return res.status(400).json({ error: 'Insufficient liquidity in sender account.' });
+    }
 
     sender.balance -= amount;
     recipient.balance += amount;
@@ -80,16 +89,25 @@ router.post('/transfer', async (req: Request, res: Response) => {
 
     await Promise.all([sender.save(), recipient.save(), senderTx.save(), recipientTx.save()]);
 
-    res.json({ success: true, recipientName: recipient.name });
-  } catch (error) {
-    res.status(500).json({ error: 'Settlement failed.' });
+    res.json({ success: true, recipientName: recipient.name, transactionId: senderTx.id });
+  } catch (error: any) {
+    console.error('[TRANSFER_ERROR]', error.message);
+    res.status(500).json({ 
+      error: 'Transfer settlement failed',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal settlement error'
+    });
   }
 });
 
 router.post('/topup-card', async (req: Request, res: Response) => {
   try {
     const validation = cardTopupSchema.safeParse(req.body);
-    if (!validation.success) return res.status(400).json({ error: 'Invalid payment data' });
+    if (!validation.success) {
+      return res.status(400).json({ 
+        error: 'Invalid payment data',
+        details: validation.error.flatten().fieldErrors 
+      });
+    }
 
     const { userId, amount, cardNumber, expiryMonth, expiryYear, cvv } = validation.data;
     const requestReference = `TOP-${uuidv4().substring(0, 8).toUpperCase()}`;
@@ -117,25 +135,51 @@ router.post('/topup-card', async (req: Request, res: Response) => {
         requestReference
       });
       await tx.save();
-      await User.findOneAndUpdate({ $or: [{ supabaseId: userId }, { email: userId }] } as any, { $inc: { balance: amount } } as any, { new: true } as any);
+      await User.findOneAndUpdate(
+        { $or: [{ supabaseId: userId }, { email: userId }] } as any, 
+        { $inc: { balance: amount } } as any, 
+        { new: true } as any
+      );
       return res.json({ success: true, transaction: tx });
     }
-    res.status(400).json({ error: 'Payment failed' });
-  } catch (error) {
-    res.status(500).json({ error: 'System error' });
+    
+    res.status(400).json({ 
+      error: 'Payment declined',
+      code: paymentResult.responseCode || 'UNKNOWN'
+    });
+  } catch (error: any) {
+    console.error('[CARD_TOPUP_ERROR]', error.message);
+    res.status(500).json({ 
+      error: 'Card payment processing failed',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Payment gateway error'
+    });
   }
 });
 
 router.post('/withdraw', async (req: Request, res: Response) => {
   try {
     const validation = withdrawalSchema.safeParse(req.body);
-    if (!validation.success) return res.status(400).json({ error: 'Invalid withdrawal data' });
+    if (!validation.success) {
+      return res.status(400).json({ 
+        error: 'Invalid withdrawal data',
+        details: validation.error.flatten().fieldErrors 
+      });
+    }
 
     const { userId, amount, bankCode, accountNumber } = validation.data;
     const requestReference = `WTH-${uuidv4().substring(0, 8).toUpperCase()}`;
 
     const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
-    if (!user || user.balance < amount) return res.status(400).json({ error: 'Insufficient liquidity' });
+    if (!user) {
+      return res.status(404).json({ error: 'User account not found' });
+    }
+    if (user.balance < amount) {
+      return res.status(400).json({ 
+        error: 'Insufficient funds',
+        available: user.balance,
+        requested: amount
+      });
+    }
 
     const payoutResult = await interswitch.processWithdrawal({
       amount: amount * 100,
@@ -162,9 +206,17 @@ router.post('/withdraw', async (req: Request, res: Response) => {
       await user.save();
       return res.json({ success: true, transaction: tx });
     }
-    res.status(400).json({ error: 'Withdrawal failed' });
-  } catch (error) {
-    res.status(500).json({ error: 'System error' });
+    
+    res.status(400).json({ 
+      error: 'Withdrawal declined',
+      code: payoutResult.responseCode || 'UNKNOWN'
+    });
+  } catch (error: any) {
+    console.error('[WITHDRAWAL_ERROR]', error.message);
+    res.status(500).json({ 
+      error: 'Withdrawal processing failed',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Payout gateway error'
+    });
   }
 });
 

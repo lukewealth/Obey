@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { AppScreen, AppTab, UserProfile, AdminMetrics } from "../types";
 import AdminSystem from "./AdminSystem";
+import TierManagement from "./TierManagement";
 import PuppyLoading from "./PuppyLoading";
 import { motion } from "framer-motion";
 import { 
@@ -10,7 +11,7 @@ import {
   Bell, CreditCard, Send, Cpu, Globe, Database, 
   HardDrive, Terminal, Map, Fingerprint, ExternalLink, 
   Download, PlayCircle, AlertTriangle, ShieldQuestion, 
-  Gavel, FileText, Wallet, Settings, Home
+  Gavel, FileText, Wallet, Settings, Home, Crown
 } from "lucide-react";
 import { useNotification } from "./NotificationSystem";
 import api from "../services/api";
@@ -24,7 +25,7 @@ interface AdminDashboardProps {
 export default function AdminDashboard({ profile, onLogout, onBackToUserDashboard }: AdminDashboardProps) {
   const { notify } = useNotification();
   const [isInitializing, setIsInitializing] = useState(true);
-  const [activeAdminTab, setActiveAdminTab] = useState<"overview" | "users" | "transactions" | "fraud" | "system">("overview");
+  const [activeAdminTab, setActiveAdminTab] = useState<"overview" | "users" | "transactions" | "fraud" | "tiers" | "system">("overview");
   
   const [adminMetrics, setAdminMetrics] = useState<AdminMetrics>({
     totalUsers: 0,
@@ -133,6 +134,7 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
               { id: "users", label: "Users", icon: Users },
               { id: "transactions", label: "Transactions", icon: DollarSign },
               { id: "fraud", label: "Fraud Alerts", icon: ShieldAlert },
+              { id: "tiers", label: "Tier Management", icon: Crown },
               { id: "system", label: "System", icon: Server },
             ].map((item) => (
               <button
@@ -338,6 +340,12 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {activeAdminTab === "tiers" && (
+              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <TierManagement />
               </div>
             )}
 

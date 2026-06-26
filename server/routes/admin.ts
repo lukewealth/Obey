@@ -21,6 +21,45 @@ router.get('/users', adminAuth, async (req, res) => {
 });
 
 /**
+ * Tier Upgrade: Admin can upgrade user tiers
+ */
+router.post('/upgrade-tier', adminAuth, async (req, res) => {
+  try {
+    const { userId, tierLevel } = req.body;
+
+    if (!userId || !tierLevel || tierLevel < 1 || tierLevel > 4) {
+      return res.status(400).json({ error: 'Invalid userId or tierLevel (must be 1-4)' });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { $or: [{ supabaseId: userId }, { email: userId }, { _id: userId }] } as any,
+      { tierLevel } as any,
+      { new: true } as any
+    ) as any;
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ 
+      success: true, 
+      user: {
+        id: user.supabaseId || user._id,
+        email: user.email,
+        tierLevel: user.tierLevel,
+        kycStatus: user.kycStatus
+      }
+    });
+  } catch (error: any) {
+    console.error('[ADMIN_TIER_UPGRADE_ERROR]', error.message);
+    res.status(500).json({ 
+      error: 'Tier upgrade failed',
+      message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+});
+
+/**
  * Sentinel Surveillance: Fraud & Risk Alerts
  */
 router.get('/fraud-alerts', adminAuth, async (req, res) => {

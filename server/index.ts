@@ -88,12 +88,14 @@ app.use(async (req, res, next) => {
   }
 
   try {
-    await connectDB();
+    const db = await connectDB();
+    if (!db) {
+      console.warn(`[DB_GUARD_WARN] Database unavailable for ${req.method} ${req.path}. Proceeding without DB.`);
+    }
     next();
   } catch (err: any) {
     console.error(`[DB_GUARD_CRITICAL] Node connectivity failure for ${req.method} ${req.path}:`, err.message);
     
-    // In institutional mode, we return a structured error node
     res.status(503).json({ 
       error: 'Institutional database node unavailable.',
       mesh_status: 're-routing',
@@ -153,11 +155,14 @@ if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
       console.log(`OBEY Backend listening on port ${port}`);
     });
   }).catch(err => {
-    console.error('Failed to connect to MongoDB:', err);
+    console.error('Failed to connect to MongoDB:', err.message);
+    console.log('Starting server without database connection...');
+    app.listen(port, () => {
+      console.log(`OBEY Backend listening on port ${port} (DB offline)`);
+    });
   });
 } else {
-  // Ensure DB connection is handled for serverless without crashing on cold starts
-  connectDB().catch(err => console.error('Early database connection failure:', err));
+  connectDB().catch(err => console.error('[VERCEL_COLD_START] DB connection deferred:', err.message));
 }
 
 export default app;

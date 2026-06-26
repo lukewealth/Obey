@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Standardize connection options for institutional mesh stability
 const MONGODB_OPTIONS = {
   bufferCommands: false,
   maxPoolSize: 10,
@@ -11,45 +10,36 @@ const MONGODB_OPTIONS = {
   socketTimeoutMS: 45000,
 };
 
-// Institutional Database Connection Node
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  console.warn('⚠️ [DB_MESH_WARN] MONGODB_URI not found in environment. Data mesh may be offline.');
+if (!MONGODB_URI || MONGODB_URI === 'your_mongodb_atlas_connection_string_here') {
+  console.warn('[DB_MESH_WARN] MONGODB_URI not configured. Database features will be unavailable.');
 }
 
 let cachedConnection: any = null;
 
-/**
- * Institutional Database Mesh Connector
- * Ensures single connection pool in serverless environments via caching.
- */
 export const connectDB = async () => {
+  if (!MONGODB_URI || MONGODB_URI === 'your_mongodb_atlas_connection_string_here') {
+    console.warn('[DB_MESH_WARN] Skipping DB connection - MONGODB_URI not configured');
+    return null;
+  }
+
   if (cachedConnection) {
-    console.log('🔄 Reusing existing institutional database node');
     return cachedConnection;
   }
 
   if (mongoose.connection.readyState === 1) {
-    console.log('🔄 Institutional database node already online (ReadyState 1)');
     cachedConnection = mongoose.connection;
     return cachedConnection;
   }
 
   try {
-    console.log('Establishing institutional database connection...');
-
-    // In serverless, we must wait for the connection to establish
     await mongoose.connect(MONGODB_URI, MONGODB_OPTIONS);
-
     cachedConnection = mongoose.connection;
-    console.log('✅ Institutional database node online');
+    console.log('[DB_MESH] Institutional database node online');
     return cachedConnection;
   } catch (error: any) {
-    console.error('❌ Institutional database node failure:', error.message);
-    // Log more details about the error if possible
-    if (error.reason) console.error('Connection details:', error.reason);
-    throw error; 
+    console.error('[DB_MESH_CRITICAL] Connection failure:', error.message);
+    throw error;
   }
 };
-
