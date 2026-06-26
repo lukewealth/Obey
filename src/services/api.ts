@@ -68,4 +68,98 @@ export const adjustUserBalance = async (userId: string, amount: number, type: 'A
   return api.post('/sync/admin/adjust-balance', { userId, amount, type });
 };
 
+// --- Nomba Payment Endpoints ---
+
+export const createCheckoutOrder = async (params: {
+  userId: string;
+  amount: number;
+  email?: string;
+  callbackUrl?: string;
+}) => {
+  return api.post('/nomba/checkout', params);
+};
+
+export const verifyTransaction = async (orderReference: string) => {
+  return api.get(`/nomba/verify/${orderReference}`);
+};
+
+export const createVirtualAccount = async (params: {
+  userId: string;
+  accountName: string;
+  expectedAmount?: number;
+}) => {
+  return api.post('/nomba/virtual-account', params);
+};
+
+export const fetchVirtualAccounts = async (userId: string) => {
+  return api.get('/nomba/virtual-accounts', { params: { userId } });
+};
+
+export const fetchBankCodes = async () => {
+  return api.get('/nomba/banks');
+};
+
+export const lookupBankAccount = async (accountNumber: string, bankCode: string) => {
+  return api.post('/nomba/account-lookup', { accountNumber, bankCode });
+};
+
+export const initiateWithdrawal = async (params: {
+  userId: string;
+  amount: number;
+  accountNumber: string;
+  bankCode: string;
+  accountName: string;
+}) => {
+  return api.post('/nomba/withdraw', params);
+};
+
+// --- AI Insights Endpoints ---
+
+export const getAIInsights = async (params: {
+  userId: string;
+  transactions?: any[];
+  balance: number;
+}) => {
+  return api.post('/ai/insights', params);
+};
+
+export const checkFraud = async (transaction: any, userHistory: any) => {
+  return api.post('/ai/fraud-check', { transaction, userHistory });
+};
+
+export const categorizeTransaction = async (description: string, amount: number) => {
+  return api.post('/ai/categorize', { description, amount });
+};
+
+export const predictCashFlow = async (history: any[], days: number = 30) => {
+  return api.post('/ai/cashflow-prediction', { history, days });
+};
+
+// --- Rewards Endpoints ---
+
+export const getUserRewards = async (userId: string) => {
+  return api.get(`/rewards/${userId}`);
+};
+
+export const earnRewards = async (params: {
+  userId: string;
+  type: 'TRANSACTION' | 'REFERRAL' | 'STREAK' | 'MILESTONE' | 'DAILY_LOGIN' | 'KYC_COMPLETE';
+  amount?: number;
+  reference?: string;
+}) => {
+  return api.post('/rewards/earn', params);
+};
+
+export const redeemRewards = async (userId: string, points: number, reason: string) => {
+  return api.post('/rewards/redeem', { userId, points, reason });
+};
+
+export const getLeaderboard = async (limit: number = 10) => {
+  return api.get(`/rewards/leaderboard/${limit}`);
+};
+
+export const claimDailyLogin = async (userId: string) => {
+  return api.post('/rewards/daily-login', { userId });
+};
+
 export default api;

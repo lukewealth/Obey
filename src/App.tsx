@@ -10,6 +10,7 @@ import CryptoSystem from "./components/CryptoSystem";
 import VirtualCardSystem from "./components/VirtualCardSystem";
 import TransactionHistory from "./components/TransactionHistory";
 import AdminSystem from "./components/AdminSystem";
+import AdminDashboard from "./components/AdminDashboard";
 import IdentityVerification from "./components/IdentityVerification";
 import OtpVerification from "./components/OtpVerification";
 import TransactionSuccess from "./components/TransactionSuccess";
@@ -59,6 +60,7 @@ export default function App() {
   const [tradeSubTab, setTradeSubTab] = useState<'crypto' | 'giftcard'>('crypto');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   
   // Auth state
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -195,8 +197,8 @@ export default function App() {
       
       // Role-Based Tab Initialization
       if (finalProfile.role === "admin") {
-         setActiveTab(AppTab.ADMIN);
-         notify("info", "Institutional Entry", "Administrative console initialized.");
+         setShowAdminDashboard(true);
+         notify("success", "Admin Access Granted", "Welcome to the institutional control panel.");
       } else {
          setActiveTab(AppTab.HOME);
       }
@@ -436,6 +438,18 @@ export default function App() {
           btcPrice={btcPrice} 
           ethPrice={ethPrice} 
           onNavigate={(screen) => setCurrentScreen(screen)} 
+        />
+      )}
+
+      {showAdminDashboard && profile.role === "admin" && (
+        <AdminDashboard 
+          profile={profile}
+          onLogout={handleLogout}
+          onBackToUserDashboard={() => {
+            setShowAdminDashboard(false);
+            setActiveTab(AppTab.HOME);
+            notify("info", "User View", "Switched to user dashboard.");
+          }}
         />
       )}
 

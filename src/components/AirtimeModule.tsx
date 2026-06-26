@@ -200,10 +200,10 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
             <button
               key={tab.id}
               onClick={() => setActiveSegment(tab.id as any)}
-              className={`px-6 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
+              className={`px-6 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative active-scale ${
                 activeSegment === tab.id 
                   ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                  : "text-gray-400 hover:text-gray-900"
+                  : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               <tab.icon size={16} />
@@ -286,13 +286,13 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         key={p.id}
                         type="button"
                         onClick={() => setSelectedProvider(p.id)}
-                        className={`flex flex-col items-center justify-center aspect-square rounded-[24px] md:rounded-[32px] border-2 transition-all duration-400 group/p relative overflow-hidden ${
+                        className={`flex flex-col items-center justify-center aspect-square rounded-[24px] md:rounded-[32px] border-2 transition-all duration-300 group/p relative overflow-hidden active-scale ${
                           selectedProvider === p.id
                             ? "border-primary bg-white shadow-xl shadow-primary/10"
                             : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
                         }`}
                       >
-                        <div className={`w-10 h-10 md:w-14 md:h-14 ${p.color} ${p.textColor} rounded-full flex items-center justify-center font-black text-lg md:text-xl mb-1 shadow-lg group-hover/p:scale-110 transition-transform shrink-0 relative z-10`}>
+                        <div className={`w-10 h-10 md:w-14 md:h-14 ${p.color} ${p.textColor} rounded-full flex items-center justify-center font-black text-lg md:text-xl mb-1 shadow-lg group-hover/p:scale-110 transition-transform duration-200 shrink-0 relative z-10`}>
                           {p.logoChar}
                         </div>
                         <span className="text-[8px] md:text-[10px] font-black text-gray-900 tracking-tight uppercase relative z-10">{p.name}</span>
@@ -315,7 +315,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         value={phoneNo}
                         onChange={(e) => setPhoneNo(e.target.value.replace(/[^0-9]/g, ""))}
                         placeholder="809 102 8824"
-                        className="w-full h-16 md:h-20 px-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-xl md:text-2xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner tracking-widest"
+                        className="w-full h-16 md:h-20 px-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-xl md:text-2xl font-black text-gray-900 input-focus-ring focus:border-primary outline-none transition-all duration-200 shadow-inner tracking-widest"
                       />
                       <AnimatePresence>
                          {phoneNo.length >= 3 && (
@@ -342,7 +342,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                           value={amount}
                           onChange={(e) => setAmount(e.target.value)}
                           placeholder="0.00"
-                          className="w-full h-16 md:h-20 pl-14 pr-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-xl md:text-2xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none transition-all shadow-inner"
+                          className="w-full h-16 md:h-20 pl-14 pr-8 bg-gray-50 border border-gray-100 rounded-[22px] md:rounded-[28px] text-xl md:text-2xl font-black text-gray-900 input-focus-ring focus:border-primary outline-none transition-all duration-200 shadow-inner"
                         />
                       </div>
                     </div>
@@ -364,7 +364,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                         <div
                           key={plan.id}
                           onClick={() => setSelectedDataPlan(plan.id)}
-                          className={`p-8 bg-white border-2 rounded-[2rem] md:rounded-[2.5rem] flex flex-col justify-between h-48 cursor-pointer transition-all duration-400 group/d relative overflow-hidden ${
+                          className={`p-8 bg-white border-2 rounded-[2rem] md:rounded-[2.5rem] flex flex-col justify-between h-48 cursor-pointer transition-all duration-300 group/d relative overflow-hidden active-scale-98 ${
                             selectedDataPlan === plan.id
                               ? "border-primary shadow-2xl shadow-primary/10"
                               : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
@@ -379,7 +379,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                           </div>
                           <div className="flex justify-between items-end relative z-10 pt-4 border-t border-gray-50">
                              <p className="text-xl font-black text-primary font-mono tracking-tighter">₦{plan.price.toLocaleString()}</p>
-                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${selectedDataPlan === plan.id ? 'bg-primary text-white scale-110' : 'bg-gray-100 text-gray-300'}`}>
+                             <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 ${selectedDataPlan === plan.id ? 'bg-primary text-white scale-110' : 'bg-gray-100 text-gray-300 group-hover/d:bg-primary/10 group-hover/d:text-primary'}`}>
                                 <Check size={18} />
                              </div>
                           </div>
@@ -391,7 +391,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
 
                 <button
                   type="submit"
-                  className="w-full h-18 md:h-22 bg-primary hover:bg-black text-white rounded-2xl md:rounded-[32px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                  className="w-full h-18 md:h-22 bg-primary hover:bg-black text-white rounded-2xl md:rounded-[32px] font-black text-sm md:text-base uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all duration-200 flex items-center justify-center active-scale hover:shadow-primary/40"
                 >
                   Confirm Settlement Node <ArrowRight className="ml-3" size={24} />
                 </button>

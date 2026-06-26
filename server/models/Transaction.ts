@@ -23,9 +23,22 @@ const TransactionSchema = new mongoose.Schema({
   network: { type: String },
   brand: { type: String },
   requestReference: { type: String },
-  riskScore: { type: Number, default: 0 }, // 0-100 institutional risk index
-  executionNode: { type: String }, // e.g. OBEY-SUI-01
-  auditHash: { type: String } // Blockchain verification hash
+  riskScore: { type: Number, default: 0 },
+  executionNode: { type: String },
+  auditHash: { type: String },
+  nombaTransactionId: { type: String, index: true },
+  orderReference: { type: String, index: true },
+  sessionId: { type: String },
+  paymentMethod: { type: String, enum: ['card', 'bank_transfer', 'virtual_account', 'wallet', 'ussd', 'qr'] },
+  webhookVerified: { type: Boolean, default: false },
+  idempotencyKey: { type: String },
+  transactionHash: { type: String, index: true },
+  previousHash: { type: String },
+  blockNumber: { type: Number },
+  aiRiskScore: { type: Number, default: 0 },
+  aiFlags: [{ type: String }],
+  fraudCheckPassed: { type: Boolean, default: true },
+  rewardsEarned: { type: Number, default: 0 }
 }, { timestamps: true });
 
 export const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);

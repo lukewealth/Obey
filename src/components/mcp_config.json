@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "CoinAPI-Market-Data": {
+      "url": "https://mcp.md.coinapi.io/mcp",
+      "headers": {
+        "X-CoinAPI-Key": "YOUR_API_KEY_HERE"
+      }
+    },
+    "CoinAPI-Indexes": {
+      "url": "https://mcp.indexes.coinapi.io/mcp",
+      "headers": {
+        "X-CoinAPI-Key": "YOUR_API_KEY_HERE"
+      }
+    },
+    "CoinAPI-Flat-Files": {
+      "url": "https://mcp.flatfiles.coinapi.io/mcp",
+      "headers": {
+        "X-CoinAPI-Key": "YOUR_API_KEY_HERE"
+      }
+    },
+    "CoinAPI-Exchange-Rates-Realtime": {
+      "url": "https://api-realtime.exrates.coinapi.io/mcp",
+      "headers": {
+        "X-CoinAPI-Key": "YOUR_API_KEY_HERE"
+      }
+    },
+    "CoinAPI-Exchange-Rates-Historical": {
+      "url": "https://api-historical.exrates.coinapi.io/mcp",
+      "headers": {
+        "X-CoinAPI-Key": "YOUR_API_KEY_HERE"
+      }
+    }
+  }
+}

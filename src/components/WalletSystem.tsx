@@ -232,10 +232,10 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             <button
               key={tab.id}
               onClick={() => { resetAllSubFlows(); setActiveSubState(tab.id as any); }}
-              className={`px-4 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative ${
+              className={`px-4 md:px-8 py-2.5 md:py-3.5 rounded-[14px] md:rounded-[18px] text-[11px] md:text-[13px] font-black tracking-tight transition-all duration-200 flex items-center justify-center gap-2 whitespace-nowrap flex-1 md:flex-initial relative active-scale ${
                 activeSubTab === tab.id 
                   ? "bg-primary text-white shadow-lg shadow-primary/20" 
-                  : "text-gray-400 hover:text-gray-900"
+                  : "text-gray-400 hover:text-gray-900 hover:bg-gray-50"
               }`}
             >
               <tab.icon size={16} />
@@ -284,15 +284,15 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                     { id: "fund", label: "Fund", icon: ArrowDownLeft, bg: "bg-primary text-white shadow-primary/20" },
                     { id: "withdraw", label: "Cashout", icon: ArrowUpRight, bg: "bg-accent-blue text-primary border border-blue-200/50 shadow-blue-500/10" },
                     { id: "transfer", label: "Send", icon: Send, bg: "bg-white text-gray-700 border border-gray-200 shadow-gray-200/50" }
-                  ].map((btn) => (
-                    <button
-                      key={btn.id}
-                      onClick={() => setActiveSubState(btn.id as any)}
-                      className={`${btn.bg} py-4 md:py-5 px-2 md:px-4 rounded-[16px] md:rounded-[22px] text-[11px] md:text-sm font-black flex items-center justify-center gap-2 md:gap-3 active-press transition-all shadow-lg hover:-translate-y-1`}
-                    >
-                      <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
-                    </button>
-                  ))}
+                   ].map((btn) => (
+                     <button
+                       key={btn.id}
+                       onClick={() => setActiveSubState(btn.id as any)}
+                       className={`${btn.bg} py-4 md:py-5 px-2 md:px-4 rounded-[16px] md:rounded-[22px] text-[11px] md:text-sm font-black flex items-center justify-center gap-2 md:gap-3 active-scale transition-all shadow-lg hover:-translate-y-1 hover:shadow-xl`}
+                     >
+                       <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
+                     </button>
+                   ))}
                 </div>
               </div>
 
@@ -353,30 +353,30 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                      <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em]">Live Audit Feed</h4>
                      <Activity size={16} className="text-primary" />
                   </div>
-                  <div className="space-y-5">
-                     {transactions.slice(0, 3).map(tx => (
-                        <div key={tx.id} className="flex items-center justify-between group cursor-pointer">
-                           <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${tx.type === 'Credit' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
-                                 {tx.type === 'Credit' ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
-                              </div>
-                              <div className="overflow-hidden">
-                                 <p className="text-[11px] font-black text-gray-900 truncate uppercase italic">{tx.title}</p>
-                                 <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{tx.date}</p>
-                              </div>
-                           </div>
-                           <p className={`text-[11px] font-mono font-black ${tx.type === 'Credit' ? 'text-emerald-600' : 'text-gray-900'}`}>
-                              {tx.type === 'Credit' ? '+' : '-'}₦{tx.amount.toLocaleString()}
-                           </p>
-                        </div>
-                     ))}
-                     <button 
-                      onClick={() => notify("log", "Audit Log", "Loading sequential ledger...")}
-                      className="w-full py-3 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
-                     >
-                        View Full Ledger
-                     </button>
-                  </div>
+                   <div className="space-y-5 custom-scrollbar">
+                      {transactions.slice(0, 3).map(tx => (
+                         <div key={tx.id} className="flex items-center justify-between group cursor-pointer transaction-item p-2 -m-2 rounded-xl transition-all duration-200">
+                            <div className="flex items-center gap-3">
+                               <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 ${tx.type === 'Credit' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                                  {tx.type === 'Credit' ? <ArrowDownLeft size={14} /> : <ArrowUpRight size={14} />}
+                               </div>
+                               <div className="overflow-hidden">
+                                  <p className="text-[11px] font-black text-gray-900 truncate uppercase italic">{tx.title}</p>
+                                  <p className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">{tx.date}</p>
+                               </div>
+                            </div>
+                            <p className={`text-[11px] font-mono font-black transition-colors ${tx.type === 'Credit' ? 'text-emerald-600 group-hover:text-emerald-700' : 'text-gray-900 group-hover:text-primary'}`}>
+                               {tx.type === 'Credit' ? '+' : '-'}₦{tx.amount.toLocaleString()}
+                            </p>
+                         </div>
+                      ))}
+                      <button 
+                       onClick={() => notify("log", "Audit Log", "Loading sequential ledger...")}
+                       className="w-full py-3 bg-gray-50 hover:bg-gray-100 text-gray-500 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all active-scale"
+                      >
+                         View Full Ledger
+                      </button>
+                   </div>
                </div>
 
                <div className="bg-[#0b0e14] rounded-[35px] md:rounded-[45px] p-8 md:p-10 text-white relative overflow-hidden shadow-2xl group">
@@ -472,28 +472,28 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                            ))}
                         </div>
 
-                        <div className="space-y-3">
-                           <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center block">Funding Magnitude (NGN)</label>
-                           <div className="relative">
-                              <span className="absolute left-8 top-1/2 -translate-y-1/2 text-primary font-black text-3xl md:text-5xl">₦</span>
-                              <input
-                                type="number"
-                                required
-                                value={fundAmount}
-                                onChange={(e) => setFundAmount(e.target.value)}
-                                placeholder="0.00"
-                                className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-4xl md:text-6xl font-black text-gray-900 focus:ring-4 focus:ring-primary/5 outline-none tracking-tighter transition-all shadow-inner"
-                              />
-                           </div>
-                        </div>
+                         <div className="space-y-3">
+                            <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center block">Funding Magnitude (NGN)</label>
+                            <div className="relative">
+                               <span className="absolute left-8 top-1/2 -translate-y-1/2 text-primary font-black text-3xl md:text-5xl">₦</span>
+                               <input
+                                 type="number"
+                                 required
+                                 value={fundAmount}
+                                 onChange={(e) => setFundAmount(e.target.value)}
+                                 placeholder="0.00"
+                                 className="w-full h-24 pl-20 pr-10 bg-gray-50 border border-gray-100 rounded-[35px] text-4xl md:text-6xl font-black text-gray-900 input-focus-ring focus:border-primary outline-none tracking-tighter transition-all shadow-inner"
+                               />
+                            </div>
+                         </div>
 
-                        <button 
-                          onClick={() => setCurrentStep(2)}
-                          disabled={!fundAmount}
-                          className="w-full h-18 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl shadow-primary/30 active-press flex items-center justify-center gap-3 disabled:opacity-50"
-                        >
-                           Continue to Configuration <ArrowRight size={20} />
-                        </button>
+                         <button 
+                           onClick={() => setCurrentStep(2)}
+                           disabled={!fundAmount}
+                           className="w-full h-18 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl shadow-primary/30 active-scale flex items-center justify-center gap-3 disabled:opacity-50 hover:shadow-primary/40 transition-all"
+                         >
+                            Continue to Configuration <ArrowRight size={20} />
+                         </button>
                       </>
                     ) : (
                       <div className="space-y-8 animate-fade-in">

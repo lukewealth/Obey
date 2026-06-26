@@ -199,7 +199,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               <button
                 key={btn.id}
                 onClick={() => onSelectAction(btn.id)}
-                className={`${btn.bg} py-4 md:py-5 px-4 md:px-6 rounded-[18px] md:rounded-[24px] text-sm md:text-base font-black flex items-center justify-center gap-2 md:gap-3 active-press transition-all shadow-lg hover:-translate-y-1`}
+                className={`${btn.bg} py-4 md:py-5 px-4 md:px-6 rounded-[18px] md:rounded-[24px] text-sm md:text-base font-black flex items-center justify-center gap-2 md:gap-3 active-scale transition-all duration-200 shadow-lg hover:-translate-y-1 hover:shadow-xl`}
               >
                 <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
               </button>
@@ -258,9 +258,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <button
             key={action.id}
             onClick={() => onSelectAction(action.id)}
-            className="bento-card p-5 md:p-8 flex flex-col justify-between gap-4 md:gap-6 hover:border-primary/40 group active-press text-left"
+            className="bento-card p-5 md:p-8 flex flex-col justify-between gap-4 md:gap-6 hover:border-primary/40 group active-scale text-left transition-all duration-200"
           >
-            <div className={`w-12 h-12 md:w-14 md:h-14 ${action.bg} ${action.color} rounded-[18px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm`}>
+            <div className={`w-12 h-12 md:w-14 md:h-14 ${action.bg} ${action.color} rounded-[18px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
               <action.icon size={22} className="md:w-7 md:h-7" />
             </div>
             <div>
@@ -292,15 +292,15 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             </button>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 custom-scrollbar">
             {Array.isArray(transactions) && transactions.length > 0 ? (
               transactions.slice(0, 5).map((tx) => (
                 <div 
                   key={tx.id} 
-                  className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 dark:hover:bg-white/5 transition-all rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 dark:hover:border-white/10 cursor-pointer"
+                  className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 dark:hover:bg-white/5 transition-all duration-200 rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 dark:hover:border-white/10 cursor-pointer active-scale-98"
                 >
                   <div className="flex items-center gap-4 md:gap-6">
-                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[20px] bg-white dark:bg-white/10 border border-gray-100 dark:border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all shadow-sm shrink-0">
+                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[20px] bg-white dark:bg-white/10 border border-gray-100 dark:border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary group-hover:scale-105 transition-all duration-200 shadow-sm shrink-0">
                       {getCategoryIcon(tx.category)}
                     </div>
                     <div className="overflow-hidden">
@@ -312,7 +312,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                   </div>
 
                   <div className="text-right shrink-0">
-                    <p className={`text-base md:text-xl font-mono font-black ${tx.type === "Credit" ? "text-emerald-600" : "text-gray-900 dark:text-white"}`}>
+                    <p className={`text-base md:text-xl font-mono font-black transition-colors ${tx.type === "Credit" ? "text-emerald-600 group-hover:text-emerald-700" : "text-gray-900 dark:text-white group-hover:text-primary"}`}>
                       {tx.type === "Credit" ? "+" : "-"}₦{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </p>
                     <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-1.5 md:mt-2 ${
@@ -347,7 +347,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               </div>
             </div>
 
-            <div className="space-y-3 md:space-y-4">
+            <div className="space-y-3 md:space-y-4 custom-scrollbar">
               {[
                 { name: "Bitcoin", symbol: "BTC", price: prices.BTC.toLocaleString(), change: "+2.4%", icon: Star, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10" },
                 { name: "Ethereum", symbol: "ETH", price: prices.ETH.toLocaleString(), change: "-0.8%", icon: Zap, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10" },
@@ -356,10 +356,10 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <div 
                   key={coin.symbol} 
                   onClick={() => onSelectAction("Crypto")}
-                  className="flex items-center justify-between p-4 md:p-5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all cursor-pointer group shadow-sm"
+                  className="flex items-center justify-between p-4 md:p-5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all duration-200 cursor-pointer group active-scale-98"
                 >
                   <div className="flex items-center gap-3 md:gap-4">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform shrink-0 shadow-sm`}>
+                    <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform duration-200 shrink-0 shadow-sm`}>
                       <coin.icon size={18} fill={coin.symbol === "BTC" ? "currentColor" : "none"} className="md:w-5 md:h-5" />
                     </div>
                     <div>
@@ -379,7 +379,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             
             <button 
               onClick={() => onNavigateTab(AppTab.TRADE)}
-              className="w-full py-4 md:py-5 bg-primary/5 hover:bg-primary/10 text-primary rounded-[18px] md:rounded-[22px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all active-press border border-primary/10"
+              className="w-full py-4 md:py-5 bg-primary/5 hover:bg-primary/10 text-primary rounded-[18px] md:rounded-[22px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all active-scale border border-primary/10 hover:border-primary/20"
             >
               Open Trading Desk
             </button>

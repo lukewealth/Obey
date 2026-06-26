@@ -12,6 +12,10 @@ import marketRoutes from './routes/market';
 import paymentRoutes from './routes/payments';
 import adminRoutes from './routes/admin';
 import cardRoutes from './routes/cards';
+import webhookRoutes from './routes/webhooks';
+import nombaPaymentRoutes from './routes/nomba_payments';
+import aiRoutes from './routes/ai';
+import rewardsRoutes from './routes/rewards';
 import { connectDB } from './db';
 
 dotenv.config();
@@ -70,7 +74,9 @@ app.use(async (req, res, next) => {
     'api/health', 
     'health',
     'api/sync/asset-sync',
-    'sync/asset-sync'
+    'sync/asset-sync',
+    'api/webhooks',
+    'webhooks'
   ];
   
   const shouldBypass = bypassRoutes.some(route => 
@@ -110,6 +116,10 @@ router.use('/market', marketRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/admin', adminRoutes);
 router.use('/cards', cardRoutes);
+router.use('/webhooks', webhookRoutes);
+router.use('/nomba', nombaPaymentRoutes);
+router.use('/ai', aiRoutes);
+router.use('/rewards', rewardsRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ 
