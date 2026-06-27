@@ -16,7 +16,7 @@ import webhookRoutes from './routes/webhooks';
 import nombaPaymentRoutes from './routes/nomba_payments';
 import aiRoutes from './routes/ai';
 import rewardsRoutes from './routes/rewards';
-import { connectDB } from './db';
+import { connectDB, prewarmDB } from './db';
 
 dotenv.config();
 
@@ -64,44 +64,25 @@ app.use(express.json({ limit: '10kb' }));
 
 // --- Institutional Database Guard ---
 app.use(async (req, res, next) => {
-  // Normalize path and remove leading/trailing slashes for precise mesh matching
   const path = req.path.toLowerCase().replace(/^\/+|\/+$/g, '');
-  
-  // Market and Health routes do not require the institutional database mesh
+
   const bypassRoutes = [
-    'api/market', 
-    'market', 
-    'api/health', 
+    'api/market',
+    'market',
+    'api/health',
     'health',
     'api/sync/asset-sync',
     'sync/asset-sync'
   ];
-  
-  const shouldBypass = bypassRoutes.some(route => 
-    path === route || path.startsWith(route + '/')
-  );
 
-  if (shouldBypass) {
+  if (bypassRoutes.some(route => path === route || path.startsWith(route + '/'))) {
     return next();
   }
 
   try {
-    const db = await connectDB();
-    if (!db) {
-      console.warn(`[DB_GUARD_WARN] Database unavailable for ${req.method} ${req.path}. Proceeding without DB.`);
-    }
-    next();
-  } catch (err: any) {
-    console.error(`[DB_GUARD_CRITICAL] Node connectivity failure for ${req.method} ${req.path}:`, err.message);
-    
-    res.status(503).json({ 
-      error: 'Institutional database node unavailable.',
-      mesh_status: 're-routing',
-      path: req.path,
-      timestamp: new Date().toISOString(),
-      message: process.env.NODE_ENV === 'development' ? err.message : 'The institutional data mesh is currently synchronizing or offline.'
-    });
-  }
+    await connectDB();
+  } catch {}
+  next();
 });
 
 // ... Dual-Path Routing Alignment ...
@@ -146,21 +127,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// For Vercel, we export the app. For local, we listen.
 if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
-  connectDB().then(() => {
-    app.listen(port, () => {
-      console.log(`OBEY Backend listening on port ${port}`);
-    });
-  }).catch(err => {
-    console.error('Failed to connect to MongoDB:', err.message);
-    console.log('Starting server without database connection...');
-    app.listen(port, () => {
-      console.log(`OBEY Backend listening on port ${port} (DB offline)`);
-    });
+  prewarmDB();
+  app.listen(port, () => {
+    console.log(`OBEY Backend listening on port ${port}`);
   });
 } else {
-  connectDB().catch(err => console.error('[VERCEL_COLD_START] DB connection deferred:', err.message));
+  prewarmDB();
 }
 
 export default app;

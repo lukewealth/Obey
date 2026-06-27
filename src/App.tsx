@@ -115,110 +115,85 @@ export default function App() {
   const [successTransaction, setSuccessTransaction] = useState<{ amount: number | string; type: string; id: string } | null>(null);
 
   const wakeupDatabase = async (force: boolean = false) => {
-    // Allow wakeup via current user OR tracked cookie for fast-fetch optimization
     const trackedEmail = getCookie('obey_user_email');
     const trackedId = getCookie('obey_user_id');
     const identifier = currentUser?.id || currentUser?.uid || trackedId || trackedEmail;
-    
+
     if (!identifier || !supabase) return;
-    
-    // Prevent redundant wakeup for the same identifier in a single session unless forced
+
     if (!force && wakeupRef.current === identifier) return;
     wakeupRef.current = identifier;
-    
-    setIsInitializing(true);
-    console.log("[WAKEUP] Initializing cross-chain depth nodes for:", identifier);
-    
-    try {
-      // 1. Fetch Master Profile from Ecosystem Depth (Hybrid: Supabase -> MongoDB Fallback)
-      let sbProfile: any = null;
-      if (currentUser?.id || currentUser?.uid || trackedId) {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", currentUser?.id || currentUser?.uid || trackedId)
-          .maybeSingle(); 
-        if (!error) sbProfile = data;
-      }
 
-      // 2. Determine Source of Truth & Align Metadata
+    setIsInitializing(true);
+
+    try {
+      const [sbResult, mongoResult] = await Promise.allSettled([
+        (currentUser?.id || currentUser?.uid || trackedId)
+          ? supabase.from("profiles").select("*").eq("id", currentUser?.id || currentUser?.uid || trackedId).maybeSingle()
+          : Promise.resolve({ data: null, error: 'skip' }),
+        api.get(`/sync/user/${identifier}`).catch(() => ({ data: null }))
+      ]);
+
+      const sbProfile = sbResult.status === 'fulfilled' ? sbResult.value?.data : null;
+      const mongoData = mongoResult.status === 'fulfilled' ? mongoResult.value?.data : null;
+
       let finalProfile: UserProfile;
       if (sbProfile) {
         finalProfile = {
           ...profile,
           ...sbProfile,
           id: sbProfile.id,
+          name: sbProfile.full_name || sbProfile.name || profile.name,
           kycStatus: sbProfile.kyc_status || profile.kycStatus,
           isEmailVerified: !!sbProfile.email_confirmed_at,
           currency: sbProfile.currency || "NGN",
         };
-        console.log("[WAKEUP] Master profile retrieved from Supabase node");
+      } else if (mongoData) {
+        finalProfile = {
+          ...profile,
+          ...mongoData,
+          id: mongoData.supabaseId || mongoData._id,
+          name: mongoData.name || profile.name,
+          isEmailVerified: mongoData.isEmailVerified,
+          currency: mongoData.currency || "NGN",
+        };
       } else {
-        // Fallback to MongoDB Node via Fast-Fetch API
-        try {
-          const res = await api.get(`/sync/user/${identifier}`);
-          if (res.data) {
-            finalProfile = {
-              ...profile,
-              ...res.data,
-              id: res.data.supabaseId || res.data._id,
-              isEmailVerified: res.data.isEmailVerified,
-              currency: res.data.currency || "NGN",
-            };
-            console.log("[WAKEUP] Reverting to MongoDB depth node");
-          } else {
-            throw new Error("No node found");
-          }
-        } catch (err) {
-          finalProfile = { ...profile, email: trackedEmail || profile.email };
-          console.log("[WAKEUP] No existing node found. Using defaults.");
-          // Trigger gated verification for new or un-synced users
-          if (currentScreen === AppScreen.DASHBOARD) {
-             setShowGatedModal(true);
-          }
+        finalProfile = { ...profile, email: trackedEmail || profile.email };
+        if (currentScreen === AppScreen.DASHBOARD) {
+           setShowGatedModal(true);
         }
       }
 
-      // 3. Metadata Node Alignment
-      await syncMetadata(finalProfile.id || identifier);
-
-      // 4. Verification Check: Confirm Email or User ID / Admin ID
       const isVerifiedId = finalProfile.id && finalProfile.id.length > 5;
       const isVerifiedEmail = finalProfile.email && finalProfile.email.includes("@");
-      
+
       if ((!isVerifiedId || !isVerifiedEmail) && currentScreen === AppScreen.DASHBOARD) {
         setCurrentScreen(AppScreen.LOGIN);
         notify("error", "Verification Required", "Valid institutional identity not confirmed.");
         return;
       }
 
-      // 5. Synchronize All Global States
       setProfile(finalProfile);
-      
-      // Role-Based Tab Initialization
+
       if (finalProfile.role === "admin") {
          setShowAdminDashboard(true);
-         notify("success", "Admin Access Granted", "Welcome to the institutional control panel.");
       } else {
          setActiveTab(AppTab.HOME);
       }
 
-      // Final Security Check: Ensure email is verified for dashboard access
       if (!finalProfile.isEmailVerified && currentScreen === AppScreen.DASHBOARD) {
          setCurrentScreen(AppScreen.LOGIN);
-         notify("error", "Access Blocked", "Institutional email verification required.");
+         notify("error", "Access Blocked", "Email verification required.");
       }
 
-      await syncProfile({ id: finalProfile.id || identifier, profile: finalProfile });
-      
-      notify("success", "Nodes Synchronized", "Ecosystem data and fiat parameters re-aligned.");
+      Promise.allSettled([
+        syncProfile({ id: finalProfile.id || identifier, profile: finalProfile }),
+        syncMetadata(finalProfile.id || identifier)
+      ]);
     } catch (err) {
-      console.error("[WAKEUP_CRITICAL] Node alignment failed:", err);
+      console.error("[WAKEUP_CRITICAL]", err);
     } finally {
-      // Institutional delay for high-fidelity discovery animation
-      setTimeout(() => {
-        setIsInitializing(false);
-      }, 2200);
+      setTimeout(() => setIsInitializing(false), 800);
     }
   };
 
@@ -275,7 +250,21 @@ export default function App() {
     const nextProfile = { ...profile, ...updated };
     setProfile(nextProfile);
     if (currentUser || nextProfile.id) {
-      syncProfile({ id: nextProfile.id || currentUser.id || currentUser.uid, profile: nextProfile });
+      const id = nextProfile.id || currentUser?.id || currentUser?.uid;
+      if (id) {
+        syncProfile({ id, profile: nextProfile });
+        api.post('/sync/user', {
+          supabaseId: id,
+          name: nextProfile.name,
+          email: nextProfile.email,
+          phone: nextProfile.phone,
+          kycStatus: nextProfile.kycStatus,
+          kycLevel: nextProfile.kycLevel,
+          balance: nextProfile.balance,
+          promoCode: nextProfile.promoCode,
+          twoFactorEnabled: nextProfile.twoFactorEnabled,
+        }).catch(() => {});
+      }
     }
   };
 
@@ -596,23 +585,16 @@ export default function App() {
 
             <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12 relative">
               {(isInitializing || adminVerifying) && (
-                <div className="absolute inset-0 z-50 bg-white/40 backdrop-blur-sm flex flex-col items-center justify-center space-y-4">
-                   <PuppyLoading />
-                </div>
+                <PuppyLoading />
               )}
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                     {activeTab === AppTab.HOME && (
-                      <DashboardHome 
-                        profile={profile} 
-                        transactions={cachedTransactions} 
-                        onNavigateTab={setActiveTab} 
-                        onRefreshData={async () => {
-                           await wakeupDatabase(true);
-                        }}
-                        onSelectAction={(action) => { 
-                          setIsInitializing(true);
-                          setTimeout(() => {
+                      <DashboardHome
+                        profile={profile}
+                        transactions={cachedTransactions}
+                        onNavigateTab={setActiveTab}
+                        onSelectAction={(action) => {
                             if (action === "fund" || action === "withdraw" || action === "transfer") {
                               setActiveTab(AppTab.WALLET);
                             } else if (action === "buy-giftcard" || action === "sell-giftcard" || action === "Giftcard") {
@@ -632,9 +614,7 @@ export default function App() {
                             } else {
                               setActiveTab(AppTab.SERVICES);
                             }
-                            setIsInitializing(false);
-                          }, 1200);
-                        }} 
+                        }}
                         prices={{
                           BTC: btcPrice,
                           ETH: ethPrice,

@@ -14,19 +14,31 @@ const router = express.Router();
  */
 router.post('/user', async (req, res) => {
   try {
-    const profile = req.body;
-    
-    if (!profile.supabaseId || !profile.email) {
+    const { supabaseId, email, name, phone, kycStatus, kycLevel, balance, promoCode, twoFactorEnabled } = req.body;
+
+    if (!supabaseId && !email) {
       return res.status(400).json({ error: 'Missing required sync parameters.' });
     }
 
-    const user = await syncUserNode(profile);
+    const updatePayload: any = { supabaseId, email };
+    if (name !== undefined) updatePayload.name = name;
+    if (phone !== undefined) updatePayload.phone = phone;
+    if (kycStatus !== undefined) updatePayload.kycStatus = kycStatus;
+    if (kycLevel !== undefined) updatePayload.kycLevel = kycLevel;
+    if (balance !== undefined) updatePayload.balance = balance;
+    if (promoCode !== undefined) updatePayload.promoCode = promoCode;
+    if (twoFactorEnabled !== undefined) updatePayload.twoFactorEnabled = twoFactorEnabled;
 
-    res.cookie('obey_user_email', user.email, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
-    res.cookie('obey_user_id', user.supabaseId, { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
+    const user = await syncUserNode(updatePayload);
+
+    if (user) {
+      res.cookie('obey_user_email', user.email || '', { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
+      res.cookie('obey_user_id', user.supabaseId || '', { maxAge: 900000, httpOnly: true, secure: true, sameSite: 'none' });
+    }
 
     res.json({ success: true, user });
   } catch (error: any) {
+    console.error('[SYNC_ERROR]', error.message);
     res.status(500).json({ error: 'Failed to synchronize ecosystem nodes' });
   }
 });
@@ -55,12 +67,11 @@ router.post('/metadata', async (req, res) => {
 router.post('/verify-kyc', async (req, res) => {
   try {
     const { userId, idType, idNumber, livenessScore } = req.body;
-    
+
     if (!userId) {
       return res.status(400).json({ error: "Missing userId for KYC verification" });
     }
 
-    // 1. Validate against Interswitch Identity Node
     const kycResult = await interswitch.validateIdentity({
       userId,
       idType,
@@ -69,18 +80,18 @@ router.post('/verify-kyc', async (req, res) => {
     });
 
     if (kycResult.responseCode === "00") {
-      // 2. Update User Node Level via Mesh Alignment
       const user = await syncUserNode({
         supabaseId: userId,
         kycStatus: "Verified",
         kycLevel: kycResult.kycLevel || 2
       });
 
-      res.json({ 
-        success: true, 
-        message: "Identity Node Settled", 
-        kycLevel: user?.kycLevel,
-        auditId: kycResult.auditId 
+      res.json({
+        success: true,
+        message: "Identity Node Settled",
+        kycLevel: user?.kycLevel || kycResult.kycLevel || 2,
+        kycStatus: "Verified",
+        auditId: kycResult.auditId
       });
     } else {
       res.status(400).json({ error: "Identity validation failed", details: kycResult.message });
