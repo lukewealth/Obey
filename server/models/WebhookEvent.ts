@@ -14,5 +14,10 @@ const WebhookEventSchema = new mongoose.Schema({
   signatureValid: { type: Boolean, required: true },
 }, { timestamps: true });
 
-export const WebhookEvent = mongoose.models.WebhookEvent || 
+WebhookEventSchema.index({ eventType: 1, processedAt: -1 });
+WebhookEventSchema.index({ userId: 1, processedAt: -1 });
+WebhookEventSchema.index({ transactionId: 1 });
+WebhookEventSchema.index({ orderReference: 1 }, { sparse: true });
+
+export const WebhookEvent = mongoose.models.WebhookEvent ||
   mongoose.model('WebhookEvent', WebhookEventSchema);

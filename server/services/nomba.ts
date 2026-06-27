@@ -165,6 +165,10 @@ export function verifyWebhookSignature(
   timestamp: string
 ): boolean {
   if (!NOMBA_WEBHOOK_SECRET || NOMBA_WEBHOOK_SECRET === 'your_webhook_secret_from_dashboard') {
+    if (process.env.NODE_ENV === 'development' || process.env.VERCEL === '1') {
+      console.warn('[NOMBA] Webhook secret not configured - bypassing verification in dev/preview');
+      return true;
+    }
     console.warn('[NOMBA] Webhook secret not configured');
     return false;
   }

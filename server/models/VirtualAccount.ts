@@ -14,5 +14,9 @@ const VirtualAccountSchema = new mongoose.Schema({
   nombaAccountId: { type: String },
 }, { timestamps: true });
 
-export const VirtualAccount = mongoose.models.VirtualAccount || 
+VirtualAccountSchema.index({ userId: 1, isActive: 1 });
+VirtualAccountSchema.index({ bankAccountNumber: 1 });
+VirtualAccountSchema.index({ nombaAccountId: 1 }, { sparse: true });
+
+export const VirtualAccount = mongoose.models.VirtualAccount ||
   mongoose.model('VirtualAccount', VirtualAccountSchema);

@@ -100,6 +100,13 @@ router.post('/transfer', async (req: Request, res: Response) => {
 });
 
 router.post('/topup-card', async (req: Request, res: Response) => {
+  if (process.env.PAYMENT_PROVIDER === 'nomba') {
+    return res.status(410).json({
+      error: 'Card top-up migrated to Nomba checkout. Use POST /api/nomba/checkout instead.',
+      migration: 'nomba'
+    });
+  }
+
   try {
     const validation = cardTopupSchema.safeParse(req.body);
     if (!validation.success) {
@@ -157,6 +164,13 @@ router.post('/topup-card', async (req: Request, res: Response) => {
 });
 
 router.post('/withdraw', async (req: Request, res: Response) => {
+  if (process.env.PAYMENT_PROVIDER === 'nomba') {
+    return res.status(410).json({
+      error: 'Withdrawal migrated to Nomba. Use POST /api/nomba/withdraw instead.',
+      migration: 'nomba'
+    });
+  }
+
   try {
     const validation = withdrawalSchema.safeParse(req.body);
     if (!validation.success) {

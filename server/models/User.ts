@@ -23,6 +23,13 @@ const UserSchema = new mongoose.Schema({
   lastSync: { type: Date, default: Date.now }
 }, { timestamps: true });
 
+UserSchema.index({ supabaseId: 1 }, { unique: true });
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ obeyId: 1 }, { sparse: true });
+UserSchema.index({ kycStatus: 1, kycLevel: 1 });
+UserSchema.index({ role: 1 });
+UserSchema.index({ createdAt: -1 });
+
 UserSchema.pre('save', function() {
   if (!this.obeyId) {
     const randomHex = Math.random().toString(16).substring(2, 7).toUpperCase();
