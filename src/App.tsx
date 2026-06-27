@@ -22,6 +22,9 @@ import LegalContent from "./components/LegalContent";
 import SystemAlert from "./components/SystemAlert";
 import GatedVerificationModal from "./components/GatedVerificationModal";
 import PuppyLoading from "./components/PuppyLoading";
+import AIChatAssistant from "./components/AIChatAssistant";
+import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
+import SecuredPortal from "./components/SecuredPortal";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -46,7 +49,9 @@ import {
   ShieldCheckIcon as ShieldCheck, 
   BoltIcon as ZapIcon,
   ArrowPathIcon as RefreshIcon,
-  CreditCardIcon
+  CreditCardIcon,
+  CpuChipIcon as BrainIcon,
+  ShieldCheckIcon as ShieldCheckOutline
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
@@ -82,6 +87,12 @@ export default function App() {
   const [showGatedModal, setShowGatedModal] = useState(false);
   const [utilitySegment, setUtilitySegment] = useState<"airtime" | "data">("airtime");
   const wakeupRef = React.useRef<string | null>(null);
+
+  // --- AI Smart System State ---
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [showAnomalyDetection, setShowAnomalyDetection] = useState(false);
+  const [showSecuredPortal, setShowSecuredPortal] = useState(false);
+  const [portalRiskLevel, setPortalRiskLevel] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('LOW');
 
   // Metadata Capture Node
   const captureMetadata = () => {
@@ -489,6 +500,35 @@ export default function App() {
 
             <div className="flex items-center gap-3 md:gap-6">
               <ThemeToggle />
+              
+              {/* AI Smart System Buttons */}
+              <div className="hidden md:flex items-center gap-2">
+                <button
+                  onClick={() => setShowAIChat(true)}
+                  className="p-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+                  title="AI Assistant"
+                >
+                  <BrainIcon className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => setShowAnomalyDetection(true)}
+                  className="p-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+                  title="Anomaly Detection"
+                >
+                  <ShieldAlert className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => {
+                    setPortalRiskLevel('MEDIUM');
+                    setShowSecuredPortal(true);
+                  }}
+                  className="p-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+                  title="Secured Portal"
+                >
+                  <ShieldCheckOutline className="w-5 h-5" />
+                </button>
+              </div>
+
               <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 dark:border-white/10 cursor-pointer hover:opacity-60 transition-opacity">
                 <div className="text-right">
                   <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Master Ledger</p>
@@ -745,6 +785,45 @@ export default function App() {
           </nav>
         </div>
       )}
+      
+      {/* AI Smart System Components */}
+      <AnimatePresence>
+        {showAIChat && (
+          <AIChatAssistant
+            userId={profile.id || currentUser?.id || currentUser?.uid || ''}
+            balance={profile.balance}
+            transactions={cachedTransactions}
+            isOpen={showAIChat}
+            onClose={() => setShowAIChat(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showAnomalyDetection && (
+          <AnomalyDetectionDashboard
+            userId={profile.id || currentUser?.id || currentUser?.uid || ''}
+            transactions={cachedTransactions}
+            isOpen={showAnomalyDetection}
+            onClose={() => setShowAnomalyDetection(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showSecuredPortal && (
+          <SecuredPortal
+            isOpen={showSecuredPortal}
+            onClose={() => setShowSecuredPortal(false)}
+            onVerified={() => {
+              notify("success", "Identity Verified", "Secure session established.");
+            }}
+            userId={profile.id || currentUser?.id || currentUser?.uid || ''}
+            riskLevel={portalRiskLevel}
+          />
+        )}
+      </AnimatePresence>
+
       <CookieConsent />
     </div>
   );

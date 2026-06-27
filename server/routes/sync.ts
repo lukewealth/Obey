@@ -183,4 +183,134 @@ router.get('/transactions/:userId', async (req, res) => {
   }
 });
 
+router.post('/verify-biometric', async (req, res) => {
+  try {
+    const { userId, deviceFingerprint, method } = req.body;
+
+    if (!userId || !deviceFingerprint) {
+      return res.status(400).json({ error: 'userId and deviceFingerprint required' });
+    }
+
+    const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const metadata = user.metadata || {};
+    const verifiedDevices = metadata.verifiedDevices || [];
+
+    if (!verifiedDevices.includes(deviceFingerprint)) {
+      verifiedDevices.push(deviceFingerprint);
+      user.metadata = { ...metadata, verifiedDevices };
+      await user.save();
+    }
+
+    console.log(`[SECURITY] Biometric verification successful for ${userId} from device ${deviceFingerprint}`);
+
+    res.json({
+      success: true,
+      message: 'Biometric verification successful',
+      deviceFingerprint,
+      method,
+    });
+  } catch (error: any) {
+    console.error('[BIOMETRIC_VERIFY] Error:', error.message);
+    res.status(500).json({ error: 'Biometric verification failed' });
+  }
+});
+
+router.post('/verify-totp', async (req, res) => {
+  try {
+    const { userId, code, deviceFingerprint } = req.body;
+
+    if (!userId || !code) {
+      return res.status(400).json({ error: 'userId and code required' });
+    }
+
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      return res.status(400).json({ error: 'Invalid code format' });
+    }
+
+    const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const metadata = user.metadata || {};
+    const totpSecret = metadata.totpSecret;
+
+    if (!totpSecret) {
+      return res.status(400).json({ error: '2FA not configured. Please set up 2FA first.' });
+    }
+
+    const isValid = verifyTotpCode(totpSecret, code);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid 2FA code' });
+    }
+
+    const verifiedDevices = metadata.verifiedDevices || [];
+    if (!verifiedDevices.includes(deviceFingerprint)) {
+      verifiedDevices.push(deviceFingerprint);
+      user.metadata = { ...metadata, verifiedDevices };
+      await user.save();
+    }
+
+    console.log(`[SECURITY] TOTP verification successful for ${userId}`);
+
+    res.json({
+      success: true,
+      message: '2FA verification successful',
+      deviceFingerprint,
+    });
+  } catch (error: any) {
+    console.error('[TOTP_VERIFY] Error:', error.message);
+    res.status(500).json({ error: '2FA verification failed' });
+  }
+});
+
+function verifyTotpCode(secret: string, code: string): boolean {
+  const crypto = require('crypto');
+  const time = Math.floor(Date.now() / 1000 / 30);
+
+  const base32Decode = (str: string): Buffer => {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    let bits = '';
+    for (let i = 0; i < str.length; i++) {
+      const val = alphabet.indexOf(str[i].toUpperCase());
+      if (val === -1) continue;
+      bits += val.toString(2).padStart(5, '0');
+    }
+    const bytes = [];
+    for (let i = 0; i + 8 <= bits.length; i += 8) {
+      bytes.push(parseInt(bits.substr(i, 8), 2));
+    }
+    return Buffer.from(bytes);
+  };
+
+  const secretBuffer = base32Decode(secret);
+
+  for (let i = -1; i <= 1; i++) {
+    const timeHex = time + i;
+    const timeBuffer = Buffer.alloc(8);
+    timeBuffer.writeUInt32BE(0, 0);
+    timeBuffer.writeUInt32BE(timeHex, 4);
+
+    const hmac = crypto.createHmac('sha1', secretBuffer);
+    hmac.update(timeBuffer);
+    const hash = hmac.digest();
+
+    const offset = hash[hash.length - 1] & 0xf;
+    const binary =
+      ((hash[offset] & 0x7f) << 24) |
+      ((hash[offset + 1] & 0xff) << 16) |
+      ((hash[offset + 2] & 0xff) << 8) |
+      (hash[offset + 3] & 0xff);
+
+    const otp = (binary % 1000000).toString().padStart(6, '0');
+    if (otp === code) return true;
+  }
+
+  return false;
+}
+
 export default router;
