@@ -23,13 +23,11 @@ const UserSchema = new mongoose.Schema({
   lastSync: { type: Date, default: Date.now }
 }, { timestamps: true });
 
-// Pre-save hook to generate obeyId if it doesn't exist
-UserSchema.pre('save', function(this: any, next: any) {
+UserSchema.pre('save', function() {
   if (!this.obeyId) {
     const randomHex = Math.random().toString(16).substring(2, 7).toUpperCase();
     this.obeyId = `OBEY-${randomHex}`;
   }
-  next();
 });
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);
