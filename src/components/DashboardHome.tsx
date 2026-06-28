@@ -312,70 +312,62 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       {/* Balance Card */}
       <motion.div
         variants={itemVariants}
-        className="relative overflow-hidden rounded-3xl p-6 md:p-8"
+        className="relative overflow-hidden rounded-2xl p-6 md:p-8 shadow-lg"
         style={{
-          background: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          background: 'linear-gradient(135deg, #0b0e14 0%, #1a1f2e 100%)',
         }}
       >
-        <motion.div
-          animate={{
-            background: [
-              'radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%)',
-              'radial-gradient(circle at 80% 50%, rgba(124, 58, 237, 0.12) 0%, transparent 50%)',
-              'radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%)',
-            ],
-          }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute inset-0"
-        />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl opacity-50" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl opacity-50" />
         
         <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-lg shadow-primary/20">
-                <Wallet size={20} className="text-white" />
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-1">Total Balance</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-gray-400 text-lg font-mono font-medium">₦</span>
+                <span className="text-4xl md:text-5xl font-bold text-white tracking-tight font-mono">
+                  {hideBalance ? "••••••" : <AnimatedNumber value={profile.balance} />}
+                </span>
+                <span className="text-gray-400 text-sm font-medium ml-1">NGN</span>
               </div>
-              <div>
-                <p className="text-sm text-gray-400">Balance</p>
+              <div className="flex items-center gap-2 mt-2">
+                <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold">
+                  <TrendingUp size={12} />
+                  +2.48%
+                </div>
+                <span className="text-xs text-gray-400">this month</span>
               </div>
             </div>
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
               onClick={() => setHideBalance(!hideBalance)}
-              className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+              className="w-10 h-10 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
             >
-              {hideBalance ? <EyeOff size={16} className="text-gray-400" /> : <Eye size={16} className="text-gray-400" />}
+              {hideBalance ? <EyeOff size={18} className="text-white" /> : <Eye size={18} className="text-white" />}
             </motion.button>
           </div>
 
-          <div className="mb-6">
-            <div className="flex items-baseline gap-2">
-              <span className="text-gray-400 text-lg font-mono font-medium">₦</span>
-              <span className="text-4xl md:text-5xl font-bold text-white tracking-tight font-mono">
-                {hideBalance ? "••••••" : <AnimatedNumber value={profile.balance} />}
-              </span>
-              <span className="text-gray-400 text-sm font-medium ml-1">NGN</span>
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium">
-                <TrendingUp size={12} />
-                +2.48%
-              </div>
-              <span className="text-xs text-gray-400">this month</span>
-            </div>
-          </div>
-
           <div className="flex gap-3">
-            <ActionButton icon={ArrowDownLeft} label="Fund" onClick={() => onSelectAction("fund")} variant="primary" delay={0.1} />
-            <ActionButton icon={ArrowUpRight} label="Withdraw" onClick={() => onSelectAction("withdraw")} variant="secondary" delay={0.2} />
-            <ActionButton icon={Send} label="Transfer" onClick={() => onSelectAction("transfer")} variant="outline" delay={0.3} />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onSelectAction("fund")}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+            >
+              <ArrowDownLeft size={18} />
+              <span>Fund</span>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => onSelectAction("withdraw")}
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white py-3 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all border border-white/10"
+            >
+              <ArrowUpRight size={18} />
+              <span>Withdraw</span>
+            </motion.button>
           </div>
         </div>
       </motion.div>

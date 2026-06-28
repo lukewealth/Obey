@@ -551,29 +551,58 @@ export default function App() {
                   { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
                   { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                   { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
-                ].map((item) => (
-                  <button 
-                    key={item.label} 
-                    onClick={() => setActiveTab(item.tab)} 
-                    className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all ${activeTab === item.tab ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14]" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"}`}
-                    title={!sidebarExpanded ? item.label : ""}
-                  >
-                    <item.icon className="w-5 h-5 flex-shrink-0" /> 
-                    {sidebarExpanded && <span>{item.label}</span>}
-                  </button>
-                ))}
+                ].map((item) => {
+                  const isActive = activeTab === item.tab;
+                  return (
+                    <motion.button 
+                      key={item.label}
+                      whileHover={{ x: 4 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setActiveTab(item.tab)} 
+                      className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
+                        isActive 
+                          ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14] shadow-lg" 
+                          : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"
+                      }`}
+                      title={!sidebarExpanded ? item.label : ""}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebar-active"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary dark:bg-[#0b0e14] rounded-r-full"
+                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                      )}
+                      <item.icon className="w-5 h-5 flex-shrink-0" /> 
+                      {sidebarExpanded && <span>{item.label}</span>}
+                    </motion.button>
+                  );
+                })}
               </nav>
 
               {profile.role === "admin" && (
                 <div className="pt-4 border-t border-gray-100 dark:border-white/10">
-                  <button 
+                  <motion.button 
+                    whileHover={{ x: 4 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleAdminAccess} 
-                    className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14]" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"}`}
+                    className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
+                      activeTab === AppTab.ADMIN 
+                        ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14] shadow-lg" 
+                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"
+                    }`}
                     title={!sidebarExpanded ? "Admin" : ""}
                   >
+                    {activeTab === AppTab.ADMIN && (
+                      <motion.div
+                        layoutId="sidebar-active"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary dark:bg-[#0b0e14] rounded-r-full"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
                     <ShieldCheck className="w-5 h-5 flex-shrink-0" /> 
                     {sidebarExpanded && <span>Admin</span>}
-                  </button>
+                  </motion.button>
                 </div>
               )}
             </aside>
