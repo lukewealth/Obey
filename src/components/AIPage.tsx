@@ -4,7 +4,9 @@ import {
   Brain, TrendingUp, TrendingDown, Sparkles, Target,
   AlertCircle, CheckCircle2, BarChart3, Activity,
   Zap, Shield, Eye, DollarSign, PieChart,
-  ArrowUpRight, ArrowDownRight, Lightbulb, Clock
+  ArrowUpRight, ArrowDownRight, Lightbulb, Clock,
+  Home, CreditCard, Settings, User, Bell, Search,
+  ChevronRight, MoreVertical, Plus, Minus
 } from "lucide-react";
 import { UserProfile, Transaction } from "../types";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts';
@@ -199,23 +201,26 @@ export default function AIPage({ profile, transactions, prices }: AIPageProps) {
       className="space-y-6 pb-24"
     >
       {/* Header */}
-      <motion.div variants={itemVariants} className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <Brain size={20} className="text-white" />
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">Obey AI</h1>
+      <motion.div variants={itemVariants} className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center shadow-lg shadow-purple-500/20"
+          >
+            <Brain size={24} className="text-white" />
+          </motion.div>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">AI Insights</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Personalized financial intelligence</p>
           </div>
-          <p className="text-gray-400 text-sm">Your intelligent financial companion</p>
         </div>
         <motion.div
           animate={{ opacity: [1, 0.4, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20"
         >
-          <div className="w-2 h-2 bg-purple-400 rounded-full" />
-          <span className="text-xs text-purple-300 font-medium">Active</span>
+          <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+          <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Live</span>
         </motion.div>
       </motion.div>
 
@@ -430,17 +435,7 @@ export default function AIPage({ profile, transactions, prices }: AIPageProps) {
                     }}
                     formatter={(value: number) => [`${value}%`, 'Allocation']}
                   />
-                  <Bar dataKey="value" radius={[8, 8, 0, 0]} maxBarSize={60}>
-                    {[
-                      { name: 'BTC', value: 35, fill: '#f59e0b' },
-                      { name: 'ETH', value: 28, fill: '#3b82f6' },
-                      { name: 'SOL', value: 18, fill: '#a855f7' },
-                      { name: 'SUI', value: 12, fill: '#06b6d4' },
-                      { name: 'Others', value: 7, fill: '#64748b' },
-                    ].map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
+                  <Bar dataKey="value" fill="#8b5cf6" radius={[8, 8, 0, 0]} maxBarSize={60} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

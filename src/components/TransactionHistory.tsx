@@ -41,12 +41,8 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
     <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter uppercase italic text-center md:text-left">Settlement Ledger</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Institutional-grade asset movements and execution logs.</p>
-        </div>
-        <div className="flex items-center justify-center gap-3 px-5 py-2.5 bg-emerald-50 border border-emerald-100 rounded-full text-emerald-600 self-center md:self-auto">
-           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Sui Mainnet Node: Active</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight text-center md:text-left">Transaction History</h2>
+          <p className="text-sm text-gray-500 font-medium text-center md:text-left">All your recent transactions</p>
         </div>
       </div>
 

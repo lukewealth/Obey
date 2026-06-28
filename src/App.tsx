@@ -217,20 +217,20 @@ export default function App() {
 
   // Local state for profile (Default placeholder removed for dynamic institutional alignment)
   const [profile, setProfile] = useState<UserProfile>(() => ({
-    name: "Authorized Node",
-    email: "node@obey.finance",
+    name: "Luke Okagha",
+    email: "luke@obey.finance",
     role: "user",
-    phone: "+234 000 000 0000",
-    avatar: "OB",
-    avatarUrl: "",
-    kycStatus: "Unverified",
-    balance: 0,
+    phone: "+234 809 102 8824",
+    avatar: "L",
+    avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    kycStatus: "Verified",
+    balance: 2580340.52,
     currency: "NGN",
     promoCode: "",
-    isEmailVerified: false,
-    kycLevel: 0,
-    tierLevel: 1,
-    twoFactorEnabled: false
+    isEmailVerified: true,
+    kycLevel: 2,
+    tierLevel: 2,
+    twoFactorEnabled: true
   }));
 
   const handleVerificationComplete = () => {

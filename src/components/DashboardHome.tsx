@@ -343,14 +343,14 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
 
           <div className="space-y-3">
             {[
-              { name: "Netflix", amount: 4400, color: "bg-red-500" },
-              { name: "Spotify", amount: 1200, color: "bg-green-500" },
-              { name: "iCloud", amount: 450, color: "bg-blue-500" },
+              { name: "Netflix", amount: 4400, logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg", color: "bg-red-500" },
+              { name: "Spotify", amount: 1200, logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg", color: "bg-green-500" },
+              { name: "Apple Music", amount: 1200, logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", color: "bg-gray-900" },
             ].map((payment) => (
-              <div key={payment.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5">
+              <div key={payment.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded-lg ${payment.color} flex items-center justify-center text-white text-xs font-bold`}>
-                    {payment.name[0]}
+                  <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
+                    <img src={payment.logo} alt={payment.name} className="w-6 h-6 object-contain" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 dark:text-white">{payment.name}</p>
@@ -384,20 +384,6 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         <div className="space-y-3">
           {Array.isArray(transactions) && transactions.length > 0 ? (
             transactions.slice(0, 5).map((tx, i) => {
-              const getCategoryIcon = (category: string) => {
-                switch (category) {
-                  case "Electronics": return <ShoppingBag size={18} />;
-                  case "Transfer": return <ArrowDownLeft size={18} />;
-                  case "Dining": return <Utensils size={18} />;
-                  case "Travel": return <Plane size={18} />;
-                  case "Food": return <Coffee size={18} />;
-                  case "Crypto": return <RefreshCw size={18} />;
-                  case "Airtime": return <Smartphone size={18} />;
-                  case "GiftCard": return <Gift size={18} />;
-                  default: return <Wallet size={18} />;
-                }
-              };
-
               const isCredit = tx.type === "Credit";
 
               return (
@@ -406,16 +392,25 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                  whileHover={{ x: 4 }}
+                  className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 transition-all cursor-pointer"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                       isCredit ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400' : 'bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-400'
                     }`}>
-                      {getCategoryIcon(tx.category)}
+                      {tx.category === "Electronics" && <ShoppingBag size={20} />}
+                      {tx.category === "Transfer" && <ArrowDownLeft size={20} />}
+                      {tx.category === "Dining" && <Utensils size={20} />}
+                      {tx.category === "Travel" && <Plane size={20} />}
+                      {tx.category === "Food" && <Coffee size={20} />}
+                      {tx.category === "Crypto" && <RefreshCw size={20} />}
+                      {tx.category === "Airtime" && <Smartphone size={20} />}
+                      {tx.category === "GiftCard" && <Gift size={20} />}
+                      {!["Electronics", "Transfer", "Dining", "Travel", "Food", "Crypto", "Airtime", "GiftCard"].includes(tx.category) && <Wallet size={20} />}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{tx.title}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{tx.title}</p>
                       <p className="text-xs text-gray-500">{tx.category} • {tx.time}</p>
                     </div>
                   </div>
