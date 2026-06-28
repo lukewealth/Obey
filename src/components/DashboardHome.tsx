@@ -199,45 +199,59 @@ const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
     ? "M0 15 L10 12 L20 18 L30 10 L40 14 L50 8 L60 12 L70 5 L80 9 L90 2 L100 6"
     : "M0 5 L10 8 L20 4 L30 12 L40 8 L50 15 L60 10 L70 18 L80 14 L90 20 L100 16";
   
+  const descriptions: Record<string, string> = {
+    BTC: "The original cryptocurrency",
+    ETH: "Smart contract platform",
+    SOL: "High-speed blockchain",
+    SUI: "Next-generation Layer 1"
+  };
+  
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay, duration: 0.4, type: 'spring', stiffness: 150, damping: 20 }}
       whileHover={{ scale: 1.02, x: 4 }}
-      className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+      whileTap={{ scale: 0.98 }}
+      className="relative flex items-center justify-between p-3 sm:p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-primary/30 transition-all duration-200 cursor-pointer group"
       style={{ backdropFilter: 'blur(8px)' }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
         <motion.div
           whileHover={{ rotate: [0, -10, 10, 0] }}
           transition={{ duration: 0.3 }}
-          className={`w-10 h-10 rounded-full ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md`}
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md flex-shrink-0`}
         >
-          <Icon size={18} className="text-white" fill={symbol === "BTC" ? "currentColor" : "none"} />
+          <Icon size={16} className="text-white sm:w-[18px] sm:h-[18px]" fill={symbol === "BTC" ? "currentColor" : "none"} />
         </motion.div>
-        <div>
-          <p className="font-semibold text-white text-sm">{name}</p>
-          <p className="text-xs text-gray-500">{symbol}</p>
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-white text-xs sm:text-sm truncate">{name}</p>
+          <p className="text-[10px] sm:text-xs text-gray-500">{symbol}</p>
         </div>
       </div>
       
-      <div className="flex-1 px-4 hidden sm:block">
+      <div className="flex-1 px-2 sm:px-4 hidden sm:block">
         <svg className={`w-full h-8 ${isPositive ? 'text-emerald-500' : 'text-red-500'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 100 20">
           <path d={sparklineData} strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </div>
       
-      <div className="text-right">
-        <p className="font-mono font-bold text-sm text-white">₦{price}</p>
+      <div className="text-right flex-shrink-0">
+        <p className="font-mono font-bold text-xs sm:text-sm text-white">₦{price}</p>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className={`text-xs font-bold flex items-center justify-end gap-0.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}
+          className={`text-[10px] sm:text-xs font-bold flex items-center justify-end gap-0.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}
         >
           {isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
           {change}
         </motion.p>
+      </div>
+      
+      {/* Hover tooltip - only on desktop */}
+      <div className="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10 hidden lg:block shadow-xl">
+        {descriptions[symbol] || `${name} cryptocurrency`}
+        <div className="absolute right-full top-1/2 -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-r-4 border-transparent border-r-gray-900"></div>
       </div>
     </motion.div>
   );

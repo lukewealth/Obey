@@ -122,8 +122,8 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1 text-center md:text-left">
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight italic uppercase">Trading Terminal</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium leading-relaxed">Institutional market access with sub-second settlement.</p>
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Trade Crypto</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium leading-relaxed">Buy and sell crypto instantly.</p>
         </div>
         
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm self-center md:self-auto">
@@ -156,13 +156,13 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
               <div className="w-16 h-16 md:w-24 md:h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto shadow-inner">
                 <CheckCircle2 size={48} className="md:w-12 md:h-12" />
               </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Order Executed</h2>
-              <p className="text-sm md:text-base text-gray-500 font-medium leading-relaxed">Your digital assets have been settled into your vault node.</p>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Order Complete</h2>
+              <p className="text-sm md:text-base text-gray-500 font-medium leading-relaxed">Your crypto has been added to your wallet.</p>
             </div>
 
             <div className="bg-gray-50 rounded-[24px] md:rounded-[32px] p-6 md:p-10 space-y-6 md:space-y-8 text-left border border-gray-100">
               <div className="flex justify-between items-center gap-4">
-                <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Volume Settled</span>
+                <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
                 <span className={`text-xl md:text-3xl font-black ${orderReceipt.type === "buy" ? "text-emerald-600" : "text-red-500"}`}>
                    {orderReceipt.cryptoAmount?.toFixed(5) || orderReceipt.amount} {orderReceipt.symbol || orderReceipt.brand}
                 </span>
@@ -174,14 +174,14 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                   <p className="text-base md:text-lg font-black text-gray-900">${orderReceipt.fiatAmount?.toLocaleString() || orderReceipt.amount.toLocaleString()}</p>
                 </div>
                 <div className="space-y-1 text-right">
-                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Node Reference</p>
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Transaction ID</p>
                   <p className="text-base md:text-lg font-black text-gray-900 font-mono tracking-tighter truncate max-w-[150px]">{orderReceipt.id}</p>
                 </div>
               </div>
             </div>
 
             <button onClick={() => setOrderReceipt(null)} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press hover:bg-black transition-all">
-              Return to Terminal
+              Done
             </button>
           </motion.div>
         ) : activeTab === 'PLATFORM' ? (
@@ -190,11 +190,11 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
             <div className="xl:col-span-8 space-y-8 md:space-y-10">
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-2">
-                   <h3 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.3em]">Market Search</h3>
-                   <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                      <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">NODES ACTIVE</span>
-                   </div>
+                   <h3 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.3em]">Search</h3>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">
+                       <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                       <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+                    </div>
                 </div>
                 <CryptoSearch onSelect={(asset) => setSelectedSymbol(asset.asset_id)} />
               </div>
@@ -232,7 +232,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary">
                   <BarChart3 size={20} className="md:w-6 md:h-6" />
                 </div>
-                <h3 className="text-[10px] md:text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Execution Desk</h3>
+                <h3 className="text-[10px] md:text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Trade</h3>
               </div>
 
               <div className="flex bg-gray-100 p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 relative z-10">
@@ -259,7 +259,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
               <form onSubmit={executeTrade} className="space-y-8 md:space-y-10 relative z-10">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center px-4">
-                    <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Order Magnitude</span>
+                    <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
                     <span className="text-[10px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
                   </div>
                   <div className="relative">

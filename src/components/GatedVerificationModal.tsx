@@ -81,33 +81,27 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 30 }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="w-full max-w-xl bg-white rounded-[35px] md:rounded-[50px] p-8 md:p-12 shadow-2xl relative overflow-hidden"
+            className="w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl relative overflow-hidden"
           >
             {status === "complete" && (
               <div className="absolute inset-0 pointer-events-none">
                 <motion.div 
                   initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1.5, opacity: 0.1 }}
+                  animate={{ scale: 1.5, opacity: 0.05 }}
                   transition={{ duration: 1 }}
-                  className="absolute -top-20 -right-20 w-64 h-64 bg-emerald-500 rounded-full blur-3xl"
-                />
-                <motion.div 
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1.5, opacity: 0.1 }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                  className="absolute -bottom-20 -left-20 w-64 h-64 bg-primary rounded-full blur-3xl"
+                  className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500 rounded-full blur-3xl"
                 />
               </div>
             )}
 
             <button 
               onClick={onClose}
-              className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-full active-scale"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-100 rounded-full"
             >
-              <X size={24} />
+              <X size={18} />
             </button>
 
-            <div className="relative z-10 text-center space-y-8 md:space-y-10">
+            <div className="relative z-10 text-center space-y-5">
                <AnimatePresence mode="wait">
                   {status === "initial" && (
                     <motion.div 
@@ -115,22 +109,22 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.9 }}
-                      className="space-y-8"
+                      className="space-y-4"
                     >
                        <motion.div
-                         initial={{ y: -20, opacity: 0 }}
+                         initial={{ y: -10, opacity: 0 }}
                          animate={{ y: 0, opacity: 1 }}
-                         className="w-20 h-20 bg-accent-blue rounded-[24px] flex items-center justify-center text-primary mx-auto shadow-inner"
+                         className="w-14 h-14 bg-accent-blue rounded-2xl flex items-center justify-center text-primary mx-auto shadow-inner"
                        >
-                          <ShieldAlert size={40} />
+                          <ShieldAlert size={28} />
                        </motion.div>
                        
-                        <div className="space-y-2">
-                           <h3 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter">Verify Your Identity</h3>
-                           <p className="text-gray-500 font-medium">Complete verification to access all features.</p>
+                        <div className="space-y-1">
+                           <h3 className="text-xl font-bold text-gray-900 tracking-tight">Verify Your Identity</h3>
+                           <p className="text-gray-500 text-sm">Complete verification to access all features.</p>
                         </div>
 
-                        <div className="bg-gray-50 rounded-3xl p-6 space-y-4 border border-gray-100">
+                        <div className="bg-gray-50 rounded-2xl p-4 space-y-3 border border-gray-100">
                            {[
                              { id: 'email', label: 'Email Verified', icon: Mail, checked: profile.isEmailVerified },
                              { id: 'id', label: 'ID Verified', icon: Fingerprint, checked: !!profile.id },
@@ -139,69 +133,66 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                            ].map((item, index) => (
                             <motion.div 
                               key={item.id}
-                              initial={{ x: -20, opacity: 0 }}
+                              initial={{ x: -10, opacity: 0 }}
                               animate={{ x: 0, opacity: 1 }}
-                              transition={{ delay: index * 0.1 }}
+                              transition={{ delay: index * 0.05 }}
                               className="flex items-center justify-between"
                             >
-                               <div className="flex items-center gap-4">
-                                  <motion.div 
-                                    whileHover={{ scale: 1.1, rotate: 5 }}
-                                    className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm shrink-0 ${item.checked ? 'bg-emerald-50 text-emerald-500' : 'bg-white text-gray-300'}`}
-                                  >
-                                      <item.icon size={18} />
-                                  </motion.div>
-                                  <p className={`text-xs font-black uppercase tracking-widest ${item.checked ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
+                               <div className="flex items-center gap-3">
+                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${item.checked ? 'bg-emerald-50 text-emerald-500' : 'bg-white text-gray-300'}`}>
+                                      <item.icon size={14} />
+                                  </div>
+                                  <p className={`text-xs font-medium ${item.checked ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
                                </div>
                                <AnimatePresence>
                                  {item.checked && (
                                    <motion.div
-                                     initial={{ scale: 0, rotate: -180 }}
-                                     animate={{ scale: 1, rotate: 0 }}
+                                     initial={{ scale: 0 }}
+                                     animate={{ scale: 1 }}
                                      exit={{ scale: 0 }}
                                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                    >
-                                      <CheckCircle2 size={18} className="text-emerald-500" />
+                                      <CheckCircle2 size={14} className="text-emerald-500" />
                                    </motion.div>
                                  )}
                                </AnimatePresence>
                             </motion.div>
                           ))}
-                       </div>
+                        </div>
 
-                       <div className="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-100">
-                          <currentTier.icon className={currentTier.color} size={24} />
-                          <div className="text-left">
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Current Tier</p>
-                             <p className={`text-sm font-black ${currentTier.color}`}>{currentTier.name}</p>
-                          </div>
-                       </div>
-                       
+                        <div className="flex items-center justify-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+                           <currentTier.icon className={currentTier.color} size={16} />
+                           <div className="text-left">
+                              <p className="text-[9px] font-medium text-gray-400 uppercase tracking-wider">Current Tier</p>
+                              <p className={`text-xs font-bold ${currentTier.color}`}>{currentTier.name}</p>
+                           </div>
+                        </div>
+                        
                         <motion.button 
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={handleStartAnalysis}
-                          className="w-full h-16 bg-primary text-white rounded-2xl font-bold uppercase text-sm tracking-widest shadow-2xl shadow-primary/30 flex items-center justify-center gap-3 hover:shadow-primary/40 transition-shadow"
+                          className="w-full h-12 bg-primary text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2"
                         >
-                           Verify Now <ArrowRight size={20} />
+                           Verify Now <ArrowRight size={16} />
                         </motion.button>
 
-                        <div className="flex items-center gap-4 pt-2">
+                        <div className="flex items-center gap-3 pt-1">
                            <motion.button 
                              whileHover={{ scale: 1.02 }}
                              whileTap={{ scale: 0.98 }}
                              onClick={onRefresh}
-                             className="flex-1 py-4 bg-gray-100 text-gray-500 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                             className="flex-1 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-medium text-[10px] tracking-wider hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
                            >
-                              <RefreshCw size={14} /> Refresh
+                              <RefreshCw size={12} /> Refresh
                            </motion.button>
                            <motion.button 
                              whileHover={{ scale: 1.02 }}
                              whileTap={{ scale: 0.98 }}
                              onClick={onLogout}
-                             className="flex-1 py-4 border border-red-100 text-red-500 rounded-xl font-bold uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+                             className="flex-1 py-2.5 border border-red-100 text-red-500 rounded-lg font-medium text-[10px] tracking-wider hover:bg-red-50 transition-all flex items-center justify-center gap-1.5"
                            >
-                              <LogOutIcon size={14} /> Sign Out
+                              <LogOutIcon size={12} /> Sign Out
                            </motion.button>
                         </div>
                     </motion.div>
@@ -213,33 +204,23 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="space-y-8 py-6"
+                      className="space-y-4 py-2"
                     >
-                       <div className="relative w-32 h-32 mx-auto">
+                       <div className="relative w-20 h-20 mx-auto">
                           <motion.div 
                             animate={{ rotate: 360 }}
                             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                             className="absolute inset-0 border-4 border-primary/10 border-t-primary rounded-full"
                           />
-                          <motion.div 
-                            animate={{ rotate: -360 }}
-                            transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
-                            className="absolute inset-2 border-4 border-primary/5 border-b-primary/50 rounded-full"
-                          />
-                          <div className="absolute inset-4 bg-gray-50 rounded-full flex items-center justify-center text-primary">
-                             <motion.div
-                               animate={{ scale: [1, 1.1, 1] }}
-                               transition={{ duration: 1, repeat: Infinity }}
-                             >
-                                <Loader2 size={32} className="animate-spin" />
-                             </motion.div>
+                          <div className="absolute inset-2 bg-gray-50 rounded-full flex items-center justify-center text-primary">
+                             <Loader2 size={24} className="animate-spin" />
                           </div>
                        </div>
                        
-                        <div className="space-y-6">
-                           <h3 className="text-2xl font-black text-gray-900 tracking-tight">Verifying...</h3>
+                        <div className="space-y-3">
+                           <h3 className="text-lg font-bold text-gray-900 tracking-tight">Verifying...</h3>
                            
-                           <div className="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                           <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                              <motion.div
                                className="bg-gradient-to-r from-primary to-blue-500 h-full rounded-full"
                                initial={{ width: "0%" }}
@@ -248,7 +229,7 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                              />
                            </div>
                            
-                           <div className="bg-gray-50 rounded-3xl p-6 space-y-4 border border-gray-100 max-w-sm mx-auto">
+                           <div className="bg-gray-50 rounded-2xl p-3 space-y-2.5 border border-gray-100">
                              {[
                                { id: 'email', label: 'Email Verified', icon: Mail },
                                { id: 'id', label: 'ID Verified', icon: Fingerprint },
@@ -257,30 +238,25 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                              ].map((item, index) => (
                               <motion.div 
                                 key={item.id}
-                                initial={{ x: -20, opacity: 0 }}
+                                initial={{ x: -10, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
-                                transition={{ delay: index * 0.1 }}
+                                transition={{ delay: index * 0.05 }}
                                 className="flex items-center justify-between"
                               >
-                                <div className="flex items-center gap-3">
-                                   <motion.div
-                                     animate={checklist[item.id as keyof typeof checklist] ? { scale: [1, 1.2, 1] } : {}}
-                                     transition={{ duration: 0.3 }}
-                                   >
-                                      <item.icon size={16} className={checklist[item.id as keyof typeof checklist] ? 'text-emerald-500' : 'text-gray-300'} />
-                                   </motion.div>
-                                   <p className={`text-[10px] font-black uppercase tracking-widest ${checklist[item.id as keyof typeof checklist] ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
+                                <div className="flex items-center gap-2">
+                                   <item.icon size={12} className={checklist[item.id as keyof typeof checklist] ? 'text-emerald-500' : 'text-gray-300'} />
+                                   <p className={`text-[10px] font-medium ${checklist[item.id as keyof typeof checklist] ? 'text-gray-900' : 'text-gray-400'}`}>{item.label}</p>
                                 </div>
                                 <AnimatePresence mode="wait">
                                   {checklist[item.id as keyof typeof checklist] ? (
                                     <motion.div
                                       key="check"
-                                      initial={{ scale: 0, rotate: -180 }}
-                                      animate={{ scale: 1, rotate: 0 }}
+                                      initial={{ scale: 0 }}
+                                      animate={{ scale: 1 }}
                                       exit={{ scale: 0 }}
                                       transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                     >
-                                       <CheckCircle2 size={14} className="text-emerald-500" />
+                                       <CheckCircle2 size={12} className="text-emerald-500" />
                                     </motion.div>
                                   ) : (
                                     <motion.div
@@ -288,76 +264,76 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                                       animate={{ rotate: 360 }}
                                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                     >
-                                       <Loader2 size={14} className="text-primary" />
+                                       <Loader2 size={12} className="text-primary" />
                                     </motion.div>
                                   )}
                                 </AnimatePresence>
                               </motion.div>
                             ))}
-                          </div>
-                       </div>
+                           </div>
+                        </div>
                     </motion.div>
                   )}
 
                   {status === "complete" && (
                     <motion.div 
                       key="complete"
-                      initial={{ opacity: 0, scale: 1.1 }}
+                      initial={{ opacity: 0, scale: 1.05 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: "spring", damping: 20, stiffness: 200 }}
-                      className="space-y-10"
+                      className="space-y-5"
                     >
                        <motion.div 
-                         initial={{ rotate: -20, scale: 0.5 }}
-                         animate={{ rotate: 0, scale: 1 }}
-                         transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
-                         className="w-24 h-24 bg-emerald-500 text-white rounded-[32px] flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30"
+                         initial={{ scale: 0 }}
+                         animate={{ scale: 1 }}
+                         transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                         className="w-16 h-16 bg-emerald-500 text-white rounded-2xl flex items-center justify-center mx-auto shadow-lg"
                        >
-                          <CheckCircle2 size={48} />
+                          <CheckCircle2 size={32} />
                        </motion.div>
                        
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                            <motion.h3
-                             initial={{ y: 20, opacity: 0 }}
+                             initial={{ y: 10, opacity: 0 }}
                              animate={{ y: 0, opacity: 1 }}
-                             transition={{ delay: 0.3 }}
-                             className="text-4xl font-black text-gray-900 tracking-tighter"
+                             transition={{ delay: 0.2 }}
+                             className="text-xl font-bold text-gray-900 tracking-tight"
                            >
-                             Verification Complete
+                              Verification Complete
                            </motion.h3>
                            <motion.p
-                             initial={{ y: 20, opacity: 0 }}
+                             initial={{ y: 10, opacity: 0 }}
                              animate={{ y: 0, opacity: 1 }}
-                             transition={{ delay: 0.4 }}
-                             className="text-gray-500 font-medium"
+                             transition={{ delay: 0.3 }}
+                             className="text-gray-500 text-sm"
                            >
-                             Your identity has been verified. You can now access all features.
+                              You can now access all features.
                            </motion.p>
                         </div>
                         
                         <motion.div
-                          initial={{ y: 20, opacity: 0 }}
+                          initial={{ y: 10, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.5 }}
-                          className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 flex items-center gap-4 text-left"
+                          transition={{ delay: 0.4 }}
+                          className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-3"
                         >
-                           <ShieldCheck className="text-emerald-500 shrink-0" size={28} />
+                           <ShieldCheck className="text-emerald-500 shrink-0" size={20} />
                            <div>
-                              <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Verification Code</p>
-                              <p className="text-base font-bold text-emerald-900">Status: Verified</p>
+                              <p className="text-[9px] font-medium text-emerald-600 uppercase tracking-wider">Status</p>
+                              <p className="text-sm font-bold text-emerald-900">Verified</p>
                            </div>
                         </motion.div>
                         
                         <motion.button 
-                          initial={{ y: 20, opacity: 0 }}
+                          initial={{ y: 10, opacity: 0 }}
                           animate={{ y: 0, opacity: 1 }}
-                          transition={{ delay: 0.6 }}
+                          transition={{ delay: 0.5 }}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={onVerify}
-                          className="w-full h-18 bg-[#0b0e14] text-white rounded-[25px] font-bold uppercase text-sm tracking-[0.2em] shadow-2xl hover:bg-primary transition-all flex items-center justify-center gap-3"
+                          className="w-full h-12 bg-[#0b0e14] text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2"
                         >
-                           Continue <ArrowRight size={20} />
+                           Continue <ArrowRight size={16} />
                         </motion.button>
                     </motion.div>
                   )}

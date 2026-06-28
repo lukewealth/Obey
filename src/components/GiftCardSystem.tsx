@@ -190,7 +190,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
              <div>
                 <h2 className="text-2xl md:text-4xl font-black text-gray-900 tracking-tight uppercase italic">Asset Terminal</h2>
                 <div className="flex items-center justify-center md:justify-start gap-3 mt-1">
-                   <p className="text-xs md:text-sm text-gray-400 font-medium">Trade global nodes with institutional depth.</p>
+                    <p className="text-xs md:text-sm text-gray-400 font-medium">Buy and sell gift cards easily.</p>
                    <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase shadow-sm">
                       <Clock size={10} className="animate-pulse" /> Sync: {lastSync.toLocaleTimeString()}
                    </div>
@@ -202,9 +202,9 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
         
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[
-            { id: GiftCardTab.BUY, label: "Platform Buy", icon: ArrowDownLeft },
-            { id: GiftCardTab.SELL, label: "Platform Sell", icon: ArrowUpRight },
-            { id: 'P2P', label: "P2P Marketplace", icon: ShoppingCart }
+            { id: GiftCardTab.BUY, label: "Buy", icon: ArrowDownLeft },
+            { id: GiftCardTab.SELL, label: "Sell", icon: ArrowUpRight },
+            { id: 'P2P', label: "Marketplace", icon: ShoppingCart }
           ].map((tab) => (
             <button
               key={tab.id}
