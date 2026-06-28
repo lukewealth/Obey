@@ -25,6 +25,8 @@ import PuppyLoading from "./components/PuppyLoading";
 import AIChatAssistant from "./components/AIChatAssistant";
 import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
 import SecuredPortal from "./components/SecuredPortal";
+import AIPage from "./components/AIPage";
+import AssetDetail from "./components/AssetDetail";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -547,8 +549,8 @@ export default function App() {
                 {[
                   { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
                   { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
-                  { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                   { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
+                  { tab: AppTab.AI, label: "AI", icon: BrainIcon },
                   { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
                   { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
                 ].map((item) => {
@@ -718,6 +720,19 @@ export default function App() {
                       </div>
                     )}
 
+                    {activeTab === AppTab.AI && (
+                      <AIPage
+                        profile={profile}
+                        transactions={cachedTransactions}
+                        prices={{
+                          BTC: btcPrice,
+                          ETH: ethPrice,
+                          SOL: solPrice,
+                          SUI: suiPrice
+                        }}
+                      />
+                    )}
+
                     {activeTab === AppTab.SERVICES && (
                       <AirtimeModule 
                         profile={profile} 
@@ -754,7 +769,7 @@ export default function App() {
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
               { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
               { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
-              { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
+              { tab: AppTab.AI, label: "AI", icon: BrainIcon },
               { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
             ].map((item) => (
               <button 

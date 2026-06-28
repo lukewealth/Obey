@@ -298,7 +298,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             Online
           </motion.div>
           <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
-            Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {profile.name.split(" ")[0]}
+            Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {profile.name.split(" ")[0]} 👋
           </h1>
         </div>
 
@@ -344,6 +344,50 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           >
             <Cloud size={18} className="text-gray-400" />
           </motion.button>
+        </div>
+      </motion.div>
+
+      {/* AI Greeting Card */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl p-6 bg-gradient-to-br from-purple-500/10 via-blue-500/10 to-emerald-500/10 border border-purple-500/20 relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl opacity-30" />
+        <div className="relative z-10">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center flex-shrink-0">
+              <Brain size={24} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-lg font-bold text-white">Obey AI</h3>
+                <motion.div
+                  animate={{ opacity: [1, 0.4, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="w-2 h-2 bg-purple-400 rounded-full"
+                />
+              </div>
+              <p className="text-sm text-gray-300 leading-relaxed">
+                Your portfolio gained <span className="text-emerald-400 font-semibold">+4.2%</span> overnight. 
+                Bitcoin has broken above resistance. Based on your spending habits, 
+                you can save <span className="text-purple-400 font-semibold">₦24,000</span> this month.
+              </p>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() => onNavigateTab(AppTab.AI)}
+                  className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/30 text-purple-300 text-sm font-medium hover:bg-purple-500/30 transition-colors"
+                >
+                  View Analysis
+                </button>
+                <button
+                  onClick={() => onNavigateTab(AppTab.TRADE)}
+                  className="px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white text-sm font-medium hover:bg-white/20 transition-colors"
+                >
+                  Invest
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
 
