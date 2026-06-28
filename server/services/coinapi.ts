@@ -129,8 +129,8 @@ export const getSymbols = async (filter_asset_id: string = 'BTC') => {
  */
 export const getHistoricalData = async (symbol: string, period: string = '1DAY', limit: number = 30) => {
   try {
-    const response = await coinApi.get(`/ohlcv/${symbol}/latest?period_id=${period}&limit=${limit}`);
-    return response.data;
+    const response = await coinApi.get(`/ohlcv/${symbol}/history?period_id=${period}&limit=${limit}`);
+    return response.data || [];
   } catch (error) {
     console.error(`[CoinAPI_ERROR] Failed to fetch history for ${symbol}:`, (error as any).message);
     return [];

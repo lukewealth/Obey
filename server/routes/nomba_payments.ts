@@ -161,19 +161,31 @@ router.get('/virtual-accounts', async (req: Request, res: Response) => {
     const { userId } = req.query;
     if (!userId) return res.status(400).json({ error: 'userId required' });
 
-    const accounts = await VirtualAccount.find({ userId, isActive: true } as any);
-    res.json({ accounts });
+    try {
+      const accounts = await VirtualAccount.find({ userId, isActive: true } as any);
+      res.json({ accounts });
+    } catch (dbError: any) {
+      console.error('[VIRTUAL_ACCOUNTS] DB error:', dbError.message);
+      res.json({ accounts: [] });
+    }
   } catch (error: any) {
-    res.status(500).json({ error: 'Failed to fetch virtual accounts' });
+    console.error('[VIRTUAL_ACCOUNTS] Error:', error.message);
+    res.json({ accounts: [] });
   }
 });
 
 router.get('/banks', async (req: Request, res: Response) => {
   try {
+    if (!process.env.NOMBA_BASE_URL || !process.env.NOMBA_CLIENT_ID) {
+      console.warn('[BANKS] Nomba env vars not configured, returning empty list');
+      return res.json({ banks: [] });
+    }
+
     const banks = await nomba.fetchBankCodes();
     res.json({ banks });
   } catch (error: any) {
-    res.status(500).json({ error: 'Failed to fetch banks' });
+    console.error('[BANKS] Error:', error.message);
+    res.json({ banks: [] });
   }
 });
 

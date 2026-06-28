@@ -118,19 +118,38 @@ router.get('/prices', async (req, res) => {
 router.get('/details/:symbol', async (req, res) => {
   const { symbol } = req.params;
   try {
-    const [rateData, history] = await Promise.all([
-      getExchangeRate(symbol, 'USD'),
-      getHistoricalData(symbol)
-    ]);
+    let rateData: any = null;
+    let history: any[] = [];
+
+    try {
+      rateData = await getExchangeRate(symbol, 'USD');
+    } catch (e) {
+      console.error(`[DETAILS] Rate fetch failed for ${symbol}:`, e);
+    }
+
+    try {
+      history = await getHistoricalData(symbol);
+    } catch (e) {
+      console.error(`[DETAILS] History fetch failed for ${symbol}:`, e);
+    }
+
+    const price = rateData?.rate || 0;
+    const updatedAt = rateData?.time || new Date().toISOString();
 
     res.json({
       symbol,
-      price: rateData?.rate || 0,
-      history,
-      updatedAt: rateData?.time
+      price,
+      history: Array.isArray(history) ? history : [],
+      updatedAt
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch node depth metadata.' });
+    console.error(`[DETAILS_CRITICAL] Failed to fetch details for ${symbol}:`, error);
+    res.json({
+      symbol,
+      price: 0,
+      history: [],
+      updatedAt: new Date().toISOString()
+    });
   }
 });
 

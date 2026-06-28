@@ -34,8 +34,9 @@ router.get('/market', async (req, res) => {
   try {
     const listings = await CryptoListing.find({ status: 'OPEN' } as any).sort({ createdAt: -1 });
     res.json(listings);
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch crypto nodes.' });
+  } catch (error: any) {
+    console.error('[CRYPTO_MARKET] DB error:', error.message);
+    res.json([]);
   }
 });
 
