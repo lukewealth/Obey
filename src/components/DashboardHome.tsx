@@ -6,7 +6,7 @@ import {
   Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
   CreditCard, Bell, Sparkles, TrendingUp, Search,
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
-  Wifi, BarChart3
+  Wifi, BarChart3, ArrowLeftRight, QrCode
 } from "lucide-react";
 import { motionVariants } from "../styles/design-tokens";
 
@@ -95,26 +95,22 @@ const ActionButton = ({
 const QuickActionCard = ({ 
   icon: Icon, 
   label, 
-  description, 
   onClick, 
-  color,
   delay = 0 
 }: { 
   icon: any; 
   label: string; 
-  description: string; 
   onClick: () => void; 
-  color: string;
   delay?: number;
 }) => (
   <motion.button
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4, type: 'spring', stiffness: 200, damping: 20 }}
-    whileHover={{ scale: 1.03, y: -4 }}
-    whileTap={{ scale: 0.97 }}
+    whileHover={{ scale: 1.05, y: -2 }}
+    whileTap={{ scale: 0.95 }}
     onClick={onClick}
-    className="relative overflow-hidden rounded-2xl p-5 text-left group transition-all duration-300"
+    className="flex flex-col items-center gap-3 p-4 rounded-2xl transition-all duration-200 group"
     style={{
       background: 'rgba(255, 255, 255, 0.04)',
       backdropFilter: 'blur(12px)',
@@ -122,21 +118,10 @@ const QuickActionCard = ({
       border: '1px solid rgba(255, 255, 255, 0.08)',
     }}
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-    
-    <div className="relative z-10">
-      <motion.div
-        whileHover={{ rotate: [0, -5, 5, 0] }}
-        transition={{ duration: 0.4 }}
-        className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
-      >
-        <Icon size={22} className="text-white" />
-      </motion.div>
-      <h4 className="font-bold text-white text-base mb-1 tracking-tight">{label}</h4>
-      <p className="text-xs text-gray-400 font-medium">{description}</p>
+    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-200">
+      <Icon size={20} />
     </div>
-    
-    <ChevronRight size={16} className="absolute top-5 right-5 text-gray-500 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+    <span className="text-xs font-medium text-gray-400 group-hover:text-white transition-colors">{label}</span>
   </motion.button>
 );
 
@@ -163,8 +148,9 @@ const TransactionRow = ({ tx, index }: { tx: Transaction; index: number }) => {
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
       whileHover={{ x: 4 }}
-      className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 cursor-pointer group"
+      className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 cursor-pointer group relative pl-6"
     >
+      <div className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full ${isCredit ? 'bg-emerald-500' : 'bg-primary'}`} />
       <div className="flex items-center gap-4">
         <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
           isCredit ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-gray-400'
@@ -209,6 +195,10 @@ const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
 }) => {
   const isPositive = change.startsWith("+");
   
+  const sparklineData = isPositive 
+    ? "M0 15 L10 12 L20 18 L30 10 L40 14 L50 8 L60 12 L70 5 L80 9 L90 2 L100 6"
+    : "M0 5 L10 8 L20 4 L30 12 L40 8 L50 15 L60 10 L70 18 L80 14 L90 20 L100 16";
+  
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
@@ -222,7 +212,7 @@ const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
         <motion.div
           whileHover={{ rotate: [0, -10, 10, 0] }}
           transition={{ duration: 0.3 }}
-          className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md`}
+          className={`w-10 h-10 rounded-full ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md`}
         >
           <Icon size={18} className="text-white" fill={symbol === "BTC" ? "currentColor" : "none"} />
         </motion.div>
@@ -230,6 +220,12 @@ const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
           <p className="font-semibold text-white text-sm">{name}</p>
           <p className="text-xs text-gray-500">{symbol}</p>
         </div>
+      </div>
+      
+      <div className="flex-1 px-4 hidden sm:block">
+        <svg className={`w-full h-8 ${isPositive ? 'text-emerald-500' : 'text-red-500'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 100 20">
+          <path d={sparklineData} strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </div>
       
       <div className="text-right">
@@ -361,8 +357,8 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
 
           <div className="mb-6">
             <div className="flex items-baseline gap-2">
-              <span className="text-gray-400 text-lg font-medium">₦</span>
-              <span className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+              <span className="text-gray-400 text-lg font-mono font-medium">₦</span>
+              <span className="text-4xl md:text-5xl font-bold text-white tracking-tight font-mono">
                 {hideBalance ? "••••••" : <AnimatedNumber value={profile.balance} />}
               </span>
               <span className="text-gray-400 text-sm font-medium ml-1">NGN</span>
@@ -385,37 +381,29 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       </motion.div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 gap-3">
         <QuickActionCard
-          icon={Smartphone}
-          label="Airtime"
-          description="Top up instantly"
-          onClick={() => onSelectAction("buy-airtime")}
-          color="bg-gradient-to-br from-blue-500 to-cyan-500"
+          icon={Send}
+          label="Send"
+          onClick={() => onSelectAction("transfer")}
           delay={0.1}
         />
         <QuickActionCard
-          icon={Wifi}
-          label="Data"
-          description="Stay connected"
-          onClick={() => onSelectAction("buy-data")}
-          color="bg-gradient-to-br from-amber-500 to-orange-500"
+          icon={ArrowLeftRight}
+          label="Swap"
+          onClick={() => onNavigateTab(AppTab.TRADE)}
           delay={0.2}
+        />
+        <QuickActionCard
+          icon={Smartphone}
+          label="Airtime"
+          onClick={() => onSelectAction("buy-airtime")}
+          delay={0.3}
         />
         <QuickActionCard
           icon={Gift}
           label="Gift Cards"
-          description="Buy & sell"
           onClick={() => onSelectAction("buy-giftcard")}
-          color="bg-gradient-to-br from-purple-500 to-pink-500"
-          delay={0.3}
-        />
-        <QuickActionCard
-          icon={BarChart3}
-          label="Crypto"
-          description="Live prices"
-          onClick={() => onNavigateTab(AppTab.TRADE)}
-          color="bg-gradient-to-br from-emerald-500 to-teal-500"
           delay={0.4}
         />
       </div>
