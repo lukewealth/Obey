@@ -62,8 +62,10 @@ const MobileAppMockup = () => (
 
     <div className="flex justify-between items-center text-[#0b0e14] dark:text-white">
        <div className="flex items-center gap-2 md:gap-3">
-          <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl md:rounded-2xl bg-[#0b0e14] dark:bg-primary flex items-center justify-center text-white font-black text-[10px] md:text-xs">O</div>
-          <span className="text-[11px] md:text-[13px] font-black uppercase tracking-widest">Obey</span>
+           <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center shadow-sm">
+              <span className="text-white font-black text-xs">O</span>
+           </div>
+           <span className="text-[11px] md:text-[13px] font-bold tracking-tight">Obey</span>
        </div>
        <div className="flex items-center gap-2 md:gap-3">
           <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center">
@@ -218,10 +220,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="flex items-center gap-2 md:gap-3 cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            <div className="w-8 h-8 md:w-9 md:h-9 bg-[#0b0e14] dark:bg-primary flex items-center justify-center rounded-[8px] md:rounded-[10px] group-hover:rotate-[10deg] transition-transform shadow-lg overflow-hidden shrink-0">
-              <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
+            <div className="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl group-hover:rotate-[10deg] transition-transform shadow-sm shrink-0">
+              <span className="text-white font-black text-xs">O</span>
             </div>
-            <span className="text-lg md:text-2xl font-black tracking-tighter text-[#0b0e14] dark:text-white font-space uppercase">OBEY</span>
+            <span className="text-lg md:text-2xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
           </div>
 
           <nav className="hidden lg:flex items-center gap-10">
@@ -271,7 +273,12 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="fixed inset-0 z-[60] bg-white dark:bg-[#121212] p-6 md:p-8 flex flex-col font-inter overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-12 md:mb-16">
-              <span className="text-xl md:text-2xl font-black tracking-tighter font-space uppercase">OBEY</span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl">
+                  <span className="text-white font-black text-xs">O</span>
+                </div>
+                <span className="text-lg font-bold tracking-tight">Obey</span>
+              </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2"><XIcon className="w-8 h-8" /></button>
             </div>
             <nav className="space-y-8 md:space-y-10 text-center flex-grow flex flex-col justify-center">
@@ -558,100 +565,100 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
            {/* Pervasive Grey Fadeout Effect */}
            <div className="absolute inset-0 bg-gradient-to-b from-gray-50/50 via-transparent to-gray-50/50 dark:from-black/10 dark:via-transparent dark:to-black/10 pointer-events-none z-0"></div>
 
-           {/* Walking Animations Container */}
-           <motion.div 
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ amount: 0.3, margin: "-100px" }}
-              transition={{ duration: 1.5 }}
-              className="max-w-[1400px] mx-auto relative h-[450px] md:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
-           >
-              {/* The Line - Centered Vertically */}
-              <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
+            {/* Walking Animations Container */}
+            <motion.div 
+               initial={{ opacity: 0 }}
+               whileInView={{ opacity: 1 }}
+               viewport={{ amount: 0.3, margin: "-100px" }}
+               transition={{ duration: 1.5 }}
+               className="max-w-[1400px] mx-auto relative h-[350px] md:h-[500px] lg:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
+            >
+               {/* The Line - Centered Vertically */}
+               <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
 
-              {/* Tree Animation - Moving Left to Right */}
-              <motion.div
-                animate={{ 
-                  x: ["-120%", "120%"],
-                  opacity: [0, 1, 1, 0]
-                }}
-                transition={{ 
-                  duration: 25,
-                  times: [0, 0.1, 0.9, 1],
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-0 -translate-y-1/2 z-10"
-              >
-                <DotLottieReact
-                  src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
-                  loop
-                  autoplay
-                />
-              </motion.div>
+               {/* Tree Animation - Moving Left to Right */}
+               <motion.div
+                 animate={{ 
+                   x: ["-120%", "120%"],
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.9, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 left-0 -translate-y-1/2 z-10"
+               >
+                 <DotLottieReact
+                   src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
+                   loop
+                   autoplay
+                 />
+               </motion.div>
 
-              {/* Original Cat Animation - Restored Motion from Extreme Edges */}
-              <motion.div
-                animate={{ 
-                  x: ["120%", "-120%"],
-                  opacity: [0, 1, 1, 0]
-                }}
-                transition={{ 
-                  duration: 25,
-                  repeat: Infinity,
-                  ease: "linear" 
-                }}
-                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 right-0 -translate-y-1/2 z-10"
-              >
-                <DotLottieReact
-                  src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
-                  loop
-                  autoplay
-                  style={{ transform: 'scaleX(1)' }}
-                />
-              </motion.div>
+               {/* Cat Walking Right to Left - Same size as seated cat */}
+               <motion.div
+                 animate={{ 
+                   x: ["120%", "-120%"],
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   repeat: Infinity,
+                   ease: "linear" 
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 right-0 -translate-y-1/2 z-10"
+               >
+                 <DotLottieReact
+                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
+                   loop
+                   autoplay
+                   style={{ transform: 'scaleX(1)' }}
+                 />
+               </motion.div>
 
-              {/* New Cat Animation - Seated at middle center center */}
-              <motion.div
-                animate={{ 
-                  opacity: [0, 1, 1, 0]
-                }}
-                transition={{ 
-                  duration: 25,
-                  times: [0, 0.1, 0.8, 1],
-                  repeat: Infinity,
-                  ease: "linear" 
-                }}
-                className="w-48 h-48 md:w-64 md:h-64 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
-              >
-                <DotLottieReact
-                  src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
-                  loop
-                  autoplay
-                />
-              </motion.div>
+               {/* Cat Seated in Middle - Same size as walking cat */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.8, 1],
+                   repeat: Infinity,
+                   ease: "linear" 
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+               >
+                 <DotLottieReact
+                   src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
+                   loop
+                   autoplay
+                 />
+               </motion.div>
 
-              {/* Tree Animation - Background node */}
-              <motion.div
-                animate={{ 
-                  opacity: [0, 0.15, 0.15, 0]
-                }}
-                transition={{ 
-                  duration: 18,
-                  times: [0, 0.1, 0.83, 1],
-                  repeat: Infinity,
-                  ease: "linear"
-                }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[95%] z-0 filter grayscale opacity-20 pointer-events-none"
-              >
-                <DotLottieReact 
-                  src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
-                  style={{ width: '300px', height: '300px' }} 
-                  autoplay 
-                  loop 
-                />
-              </motion.div>
-           </motion.div>
+               {/* Birds/Tree Animation - 2X above the tree line */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 0.15, 0.15, 0]
+                 }}
+                 transition={{ 
+                   duration: 18,
+                   times: [0, 0.1, 0.83, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[200%] sm:-translate-y-[180%] md:-translate-y-[160%] z-0 filter grayscale opacity-20 pointer-events-none"
+               >
+                 <DotLottieReact 
+                   src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
+                   style={{ width: '200px', height: '200px' }} 
+                   autoplay 
+                   loop 
+                 />
+               </motion.div>
+            </motion.div>
 
            <motion.div 
             initial={{ opacity: 0, y: 30 }}
