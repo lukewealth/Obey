@@ -1,16 +1,20 @@
 import express from 'express';
 import { getExchangeRate, getAllAssets, getSymbols, getHistoricalData } from '../services/coinapi';
+import { fetchCryptoPrice, fetchMultiplePrices, getCachedPrices, clearCache } from '../services/multiCryptoFetcher';
 
 const router = express.Router();
 
-// Cache prices to avoid hitting CoinAPI limits too fast
-let priceCache: Record<string, { price: number, timestamp: number }> = {};
+// Cache for assets
 let assetsCache: { data: any[], timestamp: number } | null = null;
+const ASSETS_TTL = 1000 * 60 * 60 * 24; // 24 hours
 
-const PRICE_TTL = 1000 * 60 * 5; // 5 minutes
-const ASSETS_TTL = 1000 * 60 * 60 * 24; // 24 hours (Asset list doesn't change often)
+// NGN conversion rate (approximate)
+const NGN_RATE = 1600;
 
-// Get Top Assets (Filtered for UI performance)
+/**
+ * GET /api/market/assets
+ * Get top crypto assets with metadata
+ */
 router.get('/assets', async (req, res) => {
   try {
     if (assetsCache && (Date.now() - assetsCache.timestamp < ASSETS_TTL)) {
@@ -18,7 +22,6 @@ router.get('/assets', async (req, res) => {
     }
 
     const allAssets = await getAllAssets();
-    // Filter for assets with a price and notable popularity (example filter)
     const topAssets = allAssets
       .filter((a: any) => a.price_usd && (a.volume_1day_usd > 1000000 || a.type_is_crypto === 1))
       .sort((a: any, b: any) => b.volume_1day_usd - a.volume_1day_usd);
@@ -30,7 +33,10 @@ router.get('/assets', async (req, res) => {
   }
 });
 
-// Search Assets
+/**
+ * GET /api/market/search?q=QUERY
+ * Search for crypto assets
+ */
 router.get('/search', async (req, res) => {
   const query = (req.query.q as string || '').toUpperCase();
   if (!query) return res.json([]);
@@ -52,6 +58,10 @@ router.get('/search', async (req, res) => {
   }
 });
 
+/**
+ * GET /api/market/prices?symbols=BTC,ETH,SOL,SUI
+ * Get live prices for multiple symbols using multi-source fetcher
+ */
 router.get('/prices', async (req, res) => {
   let symbolsArg = req.query.symbols;
   let symbols: string[] = [];
@@ -64,41 +74,27 @@ router.get('/prices', async (req, res) => {
     symbols = ['BTC', 'ETH', 'SOL', 'SUI'];
   }
 
-  const results: Record<string, number> = {};
-
   try {
-    console.log(`[MARKET_NODE] Synchronizing prices for: ${symbols.join(', ')}`);
+    console.log(`[MARKET_NODE] Fetching live prices for: ${symbols.join(', ')}`);
     
-    // Parallelize price fetching to respect Vercel's 10s execution limit
-    await Promise.all(symbols.map(async (symbol) => {
-      const cached = priceCache[symbol];
-      if (cached && (Date.now() - cached.timestamp < PRICE_TTL)) {
-        results[symbol] = cached.price;
-      } else {
-        try {
-          const data = await getExchangeRate(symbol, 'USD');
-          if (data && data.rate) {
-            results[symbol] = data.rate;
-            priceCache[symbol] = { price: data.rate, timestamp: Date.now() };
-          } else if (cached) {
-            // Fallback to expired cache if we can't get new data
-            results[symbol] = cached.price;
-          }
-        } catch (e) {
-          console.error(`[MARKET_NODE] Individual symbol sync failed: ${symbol}`, e);
-          if (cached) results[symbol] = cached.price;
-        }
+    // Use multi-source fetcher
+    const prices = await fetchMultiplePrices(symbols);
+    
+    // Convert to simple price map (USD)
+    const results: Record<string, number> = {};
+    for (const symbol of symbols) {
+      if (prices[symbol]) {
+        results[symbol] = prices[symbol].price;
       }
-    }));
-    
-    // Institutional Pegs: Final safety layer for prototype stability
+    }
+
+    // Fallback to simulated prices if any are missing
     const simulatedPegs: Record<string, number> = {
-      'BTC': 95000000 / 1600,
-      'ETH': 5000000 / 1600,
-      'SOL': 250000 / 1600,
-      'SUI': 5000 / 1600,
+      'BTC': 67000,
+      'ETH': 3500,
+      'SOL': 145,
+      'SUI': 1.8,
       'USDT': 1,
-      'NGN': 1/1600
     };
 
     for (const symbol of symbols) {
@@ -114,31 +110,84 @@ router.get('/prices', async (req, res) => {
   }
 });
 
-// Get Metadata and Historical Data for a specific symbol
+/**
+ * GET /api/market/prices-ngn?symbols=BTC,ETH,SOL,SUI
+ * Get live prices in NGN
+ */
+router.get('/prices-ngn', async (req, res) => {
+  let symbolsArg = req.query.symbols;
+  let symbols: string[] = [];
+
+  if (Array.isArray(symbolsArg)) {
+    symbols = symbolsArg.map(s => String(s));
+  } else if (typeof symbolsArg === 'string') {
+    symbols = symbolsArg.split(',');
+  } else {
+    symbols = ['BTC', 'ETH', 'SOL', 'SUI'];
+  }
+
+  try {
+    const prices = await fetchMultiplePrices(symbols);
+    
+    const results: Record<string, number> = {};
+    for (const symbol of symbols) {
+      if (prices[symbol]) {
+        results[symbol] = prices[symbol].price * NGN_RATE;
+      }
+    }
+
+    // Fallback
+    const simulatedPegs: Record<string, number> = {
+      'BTC': 67000 * NGN_RATE,
+      'ETH': 3500 * NGN_RATE,
+      'SOL': 145 * NGN_RATE,
+      'SUI': 1.8 * NGN_RATE,
+    };
+
+    for (const symbol of symbols) {
+      if (!(symbol in results) && simulatedPegs[symbol]) {
+        results[symbol] = simulatedPegs[symbol];
+      }
+    }
+
+    res.json(results);
+  } catch (error) {
+    console.error('[MARKET_NODE_CRITICAL] NGN price sync failure:', error);
+    res.status(500).json({ error: 'Failed to synchronize live price nodes.' });
+  }
+});
+
+/**
+ * GET /api/market/details/:symbol
+ * Get detailed info for a specific symbol including live price
+ */
 router.get('/details/:symbol', async (req, res) => {
   const { symbol } = req.params;
   try {
-    let rateData: any = null;
+    // Fetch live price from multi-source
+    const livePrice = await fetchCryptoPrice(symbol);
+    
+    // Fetch historical data
     let history: any[] = [];
-
-    try {
-      rateData = await getExchangeRate(symbol, 'USD');
-    } catch (e) {
-      console.error(`[DETAILS] Rate fetch failed for ${symbol}:`, e);
-    }
-
     try {
       history = await getHistoricalData(symbol);
     } catch (e) {
       console.error(`[DETAILS] History fetch failed for ${symbol}:`, e);
     }
 
-    const price = rateData?.rate || 0;
-    const updatedAt = rateData?.time || new Date().toISOString();
+    const price = livePrice?.price || 0;
+    const change24h = livePrice?.change24h || 0;
+    const volume24h = livePrice?.volume24h || 0;
+    const source = livePrice?.source || 'unknown';
+    const updatedAt = new Date(livePrice?.timestamp || Date.now()).toISOString();
 
     res.json({
       symbol,
       price,
+      priceNGN: price * NGN_RATE,
+      change24h,
+      volume24h,
+      source,
       history: Array.isArray(history) ? history : [],
       updatedAt
     });
@@ -147,10 +196,44 @@ router.get('/details/:symbol', async (req, res) => {
     res.json({
       symbol,
       price: 0,
+      priceNGN: 0,
+      change24h: 0,
+      volume24h: 0,
+      source: 'error',
       history: [],
       updatedAt: new Date().toISOString()
     });
   }
+});
+
+/**
+ * GET /api/market/cache
+ * Get current cache state (for debugging)
+ */
+router.get('/cache', (req, res) => {
+  const cache = getCachedPrices();
+  res.json({
+    cachedSymbols: Object.keys(cache),
+    cacheAge: Object.fromEntries(
+      Object.entries(cache).map(([symbol, data]) => [
+        symbol,
+        {
+          price: data.price,
+          source: data.source,
+          age: Date.now() - data.timestamp,
+        }
+      ])
+    ),
+  });
+});
+
+/**
+ * POST /api/market/cache/clear
+ * Clear the price cache
+ */
+router.post('/cache/clear', (req, res) => {
+  clearCache();
+  res.json({ success: true, message: 'Cache cleared' });
 });
 
 export default router;

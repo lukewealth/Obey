@@ -549,7 +549,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         </motion.div>
       </div>
 
-      {/* Asset Performance - Enhanced Real-time View */}
+      {/* Asset Performance - Mobile-style Vertical Cards */}
       <motion.div
         variants={itemVariants}
         className="rounded-2xl p-5"
@@ -575,7 +575,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[
             { name: "Bitcoin", symbol: "BTC", price: prices.BTC, change: "+2.4%", icon: Star, color: "from-amber-500 to-orange-600" },
             { name: "Ethereum", symbol: "ETH", price: prices.ETH, change: "-0.8%", icon: Zap, color: "from-blue-500 to-indigo-600" },
@@ -588,7 +588,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               className="relative p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-primary/30 transition-all duration-200 cursor-pointer group overflow-hidden"
+              onClick={() => onNavigateTab(AppTab.TRADE)}
             >
               <div className="flex items-center justify-between mb-3">
                 <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${asset.color} flex items-center justify-center shadow-md`}>

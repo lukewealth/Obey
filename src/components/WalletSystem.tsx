@@ -310,106 +310,127 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-start"
           >
             <div className="lg:col-span-8 space-y-6 md:space-y-8">
-              <div className="bento-card p-6 md:p-12 min-h-[300px] md:min-h-[320px] flex flex-col justify-between relative overflow-hidden group">
-                <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/40 rounded-full blur-[60px] md:blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-[2s]"></div>
-
-                <div className="space-y-4 md:space-y-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center shadow-inner">
-                      <Wallet size={20} className="md:w-6 md:h-6" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Your Balance</p>
-                      <p className="text-xs md:text-sm font-bold text-gray-900">Available Funds</p>
+              {/* Balance Card - Apple Style */}
+              <div className="relative overflow-hidden rounded-3xl p-6 md:p-8"
+                style={{
+                  background: 'linear-gradient(135deg, #0b0e14 0%, #1a1f2e 100%)',
+                  boxShadow: '0 20px 60px -10px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl opacity-50" />
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl opacity-50" />
+                
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                        <Wallet size={24} className="text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-400 font-medium">Your Balance</p>
+                        <p className="text-sm text-white font-semibold">Available Funds</p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-baseline gap-2 md:gap-4 overflow-hidden">
-                    <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-none truncate">
-                      ₦{profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                    <span className="text-lg md:text-2xl text-gray-400 font-bold font-mono shrink-0 uppercase tracking-widest">NGN</span>
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-gray-400 text-lg font-mono">₦</span>
+                      <span className="text-4xl md:text-5xl font-bold text-white tracking-tight font-mono">
+                        {profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </span>
+                      <span className="text-gray-400 text-sm font-medium ml-1">NGN</span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-3 gap-3 md:gap-6 mt-8 md:mt-12">
-                   {[
-                    { id: "fund", label: "Fund", icon: ArrowDownLeft, bg: "bg-primary text-white shadow-primary/20" },
-                    { id: "withdraw", label: "Cashout", icon: ArrowUpRight, bg: "bg-accent-blue text-primary border border-blue-200/50 shadow-blue-500/10" },
-                    { id: "transfer", label: "Send", icon: Send, bg: "bg-white text-gray-700 border border-gray-200 shadow-gray-200/50" }
-                   ].map((btn) => (
-                     <button
-                       key={btn.id}
-                       onClick={() => setActiveSubState(btn.id as any)}
-                       className={`${btn.bg} py-4 md:py-5 px-2 md:px-4 rounded-[16px] md:rounded-[22px] text-[11px] md:text-sm font-black flex items-center justify-center gap-2 md:gap-3 active-scale transition-all shadow-lg hover:-translate-y-1 hover:shadow-xl`}
-                     >
-                       <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
-                     </button>
-                   ))}
+                  <div className="grid grid-cols-3 gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setActiveSubState("fund")}
+                      className="bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all"
+                    >
+                      <ArrowDownLeft size={18} />
+                      <span>Add Money</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setActiveSubState("withdraw")}
+                      className="bg-white/10 hover:bg-white/20 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all border border-white/10"
+                    >
+                      <ArrowUpRight size={18} />
+                      <span>Withdraw</span>
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => setActiveSubState("transfer")}
+                      className="bg-white/10 hover:bg-white/20 text-white py-3 px-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all border border-white/10"
+                    >
+                      <Send size={18} />
+                      <span>Transfer</span>
+                    </motion.button>
+                  </div>
                 </div>
               </div>
 
-              <div className="bento-card p-6 md:p-10 space-y-8 md:space-y-10 relative overflow-hidden group">
-                 <div className="absolute -top-12 -right-12 w-64 h-64 bg-accent-yellow/30 rounded-full blur-[80px]"></div>
-
-                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 md:w-14 md:h-14 bg-gray-50 rounded-[18px] md:rounded-[22px] flex items-center justify-center text-gray-400 border border-gray-100 group-hover:border-primary/20 group-hover:text-primary transition-all shrink-0 shadow-sm">
-                        <Building size={24} className="md:w-7 md:h-7" />
-                      </div>
-                      <div>
-                         <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Bank Account</h3>
-                         <p className="text-xs md:text-sm text-gray-400 font-medium">Receive money from your bank</p>
-                      </div>
+              {/* Bank Account Card */}
+              <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                      <Building size={20} className="text-blue-600 dark:text-blue-400" />
                     </div>
-                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 self-start sm:self-auto shadow-sm">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        Active
-                     </div>
-                 </div>
-
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 relative z-10">
-                    <div className="p-5 md:p-6 bg-gray-50/50 rounded-[20px] md:rounded-[24px] border border-gray-100 space-y-2 shadow-inner group/bank">
-                       <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Clearing Bank</p>
-                       <p className="text-base md:text-lg font-black text-gray-900 group-hover/bank:text-primary transition-colors">
-                          {virtualAccount?.bankName || "OBEY Bank"}
-                       </p>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white">Bank Account</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Receive money from your bank</p>
                     </div>
-                    <div className="p-5 md:p-6 bg-accent-blue/40 rounded-[20px] md:rounded-[24px] border border-blue-100 space-y-2 group/acc shadow-inner">
-                       <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Account Number</p>
-                       <div className="flex items-center justify-between">
-                          <p className="text-xl md:text-2xl font-mono font-black text-primary tracking-widest leading-none pt-1">
-                            {virtualAccount?.accountNumber || "8829104422"}
-                          </p>
-                          <button
-                            onClick={triggerCopyAccount}
-                            className="w-9 h-9 md:w-10 md:h-10 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center text-primary active-press shrink-0"
-                          >
-                            {copiedText ? <Check size={16} className="text-emerald-500 md:w-5 md:h-5" /> : <Copy size={16} className="md:w-5 md:h-5" />}
-                          </button>
-                       </div>
-                    </div>
-                 </div>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-xs font-medium">
+                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                    Active
+                  </div>
+                </div>
 
-                 {virtualAccount?.accountName && (
-                   <div className="p-4 md:p-5 bg-white/40 backdrop-blur-md rounded-[20px] md:rounded-[24px] border border-white flex items-center gap-4 md:gap-5 shadow-sm">
-                      <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 text-primary rounded-[14px] md:rounded-[22px] flex items-center justify-center shrink-0 shadow-inner">
-                         <UserCheck size={20} className="md:w-6 md:h-6" />
-                      </div>
-                      <p className="text-[11px] md:text-xs text-gray-700 font-bold">
-                         Account Name: <span className="text-primary font-black">{virtualAccount.accountName}</span>
-                      </p>
-                   </div>
-                 )}
-
-                 <div className="p-4 md:p-5 bg-white/40 backdrop-blur-md rounded-[20px] md:rounded-[24px] border border-white flex items-center gap-4 md:gap-5 shadow-sm">
-                    <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-100 text-emerald-600 rounded-[14px] md:rounded-[22px] flex items-center justify-center shrink-0 shadow-inner">
-                       <ShieldCheck size={20} className="md:w-6 md:h-6" />
-                    </div>
-                    <p className="text-[11px] md:text-xs text-gray-500 font-medium leading-relaxed">
-                       All inbound transfers to this node are instantly credited to your treasury. Settlement is verified on the <span className="text-primary font-black uppercase">OBEY Sentinel Mesh</span>.
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Clearing Bank</p>
+                    <p className="text-base font-bold text-gray-900 dark:text-white">
+                      {virtualAccount?.bankName || "OBEY Bank"}
                     </p>
-                 </div>
+                  </div>
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Account Number</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-xl font-mono font-bold text-blue-600 dark:text-blue-400">
+                        {virtualAccount?.accountNumber || "8829104422"}
+                      </p>
+                      <button
+                        onClick={triggerCopyAccount}
+                        className="w-8 h-8 rounded-lg bg-white dark:bg-gray-700 flex items-center justify-center text-blue-600 dark:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                      >
+                        {copiedText ? <Check size={16} className="text-emerald-500" /> : <Copy size={16} />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {virtualAccount?.accountName && (
+                  <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl mb-4 flex items-center gap-3">
+                    <UserCheck size={20} className="text-blue-600 dark:text-blue-400" />
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      Account Name: <span className="font-bold text-blue-600 dark:text-blue-400">{virtualAccount.accountName}</span>
+                    </p>
+                  </div>
+                )}
+
+                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl flex items-center gap-3">
+                  <ShieldCheck size={20} className="text-emerald-600 dark:text-emerald-400" />
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    All transfers are instantly credited to your account. Verified and secure.
+                  </p>
+                </div>
               </div>
             </div>
 
