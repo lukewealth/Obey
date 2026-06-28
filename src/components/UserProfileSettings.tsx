@@ -87,8 +87,8 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left uppercase italic">System Identity</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Manage your institutional credentials and security nodes.</p>
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Profile Settings</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Manage your account and verification.</p>
         </div>
         <AnimatePresence>
           {showSaveSuccess && (
@@ -122,15 +122,40 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                 </div>
               </div>
               <div className="space-y-0.5 md:space-y-1">
-                <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Identity Hub</h3>
+                <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Your Profile</h3>
                 <div className="flex flex-wrap items-center gap-3">
-                  <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest truncate">Node ID: <span className="text-primary">{profile.id || "GUEST-NODE"}</span></p>
+                  <p className="text-xs md:text-sm text-gray-400 font-bold uppercase tracking-widest truncate">ID: <span className="text-primary">{profile.id || "GUEST"}</span></p>
                   {profile.obeyId && (
                     <div className="px-2 py-0.5 bg-primary/10 border border-primary/20 rounded-md flex items-center gap-1.5 shadow-sm">
                        <Zap size={10} className="text-primary" />
                        <span className="text-[10px] font-black text-primary tracking-tighter uppercase">{profile.obeyId}</span>
                     </div>
                   )}
+                  {/* KYC Tier Badge */}
+                  <div className={`px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm ${
+                    profile.kycStatus === "Verified" 
+                      ? "bg-emerald-50 border border-emerald-200 text-emerald-700" 
+                      : profile.kycStatus === "Pending"
+                      ? "bg-yellow-50 border border-yellow-200 text-yellow-700"
+                      : "bg-gray-50 border border-gray-200 text-gray-600"
+                  }`}>
+                    {profile.kycStatus === "Verified" ? (
+                      <>
+                        <ShieldCheck size={12} />
+                        <span className="text-[10px] font-bold">Tier {profile.kycLevel || 2} Verified</span>
+                      </>
+                    ) : profile.kycStatus === "Pending" ? (
+                      <>
+                        <Loader2 size={12} className="animate-spin" />
+                        <span className="text-[10px] font-bold">Pending Review</span>
+                      </>
+                    ) : (
+                      <>
+                        <Shield size={12} />
+                        <span className="text-[10px] font-bold">Tier 1 - Basic</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -138,7 +163,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
             <form onSubmit={handleProfileSave} className="space-y-8 md:space-y-10 relative z-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
                 <div className="space-y-2 md:space-y-3">
-                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Full Legal Name</label>
+                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Full Name</label>
                   <div className="relative group">
                     <User className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={18} />
                     <input
@@ -151,20 +176,20 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                   </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
-                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Primary Email Node</label>
+                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Email</label>
                   <div className="relative group">
                     <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={18} />
                     <input
                       type="email"
                       required
-                      readOnly // Email is institutional identifier
+                      readOnly
                       value={email}
                       className="w-full h-14 md:h-16 pl-14 pr-6 bg-gray-100 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold text-gray-400 cursor-not-allowed outline-none"
                     />
                   </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
-                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Verified Mobile ID</label>
+                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Phone Number</label>
                   <div className="relative group">
                     <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={18} />
                     <input
@@ -177,7 +202,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                   </div>
                 </div>
                 <div className="space-y-2 md:space-y-3">
-                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Institutional Promo Node</label>
+                  <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Promo Code</label>
                   <div className="relative group">
                     <Star className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-primary transition-colors" size={18} />
                     <input
@@ -196,7 +221,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                 className="w-full sm:w-auto px-10 md:px-12 h-14 md:h-16 bg-[#0b0e14] hover:bg-black text-white font-black text-[11px] md:text-[13px] uppercase tracking-[0.2em] rounded-[18px] md:rounded-[22px] shadow-2xl transition-all active-press disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {saving ? <Loader2 size={16} className="animate-spin" /> : null}
-                {saving ? 'Syncing...' : 'Sync Mesh Records'}
+                {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </form>
           </div>
@@ -207,12 +232,18 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 md:gap-6 relative z-10">
               <div className="space-y-1 text-center sm:text-left">
-                 <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Identity Compliance</h3>
-                 <p className="text-xs md:text-sm text-gray-500 font-medium">Tier-based institutional clearance protocol.</p>
+                 <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Verification Status</h3>
+                 <p className="text-xs md:text-sm text-gray-500 font-medium">Your account verification level.</p>
               </div>
-              <div className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-emerald-50 text-emerald-600 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm self-center sm:self-auto">
+              <div className={`flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest border shadow-sm self-center sm:self-auto ${
+                profile.kycStatus === "Verified" 
+                  ? "bg-emerald-50 text-emerald-600 border-emerald-100" 
+                  : profile.kycStatus === "Pending"
+                  ? "bg-yellow-50 text-yellow-600 border-yellow-100"
+                  : "bg-gray-50 text-gray-600 border-gray-200"
+              }`}>
                 <Shield size={14} fill="currentColor" />
-                {profile.kycStatus === "Verified" ? "Level 2 Clearance" : "Initial Node Access"}
+                {profile.kycStatus === "Verified" ? `Tier ${profile.kycLevel || 2} - Verified` : profile.kycStatus === "Pending" ? "Pending Review" : "Tier 1 - Basic"}
               </div>
             </div>
 
@@ -226,12 +257,12 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                   <CheckCircle2 size={32} className="md:w-10 md:h-10" />
                 </div>
                 <div className="space-y-2 md:space-y-3">
-                  <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight">Audit Authorized</h4>
+                  <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight">Verification Complete</h4>
                   <p className="text-sm md:text-base text-gray-600 font-medium leading-relaxed max-w-lg">
-                    Your institutional profile has settled. Transactional ceilings have been removed and global digital routing is active on all nodes.
+                    Your account is fully verified. You have access to all features and higher transaction limits.
                   </p>
                   <div className="flex items-center justify-center sm:justify-start gap-2 text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest pt-2">
-                     <Activity size={12} className="animate-pulse" /> Live Settlement Active
+                     <Activity size={12} className="animate-pulse" /> All Features Active
                   </div>
                 </div>
               </motion.div>
@@ -245,9 +276,9 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                   <Loader2 size={32} className="md:w-10 md:h-10 animate-spin" />
                 </div>
                 <div className="space-y-2 md:space-y-3">
-                  <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight uppercase tracking-widest">Compliance Audit Queued</h4>
+                  <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight">Review in Progress</h4>
                   <p className="text-sm md:text-base text-gray-700 font-medium leading-relaxed">
-                    Identity records are currently being audited against global merchant nodes. Estimated settlement: <span className="font-black text-primary animate-pulse">&lt;12 mins</span>.
+                    Your documents are being reviewed. This usually takes <span className="font-black text-primary animate-pulse">less than 12 minutes</span>.
                   </p>
                 </div>
               </motion.div>
@@ -256,9 +287,9 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                 <div className="p-5 md:p-8 bg-yellow-50/80 border border-yellow-100 rounded-[24px] md:rounded-[32px] flex gap-4 md:gap-6 items-start shadow-inner">
                   <AlertTriangle className="text-yellow-600 shrink-0 mt-0.5 md:w-6 md:h-6" size={20} />
                   <div className="space-y-1 md:space-y-2">
-                    <h4 className="text-base md:text-lg font-black text-gray-900 tracking-tight leading-none uppercase">Upgrade Required</h4>
+                    <h4 className="text-base md:text-lg font-black text-gray-900 tracking-tight leading-none">Verification Required</h4>
                     <p className="text-xs md:text-sm text-yellow-800 font-medium leading-relaxed">
-                      Upload a valid National ID or Passport node to unlock Level 2 transactional magnitude and institutional global withdrawals.
+                      Upload a valid ID (National ID or Passport) to unlock higher transaction limits and full access.
                     </p>
                   </div>
                 </div>
@@ -279,7 +310,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                           </div>
                           <div className="space-y-0.5 overflow-hidden">
                             <p className="text-sm md:text-lg font-black text-gray-900 truncate max-w-[120px] sm:max-w-xs">{uploadedKycName}</p>
-                            <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest">{submittingKyc ? "Analyzing Node Depth..." : "Node ready for audit"}</p>
+                            <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest">{submittingKyc ? "Uploading..." : "Ready to submit"}</p>
                           </div>
                         </div>
                         {!submittingKyc && (
@@ -308,8 +339,8 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                         <div className="w-14 h-14 md:w-20 md:h-20 bg-white rounded-[18px] md:rounded-[28px] flex items-center justify-center text-gray-300 shadow-sm mb-4 md:mb-6 shrink-0 group-hover/upload:scale-110 group-hover/upload:text-primary transition-all">
                           <Upload size={28} className="md:w-10 md:h-10" />
                         </div>
-                        <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight uppercase italic">Initialize Asset Dispatch</h4>
-                        <p className="text-xs md:text-sm text-gray-400 font-medium mt-1 md:mt-2">Supports high-res JPG, PNG or PDF nodes up to 10MB</p>
+                        <h4 className="text-lg md:text-xl font-black text-gray-900 tracking-tight">Upload ID Document</h4>
+                        <p className="text-xs md:text-sm text-gray-400 font-medium mt-1 md:mt-2">Supports JPG, PNG or PDF up to 10MB</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -320,7 +351,7 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
                     className="w-full h-16 md:h-20 bg-primary hover:bg-black text-white rounded-[22px] md:rounded-[28px] font-black text-xs md:text-sm uppercase tracking-[0.2em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50"
                   >
                     {submittingKyc ? <Loader2 className="animate-spin" size={24} /> : (
-                      <div className="flex items-center gap-3">Submit Identity Node <ArrowRight size={20} /></div>
+                      <div className="flex items-center gap-3">Submit for Verification <ArrowRight size={20} /></div>
                     )}
                   </button>
                 </div>
@@ -342,14 +373,14 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
               <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary shrink-0 shadow-inner">
                 <Lock size={20} className="md:w-6 md:h-6" />
               </div>
-              <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] md:tracking-[0.3em]">Security Nodes</h4>
+              <h4 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.2em] md:tracking-[0.3em]">Security Settings</h4>
             </div>
 
             <div className="space-y-6 md:space-y-8 relative z-10">
               <div className="flex items-center justify-between p-5 md:p-6 bg-white border border-gray-100 rounded-[24px] md:rounded-[28px] shadow-sm hover:shadow-md transition-all group/toggle">
                 <div className="space-y-0.5 md:space-y-1">
-                  <h5 className="text-sm md:text-base font-black text-gray-900 tracking-tight group-hover/toggle:text-primary transition-colors">Biometric Auth</h5>
-                  <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest">Multi-Sig Node</p>
+                  <h5 className="text-sm md:text-base font-black text-gray-900 tracking-tight group-hover/toggle:text-primary transition-colors">Two-Factor Auth</h5>
+                  <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest">Extra Security</p>
                 </div>
                 <button
                   onClick={() => { setTwoFactor(!twoFactor); onUpdateProfile({ twoFactorEnabled: !twoFactor }); }}
@@ -362,10 +393,10 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
               <div className="p-5 md:p-6 bg-accent-blue/20 border border-blue-100 rounded-[24px] md:rounded-[28px] space-y-4 md:space-y-5 shadow-inner">
                 <div className="flex items-center gap-2.5 md:gap-3">
                   <ShieldCheck size={18} className="text-primary md:w-5 md:h-5" />
-                  <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em]">Compliance Guard Active</span>
+                  <span className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em]">Security Active</span>
                 </div>
                 <p className="text-[10px] md:text-xs text-blue-800 font-medium leading-relaxed">
-                  Encryption secrets are dynamically rotated and stored in multi-signature cold storage vaults for every sensitive node movement.
+                  Your account is protected with bank-level encryption and multi-factor authentication.
                 </p>
               </div>
 
@@ -383,12 +414,12 @@ export default function UserProfileSettings({ profile, onUpdateProfile }: UserPr
               <div className="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-[20px] md:rounded-[24px] flex items-center justify-center text-white mx-auto mb-3 md:mb-4 border border-white/10 backdrop-blur-md shrink-0 shadow-lg">
                 <Sparkles size={28} className="md:w-8 md:h-8" />
               </div>
-              <h5 className="text-xl md:text-2xl font-black tracking-tight leading-tight uppercase italic">Master your <br /> wealth flow.</h5>
+              <h5 className="text-xl md:text-2xl font-black tracking-tight leading-tight">Unlock <br /> premium features.</h5>
               <p className="text-white/60 font-medium text-xs md:text-sm leading-relaxed mx-auto max-w-[180px] md:max-w-[200px]">
-                Corporate nodes receive world-class audit support and sub-zero spread trading.
+                Get higher limits, priority support, and exclusive features.
               </p>
               <button className="w-full py-4 md:py-5 bg-white text-primary rounded-[18px] md:rounded-[22px] font-black text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-2xl active-press transition-all hover:scale-[1.03] hover:shadow-white/20">
-                Activate Elite Node
+                Upgrade Now
               </button>
             </div>
           </div>

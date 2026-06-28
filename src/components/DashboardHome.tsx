@@ -6,7 +6,7 @@ import {
   Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
   CreditCard, Bell, Sparkles, TrendingUp, Search,
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
-  Wifi, BarChart3, ArrowLeftRight, QrCode
+  Wifi, BarChart3, ArrowLeftRight, QrCode, Cloud
 } from "lucide-react";
 import { motionVariants } from "../styles/design-tokens";
 
@@ -301,10 +301,10 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => window.location.reload()}
             className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors relative"
           >
-            <Bell size={18} className="text-gray-400" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+            <Cloud size={18} className="text-gray-400" />
           </motion.button>
         </div>
       </motion.div>
