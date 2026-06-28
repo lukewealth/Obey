@@ -39,10 +39,8 @@ export default function LegalPage({ title, lastUpdated, children, onBack }: Lega
              <p className="text-[10px] md:text-sm font-bold text-gray-400 uppercase tracking-widest pt-2 md:pt-4">Last Modified: {lastUpdated}</p>
           </div>
 
-          <div className="prose prose-zinc prose-invert max-w-none">
-             <div className="space-y-8 md:space-y-12 text-base md:text-lg text-gray-500 font-medium leading-relaxed">
-                {children}
-             </div>
+          <div className="space-y-8 md:space-y-12 text-base md:text-lg text-gray-600 font-medium leading-relaxed">
+            {children}
           </div>
         </motion.div>
       </main>

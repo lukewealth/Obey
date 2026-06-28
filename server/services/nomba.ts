@@ -18,6 +18,10 @@ let tokenExpiry: number | null = null;
 let cachedRefreshToken: string | null = null;
 
 export async function getAccessToken(): Promise<string> {
+  if (!NOMBA_BASE_URL || !NOMBA_CLIENT_ID || !NOMBA_CLIENT_SECRET) {
+    throw new Error('Nomba credentials not configured');
+  }
+
   if (cachedToken && tokenExpiry && Date.now() < tokenExpiry - 300000) {
     return cachedToken;
   }
@@ -44,6 +48,7 @@ export async function getAccessToken(): Promise<string> {
           'Content-Type': 'application/json',
           'accountId': NOMBA_PARENT_ACCOUNT_ID,
         },
+        timeout: 10000,
       }
     );
 

@@ -46,17 +46,19 @@ export default function CryptoSearch({ onSelect, placeholder = "Search crypto as
 
       setLoading(true);
       try {
+        // Use backend proxy to avoid CORS issues
         const response = await fetch(
-          `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`
+          `/api/market/coingecko/search?query=${encodeURIComponent(query)}`
         );
         const data = await response.json();
         const coins = (data.coins || []).slice(0, 12);
 
+        // Fetch details for each coin using backend proxy
         const detailed = await Promise.all(
           coins.map(async (coin: any) => {
             try {
               const detailRes = await fetch(
-                `https://api.coingecko.com/api/v3/coins/${coin.id}?localization=false&tickers=false&community_data=false&developer_data=false`
+                `/api/market/coingecko/coin/${coin.id}`
               );
               const detail = await detailRes.json();
               return {

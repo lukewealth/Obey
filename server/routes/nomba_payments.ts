@@ -185,6 +185,7 @@ router.get('/banks', async (req: Request, res: Response) => {
     res.json({ banks });
   } catch (error: any) {
     console.error('[BANKS] Error:', error.message);
+    // Return empty array instead of 500 error
     res.json({ banks: [] });
   }
 });

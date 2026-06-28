@@ -15,6 +15,7 @@ export enum AppScreen {
 export enum AppTab {
   HOME = "HOME",
   WALLET = "WALLET",
+  BANK = "BANK",
   TRADE = "TRADE",
   SERVICES = "SERVICES",
   PROFILE = "PROFILE",

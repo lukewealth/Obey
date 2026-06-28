@@ -83,39 +83,50 @@ router.get('/prices', async (req, res) => {
     symbols = ['BTC', 'ETH', 'SOL', 'SUI'];
   }
 
+  // Fallback prices (always return something)
+  const fallbackPrices: Record<string, number> = {
+    'BTC': 67000,
+    'ETH': 3500,
+    'SOL': 145,
+    'SUI': 1.8,
+    'USDT': 1,
+    'USDC': 1,
+    'BNB': 580,
+    'XRP': 0.52,
+    'ADA': 0.45,
+    'DOGE': 0.15,
+  };
+
   try {
     console.log(`[MARKET_NODE] Fetching live prices for: ${symbols.join(', ')}`);
     
-    // Use multi-source fetcher
-    const prices = await fetchMultiplePrices(symbols);
+    // Use multi-source fetcher with timeout
+    const prices = await Promise.race([
+      fetchMultiplePrices(symbols),
+      new Promise<Record<string, any>>((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 5000)
+      )
+    ]);
     
     // Convert to simple price map (USD)
     const results: Record<string, number> = {};
     for (const symbol of symbols) {
       if (prices[symbol]) {
         results[symbol] = prices[symbol].price;
-      }
-    }
-
-    // Fallback to simulated prices if any are missing
-    const simulatedPegs: Record<string, number> = {
-      'BTC': 67000,
-      'ETH': 3500,
-      'SOL': 145,
-      'SUI': 1.8,
-      'USDT': 1,
-    };
-
-    for (const symbol of symbols) {
-      if (!(symbol in results) && simulatedPegs[symbol]) {
-        results[symbol] = simulatedPegs[symbol];
+      } else if (fallbackPrices[symbol]) {
+        results[symbol] = fallbackPrices[symbol];
       }
     }
 
     res.json(results);
   } catch (error) {
-    console.error('[MARKET_NODE_CRITICAL] Global price sync failure:', error);
-    res.status(500).json({ error: 'Failed to synchronize live price nodes.' });
+    console.error('[MARKET_NODE_CRITICAL] Global price sync failure, using fallback:', error);
+    // Return fallback prices instead of 500 error
+    const results: Record<string, number> = {};
+    for (const symbol of symbols) {
+      results[symbol] = fallbackPrices[symbol] || 0;
+    }
+    res.json(results);
   }
 });
 
@@ -371,6 +382,61 @@ router.get('/sources', (req, res) => {
       currentSize: Object.keys(getCachedPrices()).length,
     },
   });
+});
+
+/**
+ * GET /api/market/coingecko/search?query=QUERY
+ * Proxy CoinGecko search to avoid CORS issues
+ */
+router.get('/coingecko/search', async (req, res) => {
+  const query = req.query.query as string;
+  if (!query) return res.json({ coins: [] });
+
+  try {
+    const response = await fetch(`https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`);
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('[COINGECKO_PROXY] Search error:', error);
+    res.json({ coins: [] });
+  }
+});
+
+/**
+ * GET /api/market/coingecko/coin/:id
+ * Proxy CoinGecko coin details to avoid CORS issues
+ */
+router.get('/coingecko/coin/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${id}?localization=false&tickers=false&community_data=false&developer_data=false`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('[COINGECKO_PROXY] Coin details error:', error);
+    res.status(500).json({ error: 'Failed to fetch coin details' });
+  }
+});
+
+/**
+ * GET /api/market/coingecko/history/:id
+ * Proxy CoinGecko market chart to avoid CORS issues
+ */
+router.get('/coingecko/history/:id', async (req, res) => {
+  const { id } = req.params;
+  const days = req.query.days || '7';
+  try {
+    const response = await fetch(
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}&interval=daily`
+    );
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('[COINGECKO_PROXY] History error:', error);
+    res.json({ prices: [] });
+  }
 });
 
 export default router;

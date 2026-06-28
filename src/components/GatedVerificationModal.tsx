@@ -37,6 +37,11 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
         wallet: profile.balance >= 0,
         metadata: false
       });
+      
+      // Security: Clear session cookies on verification modal open
+      // This ensures fresh authentication state
+      document.cookie = "obey_session_verified=; max-age=0; path=/; SameSite=Strict; Secure";
+      localStorage.removeItem('obey-cookie-consent');
     }
   }, [isOpen, profile]);
 
@@ -63,6 +68,19 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
   };
 
   const currentTier = tierInfo[profile.tierLevel as keyof typeof tierInfo] || tierInfo[1];
+
+  const handleRefresh = () => {
+    // Security: Clear all session data on refresh
+    document.cookie = "obey_session_verified=; max-age=0; path=/; SameSite=Strict; Secure";
+    document.cookie = "obey_user_email=; max-age=0; path=/; SameSite=Strict; Secure";
+    document.cookie = "obey_user_id=; max-age=0; path=/; SameSite=Strict; Secure";
+    localStorage.removeItem('obey-cookie-consent');
+    localStorage.removeItem('obey-cookie-preferences');
+    
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -177,15 +195,15 @@ export default function GatedVerificationModal({ isOpen, onClose, onVerify, onLo
                            Verify Now <ArrowRight size={16} />
                         </motion.button>
 
-                        <div className="flex items-center gap-3 pt-1">
-                           <motion.button 
-                             whileHover={{ scale: 1.02 }}
-                             whileTap={{ scale: 0.98 }}
-                             onClick={onRefresh}
-                             className="flex-1 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-medium text-[10px] tracking-wider hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
-                           >
-                              <RefreshCw size={12} /> Refresh
-                           </motion.button>
+                         <div className="flex items-center gap-3 pt-1">
+                            <motion.button 
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              onClick={handleRefresh}
+                              className="flex-1 py-2.5 bg-gray-100 text-gray-500 rounded-lg font-medium text-[10px] tracking-wider hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5"
+                            >
+                               <RefreshCw size={12} /> Refresh
+                            </motion.button>
                            <motion.button 
                              whileHover={{ scale: 1.02 }}
                              whileTap={{ scale: 0.98 }}

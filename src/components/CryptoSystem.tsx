@@ -46,13 +46,15 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
         BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', SUI: 'sui', USDC: 'usd-coin'
       };
       const coinId = coinIdMap[symbol] || symbol.toLowerCase();
+      
+      // Use backend proxy to avoid CORS issues
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`
+        `/api/market/coingecko/coin/${coinId}`
       );
       const data = await response.json();
 
       const historyRes = await fetch(
-        `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=7&interval=daily`
+        `/api/market/coingecko/history/${coinId}?days=7`
       );
       const historyData = await historyRes.json();
       const prices = (historyData.prices || []).map((p: number[]) => p[1]);

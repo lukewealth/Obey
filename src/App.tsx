@@ -27,6 +27,7 @@ import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
 import SecuredPortal from "./components/SecuredPortal";
 import AIPage from "./components/AIPage";
 import AssetDetail from "./components/AssetDetail";
+import BankTransfer from "./components/BankTransfer";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -54,7 +55,8 @@ import {
   CreditCardIcon,
   CpuChipIcon as BrainIcon,
   ShieldCheckIcon as ShieldCheckOutline,
-  ClockIcon
+  ClockIcon,
+  BuildingLibraryIcon as BankIcon
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
@@ -549,6 +551,7 @@ export default function App() {
                 {[
                   { tab: AppTab.HOME, label: "Overview", icon: HomeIcon },
                   { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
+                  { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
                   { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                   { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
                   { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
@@ -710,6 +713,18 @@ export default function App() {
                       />
                     )}
 
+                    {activeTab === AppTab.BANK && (
+                      <BankTransfer
+                        profile={profile}
+                        transactions={cachedTransactions}
+                        onTransferComplete={async (amt, details) => {
+                          handleProfileUpdate({ balance: profile.balance - amt });
+                          triggerSuccess(amt, details);
+                          return true;
+                        }}
+                      />
+                    )}
+
                     {activeTab === AppTab.CARDS && (
                       <VirtualCardSystem 
                         profile={profile} 
@@ -805,8 +820,8 @@ export default function App() {
             {[
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
               { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
+              { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
               { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
-              { tab: AppTab.AI, label: "AI", icon: BrainIcon },
               { tab: AppTab.SERVICES, label: "Pay", icon: AppIcon },
             ].map((item) => (
               <button 
