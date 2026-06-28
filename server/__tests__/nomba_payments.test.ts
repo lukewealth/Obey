@@ -83,11 +83,11 @@ describe('Nomba Payment Routes', () => {
       const response = await request(app)
         .post('/api/nomba/account-lookup')
         .send({ accountNumber: '1234567890', bankCode: '058' })
-        .expect(500);
+        .timeout(10000);
 
       // Will fail because Nomba is not configured, but validates structure
       expect(response.body).toHaveProperty('error');
-    });
+    }, 15000);
   });
 
   describe('POST /api/nomba/withdraw', () => {

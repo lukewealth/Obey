@@ -53,17 +53,29 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
   useEffect(() => {
     fetchBankCodes()
       .then(res => {
-        if (res.data?.data) setBanks(res.data.data);
+        if (res.data?.data && Array.isArray(res.data.data)) {
+          setBanks(res.data.data);
+        } else if (res.data?.banks && Array.isArray(res.data.banks)) {
+          setBanks(res.data.banks);
+        } else {
+          setBanks([]);
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        setBanks([]);
+      });
 
     api.get(`/nomba/virtual-accounts`, { params: { userId: profile.id } })
       .then(res => {
-        if (res.data?.accounts?.length > 0) {
+        if (res.data?.accounts && Array.isArray(res.data.accounts) && res.data.accounts.length > 0) {
           setVirtualAccount(res.data.accounts[0]);
+        } else {
+          setVirtualAccount(null);
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        setVirtualAccount(null);
+      });
   }, [profile.id]);
 
   const triggerCopyAccount = () => {

@@ -56,12 +56,15 @@ export default function BankTransfer({ profile, transactions, onTransferComplete
     try {
       setLoadingBanks(true);
       const response = await api.get('/nomba/banks');
-      if (response.data?.banks) {
+      if (response.data?.banks && Array.isArray(response.data.banks)) {
         setBanks(response.data.banks);
+      } else {
+        setBanks([]);
       }
     } catch (error) {
       console.error('Failed to fetch banks:', error);
-      notify("error", "Network Error", "Could not load bank list. Please try again.");
+      // Set empty array instead of showing error
+      setBanks([]);
     } finally {
       setLoadingBanks(false);
     }
@@ -73,11 +76,15 @@ export default function BankTransfer({ profile, transactions, onTransferComplete
       const response = await api.get('/nomba/virtual-accounts', {
         params: { userId: profile.id }
       });
-      if (response.data?.accounts?.length > 0) {
+      if (response.data?.accounts && Array.isArray(response.data.accounts) && response.data.accounts.length > 0) {
         setVirtualAccount(response.data.accounts[0]);
+      } else {
+        setVirtualAccount(null);
       }
     } catch (error) {
       console.error('Failed to fetch virtual account:', error);
+      // Set null instead of showing error
+      setVirtualAccount(null);
     } finally {
       setLoadingVirtualAccount(false);
     }

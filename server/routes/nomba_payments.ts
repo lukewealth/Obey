@@ -166,11 +166,11 @@ router.get('/virtual-accounts', async (req: Request, res: Response) => {
       res.json({ accounts });
     } catch (dbError: any) {
       console.error('[VIRTUAL_ACCOUNTS] DB error:', dbError.message);
-      res.json({ accounts: [] });
+      res.status(200).json({ accounts: [] });
     }
   } catch (error: any) {
     console.error('[VIRTUAL_ACCOUNTS] Error:', error.message);
-    res.json({ accounts: [] });
+    res.status(200).json({ accounts: [] });
   }
 });
 
@@ -186,7 +186,7 @@ router.get('/banks', async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('[BANKS] Error:', error.message);
     // Return empty array instead of 500 error
-    res.json({ banks: [] });
+    res.status(200).json({ banks: [] });
   }
 });
 

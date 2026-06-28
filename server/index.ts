@@ -72,7 +72,9 @@ app.use(async (req, res, next) => {
     'api/health',
     'health',
     'api/sync/asset-sync',
-    'sync/asset-sync'
+    'sync/asset-sync',
+    'api/nomba',
+    'nomba',
   ];
 
   if (bypassRoutes.some(route => path === route || path.startsWith(route + '/'))) {

@@ -257,14 +257,25 @@ let cachedBanks: any[] | null = null;
 let bankCacheExpiry: number | null = null;
 
 export async function fetchBankCodes(): Promise<any[]> {
+  // Check if credentials are configured
+  if (!NOMBA_BASE_URL || !NOMBA_CLIENT_ID || !NOMBA_CLIENT_SECRET) {
+    console.warn('[NOMBA] Credentials not configured, returning empty bank list');
+    return [];
+  }
+
   if (cachedBanks && bankCacheExpiry && Date.now() < bankCacheExpiry) {
     return cachedBanks;
   }
 
-  const response = await nombaRequest('GET', '/v1/transfers/bank');
-  cachedBanks = response.data;
-  bankCacheExpiry = Date.now() + 24 * 60 * 60 * 1000;
-  return cachedBanks;
+  try {
+    const response = await nombaRequest('GET', '/v1/transfers/bank');
+    cachedBanks = response.data;
+    bankCacheExpiry = Date.now() + 24 * 60 * 60 * 1000;
+    return cachedBanks;
+  } catch (error: any) {
+    console.error('[NOMBA] Failed to fetch bank codes:', error.message);
+    return [];
+  }
 }
 
 export async function lookupBankAccount(accountNumber: string, bankCode: string): Promise<any> {
