@@ -5,7 +5,8 @@ import {
   ArrowUpRight, ArrowDownRight, ArrowDownLeft, Wallet, Send, Smartphone,
   Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
   CreditCard, Bell, Sparkles, TrendingUp, Search,
-  ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw
+  ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
+  Wifi, BarChart3
 } from "lucide-react";
 import { motionVariants } from "../styles/design-tokens";
 
@@ -65,8 +66,8 @@ const ActionButton = ({
 }) => {
   const variants = {
     primary: "bg-gradient-to-br from-primary to-emerald-600 text-white shadow-lg shadow-primary/20",
-    secondary: "bg-white/5 border border-white/10 text-white hover:bg-white/10",
-    outline: "bg-transparent border border-white/20 text-white hover:bg-white/5",
+    secondary: "text-white",
+    outline: "text-white",
   };
 
   return (
@@ -77,7 +78,13 @@ const ActionButton = ({
       whileHover={{ scale: 1.02, y: -2 }}
       whileTap={{ scale: 0.98 }}
       onClick={onClick}
-      className={`flex-1 py-4 px-4 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${variants[variant]}`}
+      className={`flex-1 py-4 px-4 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${variants[variant]}`}
+      style={variant !== 'primary' ? {
+        background: 'rgba(255, 255, 255, 0.05)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      } : undefined}
     >
       <Icon size={18} />
       <span>{label}</span>
@@ -103,20 +110,30 @@ const QuickActionCard = ({
   <motion.button
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.4 }}
-    whileHover={{ scale: 1.02, y: -4 }}
-    whileTap={{ scale: 0.98 }}
+    transition={{ delay, duration: 0.4, type: 'spring', stiffness: 200, damping: 20 }}
+    whileHover={{ scale: 1.03, y: -4 }}
+    whileTap={{ scale: 0.97 }}
     onClick={onClick}
-    className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 p-5 text-left group hover:border-primary/30 transition-all duration-300"
+    className="relative overflow-hidden rounded-2xl p-5 text-left group transition-all duration-300"
+    style={{
+      background: 'rgba(255, 255, 255, 0.04)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+    }}
   >
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="absolute inset-0 bg-gradient-to-br from-white/[0.06] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
     
     <div className="relative z-10">
-      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+      <motion.div
+        whileHover={{ rotate: [0, -5, 5, 0] }}
+        transition={{ duration: 0.4 }}
+        className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg`}
+      >
         <Icon size={22} className="text-white" />
-      </div>
-      <h4 className="font-bold text-white text-base mb-1">{label}</h4>
-      <p className="text-xs text-gray-400">{description}</p>
+      </motion.div>
+      <h4 className="font-bold text-white text-base mb-1 tracking-tight">{label}</h4>
+      <p className="text-xs text-gray-400 font-medium">{description}</p>
     </div>
     
     <ChevronRight size={16} className="absolute top-5 right-5 text-gray-500 group-hover:text-primary group-hover:translate-x-1 transition-all" />
@@ -194,28 +211,37 @@ const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
   
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.4 }}
-      whileHover={{ scale: 1.02, y: -2 }}
-      className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.4, type: 'spring', stiffness: 150, damping: 20 }}
+      whileHover={{ scale: 1.02, x: 4 }}
+      className="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+      style={{ backdropFilter: 'blur(8px)' }}
     >
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
+        <motion.div
+          whileHover={{ rotate: [0, -10, 10, 0] }}
+          transition={{ duration: 0.3 }}
+          className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-md`}
+        >
           <Icon size={18} className="text-white" fill={symbol === "BTC" ? "currentColor" : "none"} />
-        </div>
+        </motion.div>
         <div>
           <p className="font-semibold text-white text-sm">{name}</p>
-          <p className="text-xs text-gray-400">{symbol}</p>
+          <p className="text-xs text-gray-500">{symbol}</p>
         </div>
       </div>
       
       <div className="text-right">
         <p className="font-mono font-bold text-sm text-white">₦{price}</p>
-        <p className={`text-xs font-medium flex items-center justify-end gap-0.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className={`text-xs font-bold flex items-center justify-end gap-0.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}
+        >
           {isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
           {change}
-        </p>
+        </motion.p>
       </div>
     </motion.div>
   );
@@ -251,15 +277,18 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-3"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-3"
           >
-            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-            System Online
+            <motion.div
+              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1.5 h-1.5 bg-emerald-400 rounded-full"
+            />
+            Online
           </motion.div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white">
-            Welcome back, <span className="text-primary">{profile.name.split(" ")[0]}</span>
+          <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+            Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {profile.name.split(" ")[0]}
           </h1>
-          <p className="text-gray-400 text-sm mt-1">Your financial ecosystem is performing optimally.</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -287,8 +316,26 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       {/* Balance Card */}
       <motion.div
         variants={itemVariants}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F1419] to-[#1A1F2E] border border-white/10 p-6 md:p-8"
+        className="relative overflow-hidden rounded-3xl p-6 md:p-8"
+        style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+        }}
       >
+        <motion.div
+          animate={{
+            background: [
+              'radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%)',
+              'radial-gradient(circle at 80% 50%, rgba(124, 58, 237, 0.12) 0%, transparent 50%)',
+              'radial-gradient(circle at 20% 50%, rgba(124, 58, 237, 0.08) 0%, transparent 50%)',
+            ],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute inset-0"
+        />
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
         
@@ -299,8 +346,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <Wallet size={20} className="text-white" />
               </div>
               <div>
-                <p className="text-xs text-gray-400 font-medium">Total Balance</p>
-                <p className="text-sm text-white font-semibold">NGN Wallet</p>
+                <p className="text-sm text-gray-400">Balance</p>
               </div>
             </div>
             <motion.button
@@ -326,7 +372,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <TrendingUp size={12} />
                 +2.48%
               </div>
-              <span className="text-xs text-gray-400">vs last month</span>
+              <span className="text-xs text-gray-400">this month</span>
             </div>
           </div>
 
@@ -345,15 +391,15 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           label="Airtime"
           description="Top up instantly"
           onClick={() => onSelectAction("buy-airtime")}
-          color="bg-gradient-to-br from-blue-500 to-blue-600"
+          color="bg-gradient-to-br from-blue-500 to-cyan-500"
           delay={0.1}
         />
         <QuickActionCard
-          icon={Zap}
+          icon={Wifi}
           label="Data"
-          description="Internet bundles"
+          description="Stay connected"
           onClick={() => onSelectAction("buy-data")}
-          color="bg-gradient-to-br from-amber-500 to-orange-600"
+          color="bg-gradient-to-br from-amber-500 to-orange-500"
           delay={0.2}
         />
         <QuickActionCard
@@ -361,15 +407,15 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           label="Gift Cards"
           description="Buy & sell"
           onClick={() => onSelectAction("buy-giftcard")}
-          color="bg-gradient-to-br from-purple-500 to-pink-600"
+          color="bg-gradient-to-br from-purple-500 to-pink-500"
           delay={0.3}
         />
         <QuickActionCard
-          icon={TrendingUp}
-          label="Trade"
-          description="Crypto market"
+          icon={BarChart3}
+          label="Crypto"
+          description="Live prices"
           onClick={() => onNavigateTab(AppTab.TRADE)}
-          color="bg-gradient-to-br from-emerald-500 to-teal-600"
+          color="bg-gradient-to-br from-emerald-500 to-teal-500"
           delay={0.4}
         />
       </div>
@@ -379,19 +425,22 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         {/* Transactions */}
         <motion.div
           variants={itemVariants}
-          className="lg:col-span-8 rounded-2xl bg-white/[0.02] border border-white/10 p-5"
+          className="lg:col-span-8 rounded-2xl p-5"
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
         >
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-white">Recent Activity</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Your latest transactions</p>
-            </div>
+            <h3 className="text-lg font-bold text-white tracking-tight">Transactions</h3>
             <motion.button
               whileHover={{ x: 2 }}
               onClick={() => onNavigateTab(AppTab.HISTORY)}
               className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
             >
-              View all
+              See all
               <ArrowRight size={14} />
             </motion.button>
           </div>
@@ -406,8 +455,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
                   <Activity size={24} className="text-gray-500" />
                 </div>
-                <p className="text-gray-400 text-sm">No transactions yet</p>
-                <p className="text-gray-500 text-xs mt-1">Your activity will appear here</p>
+                <p className="text-gray-400 text-sm font-medium">No transactions yet</p>
               </div>
             )}
           </div>
@@ -416,17 +464,24 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         {/* Markets */}
         <motion.div
           variants={itemVariants}
-          className="lg:col-span-4 rounded-2xl bg-white/[0.02] border border-white/10 p-5"
+          className="lg:col-span-4 rounded-2xl p-5"
+          style={{
+            background: 'rgba(255, 255, 255, 0.02)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+          }}
         >
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-white">Markets</h3>
-              <p className="text-xs text-gray-400 mt-0.5">Live prices</p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              <span className="text-xs text-gray-400">Live</span>
-            </div>
+            <h3 className="text-lg font-bold text-white tracking-tight">Markets</h3>
+            <motion.div
+              animate={{ opacity: [1, 0.4, 1] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="flex items-center gap-1.5"
+            >
+              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+              <span className="text-xs text-emerald-400 font-medium">Live</span>
+            </motion.div>
           </div>
 
           <div className="space-y-3">
@@ -460,12 +515,19 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </div>
 
           <motion.button
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, y: -1 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => onNavigateTab(AppTab.TRADE)}
-            className="w-full mt-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+            className="w-full mt-4 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200 relative overflow-hidden group"
+            style={{
+              background: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+            }}
           >
-            Open Trading Desk
+            <span className="relative z-10 flex items-center justify-center gap-2">
+              Trade
+              <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+            </span>
           </motion.button>
         </motion.div>
       </div>

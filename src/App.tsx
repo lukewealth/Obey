@@ -51,7 +51,8 @@ import {
   ArrowPathIcon as RefreshIcon,
   CreditCardIcon,
   CpuChipIcon as BrainIcon,
-  ShieldCheckIcon as ShieldCheckOutline
+  ShieldCheckIcon as ShieldCheckOutline,
+  ClockIcon
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
@@ -379,22 +380,6 @@ export default function App() {
     wakeupRef.current = null;
   };
 
-  const triggerDiagnostic = () => {
-    setSystemAlert({
-      isOpen: true,
-      title: "Diagnostic Sweep Initiated",
-      message: "Integrity check in progress on digital parameters.",
-      type: "system",
-      logs: [
-        "INITIALIZING_NODE_MESH_SYNC",
-        "FETCHING_CROSS_CHAIN_LIQUIDITY_POOLS",
-        "VERIFYING_MULTI_SIG_ESCROW_CONTRACTS",
-        "ESTABLISHING_SECURE_CLOUD_TUNNEL",
-        "DIAGNOSTIC_COMPLETE_INTEGRITY_100%"
-      ]
-    });
-  };
-
   return (
     <div className="min-h-screen text-[#0b0e14] font-sans antialiased selection:bg-primary/20 selection:text-primary relative bg-[#fcfcfd]">
       
@@ -475,152 +460,122 @@ export default function App() {
 
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[var(--app-bg)] transition-colors duration-500">
-          <header className="sticky top-0 z-40 bg-[var(--glass-bg)] backdrop-blur-3xl border-b border-gray-100 dark:border-white/10 px-4 md:px-10 h-16 md:h-24 flex items-center justify-between transition-all">
-            <div className="flex items-center gap-3 md:gap-6">
-              <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden w-10 h-10 flex items-center justify-center text-[#0b0e14] dark:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all">
-                <MenuIcon className="w-5 h-5 md:w-6 md:h-6" />
+          <header className="sticky top-0 z-40 bg-[var(--glass-bg)] backdrop-blur-3xl border-b border-gray-100 dark:border-white/10 px-4 md:px-8 h-16 flex items-center justify-between transition-all">
+            <div className="flex items-center gap-4">
+              <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden w-10 h-10 flex items-center justify-center text-[#0b0e14] dark:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all">
+                <MenuIcon className="w-5 h-5" />
               </button>
-              <div className="flex items-center gap-2 md:gap-3">
-                <button 
-                  onClick={() => setSidebarExpanded(!sidebarExpanded)}
-                  className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all mr-2"
-                >
-                  <MenuIcon className="w-6 h-6" />
-                </button>
-                <div className="w-9 h-9 md:w-11 md:h-11 bg-[#0b0e14] dark:bg-primary flex items-center justify-center rounded-[8px] md:rounded-[10px] shadow-lg overflow-hidden shrink-0">
-                  <img src="/obey_logo.svg" className="w-full h-full object-cover" alt="OBEY Logo" />
+              <button 
+                onClick={() => setSidebarExpanded(!sidebarExpanded)}
+                className="hidden lg:flex w-10 h-10 items-center justify-center text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
+              >
+                <MenuIcon className="w-5 h-5" />
+              </button>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl shadow-sm">
+                  <span className="text-white font-black text-xs">O</span>
                 </div>
-                <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] dark:text-white font-space uppercase">OBEY</span>
-                <button onClick={triggerDiagnostic} className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500/20 transition-all">
-                  <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-                  Node: {adminMetrics.systemStatus}
-                </button>
+                <span className="text-lg font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 md:gap-6">
-              <ThemeToggle />
-              
-              {/* AI Smart System Buttons */}
-              <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-1">
                 <button
                   onClick={() => setShowAIChat(true)}
-                  className="p-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
                   title="AI Assistant"
                 >
                   <BrainIcon className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setShowAnomalyDetection(true)}
-                  className="p-2.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
-                  title="Anomaly Detection"
+                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
+                  title="Security"
                 >
                   <ShieldAlert className="w-5 h-5" />
                 </button>
-                <button
-                  onClick={() => {
-                    setPortalRiskLevel('MEDIUM');
-                    setShowSecuredPortal(true);
-                  }}
-                  className="p-2.5 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all"
-                  title="Secured Portal"
-                >
-                  <ShieldCheckOutline className="w-5 h-5" />
-                </button>
               </div>
 
-              <div onClick={() => notify("log", "Audit Log Access", "Fetching sequential ledger entries from Sui Mainnet...")} className="hidden lg:flex items-center gap-4 pr-6 border-r border-gray-100 dark:border-white/10 cursor-pointer hover:opacity-60 transition-opacity">
-                <div className="text-right">
-                  <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Master Ledger</p>
-                  <p className="text-[13px] font-bold text-[#0b0e14] dark:text-white">Verified On-Chain</p>
-                </div>
-              </div>
+              <ThemeToggle />
 
-              <div onClick={() => setActiveTab(AppTab.PROFILE)} className="flex items-center gap-2 md:gap-3 pl-2 cursor-pointer group select-none">
-                <div className="w-9 h-9 md:w-11 md:h-11 rounded-[12px] md:rounded-[16px] bg-[#0b0e14] dark:bg-primary flex items-center justify-center font-black text-white text-xs md:text-sm uppercase shadow-xl group-hover:scale-105 transition-transform shrink-0 relative">
-                   {profile.avatar}
-                   {profile.role === "admin" && (
-                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-white dark:border-[#121212] flex items-center justify-center">
-                        <ZapIcon className="w-2.5 h-2.5 text-white" />
-                     </div>
-                   )}
-                </div>
-                <div className="hidden sm:block">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[12px] md:text-[13px] font-black text-[#0b0e14] dark:text-white group-hover:text-primary transition-colors">{profile.name}</p>
-                    {profile.role === "admin" && (
-                      <span className="px-1.5 py-0.5 bg-primary/10 text-primary text-[7px] font-black uppercase rounded-[4px] border border-primary/20">VIT NODE</span>
-                    )}
+              <button
+                onClick={() => notify("info", "Notifications", "You're all caught up.")}
+                className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
+              >
+                <BellIcon className="w-5 h-5" />
+              </button>
+
+              <div className="relative group">
+                <button className="flex items-center gap-2 p-1 pr-2 hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                    {profile.avatar}
                   </div>
-                  <p className="text-[8px] md:text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
-                    <VerifiedIcon className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" /> {profile.role === "admin" ? "Institutional Admin" : "Tier 2 Secure"}
-                  </p>
+                  <span className="hidden sm:block text-sm font-medium text-[#0b0e14] dark:text-white">{profile.name.split(' ')[0]}</span>
+                  <ChevronRightIcon className="w-3 h-3 text-gray-400 rotate-90" />
+                </button>
+
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+                  <div className="p-4 border-b border-gray-100 dark:border-white/10">
+                    <p className="text-sm font-semibold text-[#0b0e14] dark:text-white">{profile.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile.email}</p>
+                  </div>
+                  <div className="p-2">
+                    <button
+                      onClick={() => setActiveTab(AppTab.PROFILE)}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all"
+                    >
+                      <Cog6ToothIcon className="w-4 h-4" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
+                    >
+                      <ArrowLeftOnRectangleIcon className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </header>
 
           <div className="flex-grow flex">
-            <aside className={`hidden lg:flex ${sidebarExpanded ? "w-72" : "w-24"} bg-[var(--app-bg)] border-r border-gray-100 dark:border-white/10 p-6 flex-col justify-between transition-all duration-500 ease-[0.22, 1, 0.36, 1]`}>
-              <div className="space-y-10">
-                <div className="space-y-4">
-                  {sidebarExpanded && <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Liquidity</p>}
-                  <nav className="space-y-1">
-                    {[
-                      { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
-                      { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
-                      { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
-                      { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
-                      { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
-                    ].map((item) => (
-                      <button 
-                        key={item.label} 
-                        onClick={() => setActiveTab(item.tab)} 
-                        className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === item.tab ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
-                        title={!sidebarExpanded ? item.label : ""}
-                      >
-                        <item.icon className="w-5 h-5 flex-shrink-0" /> 
-                        {sidebarExpanded && <span>{item.label}</span>}
-                      </button>
-                    ))}
-                  </nav>
-                </div>
+            <aside className={`hidden lg:flex ${sidebarExpanded ? "w-64" : "w-20"} bg-[var(--app-bg)] border-r border-gray-100 dark:border-white/10 p-4 flex-col transition-all duration-300 ease-[0.22, 1, 0.36, 1]`}>
+              <nav className="space-y-1 flex-1">
+                {[
+                  { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
+                  { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
+                  { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
+                  { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
+                  { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
+                  { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
+                ].map((item) => (
+                  <button 
+                    key={item.label} 
+                    onClick={() => setActiveTab(item.tab)} 
+                    className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all ${activeTab === item.tab ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14]" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"}`}
+                    title={!sidebarExpanded ? item.label : ""}
+                  >
+                    <item.icon className="w-5 h-5 flex-shrink-0" /> 
+                    {sidebarExpanded && <span>{item.label}</span>}
+                  </button>
+                ))}
+              </nav>
 
-                <div className="space-y-4">
-                  {sidebarExpanded && <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.3em] pl-4">Ecosystem</p>}
-                  <nav className="space-y-1">
-                    <button 
-                      onClick={() => setActiveTab(AppTab.PROFILE)} 
-                      className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.PROFILE ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
-                      title={!sidebarExpanded ? "Parameters" : ""}
-                    >
-                      <SettingsIcon className="w-5 h-5 flex-shrink-0" /> 
-                      {sidebarExpanded && <span>Parameters</span>}
-                    </button>
-                    {profile.role === "admin" && (
-                      <button 
-                        onClick={handleAdminAccess} 
-                        className={`w-full flex items-center ${sidebarExpanded ? "gap-4 px-4" : "justify-center"} h-14 rounded-2xl text-[13px] font-black transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] text-white shadow-xl shadow-gray-200" : "text-gray-400 hover:text-[#0b0e14] hover:bg-gray-50"}`}
-                        title={!sidebarExpanded ? "Compliance" : ""}
-                      >
-                        <ShieldCheck className="w-5 h-5 flex-shrink-0" /> 
-                        {sidebarExpanded && <span>Compliance</span>}
-                      </button>
-                    )}
-                  </nav>
+              {profile.role === "admin" && (
+                <div className="pt-4 border-t border-gray-100 dark:border-white/10">
+                  <button 
+                    onClick={handleAdminAccess} 
+                    className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all ${activeTab === AppTab.ADMIN ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14]" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"}`}
+                    title={!sidebarExpanded ? "Admin" : ""}
+                  >
+                    <ShieldCheck className="w-5 h-5 flex-shrink-0" /> 
+                    {sidebarExpanded && <span>Admin</span>}
+                  </button>
                 </div>
-              </div>
-
-              <div className="pt-8 border-t border-gray-100">
-                <button 
-                  onClick={handleLogout} 
-                  className={`w-full h-14 rounded-[22px] bg-white border border-gray-100 hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all text-xs font-black uppercase tracking-widest flex items-center justify-center ${sidebarExpanded ? "gap-3" : ""} text-gray-400 active-press shadow-sm`}
-                  title={!sidebarExpanded ? "Sign Out" : ""}
-                >
-                  <LogOutIcon className="w-5 h-5 flex-shrink-0" /> 
-                  {sidebarExpanded && <span>Sign Out</span>}
-                </button>
-              </div>
+              )}
             </aside>
 
             <main className="flex-grow p-4 md:p-12 overflow-y-auto w-full max-w-7xl mx-auto pb-32 lg:pb-12 relative">
@@ -765,21 +720,21 @@ export default function App() {
             </main>
           </div>
 
-          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 backdrop-blur-2xl border-t border-gray-100 px-6 py-4 flex justify-around items-center shadow-[0_-10px_40px_rgba(0,0,0,0.02)]">
+          <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-2xl border-t border-gray-100 dark:border-white/10 px-4 py-2 flex justify-around items-center">
             {[
-              { tab: AppTab.HOME, label: "Console", icon: DashboardIcon },
-              { tab: AppTab.WALLET, label: "Treasury", icon: WalletIcon },
-              { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
-              { tab: AppTab.TRADE, label: "Exchange", icon: RefreshIcon },
-              { tab: AppTab.SERVICES, label: "Apps", icon: AppIcon },
+              { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
+              { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
+              { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
+              { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
+              { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
             ].map((item) => (
               <button 
                 key={item.label} 
                 onClick={() => setActiveTab(item.tab)} 
-                className={`flex flex-col items-center gap-1.5 transition-all duration-300 ${activeTab === item.tab ? "text-primary scale-110 font-black" : "text-gray-400 hover:text-gray-600"}`}
+                className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl transition-all ${activeTab === item.tab ? "text-primary" : "text-gray-400"}`}
               >
-                <item.icon className={`w-6 h-6 ${activeTab === item.tab ? "stroke-[2.5px]" : "stroke-2"}`} />
-                <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+                <item.icon className={`w-5 h-5 ${activeTab === item.tab ? "stroke-[2.5px]" : "stroke-2"}`} />
+                <span className="text-[10px] font-medium">{item.label}</span>
               </button>
             ))}
           </nav>
