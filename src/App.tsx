@@ -29,6 +29,9 @@ import AIPage from "./components/AIPage";
 import AssetDetail from "./components/AssetDetail";
 import BankTransfer from "./components/BankTransfer";
 import KYCTierSystem from "./components/KYCTierSystem";
+import NotificationDropdown from "./components/NotificationDropdown";
+import NotificationSettings from "./components/NotificationSettings";
+import AdminKYCManagement from "./components/AdminKYCManagement";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -542,14 +545,63 @@ export default function App() {
 
               <ThemeToggle />
 
-              <button
-                onClick={() => notify("info", "Notifications", "You're all caught up.")}
-                className="relative p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
-              >
-                <BellIcon className="w-5 h-5" />
-              </button>
+              <NotificationDropdown
+                transactions={cachedTransactions}
+                onMarkAllRead={() => {
+                  notify("success", "Marked as Read", "All notifications marked as read.");
+                }}
+                onClearAll={() => {
+                  notify("info", "Cleared", "All notifications cleared.");
+                }}
+              />
 
-              <div className="relative group">
+              {/* Mobile Profile Menu */}
+              <div className="lg:hidden relative group">
+                <button className="flex items-center gap-2 p-1 pr-2 hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
+                    {profile.avatar}
+                  </div>
+                </button>
+
+                <div className="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-2xl border border-gray-100 dark:border-white/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50">
+                  <div className="p-4 border-b border-gray-100 dark:border-white/10">
+                    <p className="text-sm font-semibold text-[#0b0e14] dark:text-white">{profile.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{profile.email}</p>
+                  </div>
+                  <div className="p-2">
+                    <button
+                      onClick={() => {
+                        setActiveTab(AppTab.PROFILE);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all"
+                    >
+                      <UserIcon className="w-4 h-4" />
+                      Profile
+                    </button>
+                    <button
+                      onClick={() => {
+                        setActiveTab(AppTab.PROFILE);
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl transition-all"
+                    >
+                      <SettingsIcon className="w-4 h-4" />
+                      Settings
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all"
+                    >
+                      <LogOutIcon className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Profile Menu */}
+              <div className="hidden lg:block relative group">
                 <button className="flex items-center gap-2 p-1 pr-2 hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xs font-bold shadow-sm">
                     {profile.avatar}
@@ -838,6 +890,7 @@ export default function App() {
                     {activeTab === AppTab.PROFILE && (
                       <div className="space-y-8">
                         <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />
+                        <NotificationSettings userId={profile.id} />
                         <KYCTierSystem 
                           profile={profile} 
                           onTierUpgrade={(newTier) => {
@@ -848,18 +901,21 @@ export default function App() {
                       </div>
                     )}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (
-                      <AdminSystem 
-                        metrics={adminMetrics} 
-                        profile={profile} 
-                        onApproveKyc={() => {
-                          notify("success", "Compliance Verified", "Identity node authorized.");
-                          handleProfileUpdate({ kycStatus: "Verified", kycLevel: 2 });
-                        }} 
-                        onUpdateSystemStatus={(status) => {
-                          setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
-                          notify("info", "System State Changed", `Master node status set to ${status}`);
-                        }} 
-                      />
+                      <div className="space-y-8">
+                        <AdminSystem 
+                          metrics={adminMetrics} 
+                          profile={profile} 
+                          onApproveKyc={() => {
+                            notify("success", "Compliance Verified", "Identity node authorized.");
+                            handleProfileUpdate({ kycStatus: "Verified", kycLevel: 2 });
+                          }} 
+                          onUpdateSystemStatus={(status) => {
+                            setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
+                            notify("info", "System State Changed", `Master node status set to ${status}`);
+                          }} 
+                        />
+                        <AdminKYCManagement adminId={profile.id || ""} />
+                      </div>
                     )}
                  </motion.div>
               </AnimatePresence>

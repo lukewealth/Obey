@@ -49,14 +49,27 @@ const KYC_TIERS = {
 router.get('/tier/:userId', async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
     const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
     
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      // Return default tier for new users
+      return res.json({
+        success: true,
+        tier: 1,
+        tierName: 'Standard',
+        limits: KYC_TIERS[1].limits,
+        kycStatus: 'Unverified',
+        isEmailVerified: false
+      });
     }
 
     const tier = user.kycLevel || 1;
-    const tierInfo = KYC_TIERS[tier as keyof typeof KYC_TIERS];
+    const tierInfo = KYC_TIERS[tier as keyof typeof KYC_TIERS] || KYC_TIERS[1];
 
     res.json({
       success: true,
@@ -68,7 +81,15 @@ router.get('/tier/:userId', async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('[KYC_TIER_ERROR]', error.message);
-    res.status(500).json({ error: 'Failed to fetch tier information' });
+    // Return default tier on error
+    res.json({
+      success: true,
+      tier: 1,
+      tierName: 'Standard',
+      limits: KYC_TIERS[1].limits,
+      kycStatus: 'Unverified',
+      isEmailVerified: false
+    });
   }
 });
 
@@ -76,6 +97,10 @@ router.get('/tier/:userId', async (req: Request, res: Response) => {
 router.post('/request-upgrade', async (req: Request, res: Response) => {
   try {
     const { userId, requestedTier, documents } = req.body;
+    
+    if (!userId || !requestedTier) {
+      return res.status(400).json({ error: 'User ID and requested tier required' });
+    }
     
     const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
     
@@ -119,7 +144,7 @@ router.post('/request-upgrade', async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error('[KYC_UPGRADE_ERROR]', error.message);
-    res.status(500).json({ error: 'Failed to submit upgrade request' });
+    res.status(500).json({ error: error.message || 'Failed to submit upgrade request' });
   }
 });
 
