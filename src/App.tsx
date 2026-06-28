@@ -545,26 +545,13 @@ export default function App() {
 
           <div className="flex-grow flex">
             <aside className={`hidden lg:flex ${sidebarExpanded ? "w-64" : "w-20"} bg-[var(--app-bg)] border-r border-gray-100 dark:border-white/10 p-4 flex-col transition-all duration-300 ease-[0.22, 1, 0.36, 1]`}>
-              {/* User Profile */}
-              <div className="flex flex-col items-center mb-6 pb-6 border-b border-gray-100 dark:border-white/10">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xl font-bold mb-3">
-                  {profile.avatar || profile.name[0]}
-                </div>
-                {sidebarExpanded && (
-                  <>
-                    <p className="text-sm font-bold text-gray-900 dark:text-white">{profile.name}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{profile.role === 'admin' ? 'Admin' : 'User'}</p>
-                  </>
-                )}
-              </div>
-
               <nav className="space-y-1 flex-1">
                 {[
                   { tab: AppTab.HOME, label: "Overview", icon: HomeIcon },
                   { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
                   { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                   { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
-                  { tab: AppTab.TRADE, label: "Activity", icon: SwapIcon },
+                  { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
                   { tab: AppTab.AI, label: "AI Insights", icon: BrainIcon },
                   { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
                 ].map((item) => {
@@ -818,7 +805,7 @@ export default function App() {
             {[
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
               { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
-              { tab: AppTab.TRADE, label: "Activity", icon: SwapIcon },
+              { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
               { tab: AppTab.AI, label: "AI", icon: BrainIcon },
               { tab: AppTab.SERVICES, label: "Pay", icon: AppIcon },
             ].map((item) => (

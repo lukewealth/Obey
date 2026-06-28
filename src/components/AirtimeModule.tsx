@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { UserProfile, Transaction } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
-import { 
-  Smartphone, Wifi, Check, RefreshCw, ChevronRight, 
+import {
+  Smartphone, Wifi, Check, RefreshCw, ChevronRight,
   AlertTriangle, ShieldCheck, Download, Zap, Search,
   ArrowRight, Landmark, CreditCard, Star, Activity, Coins,
-  Phone, Network, Loader2, FileText, BadgeCheck, Contact
+  Phone, Network, Loader2, FileText, BadgeCheck, Contact, X
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -45,6 +45,12 @@ interface DataPlan {
   recommended?: boolean;
 }
 
+interface SavedContact {
+  id: string;
+  name: string;
+  phone: string;
+}
+
 export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProps) {
   const { notify } = useNotification();
   const [activeSegment, setActiveSegment] = useState<"airtime" | "data" | "subscriptions">("airtime");
@@ -56,47 +62,55 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const [showCheckout, setShowCheckout] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [successReceipt, setSuccessReceipt] = useState<any | null>(null);
+  const [showContacts, setShowContacts] = useState(false);
+  const [contacts, setContacts] = useState<SavedContact[]>([
+    { id: "1", name: "Mom", phone: "8031234567" },
+    { id: "2", name: "Dad", phone: "8021234567" },
+    { id: "3", name: "Sarah", phone: "9031234567" },
+  ]);
+  const [newContactName, setNewContactName] = useState("");
+  const [newContactPhone, setNewContactPhone] = useState("");
 
   const providers: NetworkProvider[] = [
-    { 
-      id: "mtn", 
-      name: "MTN", 
-      color: "bg-[#FFCC00]", 
-      textColor: "text-black", 
-      logoChar: "M", 
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg",
-      paymentCode: "10101", 
-      symbolColor: "#FFCC00" 
+    {
+      id: "mtn",
+      name: "MTN",
+      color: "bg-[#FFCC00]",
+      textColor: "text-black",
+      logoChar: "M",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/MTN_Logo.svg/512px-MTN_Logo.svg.png",
+      paymentCode: "10101",
+      symbolColor: "#FFCC00"
     },
-    { 
-      id: "airtel", 
-      name: "Airtel", 
-      color: "bg-[#E50914]", 
-      textColor: "text-white", 
+    {
+      id: "airtel",
+      name: "Airtel",
+      color: "bg-[#ED1C24]",
+      textColor: "text-white",
       logoChar: "A",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Airtel_logo.svg",
-      paymentCode: "10201", 
-      symbolColor: "#E50914" 
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Airtel_Logo_2022.svg/512px-Airtel_Logo_2022.svg.png",
+      paymentCode: "10201",
+      symbolColor: "#ED1C24"
     },
-    { 
-      id: "glo", 
-      name: "Glo", 
-      color: "bg-[#339933]", 
-      textColor: "text-white", 
+    {
+      id: "glo",
+      name: "Glo",
+      color: "bg-[#00A651]",
+      textColor: "text-white",
       logoChar: "G",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Glo_telecom_logo.svg",
-      paymentCode: "10301", 
-      symbolColor: "#339933" 
+      logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Glo_telecommunications_logo.svg/512px-Glo_telecommunications_logo.svg.png",
+      paymentCode: "10301",
+      symbolColor: "#00A651"
     },
-    { 
-      id: "9mobile", 
-      name: "9mobile", 
-      color: "bg-[#015249]", 
-      textColor: "text-white", 
+    {
+      id: "9mobile",
+      name: "9mobile",
+      color: "bg-[#006B3F]",
+      textColor: "text-white",
       logoChar: "9",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2c/9mobile_logo.svg",
-      paymentCode: "10401", 
-      symbolColor: "#015249" 
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/9mobile_logo.svg/512px-9mobile_logo.svg.png",
+      paymentCode: "10401",
+      symbolColor: "#006B3F"
     },
   ];
 
@@ -386,7 +400,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                 <div className="space-y-5">
                   <div className="flex justify-between items-center px-4">
                      <label className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest">Select Network</label>
-                     <button type="button" className="text-primary text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"><Contact size={14} /> Contacts</button>
+                      <button type="button" onClick={() => setShowContacts(true)} className="text-primary text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 hover:opacity-70 transition-opacity"><Contact size={14} /> Contacts</button>
                   </div>
                   <div className="grid grid-cols-4 gap-3 md:gap-5">
                     {providers.map((p) => (
@@ -549,6 +563,83 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                   <h4 className="text-xl font-bold text-gray-900 tracking-tight relative z-10">Important</h4>
                   <p className="text-[11px] text-yellow-900 font-medium leading-relaxed relative z-10">Double-check the phone number. Transactions cannot be reversed.</p>
                </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showContacts && (
+          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-xl z-50 flex items-center justify-center p-4 md:p-6">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 30 }}
+              className="w-full max-w-lg bg-white border border-gray-100 rounded-[35px] md:rounded-[50px] p-8 md:p-10 shadow-2xl space-y-6 relative overflow-hidden max-h-[85vh] flex flex-col"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">Contacts</h3>
+                <button onClick={() => setShowContacts(false)} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                  <X size={18} className="text-gray-600" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar">
+                {contacts.map((contact) => (
+                  <button
+                    key={contact.id}
+                    onClick={() => {
+                      const cleaned = contact.phone.replace(/\D/g, "");
+                      setPhoneNo(cleaned.slice(-10));
+                      setShowContacts(false);
+                      notify("success", "Contact Selected", `${contact.name} added.`);
+                    }}
+                    className="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 transition-colors text-left group"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                      {contact.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-gray-900 truncate">{contact.name}</p>
+                      <p className="text-xs text-gray-500 font-mono">+234 {contact.phone}</p>
+                    </div>
+                    <ChevronRight size={16} className="text-gray-300 group-hover:text-primary transition-colors" />
+                  </button>
+                ))}
+              </div>
+
+              <div className="border-t border-gray-100 pt-6 space-y-3">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Add New Contact</p>
+                <input
+                  type="text"
+                  value={newContactName}
+                  onChange={(e) => setNewContactName(e.target.value)}
+                  placeholder="Name"
+                  className="w-full h-12 px-5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium text-gray-900 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all"
+                />
+                <input
+                  type="tel"
+                  value={newContactPhone}
+                  onChange={(e) => setNewContactPhone(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="Phone number (e.g. 8091028824)"
+                  className="w-full h-12 px-5 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium text-gray-900 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all font-mono"
+                />
+                <button
+                  onClick={() => {
+                    if (!newContactName.trim() || newContactPhone.length < 10) {
+                      notify("error", "Invalid Contact", "Enter a valid name and 10-digit phone number.");
+                      return;
+                    }
+                    setContacts(prev => [...prev, { id: Date.now().toString(), name: newContactName, phone: newContactPhone }]);
+                    setNewContactName("");
+                    setNewContactPhone("");
+                    notify("success", "Contact Saved", "New contact added successfully.");
+                  }}
+                  className="w-full h-14 bg-primary hover:bg-black text-white rounded-2xl font-bold text-xs uppercase tracking-widest transition-all"
+                >
+                  Save Contact
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

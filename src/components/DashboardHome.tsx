@@ -10,6 +10,7 @@ import {
   Home, CreditCard as CardIcon, PieChart, Users, Settings,
   LogOut, Moon, Sun, Plus, MoreVertical, ChevronDown
 } from "lucide-react";
+import { HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motionVariants } from "../styles/design-tokens";
 
@@ -98,8 +99,15 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       {/* Header */}
       <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight">
-            Hello, {profile.name.split(" ")[0]} 👋
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
+            <span>Hello, {profile.name.split(" ")[0]}</span>
+            <motion.span
+              animate={{ rotate: [0, -10, 10, -10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 3 }}
+              className="inline-flex w-9 h-9 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 items-center justify-center shadow-lg shadow-amber-500/30"
+            >
+              <HandThumbUpIcon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </motion.span>
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Welcome back!</p>
         </div>

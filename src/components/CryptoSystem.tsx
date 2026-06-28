@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { UserProfile, CryptoAsset } from "../types";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
+import {
   ArrowUpRight, ArrowDownLeft, Check, RefreshCw, DollarSign,
   TrendingUp, TrendingDown, Coins, HelpCircle, ShieldAlert, Award,
   ChevronRight, BarChart3, Search, Zap, Star, ArrowRight, ShieldCheck,
@@ -31,9 +31,64 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
   const [processing, setProcessing] = useState(false);
   const [orderReceipt, setOrderReceipt] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showMarketAnalysis, setShowMarketAnalysis] = useState(false);
+  const [selectedAssetData, setSelectedAssetData] = useState<any>(null);
+  const [priceHistory, setPriceHistory] = useState<number[]>([]);
+  const [loadingAnalysis, setLoadingAnalysis] = useState(false);
 
   const [p2pListings, setP2PListings] = useState<any[]>([]);
   const [loadingP2P, setLoadingP2P] = useState(false);
+
+  const fetchMarketAnalysis = async (symbol: string) => {
+    setLoadingAnalysis(true);
+    try {
+      const coinIdMap: Record<string, string> = {
+        BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', SUI: 'sui', USDC: 'usd-coin'
+      };
+      const coinId = coinIdMap[symbol] || symbol.toLowerCase();
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`
+      );
+      const data = await response.json();
+
+      const historyRes = await fetch(
+        `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=7&interval=daily`
+      );
+      const historyData = await historyRes.json();
+      const prices = (historyData.prices || []).map((p: number[]) => p[1]);
+
+      setSelectedAssetData({
+        name: data.name,
+        symbol: data.symbol?.toUpperCase() || symbol,
+        image: data.image?.large,
+        currentPrice: data.market_data?.current_price?.usd || 0,
+        priceChange24h: data.market_data?.price_change_percentage_24h || 0,
+        priceChange7d: data.market_data?.price_change_percentage_7d || 0,
+        priceChange30d: data.market_data?.price_change_percentage_30d || 0,
+        marketCap: data.market_data?.market_cap?.usd || 0,
+        volume24h: data.market_data?.total_volume?.usd || 0,
+        high24h: data.market_data?.high_24h?.usd || 0,
+        low24h: data.market_data?.low_24h?.usd || 0,
+        ath: data.market_data?.ath?.usd || 0,
+        athChange: data.market_data?.ath_change_percentage?.usd || 0,
+        rank: data.market_cap_rank || 0,
+      });
+      setPriceHistory(prices);
+      setShowMarketAnalysis(true);
+    } catch (error) {
+      console.error("Market analysis fetch error:", error);
+      notify("error", "Data Unavailable", "Could not fetch market analysis.");
+    } finally {
+      setLoadingAnalysis(false);
+    }
+  };
+
+  const handleAssetSelect = (asset: any) => {
+    const symbol = asset.asset_id || asset.symbol || asset;
+    setSelectedSymbol(typeof symbol === 'string' ? symbol : symbol.toString());
+    setSelectedAssetData(asset);
+    fetchMarketAnalysis(typeof symbol === 'string' ? symbol : symbol.toString());
+  };
 
   const assets = [
     { symbol: "BTC", name: "Bitcoin", balance: 0.00042, price: btcPrice, priceChangePercent: 2.4 },
@@ -147,6 +202,109 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
         </div>
       </div>
 
+      <AnimatePresence>
+        {showMarketAnalysis && selectedAssetData && (
+          <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-xl z-50 flex items-center justify-center p-4 md:p-6 overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="w-full max-w-3xl bg-white border border-gray-100 rounded-[35px] md:rounded-[45px] p-8 md:p-12 shadow-2xl space-y-8 relative overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  {selectedAssetData.image && (
+                    <img src={selectedAssetData.image} alt={selectedAssetData.name} className="w-14 h-14 rounded-2xl object-contain bg-gray-50 p-1 border border-gray-100" />
+                  )}
+                  <div>
+                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">{selectedAssetData.name}</h2>
+                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest">{selectedAssetData.symbol} • Rank #{selectedAssetData.rank}</p>
+                  </div>
+                </div>
+                <button onClick={() => setShowMarketAnalysis(false)} className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors">
+                  <X size={18} className="text-gray-600" />
+                </button>
+              </div>
+
+              <div className="flex items-baseline gap-3">
+                <span className="text-4xl md:text-5xl font-black text-gray-900 font-mono tracking-tight">
+                  ${selectedAssetData.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+                <span className={`text-sm font-black px-3 py-1 rounded-full ${
+                  selectedAssetData.priceChange24h >= 0
+                    ? 'bg-emerald-50 text-emerald-600'
+                    : 'bg-red-50 text-red-500'
+                }`}>
+                  {selectedAssetData.priceChange24h >= 0 ? '+' : ''}{selectedAssetData.priceChange24h.toFixed(2)}% (24h)
+                </span>
+              </div>
+
+              {priceHistory.length > 0 && (
+                <div className="h-48 bg-gray-50 rounded-2xl p-4 border border-gray-100">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">7-Day Price History</p>
+                  <div className="flex items-end gap-1 h-32">
+                    {priceHistory.map((price, i) => {
+                      const min = Math.min(...priceHistory);
+                      const max = Math.max(...priceHistory);
+                      const height = max === min ? 50 : ((price - min) / (max - min)) * 100;
+                      return (
+                        <div
+                          key={i}
+                          className="flex-1 bg-gradient-to-t from-primary/40 to-primary rounded-t-sm hover:from-primary/60 hover:to-primary/80 transition-all cursor-pointer"
+                          style={{ height: `${Math.max(height, 5)}%` }}
+                          title={`Day ${i + 1}: $${price.toLocaleString()}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">Market Cap</p>
+                  <p className="text-base font-black text-gray-900 font-mono">${(selectedAssetData.marketCap / 1e9).toFixed(2)}B</p>
+                </div>
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">24h Volume</p>
+                  <p className="text-base font-black text-gray-900 font-mono">${(selectedAssetData.volume24h / 1e6).toFixed(2)}M</p>
+                </div>
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">24h High / Low</p>
+                  <p className="text-base font-black text-gray-900 font-mono">${selectedAssetData.high24h.toLocaleString()} / ${selectedAssetData.low24h.toLocaleString()}</p>
+                </div>
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">7d Change</p>
+                  <p className={`text-base font-black font-mono ${selectedAssetData.priceChange7d >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {selectedAssetData.priceChange7d >= 0 ? '+' : ''}{selectedAssetData.priceChange7d.toFixed(2)}%
+                  </p>
+                </div>
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">30d Change</p>
+                  <p className={`text-base font-black font-mono ${selectedAssetData.priceChange30d >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                    {selectedAssetData.priceChange30d >= 0 ? '+' : ''}{selectedAssetData.priceChange30d.toFixed(2)}%
+                  </p>
+                </div>
+                <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">All-Time High</p>
+                  <p className="text-base font-black text-gray-900 font-mono">${selectedAssetData.ath.toLocaleString()}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowMarketAnalysis(false);
+                  setSelectedSymbol(selectedAssetData.symbol);
+                }}
+                className="w-full h-16 bg-primary hover:bg-black text-white rounded-[22px] font-black text-sm uppercase tracking-[0.2em] shadow-2xl transition-all flex items-center justify-center gap-3"
+              >
+                Trade {selectedAssetData.symbol} <ArrowRight size={20} />
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <AnimatePresence mode="wait">
         {orderReceipt ? (
           <motion.div key="receipt" {...containerVariants} className="max-w-2xl mx-auto bg-white border border-gray-100 rounded-[35px] md:rounded-[45px] p-8 md:p-14 text-center space-y-8 md:space-y-12 shadow-2xl relative overflow-hidden">
@@ -196,14 +354,14 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                        <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
                     </div>
                 </div>
-                <CryptoSearch onSelect={(asset) => setSelectedSymbol(asset.asset_id)} />
+                <CryptoSearch onSelect={handleAssetSelect} />
               </div>
 
               <MarketMetadata symbol={selectedSymbol} />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                 {Array.isArray(assets) && assets.slice(0, 3).map((asset) => (
-                   <div key={asset.symbol} className="bg-white border border-gray-100 rounded-[30px] p-8 space-y-6 shadow-xl hover:shadow-2xl transition-all cursor-pointer group" onClick={() => setSelectedSymbol(asset.symbol)}>
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {Array.isArray(assets) && assets.slice(0, 3).map((asset) => (
+                    <div key={asset.symbol} className="bg-white border border-gray-100 rounded-[30px] p-8 space-y-6 shadow-xl hover:shadow-2xl transition-all cursor-pointer group" onClick={() => { setSelectedSymbol(asset.symbol); fetchMarketAnalysis(asset.symbol); }}>
                       <div className="flex justify-between items-start">
                          <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center font-black text-gray-400 group-hover:bg-primary/5 group-hover:text-primary transition-all border border-gray-100 shadow-sm">
                             {asset.symbol[0]}
