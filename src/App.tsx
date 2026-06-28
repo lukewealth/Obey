@@ -940,6 +940,141 @@ export default function App() {
               </button>
             ))}
           </nav>
+
+          {/* Mobile Sidebar Menu */}
+          <AnimatePresence>
+            {mobileMenuOpen && (
+              <>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 lg:hidden"
+                />
+                <motion.div
+                  initial={{ x: "-100%" }}
+                  animate={{ x: 0 }}
+                  exit={{ x: "-100%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                  className="fixed left-0 top-0 bottom-0 w-80 bg-white dark:bg-[#1e1e1e] z-50 lg:hidden shadow-2xl overflow-y-auto"
+                >
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl shadow-sm">
+                          <span className="text-white font-black text-sm">O</span>
+                        </div>
+                        <span className="text-xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
+                      </div>
+                      <button
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-white/10 rounded-xl transition-all"
+                      >
+                        <XIcon className="w-5 h-5" />
+                      </button>
+                    </div>
+
+                    {/* User Profile */}
+                    <div className="mb-8 p-4 bg-gray-50 dark:bg-white/5 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-lg font-bold">
+                          {profile.avatar}
+                        </div>
+                        <div>
+                          <p className="text-sm font-bold text-gray-900 dark:text-white">{profile.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{profile.email}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Navigation */}
+                    <nav className="space-y-1">
+                      {[
+                        { tab: AppTab.HOME, label: "Overview", icon: HomeIcon },
+                        { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
+                        { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
+                        { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
+                        { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
+                        { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
+                        { tab: AppTab.AI, label: "AI Insights", icon: BrainIcon },
+                        { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
+                      ].map((item) => {
+                        const isActive = activeTab === item.tab;
+                        return (
+                          <button
+                            key={item.label}
+                            onClick={() => {
+                              setActiveTab(item.tab);
+                              setMobileMenuOpen(false);
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                              isActive
+                                ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14] shadow-lg"
+                                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"
+                            }`}
+                          >
+                            <item.icon className="w-5 h-5" />
+                            <span>{item.label}</span>
+                          </button>
+                        );
+                      })}
+                    </nav>
+
+                    {/* Bottom Actions */}
+                    <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/10 space-y-1">
+                      <button
+                        onClick={() => {
+                          setShowAIChat(true);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5 transition-all"
+                      >
+                        <SparklesIcon className="w-5 h-5" />
+                        <span>AI Assistant</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveTab(AppTab.PROFILE);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5 transition-all"
+                      >
+                        <SettingsIcon className="w-5 h-5" />
+                        <span>Settings</span>
+                      </button>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all"
+                      >
+                        <LogOutIcon className="w-5 h-5" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+
+                    {profile.role === "admin" && (
+                      <div className="mt-8 pt-8 border-t border-gray-100 dark:border-white/10">
+                        <button
+                          onClick={() => {
+                            handleAdminAccess();
+                            setMobileMenuOpen(false);
+                          }}
+                          className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                            activeTab === AppTab.ADMIN
+                              ? "bg-[#0b0e14] dark:bg-white text-white dark:text-[#0b0e14] shadow-lg"
+                              : "text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5"
+                          }`}
+                        >
+                          <ShieldCheck className="w-5 h-5" />
+                          <span>Admin Dashboard</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
         </div>
       )}
       

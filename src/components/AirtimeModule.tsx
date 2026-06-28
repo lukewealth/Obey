@@ -78,7 +78,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#FFCC00]",
       textColor: "text-black",
       logoChar: "M",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/MTN_Logo.svg/512px-MTN_Logo.svg.png",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/MTN_Logo.svg/256px-MTN_Logo.svg.png",
       paymentCode: "10101",
       symbolColor: "#FFCC00"
     },
@@ -88,7 +88,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#ED1C24]",
       textColor: "text-white",
       logoChar: "A",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Airtel_Logo_2022.svg/512px-Airtel_Logo_2022.svg.png",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Airtel_Logo.svg/256px-Airtel_Logo.svg.png",
       paymentCode: "10201",
       symbolColor: "#ED1C24"
     },
@@ -98,7 +98,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#00A651]",
       textColor: "text-white",
       logoChar: "G",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/en/thumb/5/54/Glo_telecommunications_logo.svg/512px-Glo_telecommunications_logo.svg.png",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Glo_telecommunications_logo.svg/256px-Glo_telecommunications_logo.svg.png",
       paymentCode: "10301",
       symbolColor: "#00A651"
     },
@@ -108,7 +108,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#006B3F]",
       textColor: "text-white",
       logoChar: "9",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/9mobile_logo.svg/512px-9mobile_logo.svg.png",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/9mobile_logo.svg/256px-9mobile_logo.svg.png",
       paymentCode: "10401",
       symbolColor: "#006B3F"
     },
