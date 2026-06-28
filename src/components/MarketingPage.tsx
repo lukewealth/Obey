@@ -384,18 +384,17 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  <div className="relative min-h-[260px] md:min-h-[340px] lg:min-h-[380px] flex items-center justify-center lg:justify-start z-10">
                     <AnimatePresence mode="wait">
                        {showHeroText && (
-                         <motion.h1 
-                           key="hero-text"
-                           initial={{ opacity: 0, y: 20, filter: "blur(15px)" }}
-                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                           exit={{ opacity: 0, y: -20, filter: "blur(15px)" }}
-                           transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
-                           className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10 px-2 lg:px-0"
-                         >
-                           Control your <br className="hidden sm:block" />
-                           financial <br className="hidden sm:block" />
-                           future with <span className="text-primary italic">OBEY.</span>
-                         </motion.h1>
+                          <motion.h1 
+                            key="hero-text"
+                            initial={{ opacity: 0, y: 20, filter: "blur(15px)" }}
+                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                            exit={{ opacity: 0, y: -20, filter: "blur(15px)" }}
+                            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
+                            className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10 px-2 lg:px-0"
+                          >
+                            Trade with <br className="hidden sm:block" />
+                            <span className="text-primary italic">Obey.</span>
+                          </motion.h1>
                        )}
                     </AnimatePresence>
                  </div>
@@ -409,8 +408,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 }}
                 className="text-[14px] md:text-base lg:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed opacity-90 px-4 lg:px-0"
               >
-                Next-generation digital asset management and institutional liquidity infrastructure. 
-                Unified wallet, utility recharge, and digital marketplaces.
+                Buy crypto, gift cards, airtime, and data in seconds. 
+                One app for all your payments and trading needs.
               </motion.p>
 
               <motion.div 
@@ -472,16 +471,16 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  >
                     <div className="w-14 h-14 md:w-16 md:h-16 bg-white dark:bg-white/10 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] dark:group-hover:bg-primary group-hover:text-white transition-all"><CreditCardIcon className="w-7 h-7 md:w-8 md:h-8" /></div>
                     <div className="space-y-4 md:space-y-6 relative z-10">
-                       <h3 className="text-3xl md:text-4xl font-black tracking-tighter dark:text-white">Custom virtual node, <br /> make it unique</h3>
-                       <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-sm">Create a custom digital card node that reflects your unique style. Choose from patterns with instant generation.</p>
+                        <h3 className="text-3xl md:text-4xl font-black tracking-tighter dark:text-white">Custom virtual card, <br /> make it unique</h3>
+                        <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-sm">Create a custom digital card that reflects your unique style. Choose from patterns with instant generation.</p>
                     </div>
                     <div className="relative pt-6 md:pt-10 h-56 md:h-64">
                        <div className="absolute top-0 -right-16 md:-right-20 w-full max-w-[360px] md:max-w-[400px] aspect-[1.6/1] bg-[#0b0e14] dark:bg-primary rounded-[2rem] md:rounded-[2.5rem] p-8 md:p-10 flex flex-col justify-between shadow-2xl rotate-[-10deg] group-hover:rotate-0 transition-transform duration-700">
-                          <p className="text-xs md:text-sm font-black italic text-white opacity-40">Obey Node</p>
-                          <div className="space-y-3 md:space-y-4">
-                             <div className="w-12 h-8 md:w-14 md:h-10 bg-yellow-400/20 rounded-lg"></div>
-                             <p className="text-xl md:text-2xl text-white font-black tracking-tighter">Institutional Node</p>
-                          </div>
+                           <p className="text-xs md:text-sm font-black italic text-white opacity-40">Obey Card</p>
+                           <div className="space-y-3 md:space-y-4">
+                              <div className="w-12 h-8 md:w-14 md:h-10 bg-yellow-400/20 rounded-lg"></div>
+                              <p className="text-xl md:text-2xl text-white font-black tracking-tighter">Premium Card</p>
+                           </div>
                        </div>
                     </div>
                  </motion.div>
@@ -495,13 +494,13 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  >
                     <div className="w-14 h-14 md:w-16 md:h-16 bg-white dark:bg-white/10 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] dark:group-hover:bg-primary group-hover:text-white transition-all"><ActivityIcon className="w-7 h-7 md:w-8 md:h-8" /></div>
                     <div className="space-y-4 md:space-y-6 relative z-10">
-                       <h3 className="text-3xl md:text-4xl font-black tracking-tighter dark:text-white">Institutional nodes <br /> and goals</h3>
-                       <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-sm">Track your spending patterns across wallet, utility, and marketplace modules with automated reporting.</p>
+                        <h3 className="text-3xl md:text-4xl font-black tracking-tighter dark:text-white">Track your spending <br /> and goals</h3>
+                        <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-sm">Track your spending patterns across wallet, utility, and marketplace modules with automated reporting.</p>
                     </div>
                     <div className="relative bg-white dark:bg-white/10 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-8 shadow-xl border border-gray-50 dark:border-white/5 group-hover:scale-105 transition-transform duration-700">
                        <div className="flex justify-between items-end mb-6 md:mb-8">
                           <div className="space-y-0.5 md:space-y-1">
-                             <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">Node Reserves</p>
+                              <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-gray-400">Total Balance</p>
                              <p className="text-2xl md:text-3xl font-black tracking-tighter dark:text-white">$15,500.00</p>
                           </div>
                           <div className="w-9 h-9 md:w-10 md:h-10 bg-emerald-500 rounded-xl md:rounded-2xl flex items-center justify-center text-white"><CheckBadgeIcon className="w-5 h-5 md:w-6 md:h-6" /></div>
@@ -529,8 +528,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     <div className="lg:w-1/2 space-y-8 md:space-y-10 text-center lg:text-left w-full">
                        <div className="w-14 h-14 md:w-16 md:h-16 bg-white dark:bg-white/10 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-lg group-hover:bg-[#0b0e14] dark:group-hover:bg-primary group-hover:text-white transition-all mx-auto lg:mx-0"><CurrencyDollarIcon className="w-7 h-7 md:w-8 md:h-8" /></div>
                        <div className="space-y-4 md:space-y-6">
-                          <h3 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Global settlements anywhere <br className="hidden sm:block" /> around the world</h3>
-                          <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-md mx-auto lg:mx-0">Experience the freedom of hassle-free money node transfers with our institutional mesh. Cross-border settlements in seconds.</p>
+                           <h3 className="text-3xl md:text-4xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Send money anywhere <br className="hidden sm:block" /> around the world</h3>
+                           <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-md mx-auto lg:mx-0">Experience the freedom of hassle-free money transfers with our secure platform. Cross-border payments in seconds.</p>
                        </div>
                     </div>
                     <div className="lg:w-1/2 w-full max-w-lg">
@@ -539,15 +538,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                              <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
                                 <div className="w-11 h-11 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-[#0b0e14] dark:bg-primary flex items-center justify-center text-white shrink-0"><BuildingLibraryIcon className="w-5 h-5 md:w-6 md:h-6" /></div>
                                 <div className="overflow-hidden">
-                                   <p className="text-xs md:text-sm font-black uppercase dark:text-white truncate">Institutional Node</p>
-                                   <p className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 truncate">Sequential Ledger Sync</p>
+                                    <p className="text-xs md:text-sm font-black uppercase dark:text-white truncate">Premium Account</p>
+                                    <p className="text-[9px] md:text-[10px] font-bold text-gray-400 dark:text-gray-500 truncate">Fast & Secure</p>
                                 </div>
                              </div>
                              <div className="flex items-center gap-1.5 md:gap-2 px-2.5 py-1 bg-primary/5 rounded-full text-[8px] md:text-[10px] font-black text-primary uppercase tracking-widest shrink-0">Active</div>
                           </div>
                           <div className="flex justify-between items-center">
                              <div className="space-y-0.5 md:space-y-1">
-                                <p className="text-[9px] md:text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Magnitude</p>
+                                 <p className="text-[9px] md:text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Amount</p>
                                 <p className="text-3xl md:text-4xl font-black font-space tracking-tighter leading-none dark:text-white">$1,500.00</p>
                              </div>
                              <button className="w-14 h-14 md:w-16 md:h-16 bg-[#0b0e14] dark:bg-primary text-white rounded-[20px] md:rounded-3xl flex items-center justify-center shadow-xl active-press hover:bg-primary transition-all shrink-0"><ArrowRightIcon className="w-6 h-6 md:w-7 md:h-7" /></button>
@@ -667,11 +666,11 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="space-y-4 md:space-y-6 relative z-10 mt-8 md:mt-12 px-4"
            >
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter dark:text-white leading-tight">
-                Institutional-grade <br className="hidden sm:block" /> 
-                nodes trust OBEY
+                Trusted by thousands <br className="hidden sm:block" /> 
+                of users
               </h2>
               <p className="text-base md:text-lg lg:text-xl text-gray-500 dark:text-gray-400 font-medium max-w-3xl mx-auto leading-relaxed">
-                Many companies have settled using OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.
+                Many companies use OBEY and they trust <br className="hidden sm:block" /> the safety of their digital assets.
               </p>
            </motion.div>
 
@@ -710,15 +709,15 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 viewport={{ once: true }}
                 className="lg:w-1/2 space-y-10 md:space-y-12 text-center lg:text-left"
               >
-                 <motion.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Join 15+ million <br className="hidden sm:block" /> who already trust <br className="hidden sm:block" /> our nodes</motion.h2>
-                 <motion.p variants={itemVariants} className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 font-medium leading-relaxed italic max-w-xl mx-auto lg:mx-0">
-                    "Overall, this app has been a life-changer for me. It has revolutionized the way I approach my finances, 
-                    providing me with the security node I need."
-                 </motion.p>
+                  <motion.h2 variants={itemVariants} className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Join 15+ million <br className="hidden sm:block" /> who already trust <br className="hidden sm:block" /> us</motion.h2>
+                  <motion.p variants={itemVariants} className="text-lg md:text-xl lg:text-2xl text-gray-500 dark:text-gray-400 font-medium leading-relaxed italic max-w-xl mx-auto lg:mx-0">
+                     "Overall, this app has been a life-changer for me. It has revolutionized the way I approach my finances, 
+                     providing me with the security I need."
+                  </motion.p>
                  <motion.div variants={itemVariants} className="flex items-center justify-between pt-6 border-t border-gray-200 dark:border-white/10">
                     <div className="text-left">
                        <p className="text-xl md:text-2xl font-black text-[#0b0e14] dark:text-white">Ellena Putri</p>
-                       <p className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest pt-1">Node Strategist</p>
+                        <p className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-widest pt-1">Financial Analyst</p>
                     </div>
                     <div className="flex gap-3 md:gap-4">
                        <button className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-white/10 border border-gray-200 dark:border-white/10 flex items-center justify-center hover:bg-black dark:hover:bg-primary hover:text-white transition-all shadow-sm"><ArrowRightIcon className="w-5 h-5 md:w-6 md:h-6 rotate-180" /></button>
@@ -738,7 +737,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 viewport={{ once: true }}
                 className="space-y-6 md:space-y-8"
               >
-                 <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Get the OBEY node app.</h2>
+                  <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-tight text-[#0b0e14] dark:text-white">Get the OBEY app.</h2>
                  <p className="text-lg md:text-xl text-gray-400 dark:text-gray-500 font-medium max-w-xl mx-auto px-4">With this platform, you can access your account anywhere, anytime for balance and so much more.</p>
                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
                     <button className="h-14 md:h-16 px-8 bg-black dark:bg-primary text-white rounded-full flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-xl active-press group w-full sm:w-auto">
@@ -818,8 +817,8 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
               <div className="flex flex-col lg:flex-row items-center justify-between gap-12 md:gap-16 relative z-10">
                  <div className="space-y-6 md:space-y-10 text-center lg:text-left">
                     <div className="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-2xl md:rounded-3xl flex items-center justify-center text-yellow-400 shadow-xl mx-auto lg:mx-0"><StarIcon className="w-7 h-7 md:w-8 md:h-8 fill-yellow-400" /></div>
-                    <h2 className="text-4xl sm:text-5xl md:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.9]">Keep up with the <br className="hidden md:block" /> latest node</h2>
-                    <p className="text-sm md:text-lg text-gray-400 dark:text-white/60 font-medium max-w-sm mx-auto lg:mx-0">Join our newsletter to stay up to date on features and node releases.</p>
+                     <h2 className="text-4xl sm:text-5xl md:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.9]">Keep up with the <br className="hidden md:block" /> latest updates</h2>
+                     <p className="text-sm md:text-lg text-gray-400 dark:text-white/60 font-medium max-w-sm mx-auto lg:mx-0">Join our newsletter to stay up to date on features and new releases.</p>
                  </div>
                  <div className="w-full max-w-lg bg-white/5 border border-white/10 p-3 md:p-4 rounded-[24px] md:rounded-3xl flex flex-col md:flex-row gap-3 md:gap-4 items-center backdrop-blur-xl">
                     <input type="email" placeholder="Enter your email" className="bg-transparent border-none focus:ring-0 text-white font-bold placeholder:text-gray-400 px-4 md:px-6 py-3 md:py-4 flex-grow w-full md:w-auto outline-none" />

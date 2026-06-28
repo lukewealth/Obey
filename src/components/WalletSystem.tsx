@@ -112,7 +112,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
             status: "Success"
           } as Transaction);
           setCurrentStep(3);
-          notify("success", "Ledger Updated", "Institutional wire recognized.");
+          notify("success", "Deposit Successful", "Money added to your wallet.");
         }, 1500);
       } else {
         setTimeout(() => {
@@ -133,7 +133,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         }, 1500);
       }
     } catch (error) {
-      notify("error", "Settlement Failure", "Node clearance error.");
+      notify("error", "Payment Failed", "Please try again.");
     } finally {
       setPaymentStatus(false);
     }
@@ -182,10 +182,10 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         await onWithdrawWallet(amountVal, `Withdrawal to ${bankName}`);
         setWithdrawSuccess(true);
         setCurrentStep(3);
-        notify("info", "Liquidity Dispatched", `₦${amountVal.toLocaleString()} routed to external node.`);
+        notify("info", "Withdrawal Successful", `₦${amountVal.toLocaleString()} sent to your bank.`);
       }
     } catch (error) {
-      notify("error", "Dispatch Failure", "Cross-chain payout error.");
+      notify("error", "Withdrawal Failed", "Please try again.");
     } finally {
       setWithdrawProcessing(false);
     }
@@ -214,10 +214,10 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         await onTransfer(amountVal, recipientIdentifier);
         setTransferSuccess(true);
         setCurrentStep(3);
-        notify("success", "Peer Transfer Settled", `Node alignment complete with ${response.data.recipientName}.`);
+        notify("success", "Transfer Successful", `Money sent to ${response.data.recipientName}.`);
       }
     } catch (error: any) {
-      notify("error", "Protocol Blocked", error.response?.data?.error || "Transfer failed.");
+      notify("error", "Transfer Failed", error.response?.data?.error || "Transfer failed.");
     } finally {
       setTransferProcessing(false);
     }
@@ -272,15 +272,15 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
     <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left uppercase italic">Treasury Operations</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Institutional liquidity and mesh settlement controls.</p>
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight text-center md:text-left">Wallet</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Manage your money</p>
         </div>
 
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[
             { id: "overview", label: "Dashboard", icon: LayoutDashboard },
-            { id: "fund", label: "Fund Node", icon: ArrowDownLeft },
-            { id: "withdraw", label: "Cashout", icon: ArrowUpRight },
+            { id: "fund", label: "Add Money", icon: ArrowDownLeft },
+            { id: "withdraw", label: "Withdraw", icon: ArrowUpRight },
             { id: "transfer", label: "Transfer", icon: Send }
           ].map((tab) => (
             <button
@@ -319,8 +319,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                       <Wallet size={20} className="md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Institutional NGN Liquidity</p>
-                      <p className="text-xs md:text-sm font-bold text-gray-900">Total Authorized Reserves</p>
+                      <p className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Your Balance</p>
+                      <p className="text-xs md:text-sm font-bold text-gray-900">Available Funds</p>
                     </div>
                   </div>
 
@@ -358,21 +358,21 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                         <Building size={24} className="md:w-7 md:h-7" />
                       </div>
                       <div>
-                        <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight uppercase italic">Settlement Account</h3>
-                        <p className="text-xs md:text-sm text-gray-400 font-medium">Virtual clearing node for inbound liquidity</p>
+                         <h3 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">Bank Account</h3>
+                         <p className="text-xs md:text-sm text-gray-400 font-medium">Receive money from your bank</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 self-start sm:self-auto shadow-sm">
-                       <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                       Mesh Active
-                    </div>
+                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-600 text-[9px] md:text-[10px] font-black uppercase tracking-widest border border-emerald-100 self-start sm:self-auto shadow-sm">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        Active
+                     </div>
                  </div>
 
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 relative z-10">
                     <div className="p-5 md:p-6 bg-gray-50/50 rounded-[20px] md:rounded-[24px] border border-gray-100 space-y-2 shadow-inner group/bank">
                        <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Clearing Bank</p>
                        <p className="text-base md:text-lg font-black text-gray-900 group-hover/bank:text-primary transition-colors">
-                         {virtualAccount?.bankName || "OBEY Global Settlement"}
+                          {virtualAccount?.bankName || "OBEY Bank"}
                        </p>
                     </div>
                     <div className="p-5 md:p-6 bg-accent-blue/40 rounded-[20px] md:rounded-[24px] border border-blue-100 space-y-2 group/acc shadow-inner">
@@ -484,33 +484,33 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        <Check size={32} className="md:w-12 md:h-12" />
                      </div>
                      <div className="space-y-2">
-                       <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Settlement Verified</h2>
-                       <p className="text-sm md:text-base text-gray-500 font-medium">Funds successfully integrated into treasury node.</p>
+                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Payment Successful</h2>
+                        <p className="text-sm md:text-base text-gray-500 font-medium">Money added to your wallet.</p>
                      </div>
                      <div className="bg-gray-50 rounded-[24px] p-8 space-y-6 text-left border border-gray-100 shadow-inner">
                         <div className="flex justify-between items-center">
-                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Base Magnitude</span>
+                           <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
                            <span className="text-2xl font-black text-gray-900">₦{fundReceipt?.amount.toLocaleString()}</span>
                         </div>
                         <div className="h-px bg-gray-200"></div>
                         <div className="grid grid-cols-2 gap-8">
                            <div className="space-y-1">
-                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Operation ID</p>
+                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Transaction ID</p>
                               <p className="text-xs font-mono font-black text-primary truncate">{fundReceipt?.id}</p>
                            </div>
                            <div className="space-y-1 text-right">
-                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Execution Node</p>
-                              <p className="text-xs font-black text-gray-900">OBEY-NOMBA-CHECKOUT</p>
+                              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Payment Method</p>
+                              <p className="text-xs font-black text-gray-900">Card Payment</p>
                            </div>
                         </div>
                      </div>
-                     <button onClick={resetAllSubFlows} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press">Return to Treasury</button>
+                      <button onClick={resetAllSubFlows} className="w-full h-16 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press">Back to Wallet</button>
                    </div>
                  ) : (
                    <div className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                      <div className="space-y-2 text-center md:text-left">
-                        <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Node Liquidity</h3>
-                        <p className="text-sm md:text-lg text-gray-500 font-medium">Choose a funding protocol to inject capital.</p>
+                         <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Add Money</h3>
+                         <p className="text-sm md:text-lg text-gray-500 font-medium">Choose how to add money.</p>
                      </div>
 
                      {currentStep === 1 ? (
@@ -519,7 +519,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                             {[
                                { id: "card", label: "Secure Checkout", desc: "Instant • Card/USSD/Transfer", icon: CreditCard, color: "text-purple-600", bg: "bg-purple-50" },
                                { id: "bank", label: "Virtual Account", desc: "Instant • Free", icon: Building, color: "text-primary", bg: "bg-primary/5" },
-                               { id: "crypto", label: "Crypto Mesh", desc: "Sub-Second • Network Fees", icon: Coins, color: "text-amber-500", bg: "bg-amber-50" }
+                               { id: "crypto", label: "Crypto", desc: "Fast • Network fees apply", icon: Coins, color: "text-amber-500", bg: "bg-amber-50" }
                             ].map(m => (
                               <button
                                key={m.id}
@@ -537,7 +537,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                          </div>
 
                           <div className="space-y-3">
-                             <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center block">Funding Magnitude (NGN)</label>
+                              <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center block">Amount (NGN)</label>
                              <div className="relative">
                                 <span className="absolute left-8 top-1/2 -translate-y-1/2 text-primary font-black text-3xl md:text-5xl">₦</span>
                                 <input
@@ -556,7 +556,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                             disabled={!fundAmount}
                             className="w-full h-18 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl shadow-primary/30 active-scale flex items-center justify-center gap-3 disabled:opacity-50 hover:shadow-primary/40 transition-all"
                           >
-                             Continue to Configuration <ArrowRight size={20} />
+                              Continue <ArrowRight size={20} />
                           </button>
                        </>
                      ) : (
@@ -565,8 +565,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                              <div className="p-8 bg-purple-50 border border-purple-100 rounded-[32px] space-y-6 text-center">
                                 <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-purple-600 mx-auto shadow-sm"><CreditCard size={40} /></div>
                                 <div className="space-y-2">
-                                   <h4 className="text-xl font-black text-purple-900 uppercase">Secure Nomba Checkout</h4>
-                                   <p className="text-xs text-purple-700 font-medium">You will be redirected to Nomba's secure payment page. Supports cards, USSD, and bank transfers.</p>
+                                    <h4 className="text-xl font-black text-purple-900 uppercase">Secure Payment</h4>
+                                    <p className="text-xs text-purple-700 font-medium">You will be redirected to our secure payment page. Supports cards, USSD, and bank transfers.</p>
                                 </div>
                                 <div className="flex items-center justify-center gap-2 text-[10px] text-purple-600 font-bold uppercase tracking-widest">
                                    <ShieldCheck size={14} /> PCI-DSS Compliant • Zero Card Data Stored
@@ -579,14 +579,14 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                                 </div>
                                 <div className="space-y-4 pt-4 border-t border-blue-100">
                                    <div className="flex justify-between items-center">
-                                      <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Target Account Node</span>
+                                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Account Number</span>
                                       <span className="font-mono text-xl font-black text-primary select-all tracking-[0.1em]">
                                         {virtualAccount?.accountNumber || "8829104422"}
                                       </span>
                                    </div>
                                    <div className="flex justify-between items-center">
                                       <span className="text-[10px] font-black text-blue-400 uppercase tracking-widest">Bank</span>
-                                      <span className="text-sm font-black text-primary">{virtualAccount?.bankName || "OBEY Settlement Hub"}</span>
+                                       <span className="text-sm font-black text-primary">{virtualAccount?.bankName || "OBEY Bank"}</span>
                                    </div>
                                    {virtualAccount?.accountName && (
                                      <div className="flex justify-between items-center">
@@ -600,8 +600,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                              <div className="p-8 bg-amber-50 border border-amber-100 rounded-[32px] space-y-6 text-center">
                                 <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-amber-500 mx-auto shadow-sm"><Coins size={40} /></div>
                                 <div className="space-y-2">
-                                   <h4 className="text-xl font-black text-amber-900 uppercase">USDT Node Settlement</h4>
-                                   <p className="text-xs text-amber-700 font-medium">Network fees apply based on Sui/Ethereum congestion.</p>
+                                    <h4 className="text-xl font-black text-amber-900 uppercase">USDT Payment</h4>
+                                    <p className="text-xs text-amber-700 font-medium">Network fees apply.</p>
                                 </div>
                                 <div className="p-4 bg-white rounded-2xl border border-amber-100 font-mono text-[10px] text-amber-600 break-all select-all">
                                    0x71C7656EC7ab88b098defB751B7401B5f6d8976F
@@ -611,29 +611,29 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                           <div className="bg-gray-900 text-white rounded-[2.5rem] p-10 space-y-6 relative overflow-hidden">
                              <div className="absolute top-0 right-0 p-6 opacity-10"><Shield size={80} /></div>
-                             <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Invoice Summary</h4>
-                             <div className="space-y-4 border-t border-white/10 pt-6">
-                                <div className="flex justify-between items-center text-xs font-black text-white/50 uppercase">
-                                   <span>Amount to Inject</span>
-                                   <span className="text-white text-base">₦{parseFloat(fundAmount).toLocaleString()}</span>
-                                </div>
-                                <div className="flex justify-between items-center text-xs font-black text-white/50 uppercase">
-                                   <span>Protocol Surcharge</span>
-                                   <span className="text-emerald-500 uppercase tracking-widest">Verified Free</span>
-                                </div>
-                                <div className="h-px bg-white/10 pt-2" />
-                                <div className="flex justify-between items-end">
-                                   <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total Authorized</span>
-                                   <span className="text-3xl font-black font-space tracking-tighter">₦{parseFloat(fundAmount).toLocaleString()}</span>
+                              <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Payment Summary</h4>
+                              <div className="space-y-4 border-t border-white/10 pt-6">
+                                 <div className="flex justify-between items-center text-xs font-black text-white/50 uppercase">
+                                    <span>Amount</span>
+                                    <span className="text-white text-base">₦{parseFloat(fundAmount).toLocaleString()}</span>
                                  </div>
-                             </div>
+                                 <div className="flex justify-between items-center text-xs font-black text-white/50 uppercase">
+                                    <span>Fee</span>
+                                    <span className="text-emerald-500 uppercase tracking-widest">Free</span>
+                                 </div>
+                                 <div className="h-px bg-white/10 pt-2" />
+                                 <div className="flex justify-between items-end">
+                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total</span>
+                                    <span className="text-3xl font-black font-space tracking-tighter">₦{parseFloat(fundAmount).toLocaleString()}</span>
+                                  </div>
+                              </div>
                           </div>
 
                           <div className="flex gap-4">
-                             <button onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Return to Specs</button>
-                             <button onClick={handleFundSubmit} disabled={paymentProcessing} className="flex-[2] h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/30 flex items-center justify-center gap-3">
-                                {paymentProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Finalize Settlement <ShieldCheck size={18} /></>}
-                             </button>
+                              <button onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Back</button>
+                              <button onClick={handleFundSubmit} disabled={paymentProcessing} className="flex-[2] h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/30 flex items-center justify-center gap-3">
+                                 {paymentProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Confirm Payment <ShieldCheck size={18} /></>}
+                              </button>
                           </div>
                        </div>
                      )}
@@ -649,18 +649,18 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        <Check size={32} className="md:w-12 md:h-12" />
                      </div>
                      <div className="space-y-2">
-                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Liquidity Dispatched</h2>
-                        <p className="text-sm md:text-lg text-gray-500 font-medium">Funds have been routed to your external clearing node.</p>
-                     </div>
-                     <button onClick={resetAllSubFlows} className="w-full h-16 bg-[#0b0e14] text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press hover:bg-black transition-all">
-                       Return to Treasury
-                     </button>
+                         <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Money Sent</h2>
+                         <p className="text-sm md:text-lg text-gray-500 font-medium">Money sent to your bank.</p>
+                      </div>
+                      <button onClick={resetAllSubFlows} className="w-full h-16 bg-[#0b0e14] text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press hover:bg-black transition-all">
+                        Back to Wallet
+                      </button>
                    </div>
                  ) : (
                    <form onSubmit={handleWithdrawalSubmit} className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                      <div className="space-y-2 text-center md:text-left">
-                        <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Withdrawal Dispatch</h3>
-                        <p className="text-sm md:text-lg text-gray-500 font-medium">Send assets to your external bank clearing account.</p>
+                         <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Withdraw Money</h3>
+                         <p className="text-sm md:text-lg text-gray-500 font-medium">Send money to your bank account.</p>
                      </div>
 
                      {currentStep === 1 ? (
@@ -722,7 +722,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                            <div className="space-y-3">
                               <div className="flex justify-between items-center px-4">
-                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Magnitude (NGN)</label>
+                                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount (NGN)</label>
                                  <span className="text-[10px] font-black text-primary uppercase tracking-widest">Limit: ₦250,000</span>
                               </div>
                               <div className="relative">
@@ -751,7 +751,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                         <div className="space-y-8 animate-fade-in">
                            <div className="bg-gray-900 text-white rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden">
                               <div className="absolute top-0 right-0 p-6 opacity-10"><Banknote size={80} /></div>
-                              <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Settlement Summary</h4>
+                              <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Withdrawal Summary</h4>
                               <div className="space-y-5 border-t border-white/10 pt-8">
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
                                     <span>Recipient</span>
@@ -766,29 +766,29 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                                     <span className="text-white text-base font-mono">{accountNumber}</span>
                                  </div>
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Base magnitude</span>
+                                    <span>Amount</span>
                                     <span className="text-white text-base">₦{parseFloat(withdrawAmount).toLocaleString()}</span>
                                  </div>
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Processing node fee</span>
+                                    <span>Processing fee</span>
                                     <span className="text-white text-base">₦12.50</span>
                                  </div>
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Network duration</span>
-                                    <span className="text-emerald-500">INSTANT (NOMBA)</span>
+                                    <span>Speed</span>
+                                    <span className="text-emerald-500">Instant</span>
                                  </div>
                                  <div className="h-px bg-white/10 pt-2" />
                                  <div className="flex justify-between items-end">
-                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total authorized</span>
+                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total</span>
                                     <span className="text-3xl font-black font-space tracking-tighter">₦{(parseFloat(withdrawAmount) + 12.50).toLocaleString()}</span>
                                   </div>
                               </div>
                            </div>
 
                            <div className="flex gap-4">
-                              <button type="button" onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Return to Specs</button>
+                              <button type="button" onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Back</button>
                               <button type="submit" onClick={handleWithdrawalSubmit} disabled={withdrawProcessing} className="flex-[2] h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/30 flex items-center justify-center gap-3">
-                                 {withdrawProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Confirm Dispatch <ShieldCheck size={18} /></>}
+                                 {withdrawProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Confirm Withdrawal <ShieldCheck size={18} /></>}
                               </button>
                            </div>
                         </div>
@@ -805,8 +805,8 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                        <Send size={32} className="md:w-12 md:h-12" />
                      </div>
                      <div className="space-y-2">
-                        <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Peer Transfer Sent</h2>
-                        <p className="text-sm md:text-lg text-gray-500 font-medium">Liquidity has been moved to <span className="font-black text-primary">{confirmedRecipient || "target node"}</span> instantly.</p>
+                         <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tighter uppercase">Transfer Sent</h2>
+                         <p className="text-sm md:text-lg text-gray-500 font-medium">Money sent to <span className="font-black text-primary">{confirmedRecipient || "recipient"}</span> instantly.</p>
                      </div>
                      <button onClick={resetAllSubFlows} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press">
                        Return to Dashboard
@@ -815,14 +815,14 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                  ) : (
                    <form onSubmit={handleTransferSubmit} className="bento-card p-6 md:p-12 shadow-2xl space-y-8 md:space-y-10">
                      <div className="space-y-2 text-center md:text-left">
-                        <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Peer Transfer</h3>
-                        <p className="text-sm md:text-lg text-gray-500 font-medium">Internal settlement between high-fidelity nodes.</p>
+                         <h3 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight uppercase italic">Send Money</h3>
+                         <p className="text-sm md:text-lg text-gray-500 font-medium">Send money to other OBEY users.</p>
                      </div>
 
                      {currentStep === 1 ? (
                         <>
                          <div className="space-y-3">
-                            <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Target Node (Obey ID or Email)</label>
+                            <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] pl-4">Recipient (Email or OBEY ID)</label>
                             <div className="relative group">
                                <input
                                  type="text"
@@ -840,7 +840,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
 
                          <div className="space-y-4">
                             <div className="flex justify-between items-center px-4">
-                               <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Magnitude (NGN)</label>
+                               <label className="text-[9px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em]">Amount (NGN)</label>
                                <span className="text-[9px] md:text-[11px] font-black text-primary">AVAIL: ₦{profile.balance.toLocaleString()}</span>
                             </div>
                             <div className="relative">
@@ -863,39 +863,39 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
                            disabled={!transferAmount || !recipientIdentifier}
                            className="w-full h-18 bg-primary text-white rounded-2xl font-black uppercase text-sm tracking-widest shadow-2xl active-press flex items-center justify-center gap-3 disabled:opacity-50"
                          >
-                            Review Dispatch <ArrowRight size={20} />
+                             Review Transfer <ArrowRight size={20} />
                          </button>
                         </>
                      ) : (
                         <div className="space-y-8 animate-fade-in">
                            <div className="bg-[#0b0e14] text-white rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden">
                               <div className="absolute top-0 right-0 p-6 opacity-10"><Send size={80} /></div>
-                              <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Transfer Review</h4>
+                              <h4 className="text-lg font-black uppercase italic tracking-widest flex items-center gap-3"><FileText className="text-primary" /> Transfer Summary</h4>
                               <div className="space-y-5 border-t border-white/10 pt-8">
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Target node</span>
+                                    <span>Recipient</span>
                                     <span className="text-white text-base">{recipientIdentifier}</span>
                                  </div>
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Transfer magnitude</span>
+                                    <span>Amount</span>
                                     <span className="text-white text-base">₦{parseFloat(transferAmount).toLocaleString()}</span>
                                  </div>
                                  <div className="flex justify-between items-center text-[10px] font-black text-white/50 uppercase tracking-widest">
-                                    <span>Network alignment</span>
-                                    <span className="text-emerald-500 font-black">INSTANT PEER</span>
+                                    <span>Speed</span>
+                                    <span className="text-emerald-500 font-black">Instant</span>
                                  </div>
                                  <div className="h-px bg-white/10 pt-2" />
                                  <div className="flex justify-between items-end">
-                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total magnitude</span>
+                                    <span className="text-sm font-black uppercase tracking-[0.2em] text-primary">Total</span>
                                     <span className="text-3xl font-black font-space tracking-tighter">₦{parseFloat(transferAmount).toLocaleString()}</span>
                                   </div>
                               </div>
                            </div>
 
                            <div className="flex gap-4">
-                              <button type="button" onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Return to Specs</button>
+                              <button type="button" onClick={() => setCurrentStep(1)} className="flex-1 h-16 bg-gray-50 text-gray-400 font-black uppercase text-[10px] rounded-2xl">Back</button>
                               <button type="submit" onClick={handleTransferSubmit} disabled={transferProcessing} className="flex-[2] h-16 bg-primary text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-primary/30 flex items-center justify-center gap-3">
-                                 {transferProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Authorize Peer Sync <ShieldCheck size={18} /></>}
+                                 {transferProcessing ? <Loader2 size={18} className="animate-spin" /> : <>Send Money <ShieldCheck size={18} /></>}
                               </button>
                            </div>
                         </div>
