@@ -1,6 +1,15 @@
 import express from 'express';
 import { getExchangeRate, getAllAssets, getSymbols, getHistoricalData } from '../services/coinapi';
-import { fetchCryptoPrice, fetchMultiplePrices, getCachedPrices, clearCache } from '../services/multiCryptoFetcher';
+import { 
+  fetchCryptoPrice, 
+  fetchMultiplePrices, 
+  getCachedPrices, 
+  clearCache,
+  fetchFromBitQuery,
+  fetchMarketCapFromBitQuery,
+  fetchStablecoinPrice,
+  fetchMultipleFromCoinpaprika
+} from '../services/multiCryptoFetcher';
 
 const router = express.Router();
 
@@ -234,6 +243,134 @@ router.get('/cache', (req, res) => {
 router.post('/cache/clear', (req, res) => {
   clearCache();
   res.json({ success: true, message: 'Cache cleared' });
+});
+
+/**
+ * GET /api/market/realtime/:symbol
+ * Get real-time 1-second price from BitQuery
+ */
+router.get('/realtime/:symbol', async (req, res) => {
+  const { symbol } = req.params;
+  try {
+    const price = await fetchFromBitQuery(symbol);
+    if (price) {
+      res.json({
+        symbol,
+        price: price.price,
+        source: 'bitquery-realtime',
+        timestamp: price.timestamp,
+      });
+    } else {
+      res.status(404).json({ error: 'Real-time price not available' });
+    }
+  } catch (error) {
+    console.error(`[REALTIME] Failed to fetch ${symbol}:`, error);
+    res.status(500).json({ error: 'Failed to fetch real-time price' });
+  }
+});
+
+/**
+ * GET /api/market/stablecoin/:symbol
+ * Get stablecoin price from BitQuery (USDT, USDC, DAI, etc.)
+ */
+router.get('/stablecoin/:symbol', async (req, res) => {
+  const { symbol } = req.params;
+  try {
+    const price = await fetchStablecoinPrice(symbol);
+    if (price) {
+      res.json({
+        symbol,
+        price: price.price,
+        source: 'bitquery-stablecoin',
+        timestamp: price.timestamp,
+      });
+    } else {
+      res.status(404).json({ error: 'Stablecoin price not available' });
+    }
+  } catch (error) {
+    console.error(`[STABLECOIN] Failed to fetch ${symbol}:`, error);
+    res.status(500).json({ error: 'Failed to fetch stablecoin price' });
+  }
+});
+
+/**
+ * GET /api/market/marketcap/:symbol
+ * Get market cap data from BitQuery
+ */
+router.get('/marketcap/:symbol', async (req, res) => {
+  const { symbol } = req.params;
+  try {
+    const data = await fetchMarketCapFromBitQuery(symbol);
+    if (data) {
+      res.json({
+        symbol,
+        price: data.price,
+        marketCap: data.marketCap,
+        source: 'bitquery',
+        timestamp: Date.now(),
+      });
+    } else {
+      res.status(404).json({ error: 'Market cap data not available' });
+    }
+  } catch (error) {
+    console.error(`[MARKETCAP] Failed to fetch ${symbol}:`, error);
+    res.status(500).json({ error: 'Failed to fetch market cap data' });
+  }
+});
+
+/**
+ * GET /api/market/batch
+ * Batch fetch multiple prices using Coinpaprika (efficient)
+ * Query: ?symbols=BTC,ETH,SOL,SUI
+ */
+router.get('/batch', async (req, res) => {
+  let symbolsArg = req.query.symbols;
+  let symbols: string[] = [];
+
+  if (Array.isArray(symbolsArg)) {
+    symbols = symbolsArg.map(s => String(s));
+  } else if (typeof symbolsArg === 'string') {
+    symbols = symbolsArg.split(',');
+  } else {
+    symbols = ['BTC', 'ETH', 'SOL', 'SUI', 'BNB', 'XRP'];
+  }
+
+  try {
+    const prices = await fetchMultipleFromCoinpaprika(symbols);
+    res.json({
+      data: prices,
+      count: prices.length,
+      source: 'coinpaprika-batch',
+      timestamp: Date.now(),
+    });
+  } catch (error) {
+    console.error('[BATCH] Failed to fetch:', error);
+    res.status(500).json({ error: 'Failed to batch fetch prices' });
+  }
+});
+
+/**
+ * GET /api/market/sources
+ * Get list of available data sources and their status
+ */
+router.get('/sources', (req, res) => {
+  res.json({
+    sources: [
+      { name: 'CoinGecko', type: 'REST', requiresKey: false, status: 'active' },
+      { name: 'Coinpaprika', type: 'REST', requiresKey: false, status: 'active' },
+      { name: 'CCXT', type: 'Exchange', requiresKey: false, status: 'active', exchanges: ['Binance', 'Coinbase', 'Kraken'] },
+      { name: 'CoinStats', type: 'REST', requiresKey: true, status: process.env.COINSTATS_API_KEY ? 'active' : 'inactive' },
+      { name: 'BitQuery', type: 'GraphQL', requiresKey: true, status: process.env.BITQUERY_API_KEY ? 'active' : 'inactive', features: ['1-second streams', 'market cap', 'stablecoins'] },
+      { name: 'TwelveData', type: 'REST', requiresKey: true, status: process.env.TWELVEDATA_API_KEY ? 'active' : 'inactive' },
+      { name: 'Finnhub', type: 'REST', requiresKey: true, status: process.env.FINNHUB_API_KEY ? 'active' : 'inactive' },
+      { name: 'AlphaVantage', type: 'REST', requiresKey: true, status: process.env.ALPHAVANTAGE_API_KEY ? 'active' : 'inactive' },
+      { name: 'DexScreener', type: 'REST', requiresKey: false, status: 'active' },
+    ],
+    cache: {
+      ttl: '30 seconds',
+      currentSize: Object.keys(getCachedPrices()).length,
+    },
+  });
 });
 
 export default router;

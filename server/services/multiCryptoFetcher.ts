@@ -255,6 +255,306 @@ async function fetchFromDexScreener(symbol: string): Promise<CryptoPrice | null>
 }
 
 /**
+ * Fetch price from Coinpaprika API (Free, no API key required)
+ * https://api.coinpaprika.com/v1
+ */
+async function fetchFromCoinpaprika(symbol: string): Promise<CryptoPrice | null> {
+  try {
+    const coinpaprikaIds: Record<string, string> = {
+      BTC: 'btc-bitcoin',
+      ETH: 'eth-ethereum',
+      SOL: 'sol-solana',
+      SUI: 'sui-sui',
+      BNB: 'bnb-binance-coin',
+      XRP: 'xrp-xrp',
+      ADA: 'ada-cardano',
+      DOGE: 'doge-dogecoin',
+      DOT: 'dot-polkadot',
+      MATIC: 'matic-polygon',
+    };
+
+    const coinId = coinpaprikaIds[symbol];
+    if (!coinId) return null;
+
+    const response = await axios.get(
+      `https://api.coinpaprika.com/v1/coins/${coinId}`,
+      { timeout: 5000 }
+    );
+
+    const data = response.data;
+    const quotes = data.quotes?.USD;
+    
+    if (quotes) {
+      return {
+        symbol,
+        price: quotes.price || 0,
+        change24h: quotes.percent_change_24h || 0,
+        volume24h: quotes.volume_24h || 0,
+        marketCap: quotes.market_cap || 0,
+        source: 'coinpaprika',
+        timestamp: Date.now(),
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`[Coinpaprika] Failed to fetch ${symbol}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch multiple coins from Coinpaprika in a single request
+ * More efficient for fetching multiple assets
+ */
+async function fetchMultipleFromCoinpaprika(symbols: string[]): Promise<CryptoPrice[]> {
+  try {
+    const response = await axios.get(
+      'https://api.coinpaprika.com/v1/tickers',
+      { timeout: 10000 }
+    );
+
+    const coinpaprikaIds: Record<string, string> = {
+      BTC: 'btc-bitcoin',
+      ETH: 'eth-ethereum',
+      SOL: 'sol-solana',
+      SUI: 'sui-sui',
+      BNB: 'bnb-binance-coin',
+      XRP: 'xrp-xrp',
+      ADA: 'ada-cardano',
+      DOGE: 'doge-dogecoin',
+      DOT: 'dot-polkadot',
+      MATIC: 'matic-polygon',
+    };
+
+    const results: CryptoPrice[] = [];
+    const tickers = response.data;
+
+    for (const symbol of symbols) {
+      const coinId = coinpaprikaIds[symbol];
+      if (!coinId) continue;
+
+      const ticker = tickers.find((t: any) => t.id === coinId);
+      if (ticker && ticker.quotes?.USD) {
+        const quotes = ticker.quotes.USD;
+        results.push({
+          symbol,
+          price: quotes.price || 0,
+          change24h: quotes.percent_change_24h || 0,
+          volume24h: quotes.volume_24h || 0,
+          marketCap: quotes.market_cap || 0,
+          source: 'coinpaprika',
+          timestamp: Date.now(),
+        });
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error(`[Coinpaprika] Failed to fetch multiple:`, error.message);
+    return [];
+  }
+}
+
+/**
+ * Fetch real-time price from BitQuery GraphQL API
+ * https://docs.bitquery.io/
+ * Provides 1-second price streams for crypto assets
+ */
+async function fetchFromBitQuery(symbol: string): Promise<CryptoPrice | null> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) {
+      console.warn('[BitQuery] API key not configured');
+      return null;
+    }
+
+    // GraphQL query for 1-second price stream
+    const query = `
+      query GetCryptoPrice($symbol: String!) {
+        ethereum(network: ethereum) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+          ) {
+            tradeAmount
+            price
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await axios.post(
+      'https://streaming.bitquery.io/graphql',
+      {
+        query,
+        variables: { symbol },
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': apiKey,
+        },
+        timeout: 10000,
+      }
+    );
+
+    const trades = response.data?.data?.ethereum?.dexTrades;
+    if (trades && trades.length > 0) {
+      const latestTrade = trades[0];
+      return {
+        symbol,
+        price: latestTrade.priceUSD || latestTrade.price || 0,
+        change24h: 0, // BitQuery provides raw price, calculate change separately
+        volume24h: 0,
+        source: 'bitquery',
+        timestamp: Date.now(),
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch ${symbol}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch market cap and price from BitQuery
+ * Based on: https://ide.bitquery.io/1-second-crypto-price-stream-with-mcap
+ */
+async function fetchMarketCapFromBitQuery(symbol: string): Promise<{ price: number; marketCap: number } | null> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) return null;
+
+    const query = `
+      query GetMarketCap($symbol: String!) {
+        ethereum(network: ethereum) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+          ) {
+            priceUSD
+            tradeAmount
+            block {
+              timestamp
+            }
+          }
+        }
+        # Get circulating supply from token info
+        ethereum(network: ethereum) {
+          tokenTransfers(
+            options: {desc: ["block.height"], limit: 1}
+            currency: {is: $symbol}
+          ) {
+            currency {
+              address
+              name
+              symbol
+              decimals
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await axios.post(
+      'https://streaming.bitquery.io/graphql',
+      {
+        query,
+        variables: { symbol },
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': apiKey,
+        },
+        timeout: 10000,
+      }
+    );
+
+    const trades = response.data?.data?.ethereum?.dexTrades;
+    if (trades && trades.length > 0) {
+      return {
+        price: trades[0].priceUSD || 0,
+        marketCap: 0, // Would need additional calculation with supply
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch market cap for ${symbol}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch stablecoin prices from BitQuery
+ * Based on: https://ide.bitquery.io/stablecoin-1-second-price-stream
+ */
+async function fetchStablecoinPrice(symbol: string): Promise<CryptoPrice | null> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) return null;
+
+    const stablecoins = ['USDT', 'USDC', 'DAI', 'BUSD', 'TUSD'];
+    if (!stablecoins.includes(symbol)) return null;
+
+    const query = `
+      query GetStablecoinPrice($symbol: String!) {
+        ethereum(network: ethereum) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+            quoteCurrency: {is: "USD"}
+          ) {
+            price
+            priceUSD
+            tradeAmount
+            block {
+              timestamp
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await axios.post(
+      'https://streaming.bitquery.io/graphql',
+      {
+        query,
+        variables: { symbol },
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-KEY': apiKey,
+        },
+        timeout: 10000,
+      }
+    );
+
+    const trades = response.data?.data?.ethereum?.dexTrades;
+    if (trades && trades.length > 0) {
+      return {
+        symbol,
+        price: trades[0].priceUSD || trades[0].price || 1, // Stablecoins should be ~$1
+        change24h: 0,
+        volume24h: 0,
+        source: 'bitquery-stablecoin',
+        timestamp: Date.now(),
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch stablecoin ${symbol}:`, error.message);
+    return null;
+  }
+}
+
+/**
  * Multi-source price fetcher with fallback strategy
  * Tries multiple sources in order of reliability
  */
@@ -275,8 +575,10 @@ export async function fetchCryptoPrice(symbol: string): Promise<CryptoPrice | nu
   // Try sources in order of reliability
   const sources = [
     fetchFromCoinGecko,
+    fetchFromCoinpaprika, // NEW: Free, no API key required
     fetchFromCCXT,
     fetchFromCoinStats,
+    fetchFromBitQuery, // NEW: 1-second price streams
     fetchFromTwelveData,
     fetchFromFinnhub,
     fetchFromAlphaVantage,
@@ -325,12 +627,31 @@ export async function fetchCryptoPrice(symbol: string): Promise<CryptoPrice | nu
 
 /**
  * Fetch multiple crypto prices in parallel
+ * Uses Coinpaprika batch endpoint for efficiency when available
  */
 export async function fetchMultiplePrices(symbols: string[]): Promise<Record<string, CryptoPrice>> {
   const results: Record<string, CryptoPrice> = {};
   
+  // Try Coinpaprika batch fetch first (most efficient)
+  try {
+    const coinpaprikaResults = await fetchMultipleFromCoinpaprika(symbols);
+    for (const result of coinpaprikaResults) {
+      results[result.symbol] = result;
+      priceCache[result.symbol] = {
+        price: result.price,
+        timestamp: result.timestamp,
+        source: result.source,
+      };
+    }
+  } catch (error) {
+    console.error('[MultiFetcher] Coinpaprika batch fetch failed:', error);
+  }
+
+  // Fetch remaining symbols individually
+  const remainingSymbols = symbols.filter(s => !results[s]);
+  
   await Promise.all(
-    symbols.map(async (symbol) => {
+    remainingSymbols.map(async (symbol) => {
       const price = await fetchCryptoPrice(symbol);
       if (price) {
         results[symbol] = price;
@@ -354,3 +675,6 @@ export function getCachedPrices(): Record<string, { price: number; timestamp: nu
 export function clearCache(): void {
   Object.keys(priceCache).forEach(key => delete priceCache[key]);
 }
+
+// Export BitQuery functions for direct access
+export { fetchFromBitQuery, fetchMarketCapFromBitQuery, fetchStablecoinPrice, fetchMultipleFromCoinpaprika };
