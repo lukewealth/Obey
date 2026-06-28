@@ -8,6 +8,7 @@ import {
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
   Wifi, BarChart3, ArrowLeftRight, QrCode, Cloud, Brain, Lightbulb
 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { motionVariants } from "../styles/design-tokens";
 
 interface DashboardHomeProps {
@@ -622,6 +623,131 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
                     strokeLinejoin="round" 
                   />
                 </svg>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Asset Performance Bar Chart - Light Purple Card */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl p-6 md:p-8"
+        style={{
+          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(167, 139, 250, 0.1) 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(139, 92, 246, 0.2)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
+              <BarChart3 size={20} className="text-purple-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-white tracking-tight">Market Volume Comparison</h3>
+              <p className="text-xs text-gray-400 mt-0.5">24h Trading Volume by Asset</p>
+            </div>
+          </div>
+          <motion.div
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30"
+          >
+            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
+            <span className="text-xs text-purple-300 font-medium">Live Data</span>
+          </motion.div>
+        </div>
+
+        <div className="h-80 md:h-96">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={[
+                { name: 'Bitcoin', symbol: 'BTC', volume: 28500000000, price: prices.BTC, fill: '#f59e0b' },
+                { name: 'Ethereum', symbol: 'ETH', volume: 15200000000, price: prices.ETH, fill: '#3b82f6' },
+                { name: 'Solana', symbol: 'SOL', volume: 3800000000, price: prices.SOL, fill: '#a855f7' },
+                { name: 'Sui', symbol: 'SUI', volume: 850000000, price: prices.SUI, fill: '#06b6d4' },
+                { name: 'BNB', symbol: 'BNB', volume: 1200000000, price: 960000, fill: '#eab308' },
+                { name: 'XRP', symbol: 'XRP', volume: 2100000000, price: 1920, fill: '#64748b' },
+              ]}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(255, 255, 255, 0.1)"
+                vertical={false}
+              />
+              <XAxis 
+                dataKey="symbol"
+                stroke="rgba(255, 255, 255, 0.5)"
+                tick={{ fill: 'rgba(255, 255, 255, 0.7)', fontSize: 12 }}
+                axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+              />
+              <YAxis 
+                stroke="rgba(255, 255, 255, 0.5)"
+                tick={{ fill: 'rgba(255, 255, 255, 0.7)', fontSize: 12 }}
+                axisLine={{ stroke: 'rgba(255, 255, 255, 0.2)' }}
+                tickFormatter={(value) => `${(value / 1000000000).toFixed(1)}B`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                  border: '1px solid rgba(139, 92, 246, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(12px)',
+                }}
+                labelStyle={{ color: 'rgba(255, 255, 255, 0.9)', fontWeight: 600 }}
+                itemStyle={{ color: 'rgba(255, 255, 255, 0.8)' }}
+                formatter={(value: number, name: string) => [
+                  `$${(value / 1000000000).toFixed(2)}B`,
+                  'Volume'
+                ]}
+                labelFormatter={(label) => `${label}`}
+              />
+              <Bar 
+                dataKey="volume" 
+                radius={[8, 8, 0, 0]}
+                maxBarSize={60}
+              >
+                {[
+                  { name: 'Bitcoin', symbol: 'BTC', volume: 28500000000, price: prices.BTC, fill: '#f59e0b' },
+                  { name: 'Ethereum', symbol: 'ETH', volume: 15200000000, price: prices.ETH, fill: '#3b82f6' },
+                  { name: 'Solana', symbol: 'SOL', volume: 3800000000, price: prices.SOL, fill: '#a855f7' },
+                  { name: 'Sui', symbol: 'SUI', volume: 850000000, price: prices.SUI, fill: '#06b6d4' },
+                  { name: 'BNB', symbol: 'BNB', volume: 1200000000, price: 960000, fill: '#eab308' },
+                  { name: 'XRP', symbol: 'XRP', volume: 2100000000, price: 1920, fill: '#64748b' },
+                ].map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.fill}
+                    className="hover:opacity-80 transition-opacity cursor-pointer"
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Asset Price Legend */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-6 border-t border-purple-500/20">
+          {[
+            { name: 'Bitcoin', symbol: 'BTC', price: prices.BTC, color: 'bg-amber-500' },
+            { name: 'Ethereum', symbol: 'ETH', price: prices.ETH, color: 'bg-blue-500' },
+            { name: 'Solana', symbol: 'SOL', price: prices.SOL, color: 'bg-purple-500' },
+            { name: 'Sui', symbol: 'SUI', price: prices.SUI, color: 'bg-cyan-500' },
+            { name: 'BNB', symbol: 'BNB', price: 960000, color: 'bg-yellow-500' },
+            { name: 'XRP', symbol: 'XRP', price: 1920, color: 'bg-gray-500' },
+          ].map((asset) => (
+            <motion.div
+              key={asset.symbol}
+              whileHover={{ scale: 1.02 }}
+              className="flex items-center gap-2 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <div className={`w-2 h-2 rounded-full ${asset.color}`} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-white truncate">{asset.symbol}</p>
+                <p className="text-[10px] text-gray-400 font-mono">{asset.price.toLocaleString()}</p>
               </div>
             </motion.div>
           ))}
