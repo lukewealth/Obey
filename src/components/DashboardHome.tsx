@@ -1,13 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AppTab, UserProfile, Transaction } from "../types";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform, animate } from "framer-motion";
 import {
-  ArrowUpRight, ArrowDownLeft, Wallet, Send, RefreshCw, Smartphone,
-  Gift, Eye, EyeOff, ShoppingBag, ArrowDown, Utensils, Plane, Coffee,
-  ChevronRight, CreditCard, Bell, Sparkles, TrendingUp, Search,
-  ArrowRight, ShieldCheck, Zap, BarChart3, Star, CheckCircle2, Activity
+  ArrowUpRight, ArrowDownRight, ArrowDownLeft, Wallet, Send, Smartphone,
+  Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
+  CreditCard, Bell, Sparkles, TrendingUp, Search,
+  ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw
 } from "lucide-react";
-
+import { motionVariants } from "../styles/design-tokens";
 
 interface DashboardHomeProps {
   profile: UserProfile;
@@ -22,341 +22,452 @@ interface DashboardHomeProps {
   };
 }
 
-export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
-  const [hideBalance, setHideBalance] = React.useState(false);
+const AnimatedNumber = ({ value, prefix = "", suffix = "" }: { value: number; prefix?: string; suffix?: string }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => `${prefix}${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${suffix}`);
+  const [displayValue, setDisplayValue] = useState(`${prefix}0.00${suffix}`);
 
-  // Helper icons for categories
+  useEffect(() => {
+    const controls = animate(count, value, {
+      duration: 1.2,
+      ease: [0.22, 1, 0.36, 1],
+    });
+    
+    const unsubscribe = rounded.on("change", (v) => setDisplayValue(v));
+    
+    return () => {
+      controls.stop();
+      unsubscribe();
+    };
+  }, [value]);
+
+  return <span>{displayValue}</span>;
+};
+
+const SkeletonPulse = ({ className }: { className?: string }) => (
+  <div className={`relative overflow-hidden bg-white/5 rounded-xl ${className}`}>
+    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+  </div>
+);
+
+const ActionButton = ({ 
+  icon: Icon, 
+  label, 
+  onClick, 
+  variant = "primary",
+  delay = 0 
+}: { 
+  icon: any; 
+  label: string; 
+  onClick: () => void; 
+  variant?: "primary" | "secondary" | "outline";
+  delay?: number;
+}) => {
+  const variants = {
+    primary: "bg-gradient-to-br from-primary to-emerald-600 text-white shadow-lg shadow-primary/20",
+    secondary: "bg-white/5 border border-white/10 text-white hover:bg-white/10",
+    outline: "bg-transparent border border-white/20 text-white hover:bg-white/5",
+  };
+
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.4 }}
+      whileHover={{ scale: 1.02, y: -2 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className={`flex-1 py-4 px-4 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 transition-all duration-200 ${variants[variant]}`}
+    >
+      <Icon size={18} />
+      <span>{label}</span>
+    </motion.button>
+  );
+};
+
+const QuickActionCard = ({ 
+  icon: Icon, 
+  label, 
+  description, 
+  onClick, 
+  color,
+  delay = 0 
+}: { 
+  icon: any; 
+  label: string; 
+  description: string; 
+  onClick: () => void; 
+  color: string;
+  delay?: number;
+}) => (
+  <motion.button
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.4 }}
+    whileHover={{ scale: 1.02, y: -4 }}
+    whileTap={{ scale: 0.98 }}
+    onClick={onClick}
+    className="relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 p-5 text-left group hover:border-primary/30 transition-all duration-300"
+  >
+    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    
+    <div className="relative z-10">
+      <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+        <Icon size={22} className="text-white" />
+      </div>
+      <h4 className="font-bold text-white text-base mb-1">{label}</h4>
+      <p className="text-xs text-gray-400">{description}</p>
+    </div>
+    
+    <ChevronRight size={16} className="absolute top-5 right-5 text-gray-500 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+  </motion.button>
+);
+
+const TransactionRow = ({ tx, index }: { tx: Transaction; index: number }) => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "Electronics":
-        return <ShoppingBag size={18} />;
-      case "Transfer":
-        return <ArrowDownLeft size={18} />;
-      case "Dining":
-        return <Utensils size={18} />;
-      case "Travel":
-        return <Plane size={18} />;
-      case "Food":
-        return <Coffee size={18} />;
-      case "Crypto":
-        return <RefreshCw size={18} />;
-      case "Airtime":
-        return <Smartphone size={18} />;
-      case "GiftCard":
-        return <Gift size={18} />;
-      default:
-        return <Wallet size={18} />;
+      case "Electronics": return <ShoppingBag size={18} />;
+      case "Transfer": return <ArrowDownLeft size={18} />;
+      case "Dining": return <Utensils size={18} />;
+      case "Travel": return <Plane size={18} />;
+      case "Food": return <Coffee size={18} />;
+      case "Crypto": return <RefreshCw size={18} />;
+      case "Airtime": return <Smartphone size={18} />;
+      case "GiftCard": return <Gift size={18} />;
+      default: return <Wallet size={18} />;
     }
   };
+
+  const isCredit = tx.type === "Credit";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      whileHover={{ x: 4 }}
+      className="flex items-center justify-between p-4 rounded-xl hover:bg-white/5 transition-all duration-200 cursor-pointer group"
+    >
+      <div className="flex items-center gap-4">
+        <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${
+          isCredit ? 'bg-emerald-500/10 text-emerald-400' : 'bg-white/5 text-gray-400'
+        } group-hover:scale-110 transition-transform duration-200`}>
+          {getCategoryIcon(tx.category)}
+        </div>
+        <div>
+          <p className="font-semibold text-white text-sm">{tx.title}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{tx.category} • {tx.time}</p>
+        </div>
+      </div>
+      
+      <div className="text-right">
+        <p className={`font-mono font-bold text-sm ${isCredit ? 'text-emerald-400' : 'text-white'}`}>
+          {isCredit ? '+' : '-'}₦{tx.amount.toLocaleString()}
+        </p>
+        <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium mt-1 ${
+          tx.status === "Success" ? 'bg-emerald-500/10 text-emerald-400' :
+          tx.status === "Processing" ? 'bg-amber-500/10 text-amber-400' :
+          'bg-red-500/10 text-red-400'
+        }`}>
+          <div className={`w-1 h-1 rounded-full ${
+            tx.status === "Success" ? 'bg-emerald-400' :
+            tx.status === "Processing" ? 'bg-amber-400 animate-pulse' :
+            'bg-red-400'
+          }`} />
+          {tx.status}
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const CryptoCard = ({ name, symbol, price, change, icon: Icon, color, delay }: {
+  name: string;
+  symbol: string;
+  price: string;
+  change: string;
+  icon: any;
+  color: string;
+  delay: number;
+}) => {
+  const isPositive = change.startsWith("+");
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.4 }}
+      whileHover={{ scale: 1.02, y: -2 }}
+      className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/10 hover:border-primary/30 transition-all duration-200 cursor-pointer group"
+    >
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-200`}>
+          <Icon size={18} className="text-white" fill={symbol === "BTC" ? "currentColor" : "none"} />
+        </div>
+        <div>
+          <p className="font-semibold text-white text-sm">{name}</p>
+          <p className="text-xs text-gray-400">{symbol}</p>
+        </div>
+      </div>
+      
+      <div className="text-right">
+        <p className="font-mono font-bold text-sm text-white">₦{price}</p>
+        <p className={`text-xs font-medium flex items-center justify-end gap-0.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`}>
+          {isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+          {change}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
+
+export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
+  const [hideBalance, setHideBalance] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.1 }
+      transition: { staggerChildren: 0.08 }
     }
   };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } }
   };
 
-
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6 md:space-y-12 pb-24 px-1 md:px-0"
+      className="space-y-6 pb-24"
     >
-      {/* Header Section */}
-      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2">
-          <motion.div 
+      {/* Header */}
+      <motion.div variants={itemVariants} className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent-blue/50 dark:bg-white/5 border border-blue-100 dark:border-white/10 text-primary dark:text-primary text-[10px] font-black uppercase tracking-widest"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium mb-3"
           >
-            <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
-            System Live: v4.2.0-NGN
+            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+            System Online
           </motion.div>
-          <h1 className="text-3xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">
-            Welcome back, <span className="gradient-text">{profile.name.split(" ")[0]}</span>.
+          <h1 className="text-2xl md:text-3xl font-bold text-white">
+            Welcome back, <span className="text-primary">{profile.name.split(" ")[0]}</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 font-medium text-base md:text-lg">Your financial ecosystem is performing optimally.</p>
+          <p className="text-gray-400 text-sm mt-1">Your financial ecosystem is performing optimally.</p>
         </div>
 
-        <div className="flex items-center gap-4">
-           <div className="relative hidden md:block group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary transition-colors" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search assets..." 
-              className="bg-white/50 dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-[20px] pl-12 pr-6 py-3 text-sm focus:ring-2 focus:ring-primary/10 w-72 transition-all outline-none text-gray-900 dark:text-white"
+        <div className="flex items-center gap-3">
+          <div className="relative hidden md:block">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search..."
+              className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 w-56 transition-all"
             />
           </div>
-          <button className="p-3 bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-600 dark:text-gray-400 rounded-[18px] md:rounded-[20px] hover:text-primary hover:bg-accent-blue dark:hover:bg-white/10 transition-all shadow-sm active-press">
-            <Bell size={20} className="md:w-5 md:h-5" />
-          </button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors relative"
+          >
+            <Bell size={18} className="text-gray-400" />
+            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+          </motion.button>
         </div>
       </motion.div>
 
-      {/* Primary Bento Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+      {/* Balance Card */}
+      <motion.div
+        variants={itemVariants}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0F1419] to-[#1A1F2E] border border-white/10 p-6 md:p-8"
+      >
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl" />
         
-        {/* Main Balance Card */}
-        <motion.div 
-          variants={itemVariants}
-          className="lg:col-span-8 bento-card min-h-[340px] md:min-h-[400px] p-6 md:p-12 flex flex-col justify-between group overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-accent-blue/40 dark:bg-primary/10 rounded-full blur-[60px] md:blur-[100px] -z-10 group-hover:scale-110 transition-transform duration-1000"></div>
-          
-          <div className="space-y-6 md:space-y-8">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 text-primary rounded-[16px] md:rounded-[20px] flex items-center justify-center shadow-inner">
-                  <Wallet size={20} className="md:w-6 md:h-6" />
-                </div>
-                <div>
-                  <p className="text-[10px] md:text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Total Liquidity</p>
-                  <p className="text-xs md:text-sm font-bold text-gray-900 dark:text-white">Institutional NGN Vault</p>
-                </div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-primary to-emerald-600 flex items-center justify-center shadow-lg shadow-primary/20">
+                <Wallet size={20} className="text-white" />
               </div>
-              <button 
-                onClick={() => setHideBalance(!hideBalance)}
-                className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-gray-400 hover:text-primary hover:bg-accent-blue dark:hover:bg-white/5 rounded-[16px] md:rounded-[20px] transition-all active-press"
-              >
-                {hideBalance ? <EyeOff size={20} className="md:w-5 md:h-5" /> : <Eye size={20} className="md:w-5 md:h-5" />}
-              </button>
-            </div>
-
-            <div className="space-y-1">
-              <p className="text-[11px] md:text-[13px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2">
-                <TrendingUp size={12} className="md:w-3.5 md:h-3.5" /> +2.48% Performance
-              </p>
-              <div className="flex items-baseline gap-2 md:gap-4 overflow-hidden">
-                <span className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black text-gray-900 dark:text-white tracking-tighter leading-none truncate">
-                  {hideBalance ? "••••••" : `₦${profile.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-                </span>
-                <span className="text-lg md:text-2xl text-gray-400 dark:text-gray-600 font-bold font-mono uppercase shrink-0">NGN</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-6 mt-8 md:mt-12">
-            {[
-              { id: "fund", label: "Fund", icon: ArrowDownLeft, bg: "bg-primary text-white shadow-primary/20" },
-              { id: "withdraw", label: "Withdraw", icon: ArrowUpRight, bg: "bg-accent-blue dark:bg-white/10 text-primary dark:text-white border border-blue-200/50 dark:border-white/10 shadow-blue-500/10" },
-              { id: "transfer", label: "Transfer", icon: Send, bg: "bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-white/10 shadow-gray-200/50" }
-            ].map((btn) => (
-              <button
-                key={btn.id}
-                onClick={() => onSelectAction(btn.id)}
-                className={`${btn.bg} py-4 md:py-5 px-4 md:px-6 rounded-[18px] md:rounded-[24px] text-sm md:text-base font-black flex items-center justify-center gap-2 md:gap-3 active-scale transition-all duration-200 shadow-lg hover:-translate-y-1 hover:shadow-xl`}
-              >
-                <btn.icon size={18} className="md:w-5 md:h-5" /> {btn.label}
-              </button>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Premium Card Display */}
-        <motion.div 
-          variants={itemVariants}
-          className="lg:col-span-4 bg-gray-900 dark:bg-black rounded-[35px] md:rounded-[45px] p-8 md:p-10 relative overflow-hidden flex flex-col justify-between shadow-2xl group text-white min-h-[280px] md:min-h-auto"
-        >
-          <div className="absolute inset-0 shimmer opacity-10 pointer-events-none"></div>
-          <div className="absolute -top-12 -right-12 w-64 h-64 bg-primary/20 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000"></div>
-          
-          <div className="flex justify-between items-start relative z-10">
-            <div className="space-y-1">
-              <span className="text-xl md:text-2xl font-black tracking-tighter italic">OBEY</span>
-              <p className="text-[9px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">Platinum Elite</p>
-            </div>
-            <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-xl rounded-[20px] md:rounded-[24px] flex items-center justify-center border border-white/10 group-hover:bg-primary transition-colors shadow-lg">
-              <CreditCard size={24} className="md:w-7 md:h-7" />
-            </div>
-          </div>
-
-          <div className="space-y-8 md:space-y-10 relative z-10">
-            <div className="space-y-2">
-              <p className="text-[9px] md:text-[10px] text-white/30 font-black uppercase tracking-[0.4em]">Account Number</p>
-              <p className="font-mono text-xl sm:text-2xl md:text-3xl tracking-[0.2em] md:tracking-[0.25em] font-bold text-white/90">
-                8829 1044 22
-              </p>
-            </div>
-            <div className="flex justify-between items-end pt-4 border-t border-white/10">
               <div>
-                <p className="text-[8px] md:text-[9px] uppercase tracking-widest text-white/30 font-black mb-1">MEMBER SINCE</p>
-                <p className="text-xs md:text-sm font-bold uppercase tracking-tight">JUNE 2026</p>
-              </div>
-              <div className="flex gap-2">
-                <div className="w-8 h-5 md:w-10 md:h-7 bg-red-500/60 rounded-md md:rounded-lg shadow-sm"></div>
-                <div className="w-8 h-5 md:w-10 md:h-7 bg-amber-500/60 rounded-md md:rounded-lg -ml-4 shadow-sm"></div>
+                <p className="text-xs text-gray-400 font-medium">Total Balance</p>
+                <p className="text-sm text-white font-semibold">NGN Wallet</p>
               </div>
             </div>
-          </div>
-        </motion.div>
-
-      </div>
-
-      {/* Quick Actions Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-        {[
-          { id: "buy-airtime", label: "Airtime", desc: "Network Node", icon: Smartphone, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10" },
-          { id: "buy-data", label: "Data", desc: "Institutional Bundles", icon: Zap, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10" },
-          { id: "buy-giftcard", label: "Buy Gifts", desc: "Digital Market", icon: Gift, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10" },
-          { id: "sell-giftcard", label: "Sell Card", desc: "Fast Liquidity", icon: TrendingUp, color: "text-emerald-500", bg: "bg-emerald-50 dark:bg-emerald-500/10" }
-        ].map((action) => (
-          <button
-            key={action.id}
-            onClick={() => onSelectAction(action.id)}
-            className="bento-card p-5 md:p-8 flex flex-col justify-between gap-4 md:gap-6 hover:border-primary/40 group active-scale text-left transition-all duration-200"
-          >
-            <div className={`w-12 h-12 md:w-14 md:h-14 ${action.bg} ${action.color} rounded-[18px] md:rounded-[22px] flex items-center justify-center group-hover:scale-110 transition-transform duration-200 shadow-sm`}>
-              <action.icon size={22} className="md:w-7 md:h-7" />
-            </div>
-            <div>
-              <p className="text-lg md:text-xl font-black text-gray-900 dark:text-white tracking-tight">{action.label}</p>
-              <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-1">{action.desc}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* Bottom Row: Ledger + Market */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Recent Activity */}
-        <motion.section 
-          variants={itemVariants}
-          className="lg:col-span-8 bento-card p-6 md:p-10"
-        >
-          <div className="flex justify-between items-center mb-8 md:mb-10">
-            <div>
-              <h3 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white tracking-tight">Financial Ledger</h3>
-              <p className="text-xs md:text-sm text-gray-400 font-medium">Real-time settlement history.</p>
-            </div>
-            <button 
-              onClick={() => onNavigateTab(AppTab.HISTORY)}
-              className="text-primary text-[10px] md:text-[11px] font-black uppercase tracking-widest hover:gap-3 flex items-center gap-1.5 md:gap-2 transition-all border-b-2 border-primary/10 pb-1"
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setHideBalance(!hideBalance)}
+              className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
             >
-              Full History <ArrowRight size={12} className="md:w-3.5 md:h-3.5" />
-            </button>
+              {hideBalance ? <EyeOff size={16} className="text-gray-400" /> : <Eye size={16} className="text-gray-400" />}
+            </motion.button>
           </div>
 
-          <div className="space-y-1 custom-scrollbar">
-            {Array.isArray(transactions) && transactions.length > 0 ? (
-              transactions.slice(0, 5).map((tx) => (
-                <div 
-                  key={tx.id} 
-                  className="flex items-center justify-between p-4 md:p-6 hover:bg-accent-blue/40 dark:hover:bg-white/5 transition-all duration-200 rounded-[20px] md:rounded-[24px] group border border-transparent hover:border-blue-100 dark:hover:border-white/10 cursor-pointer active-scale-98"
-                >
-                  <div className="flex items-center gap-4 md:gap-6">
-                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-[16px] md:rounded-[20px] bg-white dark:bg-white/10 border border-gray-100 dark:border-white/10 flex items-center justify-center text-gray-400 group-hover:text-primary group-hover:scale-105 transition-all duration-200 shadow-sm shrink-0">
-                      {getCategoryIcon(tx.category)}
-                    </div>
-                    <div className="overflow-hidden">
-                      <p className="text-sm md:text-lg font-black text-gray-900 dark:text-white tracking-tight truncate">{tx.title}</p>
-                      <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-widest mt-0.5 truncate">
-                        {tx.category} • {tx.time}
-                      </p>
-                    </div>
-                  </div>
+          <div className="mb-6">
+            <div className="flex items-baseline gap-2">
+              <span className="text-gray-400 text-lg font-medium">₦</span>
+              <span className="text-4xl md:text-5xl font-bold text-white tracking-tight">
+                {hideBalance ? "••••••" : <AnimatedNumber value={profile.balance} />}
+              </span>
+              <span className="text-gray-400 text-sm font-medium ml-1">NGN</span>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-medium">
+                <TrendingUp size={12} />
+                +2.48%
+              </div>
+              <span className="text-xs text-gray-400">vs last month</span>
+            </div>
+          </div>
 
-                  <div className="text-right shrink-0">
-                    <p className={`text-base md:text-xl font-mono font-black transition-colors ${tx.type === "Credit" ? "text-emerald-600 group-hover:text-emerald-700" : "text-gray-900 dark:text-white group-hover:text-primary"}`}>
-                      {tx.type === "Credit" ? "+" : "-"}₦{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </p>
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-0.5 md:py-1 rounded-lg text-[8px] md:text-[9px] font-black uppercase tracking-widest mt-1.5 md:mt-2 ${
-                      tx.status === "Success" ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600" : "bg-amber-50 dark:bg-amber-500/10 text-amber-600"
-                    }`}>
-                      {tx.status}
-                    </div>
-                  </div>
-                </div>
+          <div className="flex gap-3">
+            <ActionButton icon={ArrowDownLeft} label="Fund" onClick={() => onSelectAction("fund")} variant="primary" delay={0.1} />
+            <ActionButton icon={ArrowUpRight} label="Withdraw" onClick={() => onSelectAction("withdraw")} variant="secondary" delay={0.2} />
+            <ActionButton icon={Send} label="Transfer" onClick={() => onSelectAction("transfer")} variant="outline" delay={0.3} />
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <QuickActionCard
+          icon={Smartphone}
+          label="Airtime"
+          description="Top up instantly"
+          onClick={() => onSelectAction("buy-airtime")}
+          color="bg-gradient-to-br from-blue-500 to-blue-600"
+          delay={0.1}
+        />
+        <QuickActionCard
+          icon={Zap}
+          label="Data"
+          description="Internet bundles"
+          onClick={() => onSelectAction("buy-data")}
+          color="bg-gradient-to-br from-amber-500 to-orange-600"
+          delay={0.2}
+        />
+        <QuickActionCard
+          icon={Gift}
+          label="Gift Cards"
+          description="Buy & sell"
+          onClick={() => onSelectAction("buy-giftcard")}
+          color="bg-gradient-to-br from-purple-500 to-pink-600"
+          delay={0.3}
+        />
+        <QuickActionCard
+          icon={TrendingUp}
+          label="Trade"
+          description="Crypto market"
+          onClick={() => onNavigateTab(AppTab.TRADE)}
+          color="bg-gradient-to-br from-emerald-500 to-teal-600"
+          delay={0.4}
+        />
+      </div>
+
+      {/* Bottom Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Transactions */}
+        <motion.div
+          variants={itemVariants}
+          className="lg:col-span-8 rounded-2xl bg-white/[0.02] border border-white/10 p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">Recent Activity</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Your latest transactions</p>
+            </div>
+            <motion.button
+              whileHover={{ x: 2 }}
+              onClick={() => onNavigateTab(AppTab.HISTORY)}
+              className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
+            >
+              View all
+              <ArrowRight size={14} />
+            </motion.button>
+          </div>
+
+          <div className="space-y-1">
+            {Array.isArray(transactions) && transactions.length > 0 ? (
+              transactions.slice(0, 5).map((tx, i) => (
+                <TransactionRow key={tx.id} tx={tx} index={i} />
               ))
             ) : (
-              <div className="py-20 text-center space-y-4">
-                 <div className="w-16 h-16 bg-gray-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto text-gray-300 dark:text-gray-600 shadow-inner">
-                    <Activity size={32} />
-                 </div>
-                 <p className="text-sm text-gray-400 font-bold uppercase tracking-widest">No sequential ledger entries found.</p>
+              <div className="py-12 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-4">
+                  <Activity size={24} className="text-gray-500" />
+                </div>
+                <p className="text-gray-400 text-sm">No transactions yet</p>
+                <p className="text-gray-500 text-xs mt-1">Your activity will appear here</p>
               </div>
             )}
           </div>
-        </motion.section>
+        </motion.div>
 
-        {/* Live Markets + Perks */}
-        <motion.section variants={itemVariants} className="lg:col-span-4 space-y-8">
-          
-          {/* Markets */}
-          <div className="bento-card p-8 md:p-10 space-y-6 md:space-y-8">
-            <div className="flex justify-between items-center">
-              <h3 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] text-gray-400">Trading Nodes</h3>
-              <div className="flex items-center gap-2">
-                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                 <span className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">LIVE</span>
-              </div>
+        {/* Markets */}
+        <motion.div
+          variants={itemVariants}
+          className="lg:col-span-4 rounded-2xl bg-white/[0.02] border border-white/10 p-5"
+        >
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-white">Markets</h3>
+              <p className="text-xs text-gray-400 mt-0.5">Live prices</p>
             </div>
-
-            <div className="space-y-3 md:space-y-4 custom-scrollbar">
-              {[
-                { name: "Bitcoin", symbol: "BTC", price: prices.BTC.toLocaleString(), change: "+2.4%", icon: Star, color: "text-amber-500", bg: "bg-amber-50 dark:bg-amber-500/10" },
-                { name: "Ethereum", symbol: "ETH", price: prices.ETH.toLocaleString(), change: "-0.8%", icon: Zap, color: "text-blue-500", bg: "bg-blue-50 dark:bg-blue-500/10" },
-                { name: "Solana", symbol: "SOL", price: prices.SOL.toLocaleString(), change: "+5.2%", icon: Activity, color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-500/10" }
-              ].map((coin) => (
-                <div 
-                  key={coin.symbol} 
-                  onClick={() => onSelectAction("Crypto")}
-                  className="flex items-center justify-between p-4 md:p-5 bg-white dark:bg-white/5 border border-gray-100 dark:border-white/10 rounded-[20px] md:rounded-[22px] hover:border-primary/30 transition-all duration-200 cursor-pointer group active-scale-98"
-                >
-                  <div className="flex items-center gap-3 md:gap-4">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 ${coin.bg} ${coin.color} rounded-[14px] md:rounded-[18px] flex items-center justify-center font-black group-hover:scale-110 transition-transform duration-200 shrink-0 shadow-sm`}>
-                      <coin.icon size={18} fill={coin.symbol === "BTC" ? "currentColor" : "none"} className="md:w-5 md:h-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm md:text-base font-black text-gray-900 dark:text-white tracking-tight">{coin.name}</p>
-                      <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-widest">{coin.symbol}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm md:text-base font-black text-gray-900 dark:text-white font-mono tracking-tighter">₦{coin.price}</p>
-                    <p className={`text-[9px] md:text-[10px] font-black font-mono ${coin.change.startsWith("+") ? "text-emerald-500" : "text-red-500"}`}>
-                      {coin.change}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            <button 
-              onClick={() => onNavigateTab(AppTab.TRADE)}
-              className="w-full py-4 md:py-5 bg-primary/5 hover:bg-primary/10 text-primary rounded-[18px] md:rounded-[22px] text-[10px] md:text-xs font-black uppercase tracking-[0.2em] transition-all active-scale border border-primary/10 hover:border-primary/20"
-            >
-              Open Trading Desk
-            </button>
-          </div>
-
-          {/* Perks Card: Finsy Style */}
-          <div className="bg-accent-yellow/80 dark:bg-accent-yellow/10 border border-yellow-200 dark:border-yellow-900/20 rounded-[35px] md:rounded-[45px] p-8 md:p-10 relative overflow-hidden group shadow-xl">
-             <div className="absolute top-0 right-0 w-32 h-32 bg-white/20 dark:bg-white/5 rounded-full blur-2xl group-hover:scale-125 transition-transform duration-700"></div>
-             <div className="relative z-10 space-y-5 md:space-y-6">
-              <div className="w-12 h-12 md:w-16 md:h-16 bg-white dark:bg-white/10 rounded-[18px] md:rounded-[24px] flex items-center justify-center text-yellow-600 dark:text-yellow-500 shadow-sm border border-yellow-100 dark:border-yellow-900/20">
-                <Sparkles size={24} className="md:w-8 md:h-8" />
-              </div>
-              <h4 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white tracking-tighter leading-tight">Master your <br /> wealth flow.</h4>
-              <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 font-medium leading-relaxed">
-                Unlock exclusive institutional features and sub-zero spread trading.
-              </p>
-              <button className="text-gray-900 dark:text-white text-[10px] md:text-xs font-black uppercase tracking-[0.2em] border-b-2 border-gray-900/10 dark:border-white/10 hover:border-gray-900 dark:hover:border-white transition-all pb-2">
-                UPGRADE TO ELITE
-              </button>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
+              <span className="text-xs text-gray-400">Live</span>
             </div>
           </div>
-        </motion.section>
 
+          <div className="space-y-3">
+            <CryptoCard
+              name="Bitcoin"
+              symbol="BTC"
+              price={prices.BTC.toLocaleString()}
+              change="+2.4%"
+              icon={Star}
+              color="bg-gradient-to-br from-amber-500 to-orange-600"
+              delay={0.1}
+            />
+            <CryptoCard
+              name="Ethereum"
+              symbol="ETH"
+              price={prices.ETH.toLocaleString()}
+              change="-0.8%"
+              icon={Zap}
+              color="bg-gradient-to-br from-blue-500 to-indigo-600"
+              delay={0.2}
+            />
+            <CryptoCard
+              name="Solana"
+              symbol="SOL"
+              price={prices.SOL.toLocaleString()}
+              change="+5.2%"
+              icon={Activity}
+              color="bg-gradient-to-br from-purple-500 to-pink-600"
+              delay={0.3}
+            />
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => onNavigateTab(AppTab.TRADE)}
+            className="w-full mt-4 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-medium text-white hover:bg-white/10 transition-colors"
+          >
+            Open Trading Desk
+          </motion.button>
+        </motion.div>
       </div>
     </motion.div>
   );
