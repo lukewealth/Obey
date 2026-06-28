@@ -28,6 +28,7 @@ import SecuredPortal from "./components/SecuredPortal";
 import AIPage from "./components/AIPage";
 import AssetDetail from "./components/AssetDetail";
 import BankTransfer from "./components/BankTransfer";
+import KYCTierSystem from "./components/KYCTierSystem";
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -98,6 +99,36 @@ export default function App() {
   const [showAnomalyDetection, setShowAnomalyDetection] = useState(false);
   const [showSecuredPortal, setShowSecuredPortal] = useState(false);
   const [portalRiskLevel, setPortalRiskLevel] = useState<'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'>('LOW');
+
+  // --- Session Persistence: Restore on app load ---
+  useEffect(() => {
+    const restoreSession = async () => {
+      const savedSession = localStorage.getItem('obey_session');
+      if (savedSession && !currentUser) {
+        try {
+          const { uid, email } = JSON.parse(savedSession);
+          // Try to restore Supabase session
+          if (supabase) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              setCurrentUser(session.user);
+              setCurrentScreen(AppScreen.DASHBOARD);
+              return;
+            }
+          }
+          // Try Firebase session
+          if (firebaseAuth.currentUser) {
+            setCurrentUser(firebaseAuth.currentUser);
+            setCurrentScreen(AppScreen.DASHBOARD);
+          }
+        } catch (err) {
+          console.warn('[SESSION_RESTORE] Failed:', err);
+          localStorage.removeItem('obey_session');
+        }
+      }
+    };
+    restoreSession();
+  }, []);
 
   // Metadata Capture Node
   const captureMetadata = () => {
@@ -340,6 +371,8 @@ export default function App() {
     const unsubscribeFirebase = onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
         setCurrentUser(user);
+        // Persist session to localStorage
+        localStorage.setItem('obey_session', JSON.stringify({ uid: user.uid, email: user.email }));
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
            notify("success", "Access Authorized", `Welcome back to the OBEY node.`);
@@ -351,6 +384,8 @@ export default function App() {
       if (session) {
         const user = session.user;
         setCurrentUser(user);
+        // Persist session to localStorage
+        localStorage.setItem('obey_session', JSON.stringify({ uid: user.id, email: user.email }));
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
            notify("success", "Access Authorized", `Sequential ledger sync active.`);
@@ -358,6 +393,8 @@ export default function App() {
       } else {
         if (!firebaseAuth.currentUser) {
           setCurrentUser(null);
+          // Clear session from localStorage
+          localStorage.removeItem('obey_session');
           if (currentScreen === AppScreen.DASHBOARD) {
              setCurrentScreen(AppScreen.MARKETING);
           }
@@ -376,6 +413,8 @@ export default function App() {
       supabase.auth.signOut(),
       firebaseAuth.signOut()
     ]);
+    // Clear persisted session
+    localStorage.removeItem('obey_session');
     notify("info", "Session Terminated", "Institutional access securely revoked.");
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
@@ -796,7 +835,18 @@ export default function App() {
                         }} 
                       />
                     )}
-                    {activeTab === AppTab.PROFILE && <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />}
+                    {activeTab === AppTab.PROFILE && (
+                      <div className="space-y-8">
+                        <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />
+                        <KYCTierSystem 
+                          profile={profile} 
+                          onTierUpgrade={(newTier) => {
+                            handleProfileUpdate({ kycLevel: newTier as any });
+                            notify("success", "Tier Upgraded", `Welcome to Tier ${newTier}!`);
+                          }} 
+                        />
+                      </div>
+                    )}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (
                       <AdminSystem 
                         metrics={adminMetrics} 

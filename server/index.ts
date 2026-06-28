@@ -16,6 +16,7 @@ import webhookRoutes from './routes/webhooks';
 import nombaPaymentRoutes from './routes/nomba_payments';
 import aiRoutes from './routes/ai';
 import rewardsRoutes from './routes/rewards';
+import kycRoutes from './routes/kyc';
 import { connectDB, prewarmDB } from './db';
 
 dotenv.config();
@@ -103,6 +104,7 @@ router.use('/webhooks', webhookRoutes);
 router.use('/nomba', nombaPaymentRoutes);
 router.use('/ai', aiRoutes);
 router.use('/rewards', rewardsRoutes);
+router.use('/kyc', kycRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ 

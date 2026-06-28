@@ -10,16 +10,27 @@ const UserSchema = new mongoose.Schema({
   avatar: { type: String },
   kycStatus: { 
     type: String, 
-    enum: ["Unverified", "Pending", "Verified"],
+    enum: ["Unverified", "Pending", "Verified", "Rejected"],
     default: "Unverified"
   },
-  kycLevel: { type: Number, default: 0 },
-  tierLevel: { type: Number, default: 1 }, // 1: Standard, 2: Institutional/Premium
+  kycLevel: { type: Number, default: 1 },
+  tierLevel: { type: Number, default: 1 }, // 1: Standard, 2: Verified, 3: Premium, 4: Institutional
   isEmailVerified: { type: Boolean, default: false },
   balance: { type: Number, default: 0 },
   promoCode: { type: String },
   twoFactorEnabled: { type: Boolean, default: false },
   metadata: { type: mongoose.Schema.Types.Mixed },
+  kycUpgradeRequest: {
+    requestedTier: { type: Number },
+    documents: [{ type: String }],
+    requestedAt: { type: Date },
+    status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+    approvedAt: { type: Date },
+    approvedBy: { type: String },
+    rejectedAt: { type: Date },
+    rejectedBy: { type: String },
+    reason: { type: String }
+  },
   lastSync: { type: Date, default: Date.now }
 }, { timestamps: true });
 
