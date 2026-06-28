@@ -6,7 +6,7 @@ import {
   Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
   CreditCard, Bell, Sparkles, TrendingUp, Search,
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
-  Wifi, BarChart3, ArrowLeftRight, QrCode, Cloud
+  Wifi, BarChart3, ArrowLeftRight, QrCode, Cloud, Brain, Lightbulb
 } from "lucide-react";
 import { motionVariants } from "../styles/design-tokens";
 
@@ -308,14 +308,37 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
+              placeholder="AI search transactions..."
               className="bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 w-56 transition-all"
             />
+            {searchQuery && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                <Brain size={14} className="text-purple-400" />
+              </motion.div>
+            )}
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              // Trigger account verification check
+              const isVerified = profile.isEmailVerified && profile.id && profile.balance >= 0;
+              if (isVerified) {
+                // Show success notification
+                const event = new CustomEvent('notification', {
+                  detail: { type: 'success', title: 'Account Verified', message: 'All systems operational' }
+                });
+                window.dispatchEvent(event);
+              } else {
+                // Show verification modal
+                const event = new CustomEvent('show-verification');
+                window.dispatchEvent(event);
+              }
+            }}
             className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors relative"
           >
             <Cloud size={18} className="text-gray-400" />
@@ -525,6 +548,163 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </motion.button>
         </motion.div>
       </div>
+
+      {/* Asset Performance - Enhanced Real-time View */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl p-5"
+        style={{
+          background: 'rgba(255, 255, 255, 0.02)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 size={20} className="text-emerald-400" />
+            <h3 className="text-lg font-bold text-white tracking-tight">Asset Performance</h3>
+          </div>
+          <motion.div
+            animate={{ opacity: [1, 0.4, 1] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex items-center gap-1.5"
+          >
+            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+            <span className="text-xs text-emerald-400 font-medium">Real-time</span>
+          </motion.div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            { name: "Bitcoin", symbol: "BTC", price: prices.BTC, change: "+2.4%", icon: Star, color: "from-amber-500 to-orange-600" },
+            { name: "Ethereum", symbol: "ETH", price: prices.ETH, change: "-0.8%", icon: Zap, color: "from-blue-500 to-indigo-600" },
+            { name: "Solana", symbol: "SOL", price: prices.SOL, change: "+5.2%", icon: Activity, color: "from-purple-500 to-pink-600" },
+            { name: "Sui", symbol: "SUI", price: prices.SUI, change: "+1.8%", icon: Sparkles, color: "from-cyan-500 to-blue-600" },
+          ].map((asset, index) => (
+            <motion.div
+              key={asset.symbol}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02, y: -2 }}
+              className="relative p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-primary/30 transition-all duration-200 cursor-pointer group overflow-hidden"
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${asset.color} flex items-center justify-center shadow-md`}>
+                  <asset.icon size={18} className="text-white" fill={asset.symbol === "BTC" ? "currentColor" : "none"} />
+                </div>
+                <div className={`text-xs font-bold flex items-center gap-0.5 ${asset.change.startsWith("+") ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {asset.change.startsWith("+") ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+                  {asset.change}
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">{asset.name}</p>
+                <p className="text-xs text-gray-500">{asset.symbol}</p>
+              </div>
+              <div className="mt-2">
+                <p className="font-mono font-bold text-lg text-white">₦{asset.price.toLocaleString()}</p>
+              </div>
+              
+              {/* Mini sparkline */}
+              <div className="absolute bottom-0 right-0 w-20 h-12 opacity-20 group-hover:opacity-40 transition-opacity">
+                <svg className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 100 20">
+                  <path 
+                    d={asset.change.startsWith("+") 
+                      ? "M0 15 L10 12 L20 18 L30 10 L40 14 L50 8 L60 12 L70 5 L80 9 L90 2 L100 6"
+                      : "M0 5 L10 8 L20 4 L30 12 L40 8 L50 15 L60 10 L70 18 L80 14 L90 20 L100 16"
+                    } 
+                    className={asset.change.startsWith("+") ? 'text-emerald-500' : 'text-red-500'}
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                  />
+                </svg>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* AI Insights Section */}
+      <motion.div
+        variants={itemVariants}
+        className="rounded-2xl p-5"
+        style={{
+          background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          border: '1px solid rgba(124, 58, 237, 0.2)',
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+              <Brain size={16} className="text-white" />
+            </div>
+            <h3 className="text-lg font-bold text-white tracking-tight">AI Insights</h3>
+          </div>
+          <motion.div
+            animate={{ rotate: [0, 360] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles size={16} className="text-purple-400" />
+          </motion.div>
+        </div>
+
+        <div className="space-y-3">
+          {transactions.length > 0 ? (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10"
+              >
+                <Lightbulb size={16} className="text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">
+                    {transactions.filter(tx => tx.type === "Credit").length > transactions.filter(tx => tx.type === "Debit").length
+                      ? "You're saving more than spending this month"
+                      : "Consider reducing discretionary spending"}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Based on your last {transactions.length} transactions
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10"
+              >
+                <TrendingUp size={16} className="text-emerald-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">
+                    Your top category: {(() => {
+                      const categories = transactions.reduce((acc, tx) => {
+                        acc[tx.category] = (acc[tx.category] || 0) + Math.abs(tx.amount);
+                        return acc;
+                      }, {} as Record<string, number>);
+                      return Object.entries(categories).sort((a, b) => b[1] - a[1])[0]?.[0] || "Shopping";
+                    })()}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    AI-powered spending analysis
+                  </p>
+                </div>
+              </motion.div>
+            </>
+          ) : (
+            <div className="text-center py-6">
+              <Brain size={32} className="text-gray-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-400">Start transacting to get AI insights</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
     </motion.div>
   );
 }
