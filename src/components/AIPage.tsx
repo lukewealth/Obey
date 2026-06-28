@@ -7,7 +7,7 @@ import {
   ArrowUpRight, ArrowDownRight, Lightbulb, Clock
 } from "lucide-react";
 import { UserProfile, Transaction } from "../types";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, Cell } from 'recharts';
 
 interface AIPageProps {
   profile: UserProfile;

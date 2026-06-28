@@ -30,6 +30,7 @@ interface NetworkProvider {
   color: string;
   textColor: string;
   logoChar: string;
+  logoUrl?: string;
   paymentCode: string;
   symbolColor: string;
 }
@@ -46,7 +47,7 @@ interface DataPlan {
 
 export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProps) {
   const { notify } = useNotification();
-  const [activeSegment, setActiveSegment] = useState<"airtime" | "data">("airtime");
+  const [activeSegment, setActiveSegment] = useState<"airtime" | "data" | "subscriptions">("airtime");
   const [selectedProvider, setSelectedProvider] = useState<string>("mtn");
   const [phoneNo, setPhoneNo] = useState("");
   const [amount, setAmount] = useState("");
@@ -57,10 +58,46 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
   const [successReceipt, setSuccessReceipt] = useState<any | null>(null);
 
   const providers: NetworkProvider[] = [
-    { id: "mtn", name: "MTN", color: "bg-[#FFCC00]", textColor: "text-black", logoChar: "M", paymentCode: "10101", symbolColor: "#FFCC00" },
-    { id: "airtel", name: "Airtel", color: "bg-[#E50914]", textColor: "text-white", logoChar: "A", paymentCode: "10201", symbolColor: "#E50914" },
-    { id: "glo", name: "Glo", color: "bg-[#339933]", textColor: "text-white", logoChar: "G", paymentCode: "10301", symbolColor: "#339933" },
-    { id: "9mobile", name: "9mobile", color: "bg-[#015249]", textColor: "text-white", logoChar: "9", paymentCode: "10401", symbolColor: "#015249" },
+    { 
+      id: "mtn", 
+      name: "MTN", 
+      color: "bg-[#FFCC00]", 
+      textColor: "text-black", 
+      logoChar: "M", 
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/9/93/New-mtn-logo.jpg",
+      paymentCode: "10101", 
+      symbolColor: "#FFCC00" 
+    },
+    { 
+      id: "airtel", 
+      name: "Airtel", 
+      color: "bg-[#E50914]", 
+      textColor: "text-white", 
+      logoChar: "A",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e9/Airtel_logo.svg",
+      paymentCode: "10201", 
+      symbolColor: "#E50914" 
+    },
+    { 
+      id: "glo", 
+      name: "Glo", 
+      color: "bg-[#339933]", 
+      textColor: "text-white", 
+      logoChar: "G",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Glo_telecom_logo.svg",
+      paymentCode: "10301", 
+      symbolColor: "#339933" 
+    },
+    { 
+      id: "9mobile", 
+      name: "9mobile", 
+      color: "bg-[#015249]", 
+      textColor: "text-white", 
+      logoChar: "9",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/2c/9mobile_logo.svg",
+      paymentCode: "10401", 
+      symbolColor: "#015249" 
+    },
   ];
 
   const dataPlans: Record<string, DataPlan[]> = {
@@ -80,6 +117,76 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       { id: "n1", name: "Smart Plan", price: 500, dataAmount: "3GB", validity: "48 Hours", paymentCode: "10402", recommended: true },
     ]
   };
+
+  const subscriptionServices = [
+    {
+      id: "netflix",
+      name: "Netflix",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
+      color: "bg-[#E50914]",
+      plans: [
+        { id: "nf1", name: "Mobile", price: 1200, description: "1 device, 480p", duration: "Monthly" },
+        { id: "nf2", name: "Basic", price: 1800, description: "1 device, 720p", duration: "Monthly", recommended: true },
+        { id: "nf3", name: "Standard", price: 2800, description: "2 devices, 1080p", duration: "Monthly" },
+        { id: "nf4", name: "Premium", price: 4400, description: "4 devices, 4K", duration: "Monthly" },
+      ]
+    },
+    {
+      id: "spotify",
+      name: "Spotify",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
+      color: "bg-[#1DB954]",
+      plans: [
+        { id: "sp1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
+        { id: "sp2", name: "Duo", price: 1600, description: "2 accounts", duration: "Monthly" },
+        { id: "sp3", name: "Family", price: 1900, description: "6 accounts", duration: "Monthly" },
+      ]
+    },
+    {
+      id: "apple",
+      name: "Apple Music",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+      color: "bg-[#FA243C]",
+      plans: [
+        { id: "am1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
+        { id: "am2", name: "Family", price: 1800, description: "6 accounts", duration: "Monthly" },
+        { id: "am3", name: "Student", price: 600, description: "1 account", duration: "Monthly" },
+      ]
+    },
+    {
+      id: "youtube",
+      name: "YouTube Premium",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/79/YouTube_social_red_square_%282017%29.svg",
+      color: "bg-[#FF0000]",
+      plans: [
+        { id: "yt1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
+        { id: "yt2", name: "Family", price: 1900, description: "5 accounts", duration: "Monthly" },
+        { id: "yt3", name: "Student", price: 600, description: "1 account", duration: "Monthly" },
+      ]
+    },
+    {
+      id: "showmax",
+      name: "Showmax",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Showmax_logo.svg",
+      color: "bg-[#000000]",
+      plans: [
+        { id: "sm1", name: "Mobile", price: 1200, description: "1 device", duration: "Monthly", recommended: true },
+        { id: "sm2", name: "Standard", price: 2500, description: "2 devices", duration: "Monthly" },
+      ]
+    },
+    {
+      id: "dstv",
+      name: "DSTV",
+      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6c/DStv_logo.svg",
+      color: "bg-[#003DA5]",
+      plans: [
+        { id: "ds1", name: "Padi", price: 2500, description: "Local channels", duration: "Monthly" },
+        { id: "ds2", name: "Yanga", price: 3500, description: "Entertainment", duration: "Monthly", recommended: true },
+        { id: "ds3", name: "Confam", price: 6200, description: "Family package", duration: "Monthly" },
+        { id: "ds4", name: "Compact", price: 10500, description: "Full entertainment", duration: "Monthly" },
+      ]
+    },
+  ];
 
   const currentProvider = providers.find((p) => p.id === selectedProvider) || providers[0];
   const activePlans = dataPlans[selectedProvider] || [];
@@ -187,15 +294,16 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
 
   return (
     <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight text-center md:text-left">Airtime & Data</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Buy airtime and data bundles instantly.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight text-center md:text-left">Services</h2>
+          <p className="text-sm md:text-lg text-gray-500 font-medium text-center md:text-left">Airtime, data, and subscriptions.</p>
         </div>
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm">
           {[
             { id: "airtime", label: "Airtime", icon: Smartphone },
-            { id: "data", label: "Data Bundles", icon: Wifi }
+            { id: "data", label: "Data", icon: Wifi },
+            { id: "subscriptions", label: "Subscriptions", icon: Star }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -292,9 +400,26 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                             : "border-gray-100 bg-white/40 hover:border-primary/20 hover:bg-white"
                         }`}
                       >
-                        <div className={`w-10 h-10 md:w-14 md:h-14 ${p.color} ${p.textColor} rounded-full flex items-center justify-center font-black text-lg md:text-xl mb-1 shadow-lg group-hover/p:scale-110 transition-transform duration-200 shrink-0 relative z-10`}>
-                          {p.logoChar}
-                        </div>
+                        {p.logoUrl ? (
+                          <div className="w-10 h-10 md:w-14 md:h-14 rounded-full flex items-center justify-center mb-1 shadow-lg group-hover/p:scale-110 transition-transform duration-200 shrink-0 relative z-10 overflow-hidden bg-white">
+                            <img 
+                              src={p.logoUrl} 
+                              alt={p.name}
+                              className="w-full h-full object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                                (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
+                              }}
+                            />
+                            <div className={`hidden w-full h-full ${p.color} ${p.textColor} rounded-full flex items-center justify-center font-black text-lg md:text-xl`}>
+                              {p.logoChar}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className={`w-10 h-10 md:w-14 md:h-14 ${p.color} ${p.textColor} rounded-full flex items-center justify-center font-black text-lg md:text-xl mb-1 shadow-lg group-hover/p:scale-110 transition-transform duration-200 shrink-0 relative z-10`}>
+                            {p.logoChar}
+                          </div>
+                        )}
                         <span className="text-[8px] md:text-[10px] font-black text-gray-900 tracking-tight uppercase relative z-10">{p.name}</span>
                         {selectedProvider === p.id && (
                           <motion.div layoutId="provider-accent" className="absolute inset-0 bg-primary/5 -z-0" />
@@ -452,9 +577,22 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
                 <div className="flex justify-between items-center gap-4">
                   <span className="text-[10px] md:text-[11px] font-bold text-gray-400 uppercase tracking-widest shrink-0">Network</span>
                   <div className="flex items-center gap-3 overflow-hidden">
-                     <div className={`w-7 h-7 md:w-8 md:h-8 ${currentProvider.color} ${currentProvider.textColor} rounded-full flex items-center justify-center font-bold text-[9px] md:text-[10px] shrink-0`}>
-                       {currentProvider.logoChar}
-                     </div>
+                     {currentProvider.logoUrl ? (
+                       <div className="w-7 h-7 md:w-8 md:h-8 rounded-full flex items-center justify-center shrink-0 overflow-hidden bg-white border border-gray-200">
+                         <img 
+                           src={currentProvider.logoUrl} 
+                           alt={currentProvider.name}
+                           className="w-full h-full object-contain"
+                           onError={(e) => {
+                             (e.target as HTMLImageElement).style.display = 'none';
+                           }}
+                         />
+                       </div>
+                     ) : (
+                       <div className={`w-7 h-7 md:w-8 md:h-8 ${currentProvider.color} ${currentProvider.textColor} rounded-full flex items-center justify-center font-bold text-[9px] md:text-[10px] shrink-0`}>
+                         {currentProvider.logoChar}
+                       </div>
+                     )}
                      <span className="text-sm font-bold text-gray-900 truncate uppercase">{currentProvider.name}</span>
                   </div>
                 </div>

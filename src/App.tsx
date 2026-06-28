@@ -545,14 +545,28 @@ export default function App() {
 
           <div className="flex-grow flex">
             <aside className={`hidden lg:flex ${sidebarExpanded ? "w-64" : "w-20"} bg-[var(--app-bg)] border-r border-gray-100 dark:border-white/10 p-4 flex-col transition-all duration-300 ease-[0.22, 1, 0.36, 1]`}>
+              {/* User Profile */}
+              <div className="flex flex-col items-center mb-6 pb-6 border-b border-gray-100 dark:border-white/10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-white text-xl font-bold mb-3">
+                  {profile.avatar || profile.name[0]}
+                </div>
+                {sidebarExpanded && (
+                  <>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">{profile.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{profile.role === 'admin' ? 'Admin' : 'User'}</p>
+                  </>
+                )}
+              </div>
+
               <nav className="space-y-1 flex-1">
                 {[
-                  { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
-                  { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
-                  { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
-                  { tab: AppTab.AI, label: "AI", icon: BrainIcon },
-                  { tab: AppTab.SERVICES, label: "Services", icon: AppIcon },
-                  { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
+                  { tab: AppTab.HOME, label: "Overview", icon: HomeIcon },
+                  { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
+                  { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
+                  { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
+                  { tab: AppTab.TRADE, label: "Activity", icon: SwapIcon },
+                  { tab: AppTab.AI, label: "AI Insights", icon: BrainIcon },
+                  { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
                 ].map((item) => {
                   const isActive = activeTab === item.tab;
                   return (
@@ -581,6 +595,42 @@ export default function App() {
                   );
                 })}
               </nav>
+
+              {/* Bottom Actions */}
+              <div className="pt-4 border-t border-gray-100 dark:border-white/10 space-y-2">
+                <motion.button 
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowAIChat(true)}
+                  className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5`}
+                  title={!sidebarExpanded ? "AI Chat" : ""}
+                >
+                  <SparklesIcon className="w-5 h-5 flex-shrink-0" /> 
+                  {sidebarExpanded && <span>AI Assistant</span>}
+                </motion.button>
+
+                <motion.button 
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveTab(AppTab.PROFILE)}
+                  className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all text-gray-600 dark:text-gray-400 hover:bg-gray-100/70 dark:hover:bg-white/5`}
+                  title={!sidebarExpanded ? "Settings" : ""}
+                >
+                  <SettingsIcon className="w-5 h-5 flex-shrink-0" /> 
+                  {sidebarExpanded && <span>Settings</span>}
+                </motion.button>
+
+                <motion.button 
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleLogout}
+                  className={`w-full flex items-center ${sidebarExpanded ? "gap-3 px-3" : "justify-center"} h-11 rounded-xl text-sm font-medium transition-all text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10`}
+                  title={!sidebarExpanded ? "Sign Out" : ""}
+                >
+                  <LogOutIcon className="w-5 h-5 flex-shrink-0" /> 
+                  {sidebarExpanded && <span>Sign out</span>}
+                </motion.button>
+              </div>
 
               {profile.role === "admin" && (
                 <div className="pt-4 border-t border-gray-100 dark:border-white/10">
@@ -767,10 +817,10 @@ export default function App() {
           <nav className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-white/95 dark:bg-[#1e1e1e]/95 backdrop-blur-2xl border-t border-gray-100 dark:border-white/10 px-4 py-2 flex justify-around items-center">
             {[
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
-              { tab: AppTab.WALLET, label: "Wallet", icon: WalletIcon },
-              { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
+              { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
+              { tab: AppTab.TRADE, label: "Activity", icon: SwapIcon },
               { tab: AppTab.AI, label: "AI", icon: BrainIcon },
-              { tab: AppTab.HISTORY, label: "History", icon: ClockIcon },
+              { tab: AppTab.SERVICES, label: "Pay", icon: AppIcon },
             ].map((item) => (
               <button 
                 key={item.label} 
