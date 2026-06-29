@@ -28,7 +28,6 @@ import SecuredPortal from "./components/SecuredPortal";
 import AssetDetail from "./components/AssetDetail";
 import BankTransfer from "./components/BankTransfer";
 import KYCTierSystem from "./components/KYCTierSystem";
-import NotificationDropdown from "./components/NotificationDropdown";
 import NotificationSettings from "./components/NotificationSettings";
 import AdminKYCManagement from "./components/AdminKYCManagement";
 import { useNotification } from "./components/NotificationSystem";
@@ -42,7 +41,6 @@ import {
   DevicePhoneMobileIcon as AppIcon, 
   UserIcon, 
   Cog6ToothIcon as SettingsIcon, 
-  BellIcon, 
   SparklesIcon, 
   Bars3Icon as MenuIcon, 
   XMarkIcon as XIcon, 
@@ -56,7 +54,6 @@ import {
   BoltIcon as ZapIcon,
   ArrowPathIcon as RefreshIcon,
   CreditCardIcon,
-  CpuChipIcon as BrainIcon,
   ShieldCheckIcon as ShieldCheckOutline,
   ClockIcon,
   BuildingLibraryIcon as BankIcon
@@ -337,6 +334,7 @@ export default function App() {
   const [ethPrice, setEthPrice] = useState(5200000);
   const [solPrice, setSolPrice] = useState(245000);
   const [suiPrice, setSuiPrice] = useState(5200);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchPrices = async () => {
@@ -525,13 +523,6 @@ export default function App() {
             <div className="flex items-center gap-2">
               <div className="hidden md:flex items-center gap-1">
                 <button
-                  onClick={() => setShowAIChat(true)}
-                  className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
-                  title="AI Assistant"
-                >
-                  <BrainIcon className="w-5 h-5" />
-                </button>
-                <button
                   onClick={() => setShowAnomalyDetection(true)}
                   className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
                   title="Security"
@@ -542,15 +533,50 @@ export default function App() {
 
               <ThemeToggle />
 
-              <NotificationDropdown
-                transactions={cachedTransactions}
-                onMarkAllRead={() => {
-                  notify("success", "Marked as Read", "All notifications marked as read.");
+              <button
+                onClick={async () => {
+                  setIsRefreshing(true);
+                  try {
+                    const userId = currentUser?.id || currentUser?.uid;
+                    const [pricesRes, , , profileRes] = await Promise.allSettled([
+                      api.get('/market/prices?symbols=BTC,ETH,SOL,SUI'),
+                      api.get('/crypto-market/market'),
+                      api.get('/giftcards/market'),
+                      userId && supabase
+                        ? supabase.from("profiles").select("*").eq("id", userId).maybeSingle()
+                        : Promise.resolve({ data: null })
+                    ]);
+                    if (pricesRes.status === 'fulfilled' && pricesRes.value?.data) {
+                      const peg = 1600;
+                      const d = pricesRes.value.data;
+                      if (d.BTC) setBtcPrice(d.BTC * peg);
+                      if (d.ETH) setEthPrice(d.ETH * peg);
+                      if (d.SOL) setSolPrice(d.SOL * peg);
+                      if (d.SUI) setSuiPrice(d.SUI * peg);
+                    }
+                    if (profileRes.status === 'fulfilled' && profileRes.value?.data) {
+                      const sbProfile = profileRes.value.data;
+                      setProfile(prev => ({
+                        ...prev,
+                        ...sbProfile,
+                        name: sbProfile.full_name || sbProfile.name || prev.name,
+                        balance: sbProfile.balance ?? prev.balance,
+                        currency: sbProfile.currency || prev.currency,
+                      }));
+                    }
+                    notify("success", "Refreshed", "Balance and market data updated.");
+                  } catch (err) {
+                    notify("error", "Refresh Failed", "Could not update data.");
+                  } finally {
+                    setTimeout(() => setIsRefreshing(false), 600);
+                  }
                 }}
-                onClearAll={() => {
-                  notify("info", "Cleared", "All notifications cleared.");
-                }}
-              />
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-[#0b0e14] dark:hover:text-white hover:bg-gray-100/50 dark:hover:bg-white/5 rounded-xl transition-all"
+                title="Refresh balance & market data"
+                disabled={isRefreshing}
+              >
+                <RefreshIcon className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </button>
 
               {/* Mobile Profile Menu */}
               <div className="lg:hidden relative group">

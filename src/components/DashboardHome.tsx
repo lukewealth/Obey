@@ -4,9 +4,9 @@ import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import {
   ArrowUpRight, ArrowDownRight, ArrowDownLeft, Wallet, Send, Smartphone,
   Gift, Eye, EyeOff, ShoppingBag, Utensils, Plane, Coffee,
-  CreditCard, Bell, Sparkles, TrendingUp, Search,
+  CreditCard, Sparkles, TrendingUp,
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
-  Wifi, BarChart3, ArrowLeftRight, Cloud, Brain, Lightbulb,
+  Wifi, BarChart3, ArrowLeftRight, Cloud, Lightbulb,
   Home, CreditCard as CardIcon, PieChart, Users, Settings,
   LogOut, Moon, Sun, Plus, MoreVertical, ChevronDown
 } from "lucide-react";
@@ -61,7 +61,6 @@ const generateMoneyFlowData = () => {
 
 export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
   const [hideBalance, setHideBalance] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [moneyFlowData] = useState(generateMoneyFlowData());
 
   // Calculate financial stats
@@ -113,32 +112,6 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative hidden md:block">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search transactions..."
-              className="bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/50 w-64 transition-all"
-            />
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onNavigateTab(AppTab.AI)}
-            className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-500/20 flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-colors relative"
-          >
-            <Brain size={18} className="text-purple-600 dark:text-purple-400" />
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-white/5 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-white/10 transition-colors relative"
-          >
-            <Bell size={18} className="text-gray-600 dark:text-gray-400" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
-          </motion.button>
         </div>
       </motion.div>
 
