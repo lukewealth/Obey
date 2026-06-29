@@ -10,8 +10,7 @@ export const sessionService = {
     try {
       await api.post('/session/set', { uid, email }, { withCredentials: true });
     } catch (error) {
-      console.error('[SESSION] Failed to set session:', error);
-      throw error;
+      console.warn('[SESSION] Failed to set session:', error);
     }
   },
 
@@ -35,8 +34,7 @@ export const sessionService = {
     try {
       await api.post('/session/clear', {}, { withCredentials: true });
     } catch (error) {
-      console.error('[SESSION] Failed to clear session:', error);
-      throw error;
+      console.warn('[SESSION] Failed to clear session:', error);
     }
   },
 };
