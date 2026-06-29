@@ -50,6 +50,8 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
   const [timerActive, setTimerActive] = useState(true);
   const [verifying, setVerifying] = useState(false);
   const [verifiedOverlay, setVerifiedOverlay] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   const otpRefs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
 
@@ -219,6 +221,27 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
     }, 1600);
   };
 
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg(null);
+    try {
+      if (supabase) {
+        const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+          redirectTo: `${window.location.origin}/reset-password`
+        });
+        if (error) throw error;
+      } else {
+        throw new Error("Password reset not available");
+      }
+      setResetSent(true);
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to send reset email");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] as any } }
@@ -269,7 +292,7 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
                     <div className="space-y-3">
                       <div className="flex justify-between items-center px-4">
                         <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em]">Access Code</label>
-                        <button type="button" className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Forgot?</button>
+                        <button type="button" onClick={() => onNavigate(AppScreen.FORGOT_PASSWORD)} className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-widest hover:underline">Forgot?</button>
                       </div>
                       <div className="relative">
                          <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
@@ -340,6 +363,72 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
                  <button onClick={verifyOtpCode} disabled={!otpValues.every(v => v !== "") || verifying} className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press disabled:opacity-50">
                     {verifying ? <RefreshCw className="animate-spin" size={20} /> : "Authorize Settlement"}
                  </button>
+              </div>
+            </motion.div>
+          )}
+
+          {currentScreen === AppScreen.FORGOT_PASSWORD && (
+            <motion.div key="forgot" variants={containerVariants} initial="hidden" animate="visible" exit={{ opacity: 0, y: -20 }} className="w-full max-w-lg">
+              <div className="bento-card p-8 md:p-12 shadow-2xl space-y-8 md:space-y-10 relative overflow-hidden group">
+                 <div className="space-y-2 text-center md:text-left">
+                    <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-gray-900">Reset Password.</h2>
+                    <p className="text-sm md:text-base text-gray-500 font-medium">Enter your email to receive a reset link.</p>
+                 </div>
+
+                 {errorMsg && (
+                   <div className="p-4 bg-red-50 border border-red-100 rounded-2xl text-red-600 text-xs font-bold flex items-center gap-3">
+                     <ShieldCheck size={16} /> {errorMsg}
+                   </div>
+                 )}
+
+                 {resetSent ? (
+                   <div className="space-y-6">
+                     <div className="p-6 bg-emerald-50 border border-emerald-100 rounded-2xl text-center">
+                       <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto mb-3" />
+                       <p className="text-sm font-bold text-emerald-900 mb-2">Reset Link Sent</p>
+                       <p className="text-xs text-emerald-700">Check your email for password reset instructions.</p>
+                     </div>
+                     <button 
+                       onClick={() => onNavigate(AppScreen.LOGIN)}
+                       className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                     >
+                       Return to Sign In
+                     </button>
+                   </div>
+                 ) : (
+                   <form onSubmit={handlePasswordReset} className="space-y-5 md:space-y-6">
+                     <div className="space-y-3">
+                       <label className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.2em] md:tracking-[0.3em] pl-4">Account Email</label>
+                       <div className="relative">
+                          <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-300" size={18} />
+                          <input 
+                            type="email" 
+                            required 
+                            value={resetEmail} 
+                            onChange={(e) => setResetEmail(e.target.value)} 
+                            placeholder="name@obey.finance" 
+                            className="w-full h-14 md:h-16 pl-14 pr-6 bg-gray-50 border border-gray-100 rounded-[18px] md:rounded-[22px] text-base md:text-lg font-bold focus:ring-2 focus:ring-primary/10 outline-none transition-all" 
+                          />
+                       </div>
+                     </div>
+
+                     <button 
+                       type="submit" 
+                       disabled={loading} 
+                       className="w-full h-16 md:h-20 bg-primary hover:bg-primary/90 text-white rounded-[22px] md:rounded-[28px] font-black text-sm md:text-base uppercase tracking-[0.2em] md:tracking-[0.3em] shadow-2xl shadow-primary/30 transition-all flex items-center justify-center active-press"
+                     >
+                        {loading ? <RefreshCw className="animate-spin" size={20} /> : <div className="flex items-center gap-3">Send Reset Link <ArrowRight size={18} className="md:w-5 md:h-5" /></div>}
+                     </button>
+
+                     <button 
+                       type="button"
+                       onClick={() => onNavigate(AppScreen.LOGIN)}
+                       className="w-full text-center text-sm text-gray-500 hover:text-primary transition-colors"
+                     >
+                       Back to Sign In
+                     </button>
+                   </form>
+                 )}
               </div>
             </motion.div>
           )}
