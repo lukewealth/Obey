@@ -368,17 +368,30 @@ async function fetchFromBitQuery(symbol: string): Promise<CryptoPrice | null> {
       return null;
     }
 
-    // GraphQL query for 1-second price stream
+    // GraphQL query for latest price across multiple chains
     const query = `
-      query GetCryptoPrice($symbol: String!) {
+      query GetLatestPrice($symbol: String!) {
         ethereum(network: ethereum) {
           dexTrades(
             options: {desc: ["block.height", "transaction.index"], limit: 1}
             baseCurrency: {is: $symbol}
           ) {
-            tradeAmount
             price
             priceUSD
+            tradeAmount
+            block {
+              timestamp
+            }
+          }
+        }
+        bsc(network: bsc) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+          ) {
+            price
+            priceUSD
+            tradeAmount
             block {
               timestamp
             }
@@ -396,19 +409,23 @@ async function fetchFromBitQuery(symbol: string): Promise<CryptoPrice | null> {
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': apiKey,
+          Authorization: `Bearer ${apiKey}`,
         },
         timeout: 10000,
       }
     );
 
-    const trades = response.data?.data?.ethereum?.dexTrades;
-    if (trades && trades.length > 0) {
-      const latestTrade = trades[0];
+    // Try Ethereum first, then BSC
+    const ethTrades = response.data?.data?.ethereum?.dexTrades;
+    const bscTrades = response.data?.data?.bsc?.dexTrades;
+    
+    const latestTrade = ethTrades?.[0] || bscTrades?.[0];
+    
+    if (latestTrade) {
       return {
         symbol,
         price: latestTrade.priceUSD || latestTrade.price || 0,
-        change24h: 0, // BitQuery provides raw price, calculate change separately
+        change24h: 0,
         volume24h: 0,
         source: 'bitquery',
         timestamp: Date.now(),
@@ -422,21 +439,80 @@ async function fetchFromBitQuery(symbol: string): Promise<CryptoPrice | null> {
 }
 
 /**
- * Fetch market cap and price from BitQuery
- * Based on: https://ide.bitquery.io/1-second-crypto-price-stream-with-mcap
+ * Fetch market cap and supply from BitQuery BSC
+ * Based on: https://ide.bitquery.io/Total-Supply-and-onchain-Marketcap-of-a-specific-token-bsc_1
  */
-async function fetchMarketCapFromBitQuery(symbol: string): Promise<{ price: number; marketCap: number } | null> {
+async function fetchMarketCapFromBitQuery(symbol: string): Promise<{ price: number; marketCap: number; supply: number } | null> {
   try {
     const apiKey = process.env.BITQUERY_API_KEY;
     if (!apiKey) return null;
 
+    // Map common symbols to BSC contract addresses
+    const bscContracts: Record<string, string> = {
+      BTC: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+      ETH: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+      USDT: '0x55d398326f99059ff775485246999027b3197955',
+      USDC: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+      BNB: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c',
+      SOL: '0x570a5d26f7765ecb712c0924e4de545b89dd4325',
+    };
+
+    const contractAddress = bscContracts[symbol];
+    
+    // For native tokens like BNB, use a different query
+    if (symbol === 'BNB') {
+      const query = `
+        query GetBNBMarketData {
+          bsc(network: bsc) {
+            dexTrades(
+              options: {desc: ["block.height", "transaction.index"], limit: 1}
+              baseCurrency: {is: "BNB"}
+            ) {
+              price
+              priceUSD
+              tradeAmount
+              block {
+                timestamp
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await axios.post(
+        'https://streaming.bitquery.io/graphql',
+        { query },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          timeout: 10000,
+        }
+      );
+
+      const trades = response.data?.data?.bsc?.dexTrades;
+      if (trades && trades.length > 0) {
+        return {
+          price: trades[0].priceUSD || trades[0].price || 0,
+          marketCap: 0,
+          supply: 0,
+        };
+      }
+      return null;
+    }
+
+    if (!contractAddress) return null;
+
+    // Query for token supply and market cap on BSC
     const query = `
-      query GetMarketCap($symbol: String!) {
-        ethereum(network: ethereum) {
+      query GetTokenMarketData($address: String!) {
+        bsc(network: bsc) {
           dexTrades(
             options: {desc: ["block.height", "transaction.index"], limit: 1}
-            baseCurrency: {is: $symbol}
+            baseCurrency: {is: $address}
           ) {
+            price
             priceUSD
             tradeAmount
             block {
@@ -444,17 +520,17 @@ async function fetchMarketCapFromBitQuery(symbol: string): Promise<{ price: numb
             }
           }
         }
-        # Get circulating supply from token info
-        ethereum(network: ethereum) {
+        bsc(network: bsc) {
           tokenTransfers(
-            options: {desc: ["block.height"], limit: 1}
-            currency: {is: $symbol}
+            options: {desc: "block.height", limit: 1}
+            currency: {is: $address}
           ) {
             currency {
               address
               name
               symbol
               decimals
+              totalSupply
             }
           }
         }
@@ -465,28 +541,295 @@ async function fetchMarketCapFromBitQuery(symbol: string): Promise<{ price: numb
       'https://streaming.bitquery.io/graphql',
       {
         query,
-        variables: { symbol },
+        variables: { address: contractAddress },
       },
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': apiKey,
+          Authorization: `Bearer ${apiKey}`,
         },
         timeout: 10000,
       }
     );
 
-    const trades = response.data?.data?.ethereum?.dexTrades;
-    if (trades && trades.length > 0) {
+    const trades = response.data?.data?.bsc?.dexTrades;
+    const transfers = response.data?.data?.bsc?.tokenTransfers;
+    
+    const price = trades?.[0]?.priceUSD || trades?.[0]?.price || 0;
+    const totalSupply = transfers?.[0]?.currency?.totalSupply || 0;
+    const decimals = transfers?.[0]?.currency?.decimals || 18;
+    
+    // Calculate market cap: price * circulating supply
+    const supply = totalSupply / Math.pow(10, decimals);
+    const marketCap = price * supply;
+
+    return {
+      price,
+      marketCap,
+      supply,
+    };
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch market cap for ${symbol}:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch wallet balance from BitQuery
+ * Based on: https://ide.bitquery.io/balance-of-a-wallet_1
+ */
+async function fetchWalletBalance(address: string, symbol?: string): Promise<{ balance: number; balanceUSD: number } | null> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) return null;
+
+    if (symbol) {
+      // Fetch specific token balance
+      const bscContracts: Record<string, string> = {
+        BTC: '0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c',
+        ETH: '0x2170ed0880ac9a755fd29b2688956bd959f933f8',
+        USDT: '0x55d398326f99059ff775485246999027b3197955',
+        USDC: '0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d',
+      };
+
+      const contractAddress = bscContracts[symbol];
+      if (!contractAddress) return null;
+
+      const query = `
+        query GetTokenBalance($address: String!, $tokenAddress: String!) {
+          bsc(network: bsc) {
+            balance: balanceUpdates(
+              options: {desc: "block.height", limit: 1}
+              address: {is: $address}
+              currency: {is: $tokenAddress}
+            ) {
+              balance
+              currency {
+                symbol
+                decimals
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await axios.post(
+        'https://streaming.bitquery.io/graphql',
+        {
+          query,
+          variables: { address, tokenAddress: contractAddress },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          timeout: 10000,
+        }
+      );
+
+      const balanceData = response.data?.data?.bsc?.balance?.[0];
+      if (balanceData) {
+        const decimals = balanceData.currency?.decimals || 18;
+        const balance = balanceData.balance / Math.pow(10, decimals);
+        return { balance, balanceUSD: 0 };
+      }
+    } else {
+      // Fetch native BNB balance
+      const query = `
+        query GetNativeBalance($address: String!) {
+          bsc(network: bsc) {
+            balance: balanceUpdates(
+              options: {desc: "block.height", limit: 1}
+              address: {is: $address}
+              currency: {is: "BNB"}
+            ) {
+              balance
+            }
+          }
+        }
+      `;
+
+      const response = await axios.post(
+        'https://streaming.bitquery.io/graphql',
+        {
+          query,
+          variables: { address },
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          timeout: 10000,
+        }
+      );
+
+      const balanceData = response.data?.data?.bsc?.balance?.[0];
+      if (balanceData) {
+        const balance = balanceData.balance / 1e18; // BNB has 18 decimals
+        return { balance, balanceUSD: 0 };
+      }
+    }
+    return null;
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch wallet balance:`, error.message);
+    return null;
+  }
+}
+
+/**
+ * Fetch 1-minute price change from BitQuery
+ * Based on: https://ide.bitquery.io/1-minute-price-change-api_1
+ */
+async function fetchPriceChange(symbol: string, minutes: number = 1): Promise<{ currentPrice: number; previousPrice: number; change: number; changePercent: number } | null> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) return null;
+
+    const timeAgo = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+
+    const query = `
+      query GetPriceChange($symbol: String!, $timeAgo: ISO8601DateTime) {
+        ethereum(network: ethereum) {
+          currentPrice: dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+          ) {
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+          previousPrice: dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: $symbol}
+            time: {since: $timeAgo}
+          ) {
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await axios.post(
+      'https://streaming.bitquery.io/graphql',
+      {
+        query,
+        variables: { symbol, timeAgo },
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        timeout: 10000,
+      }
+    );
+
+    const currentPriceData = response.data?.data?.ethereum?.currentPrice?.[0];
+    const previousPriceData = response.data?.data?.ethereum?.previousPrice?.[0];
+
+    if (currentPriceData && previousPriceData) {
+      const currentPrice = currentPriceData.priceUSD || 0;
+      const previousPrice = previousPriceData.priceUSD || currentPrice;
+      const change = currentPrice - previousPrice;
+      const changePercent = previousPrice > 0 ? (change / previousPrice) * 100 : 0;
+
       return {
-        price: trades[0].priceUSD || 0,
-        marketCap: 0, // Would need additional calculation with supply
+        currentPrice,
+        previousPrice,
+        change,
+        changePercent,
       };
     }
     return null;
   } catch (error) {
-    console.error(`[BitQuery] Failed to fetch market cap for ${symbol}:`, error.message);
+    console.error(`[BitQuery] Failed to fetch price change for ${symbol}:`, error.message);
     return null;
+  }
+}
+
+/**
+ * Fetch Bitcoin price across multiple chains
+ * Based on: https://ide.bitquery.io/Latest-bitcoin-price-on-across-chains_5
+ */
+async function fetchBitcoinPriceAcrossChains(): Promise<{ chain: string; price: number; timestamp: string }[]> {
+  try {
+    const apiKey = process.env.BITQUERY_API_KEY;
+    if (!apiKey) return [];
+
+    const query = `
+      query GetBitcoinPriceAcrossChains {
+        ethereum(network: ethereum) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: "BTC"}
+          ) {
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+        }
+        bsc(network: bsc) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: "BTC"}
+          ) {
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+        }
+        polygon(network: polygon) {
+          dexTrades(
+            options: {desc: ["block.height", "transaction.index"], limit: 1}
+            baseCurrency: {is: "BTC"}
+          ) {
+            priceUSD
+            block {
+              timestamp
+            }
+          }
+        }
+      }
+    `;
+
+    const response = await axios.post(
+      'https://streaming.bitquery.io/graphql',
+      { query },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        timeout: 10000,
+      }
+    );
+
+    const results: { chain: string; price: number; timestamp: string }[] = [];
+
+    const chains = ['ethereum', 'bsc', 'polygon'];
+    for (const chain of chains) {
+      const trades = response.data?.data?.[chain]?.dexTrades;
+      if (trades && trades.length > 0) {
+        results.push({
+          chain,
+          price: trades[0].priceUSD || 0,
+          timestamp: trades[0].block?.timestamp || new Date().toISOString(),
+        });
+      }
+    }
+
+    return results;
+  } catch (error) {
+    console.error(`[BitQuery] Failed to fetch Bitcoin price across chains:`, error.message);
+    return [];
   }
 }
 
@@ -530,7 +873,7 @@ async function fetchStablecoinPrice(symbol: string): Promise<CryptoPrice | null>
       {
         headers: {
           'Content-Type': 'application/json',
-          'X-API-KEY': apiKey,
+          Authorization: `Bearer ${apiKey}`,
         },
         timeout: 10000,
       }
@@ -677,4 +1020,12 @@ export function clearCache(): void {
 }
 
 // Export BitQuery functions for direct access
-export { fetchFromBitQuery, fetchMarketCapFromBitQuery, fetchStablecoinPrice, fetchMultipleFromCoinpaprika };
+export { 
+  fetchFromBitQuery, 
+  fetchMarketCapFromBitQuery, 
+  fetchStablecoinPrice, 
+  fetchMultipleFromCoinpaprika,
+  fetchWalletBalance,
+  fetchPriceChange,
+  fetchBitcoinPriceAcrossChains
+};
