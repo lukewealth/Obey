@@ -128,7 +128,10 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
         fetchMarketListings();
       }
     } catch (error: any) {
-      notify("error", "Purchase Failed", error.response?.data?.error || "Failed to acquire node.");
+      const errorMsg = typeof error.response?.data?.error === 'string' 
+        ? error.response.data.error 
+        : error.response?.data?.error?.message || "Failed to acquire node.";
+      notify("error", "Purchase Failed", errorMsg);
     } finally {
       setProcessing(false);
     }
@@ -162,7 +165,10 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
         onTradeCompleted(parseFloat(cardValue), `Acquisition of ${selectedAsset} Node`, false);
       }
     } catch (error: any) {
-      notify("error", "Acquisition Failed", error.response?.data?.error || "Network terminal failure.");
+      const errorMsg = typeof error.response?.data?.error === 'string' 
+        ? error.response.data.error 
+        : error.response?.data?.error?.message || "Network terminal failure.";
+      notify("error", "Acquisition Failed", errorMsg);
     } finally {
       setProcessing(false);
     }
