@@ -52,7 +52,9 @@ router.post('/create', async (req, res) => {
       res.status(400).json({ success: false, message: interswitchRes.message });
     }
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[CARDS_CREATE] Error:', error);
+    const errorMessage = typeof error.message === 'string' ? error.message : 'Failed to create virtual card';
+    res.status(500).json({ success: false, error: errorMessage });
   }
 });
 
@@ -62,7 +64,9 @@ router.get('/user/:userId', async (req, res) => {
     const cards = await VirtualCard.find({ userId: req.params.userId });
     res.json(cards);
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[CARDS_USER] Error:', error);
+    const errorMessage = typeof error.message === 'string' ? error.message : 'Failed to fetch cards';
+    res.status(500).json({ success: false, error: errorMessage });
   }
 });
 
@@ -83,7 +87,9 @@ router.post('/rotate-cvv', async (req, res) => {
       res.status(400).json({ success: false, message: interswitchRes.message });
     }
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[CARDS_ROTATE] Error:', error);
+    const errorMessage = typeof error.message === 'string' ? error.message : 'Failed to rotate CVV';
+    res.status(500).json({ success: false, error: errorMessage });
   }
 });
 
@@ -98,7 +104,9 @@ router.patch('/:cardId/status', async (req, res) => {
     );
     res.json(card);
   } catch (error: any) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('[CARDS_STATUS] Error:', error);
+    const errorMessage = typeof error.message === 'string' ? error.message : 'Failed to update card status';
+    res.status(500).json({ success: false, error: errorMessage });
   }
 });
 

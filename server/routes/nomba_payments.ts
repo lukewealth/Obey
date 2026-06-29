@@ -162,6 +162,12 @@ router.get('/virtual-accounts', async (req: Request, res: Response) => {
     if (!userId) return res.status(400).json({ error: 'userId required' });
 
     try {
+      // Check if VirtualAccount model is available
+      if (!VirtualAccount || typeof VirtualAccount.find !== 'function') {
+        console.warn('[VIRTUAL_ACCOUNTS] Model not available');
+        return res.status(200).json({ accounts: [] });
+      }
+      
       const accounts = await VirtualAccount.find({ userId, isActive: true } as any);
       res.json({ accounts });
     } catch (dbError: any) {

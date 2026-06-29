@@ -119,8 +119,8 @@ router.get('/prices', async (req, res) => {
     }
 
     res.json(results);
-  } catch (error) {
-    console.error('[MARKET_NODE_CRITICAL] Global price sync failure, using fallback:', error);
+  } catch (error: any) {
+    console.error('[MARKET_NODE_CRITICAL] Global price sync failure, using fallback:', error?.message || error);
     // Return fallback prices instead of 500 error
     const results: Record<string, number> = {};
     for (const symbol of symbols) {
