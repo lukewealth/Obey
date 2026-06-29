@@ -566,121 +566,101 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                transition={{ duration: 1.5 }}
                className="max-w-[1400px] mx-auto relative h-[350px] md:h-[500px] lg:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
             >
-                {/* The Line - Animation Base at Bottom with Fade In/Out - Moved 4 steps upward */}
-                <motion.div
-                  animate={{ 
-                    opacity: [0, 0.6, 0.6, 0]
-                  }}
-                  transition={{ 
-                    duration: 25,
-                    times: [0, 0.1, 0.85, 1],
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                  className="absolute bottom-[42%] left-[5%] right-[5%] h-[1.5px] bg-gray-200 dark:bg-white/15 z-0"
-                ></motion.div>
+               {/* The Line - Animation Base at Bottom with Fade In/Out */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 0.6, 0.6, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.85, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="absolute bottom-[22%] left-[5%] right-[5%] h-[1.5px] bg-gray-200 dark:bg-white/15 z-0"
+               ></motion.div>
 
-                {/* New Animation - Full size, left side below birds */}
-                <motion.div
-                  animate={{ 
-                    opacity: [0, 1, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: 25,
-                    times: [0, 0.1, 0.85, 1],
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[42%] left-[10%] -translate-y-full z-10"
-                >
+               {/* Tree Animation - Stationary at Previous Position */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.85, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-[12%] -translate-y-full z-10"
+               >
                   <DotLottieReact
                     src="https://lottie.host/122427f5-886b-43b2-8e82-d17c4ee80b25/QBy2785DMo.lottie"
                     loop
                     autoplay
                   />
-                </motion.div>
+               </motion.div>
 
-                {/* Cat Walking from Right Edge to Middle - Slow Natural Pace */}
-                <motion.div
-                  animate={{ 
-                    x: ["100vw", "-50%"],
-                    opacity: [0, 1, 1, 0.8]
-                  }}
-                  transition={{ 
-                    duration: 35,
-                    repeat: Infinity,
-                    ease: "linear" 
-                  }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[42%] right-0 -translate-y-full z-10"
-                >
-                  <DotLottieReact
-                    src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
-                    loop
-                    autoplay
-                    style={{ transform: 'scaleX(-1)' }}
-                  />
-                </motion.div>
+               {/* Cat Walking Right to Left - Above the Line */}
+               <motion.div
+                 animate={{ 
+                   x: ["110%", "-110%"],
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   repeat: Infinity,
+                   ease: "linear" 
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] right-0 -translate-y-full z-10"
+               >
+                 <DotLottieReact
+                   src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
+                   loop
+                   autoplay
+                   style={{ transform: 'scaleX(1)' }}
+                 />
+               </motion.div>
 
-                {/* New Animation - Same size as cats, on the line */}
-                <motion.div
-                  animate={{ 
-                    opacity: [0, 1, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: 25,
-                    times: [0, 0.1, 0.8, 1],
-                    repeat: Infinity,
-                    ease: "linear" 
-                  }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[42%] left-[15%] -translate-y-full z-10"
-                >
-                  <DotLottieReact
-                    src="https://lottie.host/9e5c51c1-94bf-4362-b5a4-4daf3fe785aa/Gb6PsgnXJp.lottie"
-                    loop
-                    autoplay
-                  />
-                </motion.div>
+               {/* Cat Seated in Middle - Above the Line */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 1, 1, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.8, 1],
+                   repeat: Infinity,
+                   ease: "linear" 
+                 }}
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
+               >
+                 <DotLottieReact
+                   src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
+                   loop
+                   autoplay
+                 />
+               </motion.div>
 
-                {/* Cat Seated in Middle - Above the Line */}
-                <motion.div
-                  animate={{ 
-                    opacity: [0, 1, 1, 0]
-                  }}
-                  transition={{ 
-                    duration: 25,
-                    times: [0, 0.1, 0.8, 1],
-                    repeat: Infinity,
-                    ease: "linear" 
-                  }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[42%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
-                >
-                  <DotLottieReact
-                    src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
-                    loop
-                    autoplay
-                  />
-                </motion.div>
-
-                {/* Birds/Tree Animation - Background Above the Animals */}
-                <motion.div
-                  animate={{ 
-                    opacity: [0, 0.15, 0.15, 0]
-                  }}
-                  transition={{ 
-                    duration: 18,
-                    times: [0, 0.1, 0.83, 1],
-                    repeat: Infinity,
-                    ease: "linear"
-                  }}
-                  className="absolute bottom-[42%] left-1/2 -translate-x-1/2 -translate-y-[280%] sm:-translate-y-[260%] md:-translate-y-[240%] z-0 filter grayscale opacity-20 pointer-events-none"
-                >
-                  <DotLottieReact 
-                    src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
-                    style={{ width: '100px', height: '100px' }} 
-                    autoplay 
-                    loop 
-                  />
-                </motion.div>
+               {/* Birds/Tree Animation - Above the animals */}
+               <motion.div
+                 animate={{ 
+                   opacity: [0, 0.15, 0.15, 0]
+                 }}
+                 transition={{ 
+                   duration: 18,
+                   times: [0, 0.1, 0.83, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-[280%] sm:-translate-y-[260%] md:-translate-y-[240%] z-0 filter grayscale opacity-20 pointer-events-none"
+               >
+                 <DotLottieReact 
+                   src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
+                   style={{ width: '200px', height: '200px' }} 
+                   autoplay 
+                   loop 
+                 />
+               </motion.div>
             </motion.div>
 
            <motion.div 
