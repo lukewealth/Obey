@@ -4,6 +4,7 @@ import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
 import LandingLoader from "./LandingLoader";
 import ThemeToggle from "./ThemeToggle";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bars3Icon as MenuIcon, 
