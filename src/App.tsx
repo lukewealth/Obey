@@ -628,6 +628,7 @@ export default function App() {
       {currentScreen === AppScreen.USERDATA && <LegalContent slug="userdata" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.DISCLOSURES && <LegalContent slug="disclosures" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.STATUS && <LegalContent slug="status" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.COOKIE && <LegalContent slug="cookie" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.APPLE && <LegalContent slug="apple" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.CBN && <LegalContent slug="cbn" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.OPAY && <LegalContent slug="opay" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
