@@ -25,7 +25,6 @@ import PuppyLoading from "./components/PuppyLoading";
 import AIChatAssistant from "./components/AIChatAssistant";
 import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
 import SecuredPortal from "./components/SecuredPortal";
-import AIPage from "./components/AIPage";
 import AssetDetail from "./components/AssetDetail";
 import BankTransfer from "./components/BankTransfer";
 import KYCTierSystem from "./components/KYCTierSystem";
@@ -646,7 +645,6 @@ export default function App() {
                   { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                   { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
                   { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
-                  { tab: AppTab.AI, label: "AI Insights", icon: BrainIcon },
                   { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
                 ].map((item) => {
                   const isActive = activeTab === item.tab;
@@ -863,19 +861,6 @@ export default function App() {
                       </div>
                     )}
 
-                    {activeTab === AppTab.AI && (
-                      <AIPage
-                        profile={profile}
-                        transactions={cachedTransactions}
-                        prices={{
-                          BTC: btcPrice,
-                          ETH: ethPrice,
-                          SOL: solPrice,
-                          SUI: suiPrice
-                        }}
-                      />
-                    )}
-
                     {activeTab === AppTab.SERVICES && (
                       <AirtimeModule 
                         profile={profile} 
@@ -997,7 +982,6 @@ export default function App() {
                         { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
                         { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
                         { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
-                        { tab: AppTab.AI, label: "AI Insights", icon: BrainIcon },
                         { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
                       ].map((item) => {
                         const isActive = activeTab === item.tab;
@@ -1087,6 +1071,12 @@ export default function App() {
             transactions={cachedTransactions}
             isOpen={showAIChat}
             onClose={() => setShowAIChat(false)}
+            prices={{
+              BTC: btcPrice,
+              ETH: ethPrice,
+              SOL: solPrice,
+              SUI: suiPrice
+            }}
           />
         )}
       </AnimatePresence>

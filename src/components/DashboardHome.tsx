@@ -312,7 +312,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
       </motion.div>
 
       {/* Two Column Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         {/* Send Money To */}
         <motion.div
           variants={itemVariants}
@@ -334,38 +334,6 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-sm">
                 {String.fromCharCode(64 + i)}
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* Scheduled Payments */}
-        <motion.div
-          variants={itemVariants}
-          className="bg-white dark:bg-white/5 rounded-2xl p-6 border border-gray-100 dark:border-white/10"
-        >
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Scheduled Payments</h3>
-            <MoreVertical size={20} className="text-gray-400" />
-          </div>
-
-          <div className="space-y-3">
-            {[
-              { name: "Netflix", amount: 4400, logo: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg", color: "bg-red-500" },
-              { name: "Spotify", amount: 1200, logo: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg", color: "bg-green-500" },
-              { name: "Apple Music", amount: 1200, logo: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg", color: "bg-gray-900" },
-            ].map((payment) => (
-              <div key={payment.name} className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                    <img src={payment.logo} alt={payment.name} className="w-6 h-6 object-contain" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{payment.name}</p>
-                    <p className="text-xs text-gray-500">Monthly</p>
-                  </div>
-                </div>
-                <p className="text-sm font-bold text-gray-900 dark:text-white">₦{payment.amount.toLocaleString()}</p>
               </div>
             ))}
           </div>

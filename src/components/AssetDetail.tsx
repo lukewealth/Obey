@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, TrendingUp, TrendingDown, BarChart3,
   DollarSign, Activity, Clock, Shield, Zap,
-  BuyIcon, SellIcon, AlertCircle, CheckCircle2
+  AlertCircle, CheckCircle2
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { UserProfile } from "../types";

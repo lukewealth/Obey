@@ -4,6 +4,12 @@ import {
   Trophy, Star, Gift, TrendingUp, Users, Zap, Award, Crown, 
   Target, Flame, Sparkles, ArrowRight, CheckCircle, Lock
 } from 'lucide-react';
+import { 
+  DevicePhoneMobileIcon, 
+  GlobeAltIcon, 
+  GiftIcon, 
+  BanknotesIcon 
+} from '@heroicons/react/24/outline';
 import { microInteractions, NumberCounter, AnimatedCard } from './MicroInteractions';
 import api from '../services/api';
 
@@ -331,10 +337,10 @@ export default function RewardsSystem({ userId }: { userId: string }) {
             <h3 className="text-xl font-bold mb-4">Redeem Points</h3>
             <div className="space-y-3">
               {[
-                { points: 500, reward: '₦500 Airtime', icon: '📱' },
-                { points: 1000, reward: '₦1,000 Data Bundle', icon: '🌐' },
-                { points: 2000, reward: '₦2,000 Gift Card', icon: '🎁' },
-                { points: 5000, reward: '₦5,000 Cash Back', icon: '💰' },
+                { points: 500, reward: '₦500 Airtime', icon: DevicePhoneMobileIcon },
+                { points: 1000, reward: '₦1,000 Data Bundle', icon: GlobeAltIcon },
+                { points: 2000, reward: '₦2,000 Gift Card', icon: GiftIcon },
+                { points: 5000, reward: '₦5,000 Cash Back', icon: BanknotesIcon },
               ].map((item, i) => (
                 <motion.button
                   key={i}
@@ -346,7 +352,9 @@ export default function RewardsSystem({ userId }: { userId: string }) {
                   className="w-full flex items-center gap-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-4 hover:shadow-lg transition-all"
                   disabled={rewards.points < item.points}
                 >
-                  <div className="text-4xl">{item.icon}</div>
+                  <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                    <item.icon className="w-6 h-6 text-blue-600" />
+                  </div>
                   <div className="flex-1 text-left">
                     <div className="font-bold text-gray-900">{item.reward}</div>
                     <div className="text-sm text-gray-600">{item.points} points</div>
