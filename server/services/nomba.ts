@@ -4,14 +4,31 @@ import crypto from 'crypto';
 
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 const {
-  NOMBA_BASE_URL,
-  NOMBA_PARENT_ACCOUNT_ID,
-  NOMBA_SUB_ACCOUNT_ID,
-  NOMBA_CLIENT_ID,
-  NOMBA_CLIENT_SECRET,
   NOMBA_WEBHOOK_SECRET,
 } = process.env;
+
+const NOMBA_BASE_URL = isProduction
+  ? process.env.NOMBA_BASE_URL
+  : process.env.NOMBA_SANDBOX_BASE_URL;
+
+const NOMBA_PARENT_ACCOUNT_ID = isProduction
+  ? process.env.NOMBA_PARENT_ACCOUNT_ID
+  : process.env.NOMBA_SANDBOX_PARENT_ACCOUNT_ID || process.env.NOMBA_PARENT_ACCOUNT_ID;
+
+const NOMBA_SUB_ACCOUNT_ID = isProduction
+  ? process.env.NOMBA_SUB_ACCOUNT_ID
+  : process.env.NOMBA_SANDBOX_SUB_ACCOUNT_ID || process.env.NOMBA_SUB_ACCOUNT_ID;
+
+const NOMBA_CLIENT_ID = isProduction
+  ? process.env.NOMBA_CLIENT_ID
+  : process.env.NOMBA_SANDBOX_CLIENT_ID;
+
+const NOMBA_CLIENT_SECRET = isProduction
+  ? process.env.NOMBA_CLIENT_SECRET
+  : process.env.NOMBA_SANDBOX_CLIENT_SECRET;
 
 let cachedToken: string | null = null;
 let tokenExpiry: number | null = null;
