@@ -566,22 +566,32 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                transition={{ duration: 1.5 }}
                className="max-w-[1400px] mx-auto relative h-[350px] md:h-[500px] lg:h-[650px] overflow-hidden z-10 flex flex-col justify-center"
             >
-               {/* The Line - Centered Vertically */}
-               <div className="absolute top-1/2 left-0 right-0 h-[1.5px] bg-gray-200 dark:bg-white/10 -translate-y-1/2 z-0"></div>
-
-               {/* Tree Animation - Moving Left to Right */}
+               {/* The Line - Animation Base at Bottom with Fade In/Out */}
                <motion.div
                  animate={{ 
-                   x: ["-120%", "120%"],
+                   opacity: [0, 0.6, 0.6, 0]
+                 }}
+                 transition={{ 
+                   duration: 25,
+                   times: [0, 0.1, 0.85, 1],
+                   repeat: Infinity,
+                   ease: "linear"
+                 }}
+                 className="absolute bottom-[22%] left-[5%] right-[5%] h-[1.5px] bg-gray-200 dark:bg-white/15 z-0"
+               ></motion.div>
+
+               {/* Tree Animation - Stationary at Previous Position */}
+               <motion.div
+                 animate={{ 
                    opacity: [0, 1, 1, 0]
                  }}
                  transition={{ 
                    duration: 25,
-                   times: [0, 0.1, 0.9, 1],
+                   times: [0, 0.1, 0.85, 1],
                    repeat: Infinity,
                    ease: "linear"
                  }}
-                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 left-0 -translate-y-1/2 z-10"
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-[12%] -translate-y-full z-10"
                >
                  <DotLottieReact
                    src="https://lottie.host/60e2c41b-b933-4d0e-a9fb-0228b60517cc/8BwkHq1W4z.lottie"
@@ -590,10 +600,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  />
                </motion.div>
 
-               {/* Cat Walking Right to Left - Same size as seated cat */}
+               {/* Cat Walking Right to Left - Above the Line */}
                <motion.div
                  animate={{ 
-                   x: ["120%", "-120%"],
+                   x: ["110%", "-110%"],
                    opacity: [0, 1, 1, 0]
                  }}
                  transition={{ 
@@ -601,7 +611,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                    repeat: Infinity,
                    ease: "linear" 
                  }}
-                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 right-0 -translate-y-1/2 z-10"
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] right-0 -translate-y-full z-10"
                >
                  <DotLottieReact
                    src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
@@ -611,7 +621,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  />
                </motion.div>
 
-               {/* Cat Seated in Middle - Same size as walking cat */}
+               {/* Cat Seated in Middle - Above the Line */}
                <motion.div
                  animate={{ 
                    opacity: [0, 1, 1, 0]
@@ -622,7 +632,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                    repeat: Infinity,
                    ease: "linear" 
                  }}
-                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
+                 className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
                >
                  <DotLottieReact
                    src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
@@ -631,7 +641,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  />
                </motion.div>
 
-               {/* Birds/Tree Animation - 2X above the tree line */}
+               {/* Birds/Tree Animation - Above the animals */}
                <motion.div
                  animate={{ 
                    opacity: [0, 0.15, 0.15, 0]
@@ -642,7 +652,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                    repeat: Infinity,
                    ease: "linear"
                  }}
-                 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[200%] sm:-translate-y-[180%] md:-translate-y-[160%] z-0 filter grayscale opacity-20 pointer-events-none"
+                 className="absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-[280%] sm:-translate-y-[260%] md:-translate-y-[240%] z-0 filter grayscale opacity-20 pointer-events-none"
                >
                  <DotLottieReact 
                    src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 

@@ -8,7 +8,7 @@ import {
   ArrowRight, Zap, Star, Activity, ChevronRight, RefreshCw,
   Wifi, BarChart3, ArrowLeftRight, Cloud, Lightbulb,
   Home, CreditCard as CardIcon, PieChart, Users, Settings,
-  LogOut, Moon, Sun, Plus, MoreVertical, ChevronDown
+  LogOut, Moon, Sun, Plus, MoreVertical, ChevronDown, Calendar, Clock
 } from "lucide-react";
 import { HandThumbUpIcon } from "@heroicons/react/24/solid";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -281,6 +281,66 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+      </motion.div>
+
+      {/* Recent Reschedules */}
+      <motion.div
+        variants={itemVariants}
+        className="bg-white dark:bg-white/5 rounded-2xl p-6 border border-gray-100 dark:border-white/10"
+      >
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center">
+              <RefreshCw size={18} className="text-amber-600 dark:text-amber-400" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white">Recent Reschedules</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Payments moved to new dates</p>
+            </div>
+          </div>
+          <motion.button
+            whileHover={{ x: 2 }}
+            onClick={() => onNavigateTab(AppTab.SCHEDULE)}
+            className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary/80 transition-colors"
+          >
+            View all
+            <ArrowRight size={14} />
+          </motion.button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {[
+            { title: "Electricity Bill", amount: 15000, originalDate: "Jun 10", newDate: "Jun 25", category: "Bills", rescheduleCount: 1 },
+            { title: "Internet Subscription", amount: 12000, originalDate: "Jun 12", newDate: "Jun 20", category: "Bills", rescheduleCount: 2 },
+          ].map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+              whileHover={{ x: 4 }}
+              className="flex items-center gap-4 p-4 rounded-xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10 cursor-pointer transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                <RefreshCw size={16} className="text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">{item.title}</p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-xs text-gray-400 line-through">{item.originalDate}</span>
+                  <ArrowRight size={10} className="text-amber-400" />
+                  <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{item.newDate}</span>
+                  {item.rescheduleCount > 1 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400">
+                      {item.rescheduleCount}x
+                    </span>
+                  )}
+                </div>
+              </div>
+              <p className="text-sm font-bold text-gray-900 dark:text-white">₦{item.amount.toLocaleString()}</p>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
 

@@ -1,6 +1,5 @@
 
-
-keep# OBEY Institutional Admin Portal - Technical Specification
+keep # OBEY Institutional Admin Portal - Technical Specification
 
 ## Overview
 The OBEY Admin Portal is the central command node for platform governance, financial oversight, and user compliance. It provides deep visibility into the institutional ledger and user lifecycle management.

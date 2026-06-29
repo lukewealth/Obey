@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from "react";
-import { AppScreen, AppTab, UserProfile, Transaction, AdminMetrics } from "./types";
+import { AppScreen, AppTab, UserProfile, Transaction, AdminMetrics, ScheduledPayment } from "./types";
 import MarketingPage from "./components/MarketingPage";
 import AuthSystem from "./components/AuthSystem";
 import AdminDashboard from "./components/AdminDashboard";
@@ -18,6 +18,7 @@ import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
 import SecuredPortal from "./components/SecuredPortal";
 import AssetDetail from "./components/AssetDetail";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PaymentScheduleChanneler from "./components/PaymentScheduleChanneler";
 
 // Lazy load heavy feature components
 const DashboardHome = lazy(() => import("./components/DashboardHome"));
@@ -59,7 +60,8 @@ import {
   CreditCardIcon,
   ShieldCheckIcon as ShieldCheckOutline,
   ClockIcon,
-  BuildingLibraryIcon as BankIcon
+  BuildingLibraryIcon as BankIcon,
+  CalendarIcon as ScheduleIcon
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
@@ -372,6 +374,90 @@ export default function App() {
     systemStatus: "OPERATIONAL"
   });
 
+  const today = new Date();
+
+  const [scheduledPayments, setScheduledPayments] = useState<ScheduledPayment[]>([
+    {
+      id: "SP-001",
+      title: "Monthly Rent",
+      amount: 350000,
+      currency: "NGN",
+      date: `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "9:00 AM",
+      frequency: "monthly",
+      category: "Rent",
+      status: "upcoming",
+      recipient: "Landlord - Adeyemi Properties",
+      description: "Monthly apartment rent payment",
+    },
+    {
+      id: "SP-002",
+      title: "Netflix Subscription",
+      amount: 4500,
+      currency: "NGN",
+      date: `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "12:00 PM",
+      frequency: "monthly",
+      category: "Subscription",
+      status: "upcoming",
+      recipient: "Netflix",
+    },
+    {
+      id: "SP-003",
+      title: "DSTV Premium",
+      amount: 24500,
+      currency: "NGN",
+      date: `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "2:00 PM",
+      frequency: "monthly",
+      category: "Bills",
+      status: "upcoming",
+      recipient: "DSTV",
+      description: "Monthly cable subscription",
+    },
+    {
+      id: "SP-004",
+      title: "Savings Goal",
+      amount: 50000,
+      currency: "NGN",
+      date: `${today.getDate()}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "6:00 PM",
+      frequency: "weekly",
+      category: "Savings",
+      status: "upcoming",
+      description: "Weekly auto-save to emergency fund",
+    },
+    {
+      id: "SP-005",
+      title: "Electricity Bill",
+      amount: 15000,
+      currency: "NGN",
+      date: `${(today.getDate() + 2) % 30 || 30}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "10:00 AM",
+      frequency: "monthly",
+      category: "Bills",
+      status: "rescheduled",
+      recipient: "EKEDC",
+      description: "Rescheduled from last week",
+      originalDate: `${(today.getDate() - 5 + 30) % 30 || 30}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      rescheduleCount: 1,
+    },
+    {
+      id: "SP-006",
+      title: "Internet Subscription",
+      amount: 12000,
+      currency: "NGN",
+      date: `${(today.getDate() + 5) % 30 || 30}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      time: "9:00 AM",
+      frequency: "monthly",
+      category: "Bills",
+      status: "rescheduled",
+      recipient: "Spectranet",
+      originalDate: `${(today.getDate() - 3 + 30) % 30 || 30}/${today.getMonth() + 1}/${today.getFullYear()}`,
+      rescheduleCount: 2,
+    },
+  ]);
+
   useEffect(() => {
     if (!supabase) return;
 
@@ -428,6 +514,40 @@ export default function App() {
     setMobileMenuOpen(false);
     setShowGatedModal(false);
     wakeupRef.current = null;
+  };
+
+  const handleAddScheduledPayment = (payment: Omit<ScheduledPayment, "id">) => {
+    const newPayment: ScheduledPayment = {
+      ...payment,
+      id: `SP-${Date.now()}`,
+    };
+    setScheduledPayments(prev => [...prev, newPayment]);
+    notify("success", "Payment Scheduled", `${payment.title} scheduled for ${payment.date} at ${payment.time}`);
+  };
+
+  const handleReschedulePayment = (id: string, newDate: string, newTime: string) => {
+    setScheduledPayments(prev => prev.map(p =>
+      p.id === id ? { ...p, date: newDate, time: newTime, status: "rescheduled" as const, originalDate: p.date, rescheduleCount: (p.rescheduleCount || 0) + 1 } : p
+    ));
+    notify("info", "Payment Rescheduled", "New date and time applied.");
+  };
+
+  const handleCancelPayment = (id: string) => {
+    setScheduledPayments(prev => prev.map(p =>
+      p.id === id ? { ...p, status: "cancelled" as const } : p
+    ));
+    notify("info", "Payment Cancelled", "Scheduled payment has been cancelled.");
+  };
+
+  const handleCompletePayment = (id: string) => {
+    setScheduledPayments(prev => prev.map(p =>
+      p.id === id ? { ...p, status: "completed" as const } : p
+    ));
+    const payment = scheduledPayments.find(p => p.id === id);
+    if (payment) {
+      handleProfileUpdate({ balance: profile.balance - payment.amount });
+      notify("success", "Payment Completed", `${payment.title} of ₦${payment.amount.toLocaleString()} processed.`);
+    }
   };
 
   return (
@@ -674,6 +794,7 @@ export default function App() {
                   { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
                   { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
                   { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
+                  { tab: AppTab.SCHEDULE, label: "Schedule", icon: ScheduleIcon },
                   { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
                   { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
                   { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },
@@ -918,6 +1039,18 @@ export default function App() {
                         />
                       </ErrorBoundary>
                     )}
+                    {activeTab === AppTab.SCHEDULE && (
+                      <ErrorBoundary>
+                        <PaymentScheduleChanneler
+                          profile={profile}
+                          scheduledPayments={scheduledPayments}
+                          onAddPayment={handleAddScheduledPayment}
+                          onReschedule={handleReschedulePayment}
+                          onCancel={handleCancelPayment}
+                          onComplete={handleCompletePayment}
+                        />
+                      </ErrorBoundary>
+                    )}
                     {activeTab === AppTab.PROFILE && (
                       <ErrorBoundary>
                         <div className="space-y-8">
@@ -962,7 +1095,7 @@ export default function App() {
             {[
               { tab: AppTab.HOME, label: "Home", icon: HomeIcon },
               { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
-              { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
+              { tab: AppTab.SCHEDULE, label: "Schedule", icon: ScheduleIcon },
               { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
               { tab: AppTab.SERVICES, label: "Pay", icon: AppIcon },
             ].map((item) => (
@@ -1029,6 +1162,7 @@ export default function App() {
                         { tab: AppTab.WALLET, label: "Savings", icon: WalletIcon },
                         { tab: AppTab.BANK, label: "Bank", icon: BankIcon },
                         { tab: AppTab.CARDS, label: "Cards", icon: CreditCardIcon },
+                        { tab: AppTab.SCHEDULE, label: "Schedule", icon: ScheduleIcon },
                         { tab: AppTab.SERVICES, label: "Payments", icon: AppIcon },
                         { tab: AppTab.TRADE, label: "Trade", icon: SwapIcon },
                         { tab: AppTab.PROFILE, label: "Profile", icon: UserIcon },

@@ -23,7 +23,8 @@ export enum AppTab {
   ADMIN = "ADMIN",
   CARDS = "CARDS",
   HISTORY = "HISTORY",
-  AI = "AI"
+  AI = "AI",
+  SCHEDULE = "SCHEDULE"
 }
 
 export enum GiftCardTab {
@@ -100,4 +101,29 @@ export interface AdminMetrics {
   monthlyRevenue: number;
   pendingKycCount: number;
   systemStatus: "OPERATIONAL" | "DEGRADED" | "MAINTENANCE";
+}
+
+export interface ScheduledPayment {
+  id: string;
+  title: string;
+  amount: number;
+  currency: "NGN" | "USD";
+  date: string;
+  time: string;
+  frequency: "once" | "daily" | "weekly" | "monthly" | "yearly";
+  category: "Transfer" | "Bills" | "Savings" | "Subscription" | "Rent" | "Other";
+  status: "upcoming" | "completed" | "rescheduled" | "cancelled" | "failed";
+  recipient?: string;
+  description?: string;
+  originalDate?: string;
+  rescheduleCount?: number;
+}
+
+export interface WeeklyPin {
+  id: string;
+  title: string;
+  date: string;
+  time?: string;
+  category: "Personal" | "Bills" | "Savings" | "Transfer";
+  description?: string;
 }
