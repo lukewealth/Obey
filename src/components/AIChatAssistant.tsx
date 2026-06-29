@@ -370,20 +370,15 @@ function generateInsightsFromData(balance: number, transactions: any[], prices?:
 
 async function fetchAssetMarketData(symbol: string): Promise<MarketCardData | null> {
   try {
-    const coinIdMap: Record<string, string> = {
-      BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', SUI: 'sui', USDC: 'usd-coin',
-      BNB: 'binancecoin', XRP: 'ripple', ADA: 'cardano', DOGE: 'dogecoin',
-    };
-    const coinId = coinIdMap[symbol.toUpperCase()] || symbol.toLowerCase();
-    const res = await fetch(`/api/market/coingecko/coin/${coinId}`);
-    const data = await res.json();
+    const { data } = await api.get(`/market/details/${symbol.toUpperCase()}`);
+    if (!data || !data.price) return null;
     return {
-      symbol: data.symbol?.toUpperCase() || symbol.toUpperCase(),
-      name: data.name || symbol,
-      price: data.market_data?.current_price?.usd || 0,
-      change24h: data.market_data?.price_change_percentage_24h || 0,
-      marketCap: data.market_data?.market_cap?.usd ? `$${(data.market_data.market_cap.usd / 1e9).toFixed(2)}B` : undefined,
-      volume24h: data.market_data?.total_volume?.usd ? `$${(data.market_data.total_volume.usd / 1e6).toFixed(2)}M` : undefined,
+      symbol: data.symbol || symbol.toUpperCase(),
+      name: data.symbol || symbol,
+      price: data.price || 0,
+      change24h: data.change24h || 0,
+      marketCap: undefined,
+      volume24h: data.volume24h ? `$${(data.volume24h / 1e6).toFixed(2)}M` : undefined,
     };
   } catch {
     return null;
