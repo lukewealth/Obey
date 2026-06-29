@@ -28,6 +28,7 @@ import SecuredPortal from "./components/SecuredPortal";
 import AssetDetail from "./components/AssetDetail";
 import BankTransfer from "./components/BankTransfer";
 import KYCTierSystem from "./components/KYCTierSystem";
+import ErrorBoundary from "./components/ErrorBoundary";
 import NotificationSettings from "./components/NotificationSettings";
 import AdminKYCManagement from "./components/AdminKYCManagement";
 import { useNotification } from "./components/NotificationSystem";
@@ -769,162 +770,180 @@ export default function App() {
               <AnimatePresence mode="wait">
                  <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                     {activeTab === AppTab.HOME && (
-                      <DashboardHome
-                        profile={profile}
-                        transactions={cachedTransactions}
-                        onNavigateTab={setActiveTab}
-                        onSelectAction={(action) => {
-                            if (action === "fund" || action === "withdraw" || action === "transfer") {
-                              setActiveTab(AppTab.WALLET);
-                            } else if (action === "buy-giftcard" || action === "sell-giftcard" || action === "Giftcard") {
-                              setTradeSubTab('giftcard');
-                              setActiveTab(AppTab.TRADE);
-                            } else if (action === "Crypto") {
-                              setTradeSubTab('crypto');
-                              setActiveTab(AppTab.TRADE);
-                            } else if (action === "airtime" || action === "buy-airtime") {
-                              setUtilitySegment("airtime");
-                              setActiveTab(AppTab.SERVICES);
-                            } else if (action === "data" || action === "buy-data") {
-                              setUtilitySegment("data");
-                              setActiveTab(AppTab.SERVICES);
-                            } else if (action === "history") {
-                              setActiveTab(AppTab.HISTORY);
-                            } else {
-                              setActiveTab(AppTab.SERVICES);
-                            }
-                        }}
-                        prices={{
-                          BTC: btcPrice,
-                          ETH: ethPrice,
-                          SOL: solPrice,
-                          SUI: suiPrice
-                        }}
-                      />
+                      <ErrorBoundary>
+                        <DashboardHome
+                          profile={profile}
+                          transactions={cachedTransactions}
+                          onNavigateTab={setActiveTab}
+                          onSelectAction={(action) => {
+                              if (action === "fund" || action === "withdraw" || action === "transfer") {
+                                setActiveTab(AppTab.WALLET);
+                              } else if (action === "buy-giftcard" || action === "sell-giftcard" || action === "Giftcard") {
+                                setTradeSubTab('giftcard');
+                                setActiveTab(AppTab.TRADE);
+                              } else if (action === "Crypto") {
+                                setTradeSubTab('crypto');
+                                setActiveTab(AppTab.TRADE);
+                              } else if (action === "airtime" || action === "buy-airtime") {
+                                setUtilitySegment("airtime");
+                                setActiveTab(AppTab.SERVICES);
+                              } else if (action === "data" || action === "buy-data") {
+                                setUtilitySegment("data");
+                                setActiveTab(AppTab.SERVICES);
+                              } else if (action === "history") {
+                                setActiveTab(AppTab.HISTORY);
+                              } else {
+                                setActiveTab(AppTab.SERVICES);
+                              }
+                          }}
+                          prices={{
+                            BTC: btcPrice,
+                            ETH: ethPrice,
+                            SOL: solPrice,
+                            SUI: suiPrice
+                          }}
+                        />
+                      </ErrorBoundary>
                     )}
                     {activeTab === AppTab.HISTORY && (
-                      <TransactionHistory transactions={cachedTransactions} />
+                      <ErrorBoundary>
+                        <TransactionHistory transactions={cachedTransactions} />
+                      </ErrorBoundary>
                     )}
                     {activeTab === AppTab.WALLET && (
-                      <WalletSystem 
-                        profile={profile} 
-                        transactions={cachedTransactions} 
-                        onFundWallet={(amt, details) => {
-                          handleProfileUpdate({ balance: profile.balance + amt });
-                          triggerSuccess(amt, "Deposit Protocol");
-                        }} 
-                        onWithdrawWallet={async (amt, details) => { 
-                          handleProfileUpdate({ balance: profile.balance - amt }); 
-                          triggerSuccess(amt, "Withdrawal Dispatch");
-                          return true; 
-                        }} 
-                        onTransfer={async (amt, recipient) => { 
-                          handleProfileUpdate({ balance: profile.balance - amt }); 
-                          triggerSuccess(amt, `Transfer to ${recipient}`);
-                          return true; 
-                        }} 
-                      />
+                      <ErrorBoundary>
+                        <WalletSystem 
+                          profile={profile} 
+                          transactions={cachedTransactions} 
+                          onFundWallet={(amt, details) => {
+                            handleProfileUpdate({ balance: profile.balance + amt });
+                            triggerSuccess(amt, "Deposit Protocol");
+                          }} 
+                          onWithdrawWallet={async (amt, details) => { 
+                            handleProfileUpdate({ balance: profile.balance - amt }); 
+                            triggerSuccess(amt, "Withdrawal Dispatch");
+                            return true; 
+                          }} 
+                          onTransfer={async (amt, recipient) => { 
+                            handleProfileUpdate({ balance: profile.balance - amt }); 
+                            triggerSuccess(amt, `Transfer to ${recipient}`);
+                            return true; 
+                          }} 
+                        />
+                      </ErrorBoundary>
                     )}
 
                     {activeTab === AppTab.BANK && (
-                      <BankTransfer
-                        profile={profile}
-                        transactions={cachedTransactions}
-                        onTransferComplete={async (amt, details) => {
-                          handleProfileUpdate({ balance: profile.balance - amt });
-                          triggerSuccess(amt, details);
-                          return true;
-                        }}
-                      />
+                      <ErrorBoundary>
+                        <BankTransfer
+                          profile={profile}
+                          transactions={cachedTransactions}
+                          onTransferComplete={async (amt, details) => {
+                            handleProfileUpdate({ balance: profile.balance - amt });
+                            triggerSuccess(amt, details);
+                            return true;
+                          }}
+                        />
+                      </ErrorBoundary>
                     )}
 
                     {activeTab === AppTab.CARDS && (
-                      <VirtualCardSystem 
-                        profile={profile} 
-                        onUpdateBalance={(amt) => {
-                          handleProfileUpdate({ balance: profile.balance + amt });
-                          triggerSuccess(amt, amt > 0 ? "Card Funding" : "Card Unloading");
-                        }}
-                      />
+                      <ErrorBoundary>
+                        <VirtualCardSystem 
+                          profile={profile} 
+                          onUpdateBalance={(amt) => {
+                            handleProfileUpdate({ balance: profile.balance + amt });
+                            triggerSuccess(amt, amt > 0 ? "Card Funding" : "Card Unloading");
+                          }}
+                        />
+                      </ErrorBoundary>
                     )}
                     
                     {activeTab === AppTab.TRADE && (
-                      <div className="space-y-8">
-                        <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-gray-100 w-fit mx-auto md:mx-0 shadow-sm">
-                           <button 
-                            onClick={() => setTradeSubTab('crypto')}
-                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'crypto' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
-                           >
-                             Digital Assets
-                           </button>
-                           <button 
-                            onClick={() => setTradeSubTab('giftcard')}
-                            className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'giftcard' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
-                           >
-                             Gift Cards
-                           </button>
+                      <ErrorBoundary>
+                        <div className="space-y-8">
+                          <div className="flex bg-white/50 backdrop-blur-md p-1 rounded-2xl border border-gray-100 w-fit mx-auto md:mx-0 shadow-sm">
+                             <button 
+                              onClick={() => setTradeSubTab('crypto')}
+                              className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'crypto' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                             >
+                               Digital Assets
+                             </button>
+                             <button 
+                              onClick={() => setTradeSubTab('giftcard')}
+                              className={`px-8 py-3 rounded-xl text-[13px] font-black transition-all ${tradeSubTab === 'giftcard' ? 'bg-[#0b0e14] text-white shadow-xl' : 'text-gray-400 hover:text-gray-900'}`}
+                             >
+                               Gift Cards
+                             </button>
+                          </div>
+                          
+                          <AnimatePresence mode="wait">
+                            {tradeSubTab === 'giftcard' ? (
+                              <motion.div key="giftcard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                                <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => {
+                                  handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
+                                  triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
+                                }} />
+                              </motion.div>
+                            ) : (
+                              <motion.div key="crypto" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                                <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} solPrice={solPrice} suiPrice={suiPrice} onTradeCompleted={(amt, details, isSell) => {
+                                  handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
+                                  triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
+                                }} />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
-                        
-                        <AnimatePresence mode="wait">
-                          {tradeSubTab === 'giftcard' ? (
-                            <motion.div key="giftcard" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                              <GiftCardSystem profile={profile} onTradeCompleted={(amt, details, isSell) => {
-                                handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
-                                triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
-                              }} />
-                            </motion.div>
-                          ) : (
-                            <motion.div key="crypto" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                              <CryptoSystem profile={profile} btcPrice={btcPrice} ethPrice={ethPrice} solPrice={solPrice} suiPrice={suiPrice} onTradeCompleted={(amt, details, isSell) => {
-                                handleProfileUpdate({ balance: isSell ? profile.balance + amt : profile.balance - amt });
-                                triggerSuccess(amt, isSell ? `Sell ${details}` : `Buy ${details}`);
-                              }} />
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
+                      </ErrorBoundary>
                     )}
 
                     {activeTab === AppTab.SERVICES && (
-                      <AirtimeModule 
-                        profile={profile} 
-                        initialSegment={utilitySegment}
-                        onPurchase={async (amt) => { 
-                          handleProfileUpdate({ balance: profile.balance - amt }); 
-                          triggerSuccess(amt, "Service Settlement");
-                          return true; 
-                        }} 
-                      />
+                      <ErrorBoundary>
+                        <AirtimeModule 
+                          profile={profile} 
+                          initialSegment={utilitySegment}
+                          onPurchase={async (amt) => { 
+                            handleProfileUpdate({ balance: profile.balance - amt }); 
+                            triggerSuccess(amt, "Service Settlement");
+                            return true; 
+                          }} 
+                        />
+                      </ErrorBoundary>
                     )}
                     {activeTab === AppTab.PROFILE && (
-                      <div className="space-y-8">
-                        <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />
-                        <NotificationSettings userId={profile.id} />
-                        <KYCTierSystem 
-                          profile={profile} 
-                          onTierUpgrade={(newTier) => {
-                            handleProfileUpdate({ kycLevel: newTier as any });
-                            notify("success", "Tier Upgraded", `Welcome to Tier ${newTier}!`);
-                          }} 
-                        />
-                      </div>
+                      <ErrorBoundary>
+                        <div className="space-y-8">
+                          <UserProfileSettings profile={profile} onUpdateProfile={handleProfileUpdate} />
+                          <NotificationSettings userId={profile.id} />
+                          <KYCTierSystem 
+                            profile={profile} 
+                            onTierUpgrade={(newTier) => {
+                              handleProfileUpdate({ kycLevel: newTier as any });
+                              notify("success", "Tier Upgraded", `Welcome to Tier ${newTier}!`);
+                            }} 
+                          />
+                        </div>
+                      </ErrorBoundary>
                     )}
                     {activeTab === AppTab.ADMIN && profile.role === "admin" && (
-                      <div className="space-y-8">
-                        <AdminSystem 
-                          metrics={adminMetrics} 
-                          profile={profile} 
-                          onApproveKyc={() => {
-                            notify("success", "Compliance Verified", "Identity node authorized.");
-                            handleProfileUpdate({ kycStatus: "Verified", kycLevel: 2 });
-                          }} 
-                          onUpdateSystemStatus={(status) => {
-                            setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
-                            notify("info", "System State Changed", `Master node status set to ${status}`);
-                          }} 
-                        />
-                        <AdminKYCManagement adminId={profile.id || ""} />
-                      </div>
+                      <ErrorBoundary>
+                        <div className="space-y-8">
+                          <AdminSystem 
+                            metrics={adminMetrics} 
+                            profile={profile} 
+                            onApproveKyc={() => {
+                              notify("success", "Compliance Verified", "Identity node authorized.");
+                              handleProfileUpdate({ kycStatus: "Verified", kycLevel: 2 });
+                            }} 
+                            onUpdateSystemStatus={(status) => {
+                              setAdminMetrics(prev => ({ ...prev, systemStatus: status }));
+                              notify("info", "System State Changed", `Master node status set to ${status}`);
+                            }} 
+                          />
+                          <AdminKYCManagement adminId={profile.id || ""} />
+                        </div>
+                      </ErrorBoundary>
                     )}
                  </motion.div>
               </AnimatePresence>
