@@ -39,7 +39,7 @@ export interface UserProfile {
   phone: string;
   avatar: string;
   avatarUrl?: string; // Support for official avatar icons
-  kycStatus: "Unverified" | "Pending" | "Verified";
+  kycStatus: "Unverified" | "Pending" | "Verified" | "Rejected";
   kycLevel: 0 | 1 | 2; // Support for tiered verification levels
   tierLevel: number; // 1: Standard, 2: Institutional/Premium
   isEmailVerified: boolean;
@@ -66,6 +66,7 @@ export interface Transaction {
   assetName?: string;
   faceValue?: number;
   requestReference?: string;
+  paymentMethod?: 'bank_transfer' | 'card' | 'wallet' | 'crypto' | 'giftcard' | 'airtime' | 'data';
 }
 
 export interface CryptoAsset {
