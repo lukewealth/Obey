@@ -93,7 +93,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     setProcessing(true);
     try {
       const res = await api.post('/giftcards/list', {
-        sellerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        sellerId: profile.id || profile.email,
         sellerName: profile.name,
         assetName: selectedAsset,
         faceValue: parseFloat(listingForm.faceValue),
@@ -119,7 +119,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     setProcessing(true);
     try {
       const res = await api.post('/giftcards/purchase', {
-        buyerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        buyerId: profile.id || profile.email,
         listingId
       });
       if (res.data.success) {
@@ -153,7 +153,7 @@ export default function GiftCardSystem({ profile, onTradeCompleted }: GiftCardSy
     try {
       const selectedAssetObj = assets.find(a => a.name === selectedAsset);
       const res = await api.post('/giftcards/purchase', {
-        buyerId: profile.email === "felix@obey.finance" ? "felix-id" : "user-id",
+        buyerId: profile.id || profile.email,
         assetName: selectedAsset,
         amount: parseFloat(cardValue),
         rate: selectedAssetObj?.buyRate || 0

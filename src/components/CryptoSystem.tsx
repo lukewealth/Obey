@@ -130,7 +130,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
     setProcessing(true);
     try {
       const response = await api.post('/crypto-market/purchase', {
-        buyerId: profile.email === 'felix@obey.finance' ? 'felix-id' : 'user-id',
+        buyerId: profile.id || profile.email,
         listingId
       });
       if (response.data.success) {
