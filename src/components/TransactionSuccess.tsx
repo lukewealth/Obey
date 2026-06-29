@@ -29,7 +29,10 @@ export default function TransactionSuccess({ amount, type, id, onClose }: Transa
       className="fixed inset-0 z-[100] bg-white/95 backdrop-blur-3xl flex flex-col overflow-y-auto"
     >
       <header className="h-16 md:h-20 px-6 md:px-8 flex items-center justify-between max-w-7xl mx-auto w-full shrink-0">
-        <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] uppercase italic">OBEY</span>
+        <div className="flex items-center gap-2">
+          <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
+          <span className="text-xl md:text-2xl font-black tracking-tighter text-[#0b0e14] uppercase italic">OBEY</span>
+        </div>
         <button onClick={onClose} className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-full flex items-center justify-center bg-gray-50 text-gray-400 hover:text-gray-900 transition-all active-press">
           <X size={20} className="md:w-6 md:h-6" />
         </button>

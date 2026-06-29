@@ -62,10 +62,8 @@ const MobileAppMockup = () => (
 
     <div className="flex justify-between items-center text-[#0b0e14] dark:text-white">
        <div className="flex items-center gap-2 md:gap-3">
-           <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center shadow-sm">
-              <span className="text-white font-black text-xs">O</span>
-           </div>
-           <span className="text-[11px] md:text-[13px] font-bold tracking-tight">Obey</span>
+            <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
+            <span className="text-[11px] md:text-[13px] font-bold tracking-tight">Obey</span>
        </div>
        <div className="flex items-center gap-2 md:gap-3">
           <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center">
@@ -220,9 +218,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="flex items-center gap-2 md:gap-3 cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            <div className="w-8 h-8 md:w-9 md:h-9 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl group-hover:rotate-[10deg] transition-transform shadow-sm shrink-0">
-              <span className="text-white font-black text-xs">O</span>
-            </div>
+            <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl group-hover:rotate-[10deg] transition-transform shadow-sm shrink-0" />
             <span className="text-lg md:text-2xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
           </div>
 
@@ -274,9 +270,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
           >
             <div className="flex justify-between items-center mb-12 md:mb-16">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl">
-                  <span className="text-white font-black text-xs">O</span>
-                </div>
+                <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 rounded-xl" />
                 <span className="text-lg font-bold tracking-tight">Obey</span>
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2"><XIcon className="w-8 h-8" /></button>
