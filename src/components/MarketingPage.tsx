@@ -600,10 +600,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   />
                 </motion.div>
 
-                {/* Cat Walking from Outside Sidebar to Middle - Slow Natural Pace */}
+                {/* Cat Walking from Right Edge to Middle - Slow Natural Pace */}
                 <motion.div
                   animate={{ 
-                    x: ["calc(100vw + 100%)", "0%"],
+                    x: ["100vw", "-50%"],
                     opacity: [0, 1, 1, 0.8]
                   }}
                   transition={{ 
@@ -611,13 +611,33 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear" 
                   }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[32%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
+                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[32%] right-0 -translate-y-full z-10"
                 >
                   <DotLottieReact
                     src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
                     loop
                     autoplay
-                    style={{ transform: 'scaleX(1)' }}
+                    style={{ transform: 'scaleX(-1)' }}
+                  />
+                </motion.div>
+
+                {/* New Animation - Same size as cats, on the line */}
+                <motion.div
+                  animate={{ 
+                    opacity: [0, 1, 1, 0]
+                  }}
+                  transition={{ 
+                    duration: 25,
+                    times: [0, 0.1, 0.8, 1],
+                    repeat: Infinity,
+                    ease: "linear" 
+                  }}
+                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[32%] left-[15%] -translate-y-full z-10"
+                >
+                  <DotLottieReact
+                    src="https://lottie.host/9e5c51c1-94bf-4362-b5a4-4daf3fe785aa/Gb6PsgnXJp.lottie"
+                    loop
+                    autoplay
                   />
                 </motion.div>
 
@@ -656,7 +676,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                 >
                   <DotLottieReact 
                     src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
-                    style={{ width: '200px', height: '200px' }} 
+                    style={{ width: '100px', height: '100px' }} 
                     autoplay 
                     loop 
                   />
