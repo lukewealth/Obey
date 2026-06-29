@@ -4,8 +4,7 @@ import AboutUs from "./AboutUs";
 import StandardFooter from "./StandardFooter";
 import LandingLoader from "./LandingLoader";
 import ThemeToggle from "./ThemeToggle";
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   Bars3Icon as MenuIcon, 
   XMarkIcon as XIcon, 
@@ -148,7 +147,6 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
   const [activeHeader, setActiveHeader] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [showHeroText, setShowHeroText] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -157,15 +155,10 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
     window.addEventListener("scroll", handleScroll);
     
     const timer = setTimeout(() => setIsLoaded(true), 2400);
-
-    const heroCycle = setInterval(() => {
-      setShowHeroText(prev => !prev);
-    }, 16000);
     
     return () => {
       window.removeEventListener("scroll", handleScroll);
       clearTimeout(timer);
-      clearInterval(heroCycle);
     };
   }, []);
 
@@ -185,10 +178,6 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
       transition: { duration: 1, ease: [0.22, 1, 0.36, 1] as any },
     },
   };
-
-  const { scrollYProgress } = useScroll();
-  const subtitleY = useTransform(scrollYProgress, [0, 0.1], [0, -30]);
-  const subtitleOpacity = useTransform(scrollYProgress, [0, 0.08, 0.15], [1, 1, 0]);
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#121212] text-[#0b0e14] dark:text-white selection:bg-primary/10 selection:text-primary overflow-x-hidden font-inter transition-colors duration-500">
@@ -292,11 +281,108 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
 
       <main>
         {/* 2. HIGH-FIDELITY HERO */}
-        <section className="relative pt-32 pb-16 md:pt-48 md:pb-40 px-6 md:px-12 lg:px-16 overflow-hidden flex items-center min-h-[90vh]">
-          <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center gap-16 md:gap-24 lg:gap-32 w-full">
+        <section className="relative pt-28 pb-16 md:pt-40 md:pb-32 px-6 md:px-12 lg:px-16 overflow-hidden flex items-center min-h-[85vh]">
+          <div className="max-w-[1400px] mx-auto w-full">
             
-            {/* Phone Mockup Section */}
-            <div className="lg:w-1/2 relative flex justify-center order-2 lg:order-1 scale-75 sm:scale-90 md:scale-100 lg:scale-105">
+            {/* Hero Content - Logo + Text Parallel Layout */}
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-12 lg:gap-20 mb-16 md:mb-24"
+            >
+              {/* Obey Node Logo */}
+              <motion.div
+                variants={itemVariants}
+                className="shrink-0"
+              >
+                <motion.img
+                  src="/obey_logo.png"
+                  alt="OBEY Node"
+                  className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 xl:w-64 xl:h-64 object-contain drop-shadow-2xl"
+                  animate={{ 
+                    rotate: [0, 5, -5, 0],
+                    scale: [1, 1.05, 1]
+                  }}
+                  transition={{ 
+                    duration: 6, 
+                    repeat: Infinity, 
+                    ease: "easeInOut" 
+                  }}
+                />
+              </motion.div>
+
+              {/* Trade with Obey Text */}
+              <motion.div 
+                variants={itemVariants}
+                className="text-center md:text-left"
+              >
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter leading-[0.9] text-[#0b0e14] dark:text-white">
+                  Trade with
+                  <br />
+                  <span className="text-primary italic">Obey.</span>
+                </h1>
+              </motion.div>
+            </motion.div>
+
+            {/* Subtitle + CTAs */}
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex flex-col items-center text-center space-y-8 md:space-y-10"
+            >
+              <motion.p 
+                variants={itemVariants}
+                className="text-[14px] md:text-base lg:text-lg text-gray-500 dark:text-gray-400 max-w-2xl mx-auto font-medium leading-relaxed opacity-90 px-4"
+              >
+                Buy crypto, gift cards, airtime, and data in seconds. 
+                One app for all your payments and trading needs.
+              </motion.p>
+
+              <motion.div 
+                variants={itemVariants}
+                className="flex flex-col sm:flex-row gap-4 md:gap-6 pt-2 md:pt-4 px-4"
+              >
+                <button
+                  onClick={() => onNavigate(AppScreen.REGISTER)}
+                  className="bg-yellow-400 text-[#0b0e14] font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:bg-black dark:hover:bg-primary hover:text-white transition-all shadow-[0_30px_60px_-10px_rgba(250,204,21,0.5)] active-press"
+                >
+                  Open account
+                </button>
+                <button
+                  className="bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 text-[#0b0e14] dark:text-white font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:border-black dark:hover:border-primary transition-all active-press"
+                >
+                  Request card
+                </button>
+              </motion.div>
+
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 md:pt-10 px-4">
+                 <div className="flex -space-x-3 md:-space-x-4">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-gray-100 dark:bg-white/10 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
+                         <img src={`https://i.pravatar.cc/100?img=${i+15}`} alt="user" className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-primary flex items-center justify-center text-white text-xs font-black shadow-sm shrink-0">+</div>
+                 </div>
+                 <div className="space-y-1 text-center sm:text-left">
+                    <p className="text-3xl md:text-4xl font-black tracking-tighter leading-none flex items-center justify-center sm:justify-start gap-2 md:gap-3 dark:text-white">
+                       <ZapIcon className="w-5 h-5 md:w-6 md:h-6 text-primary fill-primary" /> 15M+
+                    </p>
+                    <p className="text-[9px] md:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Trusted by satisfied global node users</p>
+                 </div>
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Phone Mockup Section */}
+        <section className="relative pb-16 md:pb-32 px-6 md:px-12 lg:px-16 overflow-hidden">
+          <div className="max-w-[1400px] mx-auto flex justify-center">
+            <div className="relative flex justify-center scale-75 sm:scale-90 md:scale-100 lg:scale-105">
                <motion.div 
                   initial={{ rotateX: 20, rotateY: -10, y: 100, opacity: 0 }}
                   whileInView={{ rotateX: 0, rotateY: 0, y: 0, opacity: 1 }}
@@ -310,7 +396,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   <MobileAppMockup />
                </motion.div>
 
-               {/* Floating Feature Cards - Positioned to avoid overlay */}
+               {/* Floating Feature Cards */}
                <motion.div 
                  animate={{ y: [0, -8, 0], rotate: [0, 2, 0] }}
                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -320,7 +406,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   <p className="text-[10px] md:text-xs font-black uppercase tracking-widest leading-relaxed">One app <br /> for all</p>
                </motion.div>
 
-               {/* Virtual Card Overlay - Positioned to avoid overlay */}
+               {/* Virtual Card Overlay */}
                <motion.div 
                  animate={{ y: [0, 8, 0], rotate: [0, -2, 0] }}
                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1 }}
@@ -347,99 +433,6 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                   </div>
                </motion.div>
             </div>
-
-            {/* Typography Content */}
-            <motion.div 
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="lg:w-1/2 space-y-10 md:space-y-14 text-center lg:text-left order-1 lg:order-2 px-4 md:px-0 relative z-30"
-            >
-              <div className="flex flex-col gap-6 md:gap-10 relative">
-                 {/* Lottie Visual Element - Background Node (Increased 2X) */}
-                 <motion.div 
-                   animate={{ 
-                     opacity: showHeroText ? 0 : 0.6,
-                     scale: showHeroText ? 0.9 : 1.1,
-                   }}
-                   transition={{ duration: 6.5, ease: "easeInOut" }}
-                   className="absolute top-1/2 left-1/2 lg:left-0 -translate-x-1/2 lg:translate-x-0 -translate-y-1/2 w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64 overflow-hidden pointer-events-none -z-10"
-                 >
-                    <div className="w-full h-full">
-                      <DotLottieReact
-                        src="https://lottie.host/f250630d-88e1-4c6e-8381-3112de2d11c1/edAMqSiTOM.lottie"
-                        loop
-                        autoplay
-                      />
-                    </div>
-                 </motion.div>
-
-                 <div className="relative min-h-[260px] md:min-h-[340px] lg:min-h-[380px] flex items-center justify-center lg:justify-start z-10">
-                    <AnimatePresence mode="wait">
-                       {showHeroText && (
-                          <motion.h1 
-                            key="hero-text"
-                            initial={{ opacity: 0, y: 20, filter: "blur(15px)" }}
-                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                            exit={{ opacity: 0, y: -20, filter: "blur(15px)" }}
-                            transition={{ duration: 2.2, ease: [0.22, 1, 0.36, 1] }}
-                            className="text-4xl sm:text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tighter leading-[0.95] md:leading-[0.88] text-[#0b0e14] dark:text-white relative z-10 px-2 lg:px-0"
-                          >
-                            Trade with <br className="hidden sm:block" />
-                            <span className="text-primary italic">Obey.</span>
-                          </motion.h1>
-                       )}
-                    </AnimatePresence>
-                 </div>
-              </div>
-
-              <motion.p 
-                style={{ 
-                  y: subtitleY, 
-                  opacity: subtitleOpacity,
-                  scale: useTransform(scrollYProgress, [0, 0.1], [1, 0.98])
-                }}
-                className="text-[14px] md:text-base lg:text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed opacity-90 px-4 lg:px-0"
-              >
-                Buy crypto, gift cards, airtime, and data in seconds. 
-                One app for all your payments and trading needs.
-              </motion.p>
-
-              <motion.div 
-                variants={itemVariants}
-                className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center lg:justify-start pt-2 md:pt-4 px-4 lg:px-0"
-              >
-                <button
-                  onClick={() => onNavigate(AppScreen.REGISTER)}
-                  className="bg-yellow-400 text-[#0b0e14] font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:bg-black dark:hover:bg-primary hover:text-white transition-all shadow-[0_30px_60px_-10px_rgba(250,204,21,0.5)] active-press"
-                >
-                  Open account
-                </button>
-                <button
-                  className="bg-white dark:bg-white/5 border-2 border-gray-100 dark:border-white/10 text-[#0b0e14] dark:text-white font-black text-[13px] md:text-[15px] uppercase tracking-widest px-10 md:px-14 py-5 md:py-7 rounded-full hover:border-black dark:hover:border-primary transition-all active-press"
-                >
-                  Request card
-                </button>
-              </motion.div>
-
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 pt-8 md:pt-10 px-4 lg:px-0">
-                 <div className="flex -space-x-3 md:-space-x-4">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-gray-100 dark:bg-white/10 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
-                         <img src={`https://i.pravatar.cc/100?img=${i+15}`} alt="user" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                    <div className="w-12 h-12 md:w-14 md:h-14 rounded-full border-[4px] md:border-[6px] border-white dark:border-[#121212] bg-primary flex items-center justify-center text-white text-xs font-black shadow-sm shrink-0">+</div>
-                 </div>
-                 <div className="space-y-1 text-center sm:text-left">
-                    <p className="text-3xl md:text-4xl font-black tracking-tighter leading-none flex items-center justify-center sm:justify-start gap-2 md:gap-3 dark:text-white">
-                       <ZapIcon className="w-5 h-5 md:w-6 md:h-6 text-primary fill-primary" /> 15M+
-                    </p>
-                    <p className="text-[9px] md:text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Trusted by satisfied global node users</p>
-                 </div>
-              </motion.div>
-            </motion.div>
           </div>
         </section>
 
