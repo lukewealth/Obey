@@ -1,21 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { AppScreen, AppTab, UserProfile, Transaction, AdminMetrics } from "./types";
 import MarketingPage from "./components/MarketingPage";
 import AuthSystem from "./components/AuthSystem";
-import DashboardHome from "./components/DashboardHome";
-import WalletSystem from "./components/WalletSystem";
-import AirtimeModule from "./components/AirtimeModule";
-import GiftCardSystem from "./components/GiftCardSystem";
-import CryptoSystem from "./components/CryptoSystem";
-import VirtualCardSystem from "./components/VirtualCardSystem";
-import TransactionHistory from "./components/TransactionHistory";
-import AdminSystem from "./components/AdminSystem";
 import AdminDashboard from "./components/AdminDashboard";
 import IdentityVerification from "./components/IdentityVerification";
 import OtpVerification from "./components/OtpVerification";
 import TransactionSuccess from "./components/TransactionSuccess";
 import ThemeToggle from "./components/ThemeToggle";
-import UserProfileSettings from "./components/UserProfileSettings";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
@@ -26,11 +17,22 @@ import AIChatAssistant from "./components/AIChatAssistant";
 import AnomalyDetectionDashboard from "./components/AnomalyDetectionDashboard";
 import SecuredPortal from "./components/SecuredPortal";
 import AssetDetail from "./components/AssetDetail";
-import BankTransfer from "./components/BankTransfer";
-import KYCTierSystem from "./components/KYCTierSystem";
 import ErrorBoundary from "./components/ErrorBoundary";
-import NotificationSettings from "./components/NotificationSettings";
-import AdminKYCManagement from "./components/AdminKYCManagement";
+
+// Lazy load heavy feature components
+const DashboardHome = lazy(() => import("./components/DashboardHome"));
+const WalletSystem = lazy(() => import("./components/WalletSystem"));
+const AirtimeModule = lazy(() => import("./components/AirtimeModule"));
+const GiftCardSystem = lazy(() => import("./components/GiftCardSystem"));
+const CryptoSystem = lazy(() => import("./components/CryptoSystem"));
+const VirtualCardSystem = lazy(() => import("./components/VirtualCardSystem"));
+const TransactionHistory = lazy(() => import("./components/TransactionHistory"));
+const AdminSystem = lazy(() => import("./components/AdminSystem"));
+const UserProfileSettings = lazy(() => import("./components/UserProfileSettings"));
+const BankTransfer = lazy(() => import("./components/BankTransfer"));
+const KYCTierSystem = lazy(() => import("./components/KYCTierSystem"));
+const NotificationSettings = lazy(() => import("./components/NotificationSettings"));
+const AdminKYCManagement = lazy(() => import("./components/AdminKYCManagement"));
 import { useNotification } from "./components/NotificationSystem";
 import { supabase } from "./supabase";
 import api from "./services/api";
@@ -771,8 +773,9 @@ export default function App() {
               {(isInitializing || adminVerifying) && (
                 <PuppyLoading />
               )}
-              <AnimatePresence mode="wait">
-                 <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
+              <Suspense fallback={<PuppyLoading />}>
+                <AnimatePresence mode="wait">
+                   <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }}>
                     {activeTab === AppTab.HOME && (
                       <ErrorBoundary>
                         <DashboardHome
@@ -948,9 +951,10 @@ export default function App() {
                           <AdminKYCManagement adminId={profile.id || ""} />
                         </div>
                       </ErrorBoundary>
-                    )}
-                 </motion.div>
-              </AnimatePresence>
+                     )}
+                  </motion.div>
+               </AnimatePresence>
+              </Suspense>
             </main>
           </div>
 
