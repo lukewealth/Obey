@@ -591,7 +591,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear"
                   }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-[8%] -translate-y-full z-10"
+                  className="w-64 h-64 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] lg:w-[32rem] lg:h-[32rem] absolute bottom-[22%] left-[8%] -translate-y-full z-10"
                 >
                   <DotLottieReact
                     src="https://lottie.host/122427f5-886b-43b2-8e82-d17c4ee80b25/QBy2785DMo.lottie"
@@ -611,7 +611,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear"
                   }}
-                  className="absolute bottom-[22%] left-[8%] -translate-y-[280%] sm:-translate-y-[260%] md:-translate-y-[240%] z-0 filter grayscale opacity-20 pointer-events-none"
+                  className="absolute bottom-[22%] left-[8%] -translate-y-[320%] sm:-translate-y-[300%] md:-translate-y-[280%] z-0 filter grayscale opacity-20 pointer-events-none"
                 >
                   <DotLottieReact 
                     src="https://lottie.host/0f2eebbc-65f3-42a4-897f-7d09ef7b04fe/tdXfWkiHwJ.lottie" 
@@ -632,7 +632,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear" 
                   }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-[30%] -translate-y-full z-10"
+                  className="w-24 h-24 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-[25%] sm:left-[30%] -translate-y-full z-10"
                 >
                   <DotLottieReact
                     src="https://lottie.host/9e5c51c1-94bf-4362-b5a4-4daf3fe785aa/Gb6PsgnXJp.lottie"
@@ -652,7 +652,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear" 
                   }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] right-0 -translate-y-full z-10"
+                  className="w-24 h-24 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] right-0 -translate-y-full z-10"
                 >
                   <DotLottieReact
                     src="https://lottie.host/6d95a1ca-1d49-4ffb-860c-0564fad1ed7b/bWISUhwM4y.lottie"
@@ -673,7 +673,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                     repeat: Infinity,
                     ease: "linear" 
                   }}
-                  className="w-32 h-32 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
+                  className="w-24 h-24 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 absolute bottom-[22%] left-1/2 -translate-x-1/2 -translate-y-full z-10"
                 >
                   <DotLottieReact
                     src="https://lottie.host/9aa0c0eb-5721-4039-9c11-94db898ee147/DoBTSbknif.lottie"
