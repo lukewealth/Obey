@@ -11,15 +11,15 @@
   "categories": ["finance", "business", "productivity"],
   "icons": [
     {
-      "src": "/obey_logo.svg",
+      "src": "/obey_logo.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/obey_logo.svg",
+      "src": "/obey_logo.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
@@ -30,14 +30,14 @@
       "short_name": "Trade",
       "description": "Buy and sell cryptocurrency",
       "url": "/trade",
-      "icons": [{ "src": "/obey_logo.svg", "sizes": "96x96" }]
+      "icons": [{ "src": "/obey_logo.png", "sizes": "96x96" }]
     },
     {
       "name": "Send Money",
       "short_name": "Send",
       "description": "Send money via bank transfer",
       "url": "/bank",
-      "icons": [{ "src": "/obey_logo.svg", "sizes": "96x96" }]
+      "icons": [{ "src": "/obey_logo.png", "sizes": "96x96" }]
     }
   ],
   "prefer_related_applications": false,

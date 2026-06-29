@@ -256,7 +256,7 @@ export default function AuthSystem({ onSuccess, onNavigate, currentScreen }: Aut
           <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 group-hover:text-primary transition-all">
              <ChevronLeft size={18} className="md:w-5 md:h-5" />
           </div>
-          <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
+          <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
           <span className="text-lg md:text-xl font-black tracking-tighter text-[#0b0e14]">OBEY</span>
         </button>
         <button onClick={() => onNavigate(currentScreen === AppScreen.LOGIN ? AppScreen.REGISTER : AppScreen.LOGIN)} className="text-[11px] md:text-sm font-black text-primary uppercase tracking-widest hover:underline underline-offset-4">

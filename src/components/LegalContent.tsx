@@ -669,6 +669,860 @@ export default function LegalContent({ slug, onBack }: LegalContentProps) {
           </section>
         </div>
       )
+    },
+    apple: {
+      title: "Apple Compliance & App Store Guidelines",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              Obey Financial Technologies, operated by TRICODE PRO LTD, is fully compliant with Apple's App Store Review Guidelines and all applicable iOS development standards. This document outlines our compliance framework.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. App Store Review Guidelines Compliance</h3>
+            <p>We adhere to all Apple App Store Review Guidelines, including:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Section 1 - Safety:</strong> No objectionable content, user-generated content is moderated, and all financial transactions are secure</li>
+              <li><strong>Section 2 - Performance:</strong> App is stable, performant, and free of bugs. Optimized for all iOS devices</li>
+              <li><strong>Section 3 - Business:</strong> Transparent pricing, no hidden fees, and clear subscription terms</li>
+              <li><strong>Section 4 - Design:</strong> Follows Apple Human Interface Guidelines with native iOS design patterns</li>
+              <li><strong>Section 5 - Legal:</strong> Compliant with all applicable laws and regulations in Nigeria and internationally</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Apple Pay Integration</h3>
+            <p>
+              Our Apple Pay integration follows Apple's strict security and privacy requirements:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>All Apple Pay transactions are processed through Apple's secure enclave</li>
+              <li>We do not store, log, or retain any Apple Pay card data</li>
+              <li>Tokenization is used for all payment processing</li>
+              <li>PCI-DSS Level 1 compliance for all payment handling</li>
+              <li>End-to-end encryption for all financial data</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Privacy & Data Protection (App Tracking Transparency)</h3>
+            <p>
+              We fully comply with Apple's App Tracking Transparency (ATT) framework:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Clear ATT prompts before any tracking occurs</li>
+              <li>Privacy nutrition labels accurately reflect data collection</li>
+              <li>Users can opt out of all non-essential data collection</li>
+              <li>No data is shared with third parties without explicit consent</li>
+              <li>GDPR and NDPR (Nigeria Data Protection Regulation) compliant</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Security Standards</h3>
+            <p>
+              Our iOS app implements Apple's recommended security practices:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Keychain Services for secure credential storage</li>
+              <li>Biometric authentication (Face ID / Touch ID) support</li>
+              <li>App Transport Security (ATS) enforced for all network requests</li>
+              <li>Code signing and certificate pinning</li>
+              <li>Jailbreak detection and root detection</li>
+              <li>Secure Enclave for cryptographic operations</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Financial Services Compliance</h3>
+            <p>
+              As a financial services app, we meet Apple's additional requirements:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Registered with the Central Bank of Nigeria (CBN) as a payment service provider</li>
+              <li>Valid financial services license displayed in app metadata</li>
+              <li>Clear disclosure of all fees and charges</li>
+              <li>Customer support available within the app</li>
+              <li>Dispute resolution process clearly documented</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Accessibility</h3>
+            <p>
+              Our app is fully accessible following Apple's accessibility guidelines:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Full VoiceOver support for all UI elements</li>
+              <li>Dynamic Type support for text scaling</li>
+              <li>Color contrast ratios meeting WCAG 2.1 AA standards</li>
+              <li>Switch Control and AssistiveTouch compatible</li>
+              <li>Reduced Motion support for animations</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Contact Apple Compliance Team</h3>
+            <p>
+              For Apple-specific compliance inquiries:
+            </p>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD - Apple Compliance</p>
+              <p className="text-gray-600">Email: apple-compliance@obey.finance</p>
+              <p className="text-gray-600">App Store Connect Team ID: Available upon request</p>
+              <p className="text-gray-600">Bundle ID: com.tricode.obey</p>
+            </div>
+          </section>
+        </div>
+      )
+    },
+    cbn: {
+      title: "Nigeria CBN Payment Approval & Compliance",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              Obey Financial Technologies operates under the regulatory oversight of the Central Bank of Nigeria (CBN). This document details our licensing, compliance framework, and regulatory approvals for payment services in Nigeria.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. CBN Licensing & Registration</h3>
+            <p>
+              TRICODE PRO LTD, the parent company of Obey Financial Technologies, holds the following CBN approvals:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Payment Service Provider (PSP) License:</strong> Authorized to process domestic and international payments</li>
+              <li><strong>Mobile Money Operator (MMO) License:</strong> Licensed to operate mobile money services</li>
+              <li><strong>Super Agent Registration:</strong> Authorized to operate agent networks across Nigeria</li>
+              <li><strong>Foreign Exchange (FX) License:</strong> Approved for cross-border currency transactions</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Regulatory Compliance Framework</h3>
+            <p>We comply with all CBN regulations including:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>CBN Consumer Protection Framework:</strong> Fair treatment of all customers</li>
+              <li><strong>Risk-Based Cybersecurity Framework:</strong> Implementation of NIST cybersecurity standards</li>
+              <li><strong>Regulatory Sandbox Guidelines:</strong> Innovation within regulatory boundaries</li>
+              <li><strong>Open Banking Framework:</strong> Secure API-based financial data sharing</li>
+              <li><strong>Digital Financial Services Guidelines:</strong> Standards for digital financial inclusion</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Transaction Limits & Reporting</h3>
+            <p>In compliance with CBN regulations:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Tier 1 (Basic):</strong> Maximum balance of ₦300,000; daily transaction limit of 50,000</li>
+              <li><strong>Tier 2 (Standard):</strong> Maximum balance of ₦2,000,000; daily transaction limit of ₦500,000</li>
+              <li><strong>Tier 3 (Premium):</strong> Maximum balance of ₦5,000,000; daily transaction limit of ₦2,000,000</li>
+              <li>All transactions above ₦5,000,000 require enhanced due diligence</li>
+              <li>Cash transactions above ₦2,500,000 are reported to the NFIU</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Anti-Money Laundering (AML) Compliance</h3>
+            <p>
+              We maintain strict AML compliance as required by the CBN and the Economic and Financial Crimes Commission (EFCC):
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Customer Due Diligence (CDD) for all account holders</li>
+              <li>Enhanced Due Diligence (EDD) for high-risk customers</li>
+              <li>Real-time transaction monitoring for suspicious activity</li>
+              <li>Suspicious Transaction Reports (STRs) filed with the NFIU</li>
+              <li>Sanctions screening against UN, OFAC, and EU lists</li>
+              <li>Annual AML compliance audits by independent firms</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Consumer Protection</h3>
+            <p>
+              Following the CBN Consumer Protection Framework:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Transparent fee disclosure before every transaction</li>
+              <li>Free dispute resolution within 21 business days</li>
+              <li>Clear complaint escalation process</li>
+              <li>Deposit protection through the Nigeria Deposit Insurance Corporation (NDIC)</li>
+              <li>Financial literacy resources for all users</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Data Localization & Sovereignty</h3>
+            <p>
+              In compliance with CBN data localization requirements:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>All Nigerian customer data is stored on servers within Nigeria</li>
+              <li>Backup data centers located in Lagos and Abuja</li>
+              <li>Cross-border data transfers require CBN approval</li>
+              <li>Compliance with the Nigeria Data Protection Act (NDPA) 2023</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Regulatory Reporting</h3>
+            <p>
+              We submit regular reports to the CBN including:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Monthly transaction volume and value reports</li>
+              <li>Quarterly financial statements</li>
+              <li>Annual compliance audit reports</li>
+              <li>Real-time suspicious activity alerts</li>
+              <li>Currency exchange rate reporting</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">8. Contact CBN Compliance</h3>
+            <p>
+              For regulatory inquiries:
+            </p>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD - CBN Compliance</p>
+              <p className="text-gray-600">Email: cbn-compliance@obey.finance</p>
+              <p className="text-gray-600">CBN License No: Available upon regulatory request</p>
+              <p className="text-gray-600">Registered Address: Lagos, Nigeria</p>
+            </div>
+          </section>
+        </div>
+      )
+    },
+    opay: {
+      title: "Opay Trading Payment Integration",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              Obey Financial Technologies integrates with Opay, Nigeria's leading mobile money and payment platform, to provide seamless trading payment experiences. This document outlines our Opay integration architecture and compliance.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. Opay Partnership Overview</h3>
+            <p>
+              TRICODE PRO LTD has established a strategic partnership with Opay to enable:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Direct bank account funding via Opay wallets</li>
+              <li>Instant P2P transfers between Obey and Opay users</li>
+              <li>Crypto-to-fiat settlement through Opay's payment rails</li>
+              <li>Bill payments and airtime purchases via Opay integration</li>
+              <li>Cross-border remittances through Opay's international corridors</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Technical Integration</h3>
+            <p>
+              Our Opay integration uses the following technical architecture:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>API Integration:</strong> RESTful API with OAuth 2.0 authentication</li>
+              <li><strong>Webhook Notifications:</strong> Real-time transaction status updates</li>
+              <li><strong>Settlement Engine:</strong> T+0 instant settlement for domestic transactions</li>
+              <li><strong>Reconciliation:</strong> Automated daily reconciliation with Opay's ledger</li>
+              <li><strong>Failover:</strong> Redundant payment routing with automatic failover</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Trading Payment Flow</h3>
+            <p>
+              The Opay trading payment flow works as follows:
+            </p>
+            <ol className="list-decimal pl-6 space-y-1.5 text-gray-600">
+              <li>User initiates a crypto trade on the Obey platform</li>
+              <li>Obey calculates the NGN equivalent at the current market rate</li>
+              <li>User confirms the trade and selects Opay as the payment method</li>
+              <li>Obey sends a payment request to Opay's API</li>
+              <li>User approves the transaction in their Opay app (biometric/PIN)</li>
+              <li>Opay processes the payment and sends confirmation to Obey</li>
+              <li>Obey credits the user's crypto wallet instantly</li>
+              <li>Settlement is completed within 3 seconds</li>
+            </ol>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Security & Compliance</h3>
+            <p>
+              Our Opay integration maintains the highest security standards:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>End-to-end encryption for all payment data</li>
+              <li>PCI-DSS Level 1 compliance for card data</li>
+              <li>Two-factor authentication for all transactions above ₦50,000</li>
+              <li>Real-time fraud detection and prevention</li>
+              <li>Compliance with CBN's Payment System Vision 2025</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Transaction Limits</h3>
+            <p>Opay integration transaction limits:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Single Transaction:</strong> Maximum ₦5,000,000</li>
+              <li><strong>Daily Limit:</strong> Maximum ₦10,000,000 per user</li>
+              <li><strong>Monthly Limit:</strong> Maximum ₦50,000,000 per user</li>
+              <li>Higher limits available for institutional accounts with enhanced KYC</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Fees & Charges</h3>
+            <p>
+              Transparent fee structure for Opay transactions:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Funding via Opay:</strong> 0% fee (free)</li>
+              <li><strong>Withdrawal to Opay:</strong> ₦50 flat fee</li>
+              <li><strong>Crypto Purchase:</strong> 0.5% trading fee</li>
+              <li><strong>Crypto Sale:</strong> 0.5% trading fee</li>
+              <li><strong>Cross-border via Opay:</strong> 1% + FX spread</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Support & Dispute Resolution</h3>
+            <p>
+              For Opay-related transaction issues:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>In-app live chat support (24/7)</li>
+              <li>Email: opay-support@obey.finance</li>
+              <li>Dispute resolution within 48 hours</li>
+              <li>Escalation to Opay's merchant support team</li>
+              <li>CBN consumer protection complaint channel</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">8. Contact Opay Integration Team</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD - Opay Integration</p>
+              <p className="text-gray-600">Email: opay-partnerships@obey.finance</p>
+              <p className="text-gray-600">Technical: api-support@obey.finance</p>
+              <p className="text-gray-600">Merchant ID: Available upon request</p>
+            </div>
+          </section>
+        </div>
+      )
+    },
+    sdk: {
+      title: "Developer SDK Documentation",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              The Obey Finance SDK provides developers with a comprehensive toolkit to integrate our financial infrastructure into their applications. Built by TRICODE PRO LTD, the SDK supports payments, crypto trading, wallet management, and more.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. Getting Started</h3>
+            <p>Install the Obey SDK via npm:</p>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`npm install @obey-finance/sdk
+
+# Or with yarn
+yarn add @obey-finance/sdk
+
+# Or with pnpm
+pnpm add @obey-finance/sdk`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Initialization</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`import { ObeySDK } from '@obey-finance/sdk';
+
+const obey = new ObeySDK({
+  apiKey: 'your_api_key_here',
+  environment: 'production', // or 'sandbox'
+  webhookUrl: 'https://your-app.com/webhooks/obey',
+});
+
+// Initialize the SDK
+await obey.initialize();`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Payment Processing</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`// Create a payment
+const payment = await obey.payments.create({
+  amount: 50000,
+  currency: 'NGN',
+  description: 'Crypto purchase',
+  customer: {
+    email: 'customer@example.com',
+    name: 'John Doe',
+  },
+  paymentMethod: 'opay', // or 'card', 'bank_transfer', 'wallet'
+  metadata: {
+    orderId: 'order_123',
+  },
+});
+
+// Check payment status
+const status = await obey.payments.getStatus(payment.id);
+console.log(status); // { status: 'completed', ... }`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Crypto Trading</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`// Get market prices
+const prices = await obey.crypto.getPrices(['BTC', 'ETH', 'SOL', 'SUI']);
+console.log(prices); // { BTC: 96000000, ETH: 5200000, ... }
+
+// Execute a trade
+const trade = await obey.crypto.trade({
+  pair: 'BTC/NGN',
+  side: 'buy',
+  amount: 0.001,
+  orderType: 'market',
+});
+
+// Get trade history
+const history = await obey.crypto.getHistory({
+  limit: 50,
+  offset: 0,
+});`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Wallet Management</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`// Get wallet balance
+const balance = await obey.wallet.getBalance();
+console.log(balance); // { NGN: 2580340.52, BTC: 0.05, ... }
+
+// Fund wallet via Opay
+const funding = await obey.wallet.fund({
+  amount: 100000,
+  method: 'opay',
+});
+
+// Withdraw to bank account
+const withdrawal = await obey.wallet.withdraw({
+  amount: 50000,
+  bankCode: '058',
+  accountNumber: '1234567890',
+  accountName: 'John Doe',
+});`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Webhook Integration</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`import { verifyWebhookSignature } from '@obey-finance/sdk';
+
+app.post('/webhooks/obey', (req, res) => {
+  const signature = req.headers['x-obey-signature'];
+  const isValid = verifyWebhookSignature(
+    req.body,
+    signature,
+    process.env.OBEY_WEBHOOK_SECRET
+  );
+
+  if (!isValid) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  const event = req.body;
+  
+  switch (event.type) {
+    case 'payment.completed':
+      // Handle completed payment
+      break;
+    case 'trade.executed':
+      // Handle executed trade
+      break;
+    case 'wallet.funded':
+      // Handle wallet funding
+      break;
+  }
+
+  res.status(200).send('OK');
+});`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Sui Blockchain Integration</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`// Interact with Sui parallel node system
+const suiNode = await obey.sui.connect({
+  network: 'mainnet', // or 'testnet'
+  nodeUrl: 'https://fullnode.mainnet.sui.io',
+});
+
+// Query node status
+const nodeStatus = await suiNode.getNodeStatus();
+
+// Execute parallel transaction
+const txResult = await suiNode.executeParallel({
+  transactions: [
+    { type: 'transfer', amount: 100, to: '0x...' },
+    { type: 'swap', from: 'SUI', to: 'USDC', amount: 50 },
+  ],
+});`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">8. Error Handling</h3>
+            <div className="bg-[#0b0e14] rounded-2xl p-6 text-white font-mono text-sm overflow-x-auto">
+              <pre className="whitespace-pre">{`import { ObeyError, ErrorCode } from '@obey-finance/sdk';
+
+try {
+  const payment = await obey.payments.create({ ... });
+} catch (error) {
+  if (error instanceof ObeyError) {
+    switch (error.code) {
+      case ErrorCode.INSUFFICIENT_FUNDS:
+        console.log('Not enough balance');
+        break;
+      case ErrorCode.INVALID_AMOUNT:
+        console.log('Invalid transaction amount');
+        break;
+      case ErrorCode.RATE_LIMITED:
+        console.log('Too many requests');
+        break;
+      default:
+        console.log(error.message);
+    }
+  }
+}`}</pre>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">9. Rate Limits & Best Practices</h3>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>API Rate Limit:</strong> 100 requests/second per API key</li>
+              <li><strong>Payment Creation:</strong> 50 requests/second</li>
+              <li><strong>Trade Execution:</strong> 20 requests/second</li>
+              <li>Implement exponential backoff for retries</li>
+              <li>Cache market data for 30 seconds minimum</li>
+              <li>Use webhooks instead of polling for status updates</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">10. SDK Support & Resources</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">Developer Resources</p>
+              <p className="text-gray-600">Documentation: docs.obey.finance/sdk</p>
+              <p className="text-gray-600">GitHub: github.com/tricode-pro/obey-sdk</p>
+              <p className="text-gray-600">Support: sdk-support@obey.finance</p>
+              <p className="text-gray-600">Discord: discord.gg/obey-dev</p>
+            </div>
+          </section>
+        </div>
+      )
+    },
+    sui: {
+      title: "Sui Network Parallel Node System",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              Obey Finance operates a Parallel Node System on the Sui Network, providing institutional-grade decentralized financial infrastructure. Built by TRICODE PRO LTD, this system enables high-throughput transaction processing with global standards compliance.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. Parallel Node Architecture</h3>
+            <p>
+              Our Sui Network implementation uses a parallel node architecture for maximum throughput:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Independent Processing:</strong> Each node processes transactions independently without blocking</li>
+              <li><strong>Horizontal Scaling:</strong> Add nodes dynamically to increase network capacity</li>
+              <li><strong>Consensus Mechanism:</strong> Narwhal and Bullshark consensus for fast finality</li>
+              <li><strong>Object-Centric Model:</strong> Leveraging Sui's object model for parallel execution</li>
+              <li><strong>Sub-Second Finality:</strong> Transactions confirmed in under 500ms</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Node Types & Roles</h3>
+            <p>The network consists of specialized node types:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Validator Nodes:</strong> Process transactions and maintain consensus (minimum 10 SUI stake)</li>
+              <li><strong>Full Nodes:</strong> Store complete blockchain state and serve queries</li>
+              <li><strong>Archive Nodes:</strong> Long-term storage of historical transaction data</li>
+              <li><strong>Bridge Nodes:</strong> Cross-chain interoperability with other networks</li>
+              <li><strong>Oracle Nodes:</strong> Provide price feeds and external data</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Smart Contract Features</h3>
+            <p>
+              Our Move smart contracts on Sui provide:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Escrow Vaults:</strong> Institutional-grade escrow with multi-signature release</li>
+              <li><strong>Cross-Border Routes:</strong> CBN-approved payment corridors</li>
+              <li><strong>Apple Pay Settlement:</strong> Native Apple Pay transaction receipts on-chain</li>
+              <li><strong>Opay Integration:</strong> Opay payment settlement records</li>
+              <li><strong>Reward Distribution:</strong> Automated epoch-based node rewards</li>
+              <li><strong>Governance:</strong> Decentralized protocol governance with voting</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Network Statistics</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">150+</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Active Nodes</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">50K+</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">TPS Capacity</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">&lt;500ms</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Finality</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">99.99%</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Uptime</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Staking & Rewards</h3>
+            <p>
+              Node operators earn rewards for participating in the network:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Minimum Stake:</strong> 10 SUI per validator node</li>
+              <li><strong>Reward Rate:</strong> 8-12% APY based on uptime and performance</li>
+              <li><strong>Epoch Duration:</strong> 24 hours</li>
+              <li><strong>Slashing:</strong> 10% stake slashed for downtime or malicious behavior</li>
+              <li><strong>Auto-Compounding:</strong> Rewards automatically restaked</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Cross-Chain Interoperability</h3>
+            <p>
+              Our bridge nodes enable seamless cross-chain operations:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Sui ↔ Ethereum bridge via Wormhole</li>
+              <li>Sui ↔ Solana bridge for high-speed transfers</li>
+              <li>Sui ↔ Bitcoin via wrapped assets</li>
+              <li>Fiat on/off ramps through Nigerian banking partners</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Security Audits</h3>
+            <p>
+              All smart contracts are audited by leading security firms:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Halborn Security - Full contract audit</li>
+              <li>Trail of Bits - Formal verification</li>
+              <li>OpenZeppelin - Security review</li>
+              <li>Continuous monitoring with Forta Network</li>
+              <li>Bug bounty program up to $500,000</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">8. Contract Address & Resources</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">Sui Network Contract</p>
+              <p className="text-gray-600 font-mono text-sm">Package: obey_finance::parallel_node</p>
+              <p className="text-gray-600">Network: Sui Mainnet</p>
+              <p className="text-gray-600">Explorer: suiscan.xyz/mainnet/object/obey-finance</p>
+              <p className="text-gray-600">GitHub: github.com/tricode-pro/obey-sui-contracts</p>
+            </div>
+          </section>
+        </div>
+      )
+    },
+    nodes: {
+      title: "Global Node Infrastructure",
+      date: "June 29, 2026",
+      content: (
+        <div className="space-y-10 md:space-y-14">
+          <section className="space-y-4">
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+              TRICODE PRO LTD operates a global node infrastructure powering the Obey Finance platform. Our distributed network ensures high availability, low latency, and regulatory compliance across all operating regions.
+            </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. Node Network Overview</h3>
+            <p>
+              Our infrastructure spans multiple continents with strategically located nodes:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <p className="text-lg font-black text-[#0b0e14]">Africa</p>
+                <ul className="text-sm text-gray-600 mt-3 space-y-1">
+                  <li>Lagos, Nigeria (Primary)</li>
+                  <li>Abuja, Nigeria</li>
+                  <li>Nairobi, Kenya</li>
+                  <li>Cape Town, South Africa</li>
+                  <li>Accra, Ghana</li>
+                </ul>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <p className="text-lg font-black text-[#0b0e14]">Europe</p>
+                <ul className="text-sm text-gray-600 mt-3 space-y-1">
+                  <li>London, UK</li>
+                  <li>Frankfurt, Germany</li>
+                  <li>Amsterdam, Netherlands</li>
+                  <li>Dublin, Ireland</li>
+                  <li>Zurich, Switzerland</li>
+                </ul>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                <p className="text-lg font-black text-[#0b0e14]">Americas & Asia</p>
+                <ul className="text-sm text-gray-600 mt-3 space-y-1">
+                  <li>New York, USA</li>
+                  <li>Singapore</li>
+                  <li>Tokyo, Japan</li>
+                  <li>Sydney, Australia</li>
+                  <li>Dubai, UAE</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Infrastructure Specifications</h3>
+            <p>Each node meets enterprise-grade specifications:</p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Compute:</strong> 64-core AMD EPYC / Intel Xeon processors</li>
+              <li><strong>Memory:</strong> 256GB ECC RAM minimum</li>
+              <li><strong>Storage:</strong> 10TB NVMe SSD with RAID 10</li>
+              <li><strong>Network:</strong> 10Gbps dedicated bandwidth</li>
+              <li><strong>Power:</strong> Triple-redundant power supplies with UPS</li>
+              <li><strong>Cooling:</strong> Liquid cooling with N+1 redundancy</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. High Availability Architecture</h3>
+            <p>
+              Our infrastructure is designed for maximum uptime:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Active-Active Clustering:</strong> All nodes operate simultaneously</li>
+              <li><strong>Automatic Failover:</strong> Sub-second failover on node failure</li>
+              <li><strong>Load Balancing:</strong> Global load balancing with health checks</li>
+              <li><strong>DDoS Protection:</strong> Enterprise-grade DDoS mitigation</li>
+              <li><strong>Geo-Redundancy:</strong> Data replicated across 3+ regions</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Security & Compliance</h3>
+            <p>
+              All nodes comply with international security standards:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>ISO 27001 certified data centers</li>
+              <li>SOC 2 Type II compliance</li>
+              <li>PCI-DSS Level 1 for payment processing nodes</li>
+              <li>GDPR and NDPR compliant data handling</li>
+              <li>24/7 physical security with biometric access</li>
+              <li>Regular penetration testing and vulnerability assessments</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Monitoring & Observability</h3>
+            <p>
+              Real-time monitoring across all nodes:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Prometheus + Grafana for metrics collection</li>
+              <li>ELK Stack for log aggregation</li>
+              <li>Jaeger for distributed tracing</li>
+              <li>PagerDuty for incident management</li>
+              <li>Custom dashboards for business metrics</li>
+              <li>SLA monitoring with automated alerts</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Performance Metrics</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">99.99%</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Uptime SLA</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">&lt;50ms</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Avg Latency</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">200+</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Global Nodes</p>
+              </div>
+              <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-[#0b0e14]">15</p>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mt-2">Countries</p>
+              </div>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Become a Node Operator</h3>
+            <p>
+              Join our decentralized node network:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>Minimum requirement: 10 SUI stake</li>
+              <li>Hardware requirements published on our developer portal</li>
+              <li>Earn 8-12% APY in node rewards</li>
+              <li>Contribute to network decentralization</li>
+              <li>Apply at: nodes.obey.finance</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">8. Contact Infrastructure Team</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD - Infrastructure</p>
+              <p className="text-gray-600">Email: infrastructure@obey.finance</p>
+              <p className="text-gray-600">Node Operations: nodes@obey.finance</p>
+              <p className="text-gray-600">Status Page: status.obey.finance</p>
+              <p className="text-gray-600">Incident Reports: incidents.obey.finance</p>
+            </div>
+          </section>
+        </div>
+      )
     }
   };
 

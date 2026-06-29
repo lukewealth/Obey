@@ -10,7 +10,14 @@ export enum AppScreen {
   AMLKYC = "AMLKYC",
   USERDATA = "USERDATA",
   DISCLOSURES = "DISCLOSURES",
-  STATUS = "STATUS"
+  STATUS = "STATUS",
+  COOKIE = "COOKIE",
+  SDK = "SDK",
+  SUI = "SUI",
+  OPAY = "OPAY",
+  APPLE = "APPLE",
+  CBN = "CBN",
+  NODES = "NODES"
 }
 
 export enum AppTab {

@@ -23,7 +23,7 @@ export default function LegalPage({ title, lastUpdated, children, onBack }: Lega
             <span className="sm:hidden">Back</span>
           </button>
           <div className="flex items-center gap-2 shrink-0">
-            <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
+            <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
             <span className="text-lg md:text-xl font-black tracking-tighter font-space uppercase">OBEY</span>
           </div>
         </div>

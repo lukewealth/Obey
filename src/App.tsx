@@ -627,6 +627,12 @@ export default function App() {
       {currentScreen === AppScreen.USERDATA && <LegalContent slug="userdata" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.DISCLOSURES && <LegalContent slug="disclosures" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.STATUS && <LegalContent slug="status" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.APPLE && <LegalContent slug="apple" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.CBN && <LegalContent slug="cbn" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.OPAY && <LegalContent slug="opay" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.SDK && <LegalContent slug="sdk" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.SUI && <LegalContent slug="sui" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.NODES && <LegalContent slug="nodes" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
 
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[var(--app-bg)] transition-colors duration-500">
@@ -642,7 +648,7 @@ export default function App() {
                 <MenuIcon className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-2.5">
-                <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 rounded-xl shadow-sm" />
+                <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 rounded-xl shadow-sm" />
                 <span className="text-lg font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
               </div>
             </div>
@@ -1131,7 +1137,7 @@ export default function App() {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-8">
                       <div className="flex items-center gap-3">
-                        <img src="/obey_logo.svg" alt="OBEY" className="w-10 h-10 rounded-xl shadow-sm" />
+                        <img src="/obey_logo.png" alt="OBEY" className="w-10 h-10 rounded-xl shadow-sm" />
                         <span className="text-xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
                       </div>
                       <button

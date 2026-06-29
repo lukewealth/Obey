@@ -62,7 +62,7 @@ const MobileAppMockup = () => (
 
     <div className="flex justify-between items-center text-[#0b0e14] dark:text-white">
        <div className="flex items-center gap-2 md:gap-3">
-            <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
+            <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl shadow-sm" />
             <span className="text-[11px] md:text-[13px] font-bold tracking-tight">Obey</span>
        </div>
        <div className="flex items-center gap-2 md:gap-3">
@@ -218,7 +218,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
             className="flex items-center gap-2 md:gap-3 cursor-pointer group"
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           >
-            <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl group-hover:rotate-[10deg] transition-transform shadow-sm shrink-0" />
+            <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 md:w-9 md:h-9 rounded-xl group-hover:rotate-[10deg] transition-transform shadow-sm shrink-0" />
             <span className="text-lg md:text-2xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
           </div>
 
@@ -270,7 +270,7 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
           >
             <div className="flex justify-between items-center mb-12 md:mb-16">
               <div className="flex items-center gap-2.5">
-                <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 rounded-xl" />
+                <img src="/obey_logo.png" alt="OBEY" className="w-8 h-8 rounded-xl" />
                 <span className="text-lg font-bold tracking-tight">Obey</span>
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2"><XIcon className="w-8 h-8" /></button>
