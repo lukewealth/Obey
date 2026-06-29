@@ -517,9 +517,7 @@ export default function App() {
                 <MenuIcon className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl shadow-sm">
-                  <span className="text-white font-black text-xs">O</span>
-                </div>
+                <img src="/obey_logo.svg" alt="OBEY" className="w-8 h-8 rounded-xl shadow-sm" />
                 <span className="text-lg font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
               </div>
             </div>
@@ -947,9 +945,7 @@ export default function App() {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-8">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-br from-[#0b0e14] to-[#1a1f2e] dark:from-primary dark:to-purple-600 flex items-center justify-center rounded-xl shadow-sm">
-                          <span className="text-white font-black text-sm">O</span>
-                        </div>
+                        <img src="/obey_logo.svg" alt="OBEY" className="w-10 h-10 rounded-xl shadow-sm" />
                         <span className="text-xl font-bold tracking-tight text-[#0b0e14] dark:text-white">Obey</span>
                       </div>
                       <button
