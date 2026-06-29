@@ -61,6 +61,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import { useUserProfile, useTransactions } from "./services/queries";
+import { sessionService } from "./services/session";
 import { auth as firebaseAuth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -103,10 +104,13 @@ export default function App() {
   // --- Session Persistence: Restore on app load ---
   useEffect(() => {
     const restoreSession = async () => {
-      const savedSession = localStorage.getItem('obey_session');
-      if (savedSession && !currentUser) {
-        try {
-          const { uid, email } = JSON.parse(savedSession);
+      if (currentUser) return;
+      
+      try {
+        // Try to restore from httpOnly cookie session
+        const sessionData = await sessionService.verifySession();
+        
+        if (sessionData) {
           // Try to restore Supabase session
           if (supabase) {
             const { data: { session } } = await supabase.auth.getSession();
@@ -121,10 +125,10 @@ export default function App() {
             setCurrentUser(firebaseAuth.currentUser);
             setCurrentScreen(AppScreen.DASHBOARD);
           }
-        } catch (err) {
-          console.warn('[SESSION_RESTORE] Failed:', err);
-          localStorage.removeItem('obey_session');
         }
+      } catch (err) {
+        console.warn('[SESSION_RESTORE] Failed:', err);
+        await sessionService.clearSession();
       }
     };
     restoreSession();
@@ -372,8 +376,8 @@ export default function App() {
     const unsubscribeFirebase = onAuthStateChanged(firebaseAuth, async (user) => {
       if (user) {
         setCurrentUser(user);
-        // Persist session to localStorage
-        localStorage.setItem('obey_session', JSON.stringify({ uid: user.uid, email: user.email }));
+        // Persist session to httpOnly cookie
+        await sessionService.setSession(user.uid, user.email || '');
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
            notify("success", "Access Authorized", `Welcome back to the OBEY node.`);
@@ -385,8 +389,8 @@ export default function App() {
       if (session) {
         const user = session.user;
         setCurrentUser(user);
-        // Persist session to localStorage
-        localStorage.setItem('obey_session', JSON.stringify({ uid: user.id, email: user.email }));
+        // Persist session to httpOnly cookie
+        await sessionService.setSession(user.id, user.email || '');
         if (currentScreen === AppScreen.LOGIN || currentScreen === AppScreen.REGISTER) {
            setCurrentScreen(AppScreen.DASHBOARD);
            notify("success", "Access Authorized", `Sequential ledger sync active.`);
@@ -394,8 +398,8 @@ export default function App() {
       } else {
         if (!firebaseAuth.currentUser) {
           setCurrentUser(null);
-          // Clear session from localStorage
-          localStorage.removeItem('obey_session');
+          // Clear session from httpOnly cookie
+          await sessionService.clearSession();
           if (currentScreen === AppScreen.DASHBOARD) {
              setCurrentScreen(AppScreen.MARKETING);
           }
@@ -414,8 +418,8 @@ export default function App() {
       supabase.auth.signOut(),
       firebaseAuth.signOut()
     ]);
-    // Clear persisted session
-    localStorage.removeItem('obey_session');
+    // Clear persisted session from httpOnly cookie
+    await sessionService.clearSession();
     notify("info", "Session Terminated", "Institutional access securely revoked.");
     setCurrentScreen(AppScreen.MARKETING);
     setActiveTab(AppTab.HOME);
