@@ -671,109 +671,78 @@ export default function LegalContent({ slug, onBack }: LegalContentProps) {
       )
     },
     apple: {
-      title: "Apple Compliance & App Store Guidelines",
+      title: "About Us",
       date: "June 29, 2026",
       content: (
         <div className="space-y-10 md:space-y-14">
           <section className="space-y-4">
             <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-              Obey Financial Technologies, operated by TRICODE PRO LTD, is fully compliant with Apple's App Store Review Guidelines and all applicable iOS development standards. This document outlines our compliance framework.
+              Obey Financial Technologies is a next-generation digital asset management and institutional liquidity platform operated by <strong>TRICODE PRO LTD</strong>. We empower millions of users worldwide to trade crypto, buy gift cards, purchase airtime and data, and manage all their payments through one unified app.
             </p>
           </section>
 
           <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. App Store Review Guidelines Compliance</h3>
-            <p>We adhere to all Apple App Store Review Guidelines, including:</p>
-            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li><strong>Section 1 - Safety:</strong> No objectionable content, user-generated content is moderated, and all financial transactions are secure</li>
-              <li><strong>Section 2 - Performance:</strong> App is stable, performant, and free of bugs. Optimized for all iOS devices</li>
-              <li><strong>Section 3 - Business:</strong> Transparent pricing, no hidden fees, and clear subscription terms</li>
-              <li><strong>Section 4 - Design:</strong> Follows Apple Human Interface Guidelines with native iOS design patterns</li>
-              <li><strong>Section 5 - Legal:</strong> Compliant with all applicable laws and regulations in Nigeria and internationally</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. Apple Pay Integration</h3>
-            <p>
-              Our Apple Pay integration follows Apple's strict security and privacy requirements:
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">1. Our Mission</h3>
+            <p className="text-gray-600 leading-relaxed">
+              To democratize access to financial services by building a trustless, node-powered infrastructure that connects people to global liquidity. We believe everyone deserves fast, secure, and affordable financial tools — whether you're buying crypto in Lagos, sending airtime in Nairobi, or trading gift cards from anywhere in the world.
             </p>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">2. What We Build</h3>
             <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li>All Apple Pay transactions are processed through Apple's secure enclave</li>
-              <li>We do not store, log, or retain any Apple Pay card data</li>
-              <li>Tokenization is used for all payment processing</li>
-              <li>PCI-DSS Level 1 compliance for all payment handling</li>
-              <li>End-to-end encryption for all financial data</li>
+              <li><strong>Obey Trading App:</strong> One app for crypto trading, gift card exchange, airtime & data purchases, virtual card generation, and peer-to-peer payments</li>
+              <li><strong>Parallel Node System:</strong> Institutional-grade decentralized infrastructure on the Sui Network for high-throughput transaction processing</li>
+              <li><strong>Virtual Card Engine:</strong> Generate disposable and recurring virtual cards for secure online purchases</li>
+              <li><strong>Jara Token Ecosystem:</strong> A music streaming NFT voting platform powering user rewards through the $JARA token (<a href="https://www.mintjara.app" className="text-primary underline font-bold" target="_blank" rel="noopener noreferrer">www.mintjara.app</a>)</li>
+              <li><strong>Marketplace Escrow:</strong> Secure peer-to-peer trading with built-in dispute resolution</li>
             </ul>
           </section>
 
           <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. Privacy & Data Protection (App Tracking Transparency)</h3>
-            <p>
-              We fully comply with Apple's App Tracking Transparency (ATT) framework:
-            </p>
-            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li>Clear ATT prompts before any tracking occurs</li>
-              <li>Privacy nutrition labels accurately reflect data collection</li>
-              <li>Users can opt out of all non-essential data collection</li>
-              <li>No data is shared with third parties without explicit consent</li>
-              <li>GDPR and NDPR (Nigeria Data Protection Regulation) compliant</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Security Standards</h3>
-            <p>
-              Our iOS app implements Apple's recommended security practices:
-            </p>
-            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li>Keychain Services for secure credential storage</li>
-              <li>Biometric authentication (Face ID / Touch ID) support</li>
-              <li>App Transport Security (ATS) enforced for all network requests</li>
-              <li>Code signing and certificate pinning</li>
-              <li>Jailbreak detection and root detection</li>
-              <li>Secure Enclave for cryptographic operations</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Financial Services Compliance</h3>
-            <p>
-              As a financial services app, we meet Apple's additional requirements:
-            </p>
-            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li>Registered with the Central Bank of Nigeria (CBN) as a payment service provider</li>
-              <li>Valid financial services license displayed in app metadata</li>
-              <li>Clear disclosure of all fees and charges</li>
-              <li>Customer support available within the app</li>
-              <li>Dispute resolution process clearly documented</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Accessibility</h3>
-            <p>
-              Our app is fully accessible following Apple's accessibility guidelines:
-            </p>
-            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
-              <li>Full VoiceOver support for all UI elements</li>
-              <li>Dynamic Type support for text scaling</li>
-              <li>Color contrast ratios meeting WCAG 2.1 AA standards</li>
-              <li>Switch Control and AssistiveTouch compatible</li>
-              <li>Reduced Motion support for animations</li>
-            </ul>
-          </section>
-
-          <section className="space-y-4">
-            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">7. Contact Apple Compliance Team</h3>
-            <p>
-              For Apple-specific compliance inquiries:
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">3. TRICODE PRO LTD</h3>
+            <p className="text-gray-600 leading-relaxed">
+              TRICODE PRO LTD is the corporate entity behind Obey Financial Technologies. Registered and operating from Nigeria, we are licensed by the Central Bank of Nigeria (CBN) as a payment service provider. Our team of engineers, designers, and financial experts is dedicated to building Africa's most trusted digital finance platform.
             </p>
             <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
-              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD - Apple Compliance</p>
-              <p className="text-gray-600">Email: apple-compliance@obey.finance</p>
-              <p className="text-gray-600">App Store Connect Team ID: Available upon request</p>
+              <p className="font-bold text-[#0b0e14]">TRICODE PRO LTD</p>
+              <p className="text-gray-600">Email: support@obey.finance</p>
+              <p className="text-gray-600">Website: obey.finance</p>
               <p className="text-gray-600">Bundle ID: com.tricode.obey</p>
+            </div>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">4. Our Ecosystem</h3>
+            <p className="text-gray-600 leading-relaxed">
+              The Obey ecosystem extends beyond trading. Through strategic partnerships and proprietary technology, we offer:
+            </p>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li><strong>Sui Network Integration:</strong> Leveraging the Sui blockchain for fast, low-cost settlements</li>
+              <li><strong>Opay Payments:</strong> Seamless fiat on-ramps through Nigeria's leading mobile money platform</li>
+              <li><strong>Developer SDK:</strong> Open APIs for third-party integrations and custom payment flows</li>
+              <li><strong>Jara Token ($JARA):</strong> A utility token for music streaming, NFT voting, and user rewards</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">5. Security & Trust</h3>
+            <ul className="list-disc pl-6 space-y-1.5 text-gray-600">
+              <li>AES-256 encryption for all data at rest and in transit</li>
+              <li>Biometric authentication (Face ID / Touch ID) support</li>
+              <li>PCI-DSS Level 1 compliance for payment handling</li>
+              <li>Multi-signature authorization for institutional transactions</li>
+              <li>24/7 monitoring and incident response</li>
+            </ul>
+          </section>
+
+          <section className="space-y-4">
+            <h3 className="text-xl md:text-2xl font-black text-[#0b0e14] tracking-tight">6. Contact Us</h3>
+            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100 space-y-2">
+              <p className="font-bold text-[#0b0e14]">Obey Financial Technologies</p>
+              <p className="text-gray-600">Email: support@obey.finance</p>
+              <p className="text-gray-600">Jara Token: <a href="https://www.mintjara.app" className="text-primary underline font-bold" target="_blank" rel="noopener noreferrer">www.mintjara.app</a></p>
+              <p className="text-gray-600">Powered by TRICODE PRO LTD</p>
             </div>
           </section>
         </div>

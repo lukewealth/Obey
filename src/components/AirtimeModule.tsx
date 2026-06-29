@@ -78,7 +78,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#FFCC00]",
       textColor: "text-black",
       logoChar: "M",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/MTN_Logo.svg/256px-MTN_Logo.svg.png",
       paymentCode: "10101",
       symbolColor: "#FFCC00"
     },
@@ -88,7 +87,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#ED1C24]",
       textColor: "text-white",
       logoChar: "A",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Airtel_Logo.svg/256px-Airtel_Logo.svg.png",
       paymentCode: "10201",
       symbolColor: "#ED1C24"
     },
@@ -98,7 +96,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#00A651]",
       textColor: "text-white",
       logoChar: "G",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Glo_telecommunications_logo.svg/256px-Glo_telecommunications_logo.svg.png",
       paymentCode: "10301",
       symbolColor: "#00A651"
     },
@@ -108,7 +105,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#006B3F]",
       textColor: "text-white",
       logoChar: "9",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/9mobile_logo.svg/256px-9mobile_logo.svg.png",
       paymentCode: "10401",
       symbolColor: "#006B3F"
     },
@@ -181,7 +177,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "showmax",
       name: "Showmax",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Showmax_logo.svg",
       color: "bg-[#000000]",
       plans: [
         { id: "sm1", name: "Mobile", price: 1200, description: "1 device", duration: "Monthly", recommended: true },
@@ -191,7 +186,6 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "dstv",
       name: "DSTV",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6c/DStv_logo.svg",
       color: "bg-[#003DA5]",
       plans: [
         { id: "ds1", name: "Padi", price: 2500, description: "Local channels", duration: "Monthly" },

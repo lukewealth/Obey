@@ -40,7 +40,7 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
             <div className="flex items-center gap-3 pt-2">
               <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-100 rounded-lg shadow-sm">
                 <Apple size={14} className="text-[#0b0e14]" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-[#0b0e14]">Apple Compliant</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#0b0e14]">TRICODE PRO LTD</span>
               </div>
               <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-gray-100 rounded-lg shadow-sm">
                 <Globe size={14} className="text-emerald-600" />
@@ -66,7 +66,8 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
             <div className="space-y-6 md:space-y-8">
               <h5 className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.3em] text-primary">Regulatory</h5>
               <ul className="space-y-4 md:space-y-5 text-sm font-bold text-gray-500">
-                <li><button onClick={() => onNavigate(AppScreen.APPLE)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Apple Compliance <ExternalLink size={12} /></button></li>
+                <li><button onClick={() => onNavigate(AppScreen.APPLE)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">About Us <ExternalLink size={12} /></button></li>
+                <li><button onClick={() => onNavigate(AppScreen.INFOGRAPHIC)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">$JARA Ecosystem <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.CBN)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">CBN Approval <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.DISCLOSURES)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Disclosures <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.STATUS)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">System Status <ExternalLink size={12} /></button></li>
@@ -110,7 +111,8 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
              <p className="text-primary">Trade with Opay</p>
           </div>
           <div className="flex gap-6 md:gap-10 flex-wrap justify-center">
-            <button onClick={() => onNavigate(AppScreen.APPLE)} className="hover:text-primary transition-colors uppercase">Apple</button>
+            <button onClick={() => onNavigate(AppScreen.APPLE)} className="hover:text-primary transition-colors uppercase">About</button>
+            <button onClick={() => onNavigate(AppScreen.INFOGRAPHIC)} className="hover:text-primary transition-colors uppercase">$JARA</button>
             <button onClick={() => onNavigate(AppScreen.CBN)} className="hover:text-primary transition-colors uppercase">CBN</button>
             <button onClick={() => onNavigate(AppScreen.OPAY)} className="hover:text-primary transition-colors uppercase">Opay</button>
             <button onClick={() => onNavigate(AppScreen.SDK)} className="hover:text-primary transition-colors uppercase">SDK</button>

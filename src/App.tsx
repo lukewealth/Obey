@@ -10,6 +10,7 @@ import ThemeToggle from "./components/ThemeToggle";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
+import InfographicPage from "./components/InfographicPage";
 import SystemAlert from "./components/SystemAlert";
 import GatedVerificationModal from "./components/GatedVerificationModal";
 import PuppyLoading from "./components/PuppyLoading";
@@ -633,6 +634,7 @@ export default function App() {
       {currentScreen === AppScreen.SDK && <LegalContent slug="sdk" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.SUI && <LegalContent slug="sui" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.NODES && <LegalContent slug="nodes" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.INFOGRAPHIC && <InfographicPage onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
 
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[var(--app-bg)] transition-colors duration-500">
