@@ -6,6 +6,7 @@ import {
   Loader2, ChevronRight
 } from "lucide-react";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errorHandler";
 import { useNotification } from "./NotificationSystem";
 
 interface TierManagementProps {
@@ -71,7 +72,7 @@ export default function TierManagement({ userId, currentTier = 1, onUpdate }: Ti
       setSelectedTier(null);
       onUpdate?.();
     } catch (error: any) {
-      notify("error", "Upgrade Failed", error.response?.data?.error || "Failed to upgrade tier");
+      notify("error", "Upgrade Failed", getErrorMessage(error, "Failed to upgrade tier"));
     } finally {
       setUpgrading(false);
     }

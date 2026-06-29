@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { UserProfile } from "../types";
 import { useNotification } from "./NotificationSystem";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errorHandler";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, ShieldCheck, ShieldAlert, Star, Award, Crown, Zap,
@@ -101,6 +102,10 @@ export default function KYCTierSystem({ profile, onTierUpgrade }: KYCTierSystemP
   }, [profile.id]);
 
   const fetchTierInfo = async () => {
+    if (!profile.id) {
+      setLoading(false);
+      return;
+    }
     try {
       setLoading(true);
       const response = await api.get(`/kyc/tier/${profile.id}`);
@@ -129,7 +134,7 @@ export default function KYCTierSystem({ profile, onTierUpgrade }: KYCTierSystemP
         notify("success", "Upgrade Requested", "Your KYC upgrade request has been submitted. Awaiting admin approval.");
       }
     } catch (error: any) {
-      notify("error", "Request Failed", error.response?.data?.error || "Could not submit upgrade request.");
+      notify("error", "Request Failed", getErrorMessage(error, "Could not submit upgrade request."));
     } finally {
       setUpgrading(false);
       setSelectedTier(null);

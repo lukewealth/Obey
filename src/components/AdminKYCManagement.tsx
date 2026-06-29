@@ -11,6 +11,7 @@ import {
   ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errorHandler";
 import { useNotification } from "./NotificationSystem";
 
 interface KYCRequest {
@@ -76,7 +77,7 @@ export default function AdminKYCManagement({ adminId }: AdminKYCManagementProps)
         setRequests((prev) => prev.filter((r) => r._id !== request._id));
       }
     } catch (error: any) {
-      notify("error", "Approval Failed", error.response?.data?.error || "Could not approve request.");
+      notify("error", "Approval Failed", getErrorMessage(error, "Could not approve request."));
     } finally {
       setProcessing(null);
     }
@@ -101,7 +102,7 @@ export default function AdminKYCManagement({ adminId }: AdminKYCManagementProps)
         setRejectionReason("");
       }
     } catch (error: any) {
-      notify("error", "Rejection Failed", error.response?.data?.error || "Could not reject request.");
+      notify("error", "Rejection Failed", getErrorMessage(error, "Could not reject request."));
     } finally {
       setProcessing(null);
     }

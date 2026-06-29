@@ -6,6 +6,7 @@ import {
   AlertCircle, Banknote, User, Hash, Shield, Clock, TrendingUp
 } from "lucide-react";
 import api from "../services/api";
+import { getErrorMessage } from "../utils/errorHandler";
 import { useNotification } from "./NotificationSystem";
 
 interface BankTransferProps {
@@ -157,7 +158,10 @@ export default function BankTransfer({ profile, transactions, onTransferComplete
         setTransferSuccess(true);
         notify("success", "Transfer Initiated", "Your transfer is being processed.");
       } else {
-        notify("error", "Transfer Failed", response.data?.error || "Could not complete transfer.");
+        const errorMsg = typeof response.data?.error === 'string' 
+          ? response.data.error 
+          : response.data?.error?.message || "Could not complete transfer.";
+        notify("error", "Transfer Failed", errorMsg);
       }
     } catch (error) {
       console.error('Transfer failed:', error);

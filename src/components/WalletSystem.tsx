@@ -9,6 +9,7 @@ import {
   Coins, Lock, Fingerprint, Banknote, Building, FileText, Search
 } from "lucide-react";
 import api, { createCheckoutOrder, verifyTransaction, initiateWithdrawal, fetchBankCodes, lookupBankAccount } from "../services/api";
+import { getErrorMessage } from "../utils/errorHandler";
 import { useNotification } from "./NotificationSystem";
 
 interface WalletSystemProps {
@@ -229,7 +230,7 @@ export default function WalletSystem({ profile, transactions, onFundWallet, onWi
         notify("success", "Transfer Successful", `Money sent to ${response.data.recipientName}.`);
       }
     } catch (error: any) {
-      notify("error", "Transfer Failed", error.response?.data?.error || "Transfer failed.");
+      notify("error", "Transfer Failed", getErrorMessage(error, "Transfer failed."));
     } finally {
       setTransferProcessing(false);
     }
