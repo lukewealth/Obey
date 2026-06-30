@@ -162,4 +162,59 @@ export const claimDailyLogin = async (userId: string) => {
   return api.post('/rewards/daily-login', { userId });
 };
 
+// --- Notification Endpoints ---
+
+export const fetchNotifications = async (userId: string) => {
+  return api.get(`/notifications/${userId}`);
+};
+
+export const markNotificationRead = async (id: string) => {
+  return api.post(`/notifications/${id}/read`);
+};
+
+export const markAllNotificationsRead = async (userId: string) => {
+  return api.post('/notifications/read-all', { userId });
+};
+
+export const deleteNotification = async (id: string) => {
+  return api.delete(`/notifications/${id}`);
+};
+
+// --- Scheduled Payments Endpoints ---
+
+export const fetchScheduledPayments = async (userId: string, status?: string) => {
+  const params = status && status !== 'all' ? { status } : {};
+  return api.get(`/scheduled-payments/${userId}`, { params });
+};
+
+export const createScheduledPayment = async (data: any) => {
+  return api.post('/scheduled-payments', data);
+};
+
+export const updateScheduledPayment = async (id: string, data: any) => {
+  return api.put(`/scheduled-payments/${id}`, data);
+};
+
+export const cancelScheduledPayment = async (id: string) => {
+  return api.post(`/scheduled-payments/${id}/cancel`);
+};
+
+export const executeScheduledPayment = async (id: string) => {
+  return api.post(`/scheduled-payments/${id}/execute`);
+};
+
+export const deleteScheduledPayment = async (id: string) => {
+  return api.delete(`/scheduled-payments/${id}`);
+};
+
+// --- Banking Endpoints ---
+
+export const fetchBanks = async (search?: string) => {
+  return api.get('/banks', { params: { search } });
+};
+
+export const resolveBankAccount = async (accountNumber: string, bankCode: string) => {
+  return api.post('/banks/resolve-account', { accountNumber, bankCode });
+};
+
 export default api;

@@ -19,6 +19,9 @@ import aiRoutes from './routes/ai';
 import rewardsRoutes from './routes/rewards';
 import kycRoutes from './routes/kyc';
 import sessionRoutes from './routes/session';
+import notificationRoutes from './routes/notifications';
+import scheduledPaymentRoutes from './routes/scheduled_payments';
+import bankRoutes from './routes/banks';
 import { connectDB, prewarmDB } from './db';
 
 dotenv.config();
@@ -80,6 +83,10 @@ app.use(async (req, res, next) => {
     'nomba',
     'api/session',
     'session',
+    'api/banks',
+    'banks',
+    'api/notifications',
+    'notifications',
   ];
 
   if (bypassRoutes.some(route => path === route || path.startsWith(route + '/'))) {
@@ -111,6 +118,9 @@ router.use('/ai', aiRoutes);
 router.use('/rewards', rewardsRoutes);
 router.use('/kyc', kycRoutes);
 router.use('/session', sessionRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/scheduled-payments', scheduledPaymentRoutes);
+router.use('/banks', bankRoutes);
 
 router.get('/health', (req, res) => {
   res.json({ 

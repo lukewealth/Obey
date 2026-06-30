@@ -73,15 +73,13 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
 
           <div className="md:col-span-7 grid grid-cols-2 sm:grid-cols-3 gap-10 md:gap-16">
             <div className="space-y-6 md:space-y-8">
-              <h5 className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.3em] text-primary">Compliance</h5>
+              <h5 className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.3em] text-primary">Company</h5>
               <ul className="space-y-4 md:space-y-5 text-sm font-bold text-gray-500">
+                <li><button onClick={() => onNavigate(AppScreen.ABOUT)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">About Us <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.PRIVACY)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Privacy Policy <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.TERMS)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Terms of Service <ExternalLink size={12} /></button></li>
-                <li><button onClick={() => onNavigate(AppScreen.USERDATA)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">User Data Agreement <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.AMLKYC)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">AML / KYC Policy <ExternalLink size={12} /></button></li>
                 <li><button onClick={() => onNavigate(AppScreen.COOKIE)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Cookie Policy <ExternalLink size={12} /></button></li>
-                <li><button onClick={() => onNavigate(AppScreen.APPLE)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">Apple Compliance <ExternalLink size={12} /></button></li>
-                <li><button onClick={() => onNavigate(AppScreen.CBN)} className="hover:text-primary transition-colors flex items-center gap-2 text-left">CBN Approval <ExternalLink size={12} /></button></li>
               </ul>
             </div>
             <div className="space-y-6 md:space-y-8">
@@ -124,6 +122,7 @@ export default function StandardFooter({ onNavigate }: StandardFooterProps) {
              <p className="text-emerald-600">CBN APPROVED</p>
           </div>
           <div className="flex gap-6 md:gap-10 flex-wrap justify-center">
+            <button onClick={() => onNavigate(AppScreen.ABOUT)} className="hover:text-primary transition-colors uppercase">About</button>
             <button onClick={() => onNavigate(AppScreen.AMLKYC)} className="hover:text-primary transition-colors uppercase">AML / KYC</button>
             <button onClick={() => onNavigate(AppScreen.DISCLOSURES)} className="hover:text-primary transition-colors uppercase">Disclosures</button>
             <button onClick={() => onNavigate(AppScreen.STATUS)} className="hover:text-primary transition-colors uppercase">System Status</button>

@@ -18,7 +18,8 @@ export enum AppScreen {
   APPLE = "APPLE",
   CBN = "CBN",
   NODES = "NODES",
-  INFOGRAPHIC = "INFOGRAPHIC"
+  INFOGRAPHIC = "INFOGRAPHIC",
+  ABOUT = "ABOUT"
 }
 
 export enum AppTab {

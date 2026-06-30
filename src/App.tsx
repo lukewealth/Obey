@@ -7,10 +7,12 @@ import IdentityVerification from "./components/IdentityVerification";
 import OtpVerification from "./components/OtpVerification";
 import TransactionSuccess from "./components/TransactionSuccess";
 import ThemeToggle from "./components/ThemeToggle";
+import NotificationBell from "./components/NotificationBell";
 import CookieConsent from "./components/CookieConsent";
 import StandardFooter from "./components/StandardFooter";
 import LegalContent from "./components/LegalContent";
 import InfographicPage from "./components/InfographicPage";
+import AboutPage from "./components/AboutPage";
 import SystemAlert from "./components/SystemAlert";
 import GatedVerificationModal from "./components/GatedVerificationModal";
 import PuppyLoading from "./components/PuppyLoading";
@@ -636,6 +638,7 @@ export default function App() {
       {currentScreen === AppScreen.SUI && <LegalContent slug="sui" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.NODES && <LegalContent slug="nodes" onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
       {currentScreen === AppScreen.INFOGRAPHIC && <InfographicPage onBack={() => setCurrentScreen(AppScreen.MARKETING)} />}
+      {currentScreen === AppScreen.ABOUT && <AboutPage onBack={() => setCurrentScreen(AppScreen.MARKETING)} onNavigate={setCurrentScreen} />}
 
       {currentScreen === AppScreen.DASHBOARD && (
         <div className="min-h-screen flex flex-col relative bg-[var(--app-bg)] transition-colors duration-500">
@@ -668,6 +671,8 @@ export default function App() {
               </div>
 
               <ThemeToggle />
+
+              <NotificationBell userId={currentUser?.id || currentUser?.uid} />
 
               <button
                 onClick={async () => {
