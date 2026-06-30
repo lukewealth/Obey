@@ -131,7 +131,7 @@ export default function AboutUs() {
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Ready to join the <br /><span className="text-primary italic">next generation?</span></h2>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <button className="h-20 px-10 bg-white text-[#0b0e14] rounded-2xl flex items-center gap-5 hover:scale-105 transition-all shadow-2xl active-press group/btn">
-                   <img src="https://developer.apple.com/assets/elements/icons/apple/apple-96x96.png" alt="Apple" className="w-8 h-8 group-hover/btn:scale-110 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = '/apple-logo.svg'; }} />
+                   <img src="/apple.png" alt="Apple" className="w-8 h-8 group-hover/btn:scale-110 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = '/apple.png'; }} />
                    <div className="text-left">
                       <p className="text-[10px] font-bold uppercase opacity-50">App Store</p>
                       <p className="text-lg font-black uppercase tracking-wider">Download Now</p>

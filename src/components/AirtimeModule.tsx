@@ -78,7 +78,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#FFCC00]",
       textColor: "text-black",
       logoChar: "M",
-      logoUrl: "https://nigerialogos.com/logos/mtn.svg",
+      logoUrl: "/mtn.svg",
       paymentCode: "10101",
       symbolColor: "#FFCC00"
     },
@@ -88,7 +88,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#ED1C24]",
       textColor: "text-white",
       logoChar: "A",
-      logoUrl: "https://nigerialogos.com/logos/airtel.svg",
+      logoUrl: "/airtel.png",
       paymentCode: "10201",
       symbolColor: "#ED1C24"
     },
@@ -98,7 +98,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#00A651]",
       textColor: "text-white",
       logoChar: "G",
-      logoUrl: "https://nigerialogos.com/logos/glo.svg",
+      logoUrl: "/glo.jpeg",
       paymentCode: "10301",
       symbolColor: "#00A651"
     },
@@ -108,7 +108,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#006B3F]",
       textColor: "text-white",
       logoChar: "9",
-      logoUrl: "https://nigerialogos.com/logos/9mobile.svg",
+      logoUrl: "/9mobile.png",
       paymentCode: "10401",
       symbolColor: "#006B3F"
     },
@@ -136,7 +136,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "netflix",
       name: "Netflix",
-      logoUrl: "https://images.ctfassets.net/y2ske730sjqp/6BHnPhR9RRNm8kYKwQQ8W8/7c5d7e5f5f5f5f5f5f5f5f5f5f5f5f5f/Netflix_Logo.png",
+      logoUrl: "/netflix.jpg",
       color: "bg-[#E50914]",
       plans: [
         { id: "nf1", name: "Mobile", price: 1200, description: "1 device, 480p", duration: "Monthly" },
@@ -159,7 +159,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "apple",
       name: "Apple Music",
-      logoUrl: "https://developer.apple.com/assets/elements/icons/apple-music/apple-music-96x96.png",
+      logoUrl: "/apple.png",
       color: "bg-[#FA243C]",
       plans: [
         { id: "am1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
@@ -191,7 +191,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "dstv",
       name: "DSTV",
-      logoUrl: "https://nigerialogos.com/logos/dstv.svg",
+      logoUrl: "/dstv.svg",
       color: "bg-[#003DA5]",
       plans: [
         { id: "ds1", name: "Padi", price: 2500, description: "Local channels", duration: "Monthly" },
