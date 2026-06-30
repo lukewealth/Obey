@@ -5,7 +5,8 @@ import {
   ArrowUpRight, ArrowDownLeft, Check, RefreshCw, DollarSign,
   TrendingUp, TrendingDown, Coins, HelpCircle, ShieldAlert, Award,
   ChevronRight, BarChart3, Search, Zap, Star, ArrowRight, ShieldCheck,
-  ShoppingCart, X, Loader2, Play, LayoutGrid, List, CheckCircle2, Lock, Activity
+  ShoppingCart, X, Loader2, Play, LayoutGrid, List, CheckCircle2, Lock, Activity,
+  Percent, Crown, Gift
 } from "lucide-react";
 import api from "../services/api";
 import { useNotification } from "./NotificationSystem";
@@ -23,6 +24,22 @@ interface CryptoSystemProps {
   onTradeCompleted: (amount: number, details: string, isSell: boolean) => void;
 }
 
+interface LivePrice {
+  symbol: string;
+  name: string;
+  priceUSD: number;
+  priceNGN: number;
+  change24h: number;
+  volume24h: number;
+  marketCap: number;
+  source: string;
+  fees: {
+    tradingFeePercent: number;
+    platformFeePercent: number;
+    totalFeePercent: number;
+  };
+}
+
 export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, suiPrice, onTradeCompleted }: CryptoSystemProps) {
   const { notify } = useNotification();
   const [activeTab, setActiveTab] = useState<"PLATFORM" | "P2P">("PLATFORM");
@@ -37,6 +54,50 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
   const [loadingP2P, setLoadingP2P] = useState(false);
   const [showAssetDetail, setShowAssetDetail] = useState(false);
   const [selectedAssetForDetail, setSelectedAssetForDetail] = useState<any>(null);
+
+  const [livePrice, setLivePrice] = useState<LivePrice | null>(null);
+  const [priceLoading, setPriceLoading] = useState(false);
+  const [userRewards, setUserRewards] = useState<any>(null);
+
+  const NGN_PEG = 1600;
+
+  const assets = [
+    { symbol: "BTC", name: "Bitcoin", balance: 0.00042, price: btcPrice, priceChangePercent: 2.4 },
+    { symbol: "ETH", name: "Ethereum", balance: 0.0125, price: ethPrice, priceChangePercent: -1.2 },
+    { symbol: "SOL", name: "Solana", balance: 1.5, price: solPrice, priceChangePercent: 5.8 },
+    { symbol: "SUI", name: "Sui", balance: 120.4, price: suiPrice, priceChangePercent: 12.5 },
+    { symbol: "USDC", name: "USD Coin", balance: 450.0, price: 1.00 * NGN_PEG, priceChangePercent: 0.01 },
+  ];
+
+  useEffect(() => {
+    fetchLivePrice(selectedSymbol);
+    fetchUserRewards();
+  }, [selectedSymbol]);
+
+  useEffect(() => {
+    if (activeTab === 'P2P') fetchP2PListings();
+  }, [activeTab]);
+
+  const fetchLivePrice = async (symbol: string) => {
+    setPriceLoading(true);
+    try {
+      const response = await api.get(`/crypto-trade/price/${symbol}`);
+      setLivePrice(response.data);
+    } catch (error) {
+      console.error('Live price fetch failed:', error);
+    } finally {
+      setPriceLoading(false);
+    }
+  };
+
+  const fetchUserRewards = async () => {
+    try {
+      const response = await api.get(`/rewards/${profile.id || profile.email}`);
+      setUserRewards(response.data);
+    } catch (error) {
+      console.error('Rewards fetch failed:', error);
+    }
+  };
 
   const handleAssetSelect = (asset: any) => {
     const symbol = asset.asset_id || asset.symbol || asset;
@@ -61,21 +122,13 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
       setSelectedAssetForDetail({
         asset_id: asset.symbol,
         name: asset.name,
-        price_usd: asset.price / 1600,
+        price_usd: asset.price / NGN_PEG,
         price_change_24h: asset.priceChangePercent,
         coingeckoId: asset.symbol.toLowerCase(),
       });
       setShowAssetDetail(true);
     }
   };
-
-  const assets = [
-    { symbol: "BTC", name: "Bitcoin", balance: 0.00042, price: btcPrice, priceChangePercent: 2.4 },
-    { symbol: "ETH", name: "Ethereum", balance: 0.0125, price: ethPrice, priceChangePercent: -1.2 },
-    { symbol: "SOL", name: "Solana", balance: 1.5, price: solPrice, priceChangePercent: 5.8 },
-    { symbol: "SUI", name: "Sui", balance: 120.4, price: suiPrice, priceChangePercent: 12.5 },
-    { symbol: "USDC", name: "USD Coin", balance: 450.0, price: 1.00, priceChangePercent: 0.01 },
-  ];
 
   const fetchP2PListings = async () => {
     setLoadingP2P(true);
@@ -89,10 +142,6 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
     }
   };
 
-  useEffect(() => {
-    if (activeTab === 'P2P') fetchP2PListings();
-  }, [activeTab]);
-
   const executeTrade = async (e: React.FormEvent) => {
     e.preventDefault();
     const amount = parseFloat(fiatValue);
@@ -105,24 +154,39 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
 
     setProcessing(true);
     try {
-       // Platform trade simulation
-       setTimeout(() => {
-         const cryptoAmount = amount / (assets.find(a => a.symbol === selectedSymbol)?.price || 1);
-         onTradeCompleted(amount, `${tradeType === 'buy' ? 'Acquired' : 'Liquidated'} ${selectedSymbol} via Platform Node`, tradeType === 'sell');
-         setOrderReceipt({
-            id: `CRY-${Math.random().toString(36).substring(2, 10).toUpperCase()}`,
-            type: tradeType,
-            symbol: selectedSymbol,
-            fiatAmount: amount,
-            cryptoAmount,
-            status: "Settled"
-         });
-         setProcessing(false);
-         notify("success", "Node Settled", `Institutional ${tradeType} order successfully executed on sequential ledger.`);
-       }, 2000);
-    } catch (err) {
-       notify("error", "Execution Failed", "Node mesh synchronization timeout.");
-       setProcessing(false);
+      const response = await api.post('/crypto-trade/execute', {
+        userId: profile.id || profile.email,
+        symbol: selectedSymbol,
+        type: tradeType,
+        fiatAmount: amount,
+      });
+
+      if (response.data.success) {
+        const tx = response.data.transaction;
+        onTradeCompleted(amount, `${tradeType === 'buy' ? 'Acquired' : 'Liquidated'} ${tx.symbol} via Live Market`, tradeType === 'sell');
+
+        setOrderReceipt({
+          id: tx.id,
+          type: tradeType,
+          symbol: tx.symbol,
+          name: tx.name,
+          fiatAmount: tx.fiatAmount,
+          cryptoAmount: tx.cryptoAmount,
+          priceUSD: tx.priceUSD,
+          priceNGN: tx.priceNGN,
+          fees: tx.fees,
+          netAmount: tx.netAmount,
+          status: "Settled",
+          rewards: response.data.rewards,
+        });
+
+        notify("success", "Trade Executed", `Live ${tradeType} order settled. +${response.data.rewards?.pointsEarned || 0} rewards earned!`);
+        fetchUserRewards();
+      }
+    } catch (err: any) {
+      notify("error", "Execution Failed", err.response?.data?.error || "Trade execution failed.");
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -145,6 +209,13 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
     }
   };
 
+  const estimatedCrypto = livePrice && fiatValue
+    ? (parseFloat(fiatValue) * (1 - livePrice.fees.totalFeePercent / 100)) / livePrice.priceUSD
+    : 0;
+
+  const tradingFee = fiatValue ? parseFloat(fiatValue) * (livePrice?.fees.tradingFeePercent || 0.5) / 100 : 0;
+  const platformFee = fiatValue ? parseFloat(fiatValue) * (livePrice?.fees.platformFeePercent || 0.25) / 100 : 0;
+
   const containerVariants = {
     initial: { opacity: 0, y: 10 },
     animate: { opacity: 1, y: 0 },
@@ -157,7 +228,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
         <div className="space-y-1 text-center md:text-left">
           <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">Trade Crypto</h2>
-          <p className="text-sm md:text-lg text-gray-500 font-medium leading-relaxed">Buy and sell crypto instantly.</p>
+          <p className="text-sm md:text-lg text-gray-500 font-medium leading-relaxed">Buy and sell crypto with live market data.</p>
         </div>
         
         <div className="flex bg-white/50 backdrop-blur-md p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 w-full md:w-fit hide-scrollbar overflow-x-auto shadow-sm self-center md:self-auto">
@@ -213,20 +284,43 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
               <div className="flex justify-between items-center gap-4">
                 <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
                 <span className={`text-xl md:text-3xl font-black ${orderReceipt.type === "buy" ? "text-emerald-600" : "text-red-500"}`}>
-                   {orderReceipt.cryptoAmount?.toFixed(5) || orderReceipt.amount} {orderReceipt.symbol || orderReceipt.brand}
+                   {orderReceipt.cryptoAmount?.toFixed(6) || orderReceipt.amount} {orderReceipt.symbol || orderReceipt.brand}
                 </span>
               </div>
               <div className="h-px bg-gray-200"></div>
               <div className="grid grid-cols-2 gap-8 md:gap-12">
                 <div className="space-y-1">
                   <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Fiat Value</p>
-                  <p className="text-base md:text-lg font-black text-gray-900">${orderReceipt.fiatAmount?.toLocaleString() || orderReceipt.amount.toLocaleString()}</p>
+                  <p className="text-base md:text-lg font-black text-gray-900">{orderReceipt.fiatAmount?.toLocaleString() || orderReceipt.amount.toLocaleString()}</p>
                 </div>
                 <div className="space-y-1 text-right">
                   <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Transaction ID</p>
                   <p className="text-base md:text-lg font-black text-gray-900 font-mono tracking-tighter truncate max-w-[150px]">{orderReceipt.id}</p>
                 </div>
               </div>
+              <div className="h-px bg-gray-200"></div>
+              <div className="grid grid-cols-2 gap-8 md:gap-12">
+                <div className="space-y-1">
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Trading Fee</p>
+                  <p className="text-sm md:text-base font-black text-gray-900">{orderReceipt.fees?.tradingFee?.toLocaleString() || '0'}</p>
+                </div>
+                <div className="space-y-1 text-right">
+                  <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest">Platform Fee</p>
+                  <p className="text-sm md:text-base font-black text-gray-900">₦{orderReceipt.fees?.platformFee?.toLocaleString() || '0'}</p>
+                </div>
+              </div>
+              {orderReceipt.rewards && (
+                <>
+                  <div className="h-px bg-gray-200"></div>
+                  <div className="flex items-center justify-center gap-3 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                    <Gift className="w-5 h-5 text-amber-600" />
+                    <div className="text-left">
+                      <p className="text-[9px] font-black text-amber-600 uppercase tracking-widest">Rewards Earned</p>
+                      <p className="text-lg font-black text-amber-900">+{orderReceipt.rewards.pointsEarned} points</p>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
 
             <button onClick={() => setOrderReceipt(null)} className="w-full bg-primary text-white py-5 md:py-6 rounded-[18px] md:rounded-[22px] font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl active-press hover:bg-black transition-all">
@@ -242,7 +336,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                    <h3 className="text-[10px] md:text-[11px] font-black uppercase text-gray-400 tracking-[0.3em]">Search</h3>
                     <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-100">
                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                       <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">Live</span>
+                       <span className="text-[8px] md:text-[9px] font-black text-emerald-600 uppercase tracking-widest">Live Market</span>
                     </div>
                 </div>
                 <CryptoSearch onSelect={handleAssetSelect} />
@@ -263,7 +357,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                       </div>
                       <div className="space-y-1">
                          <p className="text-xl font-black text-gray-900 tracking-tight">{asset.name}</p>
-                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">${asset.price.toLocaleString()}</p>
+                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">₦{asset.price.toLocaleString()}</p>
                       </div>
                       <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
                          <p className="text-[10px] font-bold text-gray-400">Bal: {asset.balance} {asset.symbol}</p>
@@ -281,8 +375,35 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                 <div className="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-[14px] md:rounded-[20px] flex items-center justify-center text-primary">
                   <BarChart3 size={20} className="md:w-6 md:h-6" />
                 </div>
-                <h3 className="text-[10px] md:text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Trade</h3>
+                <h3 className="text-[10px] md:text-[11px] uppercase font-black text-gray-400 tracking-[0.2em]">Trade {selectedSymbol}</h3>
               </div>
+
+              {livePrice && (
+                <div className="bg-gray-50 rounded-2xl p-4 border border-gray-100 relative z-10">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Live Price</span>
+                    <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                      {livePrice.source}
+                    </span>
+                  </div>
+                  <p className="text-2xl font-black text-gray-900 font-mono">{livePrice.priceNGN.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`text-xs font-black flex items-center gap-1 ${livePrice.change24h >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+                      {livePrice.change24h >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
+                      {livePrice.change24h >= 0 ? '+' : ''}{livePrice.change24h.toFixed(2)}%
+                    </span>
+                    <span className="text-[9px] text-gray-400 font-bold">24h</span>
+                  </div>
+                </div>
+              )}
+
+              {priceLoading && (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                  <span className="text-xs font-black text-gray-400 ml-2">Fetching live price...</span>
+                </div>
+              )}
 
               <div className="flex bg-gray-100 p-1.5 rounded-[18px] md:rounded-[22px] border border-gray-200 relative z-10">
                 <button
@@ -309,7 +430,7 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                 <div className="space-y-4">
                   <div className="flex justify-between items-center px-4">
                     <span className="text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">Amount</span>
-                    <span className="text-[10px] md:text-[11px] font-black text-primary">AVAIL: ${profile.balance.toLocaleString()}</span>
+                    <span className="text-[10px] md:text-[11px] font-black text-primary">AVAIL: ₦{profile.balance.toLocaleString()}</span>
                   </div>
                   <div className="relative">
                     <DollarSign className="absolute left-6 md:left-8 top-1/2 -translate-y-1/2 text-primary md:w-7 md:h-7" size={24} />
@@ -328,14 +449,32 @@ export default function CryptoSystem({ profile, btcPrice, ethPrice, solPrice, su
                   <div className="flex justify-between items-center text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">
                      <span>Estimated Amount</span>
                      <span className="text-gray-900 font-mono">
-                       {(parseFloat(fiatValue) / (assets.find(a => a.symbol === selectedSymbol)?.price || 1) || 0).toFixed(6)} {selectedSymbol}
+                       {estimatedCrypto.toFixed(6)} {selectedSymbol}
                      </span>
                   </div>
                   <div className="h-px bg-gray-200"></div>
                   <div className="flex justify-between items-center text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">
-                     <span>Execution Fee</span>
-                     <span className="text-emerald-500">SUB-ZERO</span>
+                     <span>Trading Fee ({livePrice?.fees.tradingFeePercent || 0.5}%)</span>
+                     <span className="text-amber-600 font-mono">₦{tradingFee.toFixed(2)}</span>
                   </div>
+                  <div className="flex justify-between items-center text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                     <span>Platform Fee ({livePrice?.fees.platformFeePercent || 0.25}%)</span>
+                     <span className="text-amber-600 font-mono">₦{platformFee.toFixed(2)}</span>
+                  </div>
+                  <div className="h-px bg-gray-200"></div>
+                  <div className="flex justify-between items-center text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-widest">
+                     <span>Total Fee</span>
+                     <span className="text-red-500 font-mono">₦{(tradingFee + platformFee).toFixed(2)}</span>
+                  </div>
+                  {userRewards && (
+                    <>
+                      <div className="h-px bg-gray-200"></div>
+                      <div className="flex justify-between items-center text-[10px] md:text-[11px] font-black text-amber-600 uppercase tracking-widest">
+                         <span className="flex items-center gap-1"><Gift size={12} /> Rewards Earned</span>
+                         <span className="font-mono">+{Math.floor((parseFloat(fiatValue) || 0) * 0.01 + 10)} pts</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <button

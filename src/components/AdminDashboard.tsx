@@ -40,6 +40,7 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
   const [fraudAlerts, setFraudAlerts] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [adminEarnings, setAdminEarnings] = useState<any>(null);
 
   useEffect(() => {
     loadAdminData();
@@ -48,10 +49,11 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
   const loadAdminData = async () => {
     setIsInitializing(true);
     try {
-      const [usersRes, fraudRes, auditRes] = await Promise.all([
+      const [usersRes, fraudRes, auditRes, earningsRes] = await Promise.all([
         api.get('/admin/users'),
         api.get('/admin/fraud-alerts'),
-        api.get('/admin/audit-ledger')
+        api.get('/admin/audit-ledger'),
+        api.get('/crypto-trade/admin-earnings').catch(() => ({ data: null })),
       ]);
 
       const usersData = usersRes.data.users || usersRes.data;
@@ -65,6 +67,10 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
         pendingKycCount: auditData.pendingUsers || usersData.filter((u: any) => u.kycStatus === 'Pending').length,
         systemStatus: "OPERATIONAL"
       });
+
+      if (earningsRes.data) {
+        setAdminEarnings(earningsRes.data);
+      }
 
       notify("success", "Admin Console Loaded", "All institutional nodes synchronized.");
     } catch (error) {
@@ -298,6 +304,29 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <p className="text-xs text-amber-600 font-bold mt-2">Requires attention</p>
                     </div>
                   </div>
+
+                  {adminEarnings && (
+                    <div className="mt-8 pt-8 border-t border-gray-100">
+                      <h3 className="text-lg font-black text-gray-900 mb-4 flex items-center gap-2">
+                        <Crown className="w-5 h-5 text-amber-500" />
+                        Platform Earnings (Crypto Trades)
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="p-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Earnings</p>
+                          <p className="text-2xl font-black text-amber-900">₦{adminEarnings.totalEarnings?.toLocaleString() || '0'}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Today's Earnings</p>
+                          <p className="text-2xl font-black text-emerald-900">₦{adminEarnings.todayEarnings?.toLocaleString() || '0'}</p>
+                        </div>
+                        <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Trade Count</p>
+                          <p className="text-2xl font-black text-blue-900">{adminEarnings.transactionCount || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
