@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import { authRateLimit } from '../middleware/rateLimit';
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ interface SessionPayload {
   exp?: number;
 }
 
-router.post('/set', (req: Request, res: Response) => {
+router.post('/set', authRateLimit, (req: Request, res: Response) => {
   try {
     const { uid, email } = req.body;
 

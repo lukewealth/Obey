@@ -10,3 +10,4 @@ gen-lang-client-*.json
 *.key
 *.pem
 *.cert
+.vercel

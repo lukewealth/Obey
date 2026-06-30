@@ -6,6 +6,7 @@ import { syncUserNode } from '../mesh/id_user';
 import { saveTransactionNode } from '../mesh/save';
 import { syncCryptoAsset } from '../mesh/crypto';
 import { syncMetadataNode } from '../mesh/metadatabse';
+import { sensitiveRateLimit } from '../middleware/rateLimit';
 
 const router = express.Router();
 
@@ -107,7 +108,7 @@ router.post('/metadata', async (req, res) => {
 /**
  * Identity Verification Node (Interswitch Mesh)
  */
-router.post('/verify-kyc', async (req, res) => {
+router.post('/verify-kyc', sensitiveRateLimit, async (req, res) => {
   try {
     const { userId, idType, idNumber, livenessScore } = req.body;
 
@@ -286,7 +287,7 @@ router.get('/transactions/:userId', async (req, res) => {
   }
 });
 
-router.post('/verify-biometric', async (req, res) => {
+router.post('/verify-biometric', sensitiveRateLimit, async (req, res) => {
   try {
     const { userId, deviceFingerprint, method } = req.body;
 
@@ -332,7 +333,7 @@ router.post('/verify-biometric', async (req, res) => {
   }
 });
 
-router.post('/verify-totp', async (req, res) => {
+router.post('/verify-totp', sensitiveRateLimit, async (req, res) => {
   try {
     const { userId, code, deviceFingerprint } = req.body;
 

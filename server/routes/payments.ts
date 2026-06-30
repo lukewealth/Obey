@@ -4,6 +4,7 @@ import * as interswitch from '../services/interswitch';
 import { Transaction } from '../models/Transaction';
 import { User } from '../models/User';
 import { v4 as uuidv4 } from 'uuid';
+import mongoose from 'mongoose';
 
 const router = express.Router();
 
@@ -31,9 +32,14 @@ const transferSchema = z.object({
 });
 
 router.post('/transfer', async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  
   try {
     const validation = transferSchema.safeParse(req.body);
     if (!validation.success) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ 
         error: 'Invalid transfer parameters',
         details: validation.error.flatten().fieldErrors 
@@ -43,21 +49,32 @@ router.post('/transfer', async (req: Request, res: Response) => {
     const { senderId, recipientIdentifier, amount } = validation.data;
     const requestReference = `P2P-${uuidv4().substring(0, 8).toUpperCase()}`;
 
-    const sender = await User.findOne({ $or: [{ supabaseId: senderId }, { email: senderId }] } as any);
+    // Find sender and recipient with session for transaction
+    const sender = await User.findOne({ $or: [{ supabaseId: senderId }, { email: senderId }] } as any).session(session);
     const recipient = await User.findOne({ 
       $or: [
         { email: recipientIdentifier.toLowerCase() }, 
         { obeyId: recipientIdentifier.toUpperCase() }
       ] 
-    } as any);
+    } as any).session(session);
 
     if (!sender || !recipient) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ error: 'Sender or recipient node not found.' });
     }
+    if (sender.supabaseId === recipient.supabaseId) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ error: 'Cannot transfer to yourself.' });
+    }
     if (sender.balance < amount) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({ error: 'Insufficient liquidity in sender account.' });
     }
 
+    // Update balances within transaction
     sender.balance -= amount;
     recipient.balance += amount;
 
@@ -87,10 +104,15 @@ router.post('/transfer', async (req: Request, res: Response) => {
       requestReference
     });
 
-    await Promise.all([sender.save(), recipient.save(), senderTx.save(), recipientTx.save()]);
+    await Promise.all([sender.save({ session }), recipient.save({ session }), senderTx.save({ session }), recipientTx.save({ session })]);
+
+    await session.commitTransaction();
+    session.endSession();
 
     res.json({ success: true, recipientName: recipient.name, transactionId: senderTx.id });
   } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
     console.error('[TRANSFER_ERROR]', error.message);
     res.status(500).json({ 
       error: 'Transfer settlement failed',
