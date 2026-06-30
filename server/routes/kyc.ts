@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { User } from '../models/User';
 import { Transaction } from '../models/Transaction';
 import { v4 as uuidv4 } from 'uuid';
+import { adminAuth } from '../middleware/adminAuth';
 
 const router = express.Router();
 
@@ -149,13 +150,10 @@ router.post('/request-upgrade', async (req: Request, res: Response) => {
 });
 
 // Admin: Approve KYC upgrade
-router.post('/admin/approve', async (req: Request, res: Response) => {
+router.post('/admin/approve', adminAuth, async (req: Request, res: Response) => {
   try {
-    const { userId, newTier, adminId } = req.body;
-    
-    if (!adminId) {
-      return res.status(403).json({ error: 'Admin authentication required' });
-    }
+    const { userId, newTier } = req.body;
+    const adminId = (req as any).adminUser.supabaseId;
 
     const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
     
@@ -201,13 +199,10 @@ router.post('/admin/approve', async (req: Request, res: Response) => {
 });
 
 // Admin: Reject KYC upgrade
-router.post('/admin/reject', async (req: Request, res: Response) => {
+router.post('/admin/reject', adminAuth, async (req: Request, res: Response) => {
   try {
-    const { userId, reason, adminId } = req.body;
-    
-    if (!adminId) {
-      return res.status(403).json({ error: 'Admin authentication required' });
-    }
+    const { userId, reason } = req.body;
+    const adminId = (req as any).adminUser.supabaseId;
 
     const user = await User.findOne({ $or: [{ supabaseId: userId }, { email: userId }] } as any);
     
@@ -236,13 +231,8 @@ router.post('/admin/reject', async (req: Request, res: Response) => {
 });
 
 // Get pending KYC requests (admin)
-router.get('/admin/pending', async (req: Request, res: Response) => {
+router.get('/admin/pending', adminAuth, async (req: Request, res: Response) => {
   try {
-    const { adminId } = req.query;
-    
-    if (!adminId) {
-      return res.status(403).json({ error: 'Admin authentication required' });
-    }
 
     const pendingUsers = await User.find({ 
       'kycUpgradeRequest.status': 'pending' 

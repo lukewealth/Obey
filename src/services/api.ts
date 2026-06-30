@@ -11,8 +11,57 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json'
-  }
+  },
+  timeout: 30000, // 30 second timeout
 });
+
+// Request interceptor - add auth headers if available
+api.interceptors.request.use(
+  (config) => {
+    // Add session token from cookie if available
+    const sessionCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('obey_session='));
+    
+    if (sessionCookie) {
+      const token = sessionCookie.split('=')[1];
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - handle common errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // Server responded with error status
+      const { status } = error.response;
+      
+      if (status === 401) {
+        // Unauthorized - session expired
+        console.warn('[API] Session expired, redirecting to login');
+        // Could trigger logout flow here
+      } else if (status === 403) {
+        console.warn('[API] Access forbidden');
+      } else if (status === 429) {
+        console.warn('[API] Rate limit exceeded');
+      } else if (status >= 500) {
+        console.error('[API] Server error:', status);
+      }
+    } else if (error.request) {
+      // Request made but no response
+      console.error('[API] Network error - no response received');
+    }
+    
+    return Promise.reject(error);
+  }
+);
 
 export const syncUserWithMongoDB = async (supabaseId: string, profile: UserProfile) => {
   try {

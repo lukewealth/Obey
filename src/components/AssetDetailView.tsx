@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { UserProfile } from "../types";
+import api from "../services/api";
 
 interface AssetDetailViewProps {
   asset: {
@@ -72,12 +73,12 @@ export default function AssetDetailView({ asset, onClose, onTrade, profile }: As
       setLoading(true);
       try {
         const [coinRes, historyRes] = await Promise.allSettled([
-          fetch(`/api/market/coingecko/coin/${resolvedId}`),
-          fetch(`/api/market/coingecko/history/${resolvedId}?days=${chartPeriod === '1D' ? '1' : chartPeriod === '7D' ? '7' : chartPeriod === '30D' ? '30' : '365'}`),
+          api.get(`/market/coingecko/coin/${resolvedId}`),
+          api.get(`/market/coingecko/history/${resolvedId}?days=${chartPeriod === '1D' ? '1' : chartPeriod === '7D' ? '7' : chartPeriod === '30D' ? '30' : '365'}`),
         ]);
 
         if (coinRes.status === 'fulfilled') {
-          const data = await coinRes.value.json();
+          const data = coinRes.value.data;
           setMarketData({
             currentPrice: data.market_data?.current_price?.usd || 0,
             priceChange24h: data.market_data?.price_change_percentage_24h || 0,
@@ -97,7 +98,7 @@ export default function AssetDetailView({ asset, onClose, onTrade, profile }: As
         }
 
         if (historyRes.status === 'fulfilled') {
-          const histData = await historyRes.value.json();
+          const histData = historyRes.value.data;
           const prices = (histData.prices || []).map((p: number[]) => ({
             time: new Date(p[0]).toLocaleDateString('en-US', {
               month: chartPeriod === '1D' ? undefined : 'short',
@@ -127,8 +128,8 @@ export default function AssetDetailView({ asset, onClose, onTrade, profile }: As
   useEffect(() => {
     intervalRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/market/coingecko/coin/${resolvedId}`);
-        const data = await res.json();
+        const res = await api.get(`/market/coingecko/coin/${resolvedId}`);
+        const data = res.data;
         if (data.market_data?.current_price?.usd) {
           setLivePrice(data.market_data.current_price.usd);
           setLastUpdate(new Date());

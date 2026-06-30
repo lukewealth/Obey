@@ -62,7 +62,13 @@ router.post('/create', async (req, res) => {
 router.get('/user/:userId', async (req, res) => {
   try {
     const cards = await VirtualCard.find({ userId: req.params.userId });
-    res.json(cards);
+    // Return decrypted card details
+    const decryptedCards = cards.map(card => ({
+      ...card.toObject(),
+      cardNumber: card.getDecryptedCardNumber(),
+      cvv: card.getDecryptedCVV()
+    }));
+    res.json(decryptedCards);
   } catch (error: any) {
     console.error('[CARDS_USER] Error:', error);
     const errorMessage = typeof error.message === 'string' ? error.message : 'Failed to fetch cards';

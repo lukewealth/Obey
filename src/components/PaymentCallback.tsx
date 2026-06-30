@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, XCircle, Loader2, ArrowRight } from "lucide-react";
 import { verifyTransaction } from "../services/api";
@@ -11,6 +11,7 @@ export default function PaymentCallback({ onNavigate }: PaymentCallbackProps) {
   const [status, setStatus] = useState<"verifying" | "success" | "failed">("verifying");
   const [transaction, setTransaction] = useState<any>(null);
   const [pollCount, setPollCount] = useState(0);
+  const statusRef = useRef(status);
 
   const urlParams = new URLSearchParams(window.location.search);
   const orderReference = urlParams.get("orderReference");
@@ -22,6 +23,10 @@ export default function PaymentCallback({ onNavigate }: PaymentCallbackProps) {
       window.location.href = path;
     }
   };
+
+  useEffect(() => {
+    statusRef.current = status;
+  }, [status]);
 
   useEffect(() => {
     if (!orderReference) {
@@ -52,7 +57,7 @@ export default function PaymentCallback({ onNavigate }: PaymentCallbackProps) {
 
     const timeout = setTimeout(() => {
       clearInterval(interval);
-      if (status === "verifying") {
+      if (statusRef.current === "verifying") {
         setStatus("failed");
       }
     }, 60000);

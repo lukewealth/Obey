@@ -3,7 +3,10 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET = process.env.JWT_SECRET || 'obey-dev-secret-key-change-in-production';
+if (!process.env.JWT_SECRET) {
+  console.warn('[SESSION_WARN] JWT_SECRET not configured. Using development fallback.');
+}
 const SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 interface SessionPayload {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Loader2, TrendingUp, TrendingDown, Star, Zap, Clock, Flame, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import api from "../services/api";
 
 interface CryptoAsset {
   asset_id: string;
@@ -109,10 +110,10 @@ export default function CryptoSearch({ onSelect, placeholder = "Search crypto as
       }
 
       try {
-        const response = await fetch(
-          `/api/market/coingecko/search?query=${encodeURIComponent(query)}`
+        const response = await api.get(
+          `/market/coingecko/search?query=${encodeURIComponent(query)}`
         );
-        const data = await response.json();
+        const data = response.data;
         const coins = (data.coins || []).slice(0, 12);
 
         const detailed = await Promise.all(
@@ -120,8 +121,8 @@ export default function CryptoSearch({ onSelect, placeholder = "Search crypto as
             const existing = localResults.find(r => r.coingeckoId === coin.id || r.asset_id === coin.symbol?.toUpperCase());
             if (existing) return existing;
             try {
-              const detailRes = await fetch(`/api/market/coingecko/coin/${coin.id}`);
-              const detail = await detailRes.json();
+              const detailRes = await api.get(`/market/coingecko/coin/${coin.id}`);
+              const detail = detailRes.data;
               return {
                 asset_id: coin.symbol.toUpperCase(),
                 name: coin.name,

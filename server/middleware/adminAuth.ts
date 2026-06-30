@@ -5,43 +5,8 @@ const ALLOWED_IPS = process.env.ALLOWED_ADMIN_IPS?.split(',') || [];
 
 export const adminAuth = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // IP White-listing for production
-    if (process.env.NODE_ENV === 'production' && ALLOWED_IPS.length > 0) {
-      const clientIp = req.ip || req.socket.remoteAddress;
-      if (clientIp && !ALLOWED_IPS.includes(clientIp)) {
-        console.warn(`[SECURITY] Unauthorized IP attempt: ${clientIp}`);
-        return res.status(403).json({ error: 'Geospatial node rejected. Access restricted.' });
-      }
-    }
-
-    const identifier = (req.headers['x-admin-id'] || req.query.adminId) as string;
+    const identifier = (req.headers['x-admin-id'] || req.query.adminId || req.body.adminId) as string;
     
-    // Development mode bypass - allow all admin requests in dev
-    if (process.env.NODE_ENV !== 'production') {
-      // Try to find any admin user or use a default admin context
-      let adminUser = null;
-      
-      if (identifier) {
-        adminUser = await User.findOne({ 
-          $or: [{ supabaseId: identifier }, { email: identifier }] 
-        } as any);
-      }
-      
-      // If no identifier or no admin user found, use default admin context for dev
-      if (!adminUser) {
-        adminUser = {
-          supabaseId: 'dev-admin',
-          email: 'admin@obey.com',
-          role: 'admin',
-          isEmailVerified: true,
-          name: 'Development Admin'
-        };
-      }
-      
-      (req as any).adminUser = adminUser;
-      return next();
-    }
-
     if (!identifier) {
       return res.status(401).json({ error: 'Authentication required for institutional access.' });
     }
@@ -60,6 +25,15 @@ export const adminAuth = async (req: Request, res: Response, next: NextFunction)
 
     if (!user.isEmailVerified) {
       return res.status(403).json({ error: 'Email verification required for administrative nodes.' });
+    }
+
+    // IP White-listing for production
+    if (process.env.NODE_ENV === 'production' && ALLOWED_IPS.length > 0) {
+      const clientIp = req.ip || req.socket.remoteAddress;
+      if (clientIp && !ALLOWED_IPS.includes(clientIp)) {
+        console.warn(`[SECURITY] Unauthorized IP attempt: ${clientIp}`);
+        return res.status(403).json({ error: 'Geospatial node rejected. Access restricted.' });
+      }
     }
 
     // Attach user to request for further use
