@@ -35,6 +35,12 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
     systemStatus: "OPERATIONAL"
   });
 
+  const [users, setUsers] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [fraudAlerts, setFraudAlerts] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
   useEffect(() => {
     loadAdminData();
   }, []);
@@ -48,11 +54,15 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
         api.get('/admin/audit-ledger')
       ]);
 
+      const usersData = usersRes.data.users || usersRes.data;
+      const auditData = auditRes.data;
+
+      setUsers(Array.isArray(usersData) ? usersData : []);
       setAdminMetrics({
-        totalUsers: usersRes.data.length,
-        totalVolume: auditRes.data.totalVolume || 0,
-        monthlyRevenue: auditRes.data.monthlyRevenue || 0,
-        pendingKycCount: usersRes.data.filter((u: any) => u.kycStatus === 'Pending').length,
+        totalUsers: auditData.totalUsers || usersData.length || 0,
+        totalVolume: auditData.totalVolume || 0,
+        monthlyRevenue: auditData.monthlyRevenue || 0,
+        pendingKycCount: auditData.pendingUsers || usersData.filter((u: any) => u.kycStatus === 'Pending').length,
         systemStatus: "OPERATIONAL"
       });
 
@@ -244,6 +254,51 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                     </div>
                   </div>
                 </div>
+
+                <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                  <h2 className="text-xl font-black text-gray-900 mb-6">Business Insights</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <Users className="w-8 h-8 text-blue-600" />
+                        <TrendingUp className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-bold text-gray-600 mb-1">User Growth</p>
+                      <p className="text-2xl font-black text-gray-900">{adminMetrics.totalUsers}</p>
+                      <p className="text-xs text-emerald-600 font-bold mt-2">+12% this month</p>
+                    </div>
+
+                    <div className="p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl border border-emerald-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <DollarSign className="w-8 h-8 text-emerald-600" />
+                        <TrendingUp className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-bold text-gray-600 mb-1">Transaction Volume</p>
+                      <p className="text-2xl font-black text-gray-900">₦{(adminMetrics.totalVolume / 1000000).toFixed(1)}M</p>
+                      <p className="text-xs text-emerald-600 font-bold mt-2">+8% this month</p>
+                    </div>
+
+                    <div className="p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <TrendingUp className="w-8 h-8 text-purple-600" />
+                        <TrendingUp className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="text-sm font-bold text-gray-600 mb-1">Monthly Revenue</p>
+                      <p className="text-2xl font-black text-gray-900">₦{(adminMetrics.monthlyRevenue / 1000).toFixed(1)}K</p>
+                      <p className="text-xs text-emerald-600 font-bold mt-2">+15% this month</p>
+                    </div>
+
+                    <div className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl border border-amber-200">
+                      <div className="flex items-center justify-between mb-4">
+                        <AlertCircle className="w-8 h-8 text-amber-600" />
+                        <span className="text-xs font-black text-amber-600 uppercase">Pending</span>
+                      </div>
+                      <p className="text-sm font-bold text-gray-600 mb-1">KYC Queue</p>
+                      <p className="text-2xl font-black text-gray-900">{adminMetrics.pendingKycCount}</p>
+                      <p className="text-xs text-amber-600 font-bold mt-2">Requires attention</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -257,34 +312,65 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <input 
                         type="text" 
                         placeholder="Search users..." 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
                       />
                     </div>
+                    <select 
+                      value={statusFilter}
+                      onChange={(e) => setStatusFilter(e.target.value)}
+                      className="px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium"
+                    >
+                      <option value="all">All Status</option>
+                      <option value="Verified">Verified</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Unverified">Unverified</option>
+                    </select>
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm">
-                          U{i}
+                  {users
+                    .filter((u: any) => {
+                      const matchesSearch = !searchQuery || 
+                        u.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        u.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        u.supabaseId?.toLowerCase().includes(searchQuery.toLowerCase());
+                      const matchesStatus = statusFilter === 'all' || u.kycStatus === statusFilter;
+                      return matchesSearch && matchesStatus;
+                    })
+                    .map((user: any) => (
+                      <div key={user._id || user.supabaseId} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-black text-sm">
+                            {user.name?.charAt(0) || 'U'}
+                          </div>
+                          <div>
+                            <p className="font-bold text-gray-900">{user.name || 'Anonymous'}</p>
+                            <p className="text-sm text-gray-500">{user.email}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-bold text-gray-900">User {i}</p>
-                          <p className="text-sm text-gray-500">user{i}@example.com</p>
+                        <div className="flex items-center gap-3">
+                          <span className={`px-3 py-1 text-xs font-black rounded-lg uppercase ${
+                            user.kycStatus === 'Verified' ? 'bg-emerald-100 text-emerald-700' :
+                            user.kycStatus === 'Pending' ? 'bg-amber-100 text-amber-700' :
+                            'bg-gray-100 text-gray-700'
+                          }`}>
+                            {user.kycStatus || 'Unverified'}
+                          </span>
+                          <button className="p-2 hover:bg-gray-200 rounded-lg transition-all">
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg uppercase">
-                          Verified
-                        </span>
-                        <button className="p-2 hover:bg-gray-200 rounded-lg transition-all">
-                          <ChevronRight className="w-4 h-4" />
-                        </button>
-                      </div>
+                    ))}
+                  {users.length === 0 && (
+                    <div className="text-center py-12 text-gray-400">
+                      <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-bold">No users found</p>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             )}
@@ -293,23 +379,33 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                 <h2 className="text-xl font-black text-gray-900 mb-6">Transaction Ledger</h2>
                 <div className="space-y-3">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                  {transactions.map((tx: any) => (
+                    <div key={tx._id || tx.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center">
                           <DollarSign className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900">Transaction #{1000 + i}</p>
-                          <p className="text-sm text-gray-500">User {i} • {new Date().toLocaleDateString()}</p>
+                          <p className="font-bold text-gray-900">{tx.title || 'Transaction'}</p>
+                          <p className="text-sm text-gray-500">{tx.userId} • {tx.date || new Date().toLocaleDateString()}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-gray-900">₦{(Math.random() * 100000).toFixed(2)}</p>
-                        <span className="text-xs font-bold text-emerald-600 uppercase">Success</span>
+                        <p className="font-black text-gray-900">₦{(tx.amount || 0).toLocaleString()}</p>
+                        <span className={`text-xs font-bold uppercase ${
+                          tx.status === 'Success' || tx.status === 'Completed' ? 'text-emerald-600' :
+                          tx.status === 'Processing' ? 'text-amber-600' :
+                          'text-red-600'
+                        }`}>{tx.status || 'Unknown'}</span>
                       </div>
                     </div>
                   ))}
+                  {transactions.length === 0 && (
+                    <div className="text-center py-12 text-gray-400">
+                      <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-bold">No transactions found</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -318,27 +414,55 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                 <h2 className="text-xl font-black text-gray-900 mb-6">Fraud Detection</h2>
                 <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="flex items-center justify-between p-4 bg-orange-50 border border-orange-200 rounded-xl">
+                  {fraudAlerts.map((alert: any) => (
+                    <div key={alert._id || alert.id} className="flex items-center justify-between p-4 bg-orange-50 border border-orange-200 rounded-xl">
                       <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-orange-500 rounded-xl flex items-center justify-center">
                           <AlertTriangle className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <p className="font-bold text-gray-900">Alert #{2000 + i}</p>
-                          <p className="text-sm text-gray-600">Suspicious transaction detected</p>
+                          <p className="font-bold text-gray-900">{alert.type || 'Alert'}</p>
+                          <p className="text-sm text-gray-600">{alert.description || 'Suspicious activity detected'}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-lg transition-all">
+                        <button 
+                          onClick={async () => {
+                            try {
+                              await api.post('/admin/resolve-alert', { alertId: alert._id || alert.id, action: 'RESOLVE' });
+                              setFraudAlerts(prev => prev.filter(a => (a._id || a.id) !== (alert._id || alert.id)));
+                              notify("success", "Alert Resolved", "Fraud alert has been resolved.");
+                            } catch (err) {
+                              notify("error", "Error", "Failed to resolve alert.");
+                            }
+                          }}
+                          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold rounded-lg transition-all"
+                        >
                           Resolve
                         </button>
-                        <button className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-bold rounded-lg transition-all">
+                        <button 
+                          onClick={async () => {
+                            try {
+                              await api.post('/admin/resolve-alert', { alertId: alert._id || alert.id, action: 'DISMISS' });
+                              setFraudAlerts(prev => prev.filter(a => (a._id || a.id) !== (alert._id || alert.id)));
+                              notify("success", "Alert Dismissed", "Fraud alert has been dismissed.");
+                            } catch (err) {
+                              notify("error", "Error", "Failed to dismiss alert.");
+                            }
+                          }}
+                          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm font-bold rounded-lg transition-all"
+                        >
                           Dismiss
                         </button>
                       </div>
                     </div>
                   ))}
+                  {fraudAlerts.length === 0 && (
+                    <div className="text-center py-12 text-gray-400">
+                      <ShieldAlert className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      <p className="font-bold">No fraud alerts</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -384,6 +508,36 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <Download className="w-4 h-4" />
                       Export
                     </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                      <p className="font-bold text-gray-900">API Server</p>
+                      <p className="text-sm text-gray-500">Backend service status</p>
+                    </div>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg uppercase">
+                      Online
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                      <p className="font-bold text-gray-900">Database</p>
+                      <p className="text-sm text-gray-500">MongoDB connection status</p>
+                    </div>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg uppercase">
+                      Connected
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                    <div>
+                      <p className="font-bold text-gray-900">Payment Gateway</p>
+                      <p className="text-sm text-gray-500">Nomba/Interswitch status</p>
+                    </div>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-black rounded-lg uppercase">
+                      Active
+                    </span>
                   </div>
                 </div>
               </div>

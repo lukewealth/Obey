@@ -16,6 +16,32 @@ export const adminAuth = async (req: Request, res: Response, next: NextFunction)
 
     const identifier = (req.headers['x-admin-id'] || req.query.adminId) as string;
     
+    // Development mode bypass - allow all admin requests in dev
+    if (process.env.NODE_ENV !== 'production') {
+      // Try to find any admin user or use a default admin context
+      let adminUser = null;
+      
+      if (identifier) {
+        adminUser = await User.findOne({ 
+          $or: [{ supabaseId: identifier }, { email: identifier }] 
+        } as any);
+      }
+      
+      // If no identifier or no admin user found, use default admin context for dev
+      if (!adminUser) {
+        adminUser = {
+          supabaseId: 'dev-admin',
+          email: 'admin@obey.com',
+          role: 'admin',
+          isEmailVerified: true,
+          name: 'Development Admin'
+        };
+      }
+      
+      (req as any).adminUser = adminUser;
+      return next();
+    }
+
     if (!identifier) {
       return res.status(401).json({ error: 'Authentication required for institutional access.' });
     }

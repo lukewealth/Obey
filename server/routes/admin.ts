@@ -13,8 +13,39 @@ const router = express.Router();
  */
 router.get('/users', adminAuth, async (req, res) => {
   try {
-    const users = await User.find({} as any).sort({ createdAt: -1 });
-    res.json(users);
+    const { search, status, page = 1, limit = 50 } = req.query;
+    const query: any = {};
+    
+    if (search) {
+      query.$or = [
+        { name: { $regex: search as string, $options: 'i' } },
+        { email: { $regex: search as string, $options: 'i' } },
+        { supabaseId: { $regex: search as string, $options: 'i' } },
+        { obeyId: { $regex: search as string, $options: 'i' } }
+      ];
+    }
+    
+    if (status && status !== 'all') {
+      query.kycStatus = status;
+    }
+    
+    const skip = (Number(page) - 1) * Number(limit);
+    const users = await User.find(query as any)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number(limit));
+    
+    const total = await User.countDocuments(query as any);
+    
+    res.json({
+      users,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        pages: Math.ceil(total / Number(limit))
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve ledger participants.' });
   }
@@ -153,11 +184,30 @@ router.get('/audit-ledger', adminAuth, async (req, res) => {
     // System Equity: Institutional liquidity pool (simulated)
     const systemEquity = 12400000; 
 
+    // Calculate additional metrics
+    const totalUsers = users.length;
+    const verifiedUsers = users.filter((u: any) => u.kycStatus === 'Verified').length;
+    const pendingUsers = users.filter((u: any) => u.kycStatus === 'Pending').length;
+    
+    // Get transaction metrics
+    const transactions = await Transaction.find({} as any);
+    const totalVolume = transactions.reduce((acc, tx) => acc + (tx.amount || 0), 0);
+    const successfulTx = transactions.filter((tx: any) => tx.status === 'Completed' || tx.status === 'Success').length;
+    
+    // Monthly revenue (simulated as 0.5% of volume)
+    const monthlyRevenue = totalVolume * 0.005;
+
     res.json({
       totalLiabilities,
       systemEquity,
       delta: systemEquity - totalLiabilities,
       integrity: "99.98%",
+      totalUsers,
+      verifiedUsers,
+      pendingUsers,
+      totalVolume,
+      successfulTx,
+      monthlyRevenue,
       recentEvents: [
         { id: "EVT-01", type: "Ledger Pass", status: "Verified", time: new Date() },
         { id: "EVT-02", type: "Liabilities Sync", status: "Stable", time: new Date() }
@@ -282,6 +332,149 @@ router.get('/vault-metrics', adminAuth, async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to sync vault metrics.' });
+  }
+});
+
+/**
+ * Business Insights & Analytics
+ */
+router.get('/analytics', adminAuth, async (req, res) => {
+  try {
+    const { period = '30d' } = req.query;
+    
+    // Calculate date range
+    const now = new Date();
+    const startDate = new Date();
+    if (period === '7d') startDate.setDate(now.getDate() - 7);
+    else if (period === '30d') startDate.setDate(now.getDate() - 30);
+    else if (period === '90d') startDate.setDate(now.getDate() - 90);
+    else startDate.setDate(now.getDate() - 30);
+
+    // User growth
+    const userGrowth = await User.find({
+      createdAt: { $gte: startDate }
+    } as any);
+
+    // Transaction volume by category
+    const txByCategory = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $group: { _id: '$category', count: { $sum: 1 }, totalAmount: { $sum: '$amount' } } },
+      { $sort: { totalAmount: -1 } }
+    ]);
+
+    // Daily transaction volume
+    const dailyVolume = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, count: { $sum: 1 }, amount: { $sum: '$amount' } } },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Top users by volume
+    const topUsers = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate } } },
+      { $group: { _id: '$userId', count: { $sum: 1 }, totalAmount: { $sum: '$amount' } } },
+      { $sort: { totalAmount: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // Revenue metrics
+    const totalRevenue = await Transaction.aggregate([
+      { $match: { createdAt: { $gte: startDate }, fee: { $exists: true } } },
+      { $group: { _id: null, total: { $sum: '$fee' } } }
+    ]);
+
+    res.json({
+      period,
+      userGrowth: userGrowth.length,
+      txByCategory,
+      dailyVolume,
+      topUsers,
+      revenue: totalRevenue[0]?.total || 0,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Analytics retrieval failed.' });
+  }
+});
+
+/**
+ * Update User Status (Ban/Unban/Verify)
+ */
+router.post('/update-user-status', adminAuth, async (req, res) => {
+  try {
+    const { userId, action, reason } = req.body;
+    
+    if (!userId || !action) {
+      return res.status(400).json({ error: 'Missing required parameters.' });
+    }
+
+    let updatePayload: any = {};
+    
+    switch (action) {
+      case 'VERIFY':
+        updatePayload = { kycStatus: 'Verified', kycLevel: 2 };
+        break;
+      case 'REJECT':
+        updatePayload = { kycStatus: 'Rejected' };
+        break;
+      case 'SUSPEND':
+        updatePayload = { kycStatus: 'Suspended' };
+        break;
+      case 'REACTIVATE':
+        updatePayload = { kycStatus: 'Verified' };
+        break;
+      default:
+        return res.status(400).json({ error: 'Invalid action.' });
+    }
+
+    const user = await User.findOneAndUpdate(
+      { $or: [{ supabaseId: userId }, { email: userId }, { _id: userId }] } as any,
+      updatePayload as any,
+      { new: true } as any
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    res.json({
+      success: true,
+      message: `User ${action.toLowerCase()}d successfully.`,
+      user: {
+        id: user.supabaseId || user._id,
+        email: user.email,
+        kycStatus: user.kycStatus,
+        kycLevel: user.kycLevel
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'User status update failed.' });
+  }
+});
+
+/**
+ * System Configuration
+ */
+router.get('/config', adminAuth, async (req, res) => {
+  try {
+    res.json({
+      systemStatus: process.env.SYSTEM_STATUS || 'OPERATIONAL',
+      maintenanceMode: process.env.MAINTENANCE_MODE === 'true',
+      features: {
+        crypto: true,
+        giftcards: true,
+        airtime: true,
+        virtualCards: true,
+        bankTransfer: true
+      },
+      limits: {
+        maxTransactionAmount: 5000000,
+        dailyWithdrawalLimit: 10000000,
+        maxVirtualAccounts: 2
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Config retrieval failed.' });
   }
 });
 
