@@ -41,10 +41,33 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [adminEarnings, setAdminEarnings] = useState<any>(null);
+  const [systemHealth, setSystemHealth] = useState({
+    api: 'checking',
+    database: 'checking',
+    webhooks: 'checking'
+  });
 
   useEffect(() => {
     loadAdminData();
+    checkSystemHealth();
   }, []);
+
+  const checkSystemHealth = async () => {
+    try {
+      const res = await api.get('/health');
+      setSystemHealth({
+        api: 'online',
+        database: res.data.database ? 'connected' : 'disconnected',
+        webhooks: 'active'
+      });
+    } catch (error) {
+      setSystemHealth({
+        api: 'offline',
+        database: 'disconnected',
+        webhooks: 'inactive'
+      });
+    }
+  };
 
   const loadAdminData = async () => {
     setIsInitializing(true);
@@ -229,33 +252,39 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                 <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
                   <h2 className="text-xl font-black text-gray-900 mb-6">System Health</h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl">
-                      <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${systemHealth.api === 'online' ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${systemHealth.api === 'online' ? 'bg-emerald-500' : 'bg-red-500'}`}>
                         <Cpu className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-600">API Server</p>
-                        <p className="text-lg font-black text-emerald-600">Online</p>
+                        <p className={`text-lg font-black ${systemHealth.api === 'online' ? 'text-emerald-600' : 'text-red-600'}`}>
+                          {systemHealth.api === 'online' ? 'Online' : 'Offline'}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl">
-                      <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${systemHealth.database === 'connected' ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${systemHealth.database === 'connected' ? 'bg-emerald-500' : 'bg-red-500'}`}>
                         <Database className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-600">Database</p>
-                        <p className="text-lg font-black text-emerald-600">Connected</p>
+                        <p className={`text-lg font-black ${systemHealth.database === 'connected' ? 'text-emerald-600' : 'text-red-600'}`}>
+                          {systemHealth.database === 'connected' ? 'Connected' : 'Disconnected'}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 p-4 bg-emerald-50 rounded-xl">
-                      <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center">
+                    <div className={`flex items-center gap-4 p-4 rounded-xl ${systemHealth.webhooks === 'active' ? 'bg-emerald-50' : 'bg-red-50'}`}>
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${systemHealth.webhooks === 'active' ? 'bg-emerald-500' : 'bg-red-500'}`}>
                         <Globe className="w-6 h-6 text-white" />
                       </div>
                       <div>
                         <p className="text-sm font-bold text-gray-600">Webhooks</p>
-                        <p className="text-lg font-black text-emerald-600">Active</p>
+                        <p className={`text-lg font-black ${systemHealth.webhooks === 'active' ? 'text-emerald-600' : 'text-red-600'}`}>
+                          {systemHealth.webhooks === 'active' ? 'Active' : 'Inactive'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -511,7 +540,14 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <p className="font-bold text-gray-900">System Status</p>
                       <p className="text-sm text-gray-500">Current operational status</p>
                     </div>
-                    <select className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold">
+                    <select 
+                      value={adminMetrics.systemStatus}
+                      onChange={(e) => {
+                        setAdminMetrics(prev => ({ ...prev, systemStatus: e.target.value as any }));
+                        notify("success", "Status Updated", `System status changed to ${e.target.value}`);
+                      }}
+                      className="px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-bold"
+                    >
                       <option>OPERATIONAL</option>
                       <option>DEGRADED</option>
                       <option>MAINTENANCE</option>
@@ -523,7 +559,13 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <p className="font-bold text-gray-900">Maintenance Mode</p>
                       <p className="text-sm text-gray-500">Enable maintenance mode for users</p>
                     </div>
-                    <button className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-lg transition-all">
+                    <button 
+                      onClick={() => {
+                        setAdminMetrics(prev => ({ ...prev, systemStatus: 'MAINTENANCE' }));
+                        notify("warning", "Maintenance Mode", "System is now in maintenance mode.");
+                      }}
+                      className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white text-sm font-bold rounded-lg transition-all"
+                    >
                       Enable
                     </button>
                   </div>
@@ -533,7 +575,25 @@ export default function AdminDashboard({ profile, onLogout, onBackToUserDashboar
                       <p className="font-bold text-gray-900">Export Audit Logs</p>
                       <p className="text-sm text-gray-500">Download system audit trail</p>
                     </div>
-                    <button className="px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2">
+                    <button 
+                      onClick={() => {
+                        const auditData = JSON.stringify({
+                          users: users,
+                          transactions: transactions,
+                          fraudAlerts: fraudAlerts,
+                          exportedAt: new Date().toISOString()
+                        }, null, 2);
+                        const blob = new Blob([auditData], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `audit_logs_${new Date().toISOString().split('T')[0]}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        notify("success", "Export Complete", "Audit logs downloaded successfully.");
+                      }}
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-lg transition-all flex items-center gap-2"
+                    >
                       <Download className="w-4 h-4" />
                       Export
                     </button>

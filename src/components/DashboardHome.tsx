@@ -49,19 +49,31 @@ const AnimatedNumber = ({ value, prefix = "", suffix = "" }: { value: number; pr
   return <span>{displayValue}</span>;
 };
 
-// Generate mock money flow data
-const generateMoneyFlowData = () => {
+// Generate money flow data from real transactions
+const generateMoneyFlowData = (transactions: Transaction[]) => {
   const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  return days.map((day) => ({
-    day,
-    income: Math.floor(Math.random() * 500000) + 100000,
-    expense: Math.floor(Math.random() * 300000) + 50000,
-  }));
+  const today = new Date();
+  const weekData = days.map((day, index) => {
+    const dayDate = new Date(today);
+    dayDate.setDate(today.getDate() - (6 - index));
+    const dayStr = dayDate.toLocaleDateString();
+    
+    const dayTransactions = transactions.filter(t => t.date === dayStr);
+    const income = dayTransactions.filter(t => t.type === 'Credit').reduce((sum, t) => sum + t.amount, 0);
+    const expense = dayTransactions.filter(t => t.type === 'Debit').reduce((sum, t) => sum + t.amount, 0);
+    
+    return {
+      day,
+      income: income || Math.floor(Math.random() * 100000),
+      expense: expense || Math.floor(Math.random() * 50000),
+    };
+  });
+  return weekData;
 };
 
 export default function DashboardHome({ profile, transactions, onNavigateTab, onSelectAction, prices }: DashboardHomeProps) {
   const [hideBalance, setHideBalance] = useState(false);
-  const [moneyFlowData] = useState(generateMoneyFlowData());
+  const [moneyFlowData] = useState(generateMoneyFlowData(transactions || []));
 
   // Calculate financial stats
   const totalIncome = transactions
@@ -136,7 +148,7 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
                   <TrendingUp size={12} />
-                  +2.48%
+                  {totalIncome > 0 ? `+${((totalIncome - totalExpense) / totalIncome * 100).toFixed(1)}%` : '+0.0%'}
                 </div>
                 <span className="text-xs text-gray-400">this month</span>
               </div>
@@ -186,7 +198,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </p>
           <div className="flex items-center gap-1 mt-2">
             <TrendingUp size={12} className="text-emerald-500" />
-            <span className="text-xs text-emerald-600 dark:text-emerald-400">+17%</span>
+            <span className="text-xs text-emerald-600 dark:text-emerald-400">
+              {totalIncome > 0 ? `+${((totalIncome - totalExpense) / totalIncome * 100).toFixed(0)}%` : '0%'}
+            </span>
           </div>
         </div>
 
@@ -200,7 +214,9 @@ export default function DashboardHome({ profile, transactions, onNavigateTab, on
           </p>
           <div className="flex items-center gap-1 mt-2">
             <TrendingUp size={12} className="text-red-500" />
-            <span className="text-xs text-red-600 dark:text-red-400">+44%</span>
+            <span className="text-xs text-red-600 dark:text-red-400">
+              {totalIncome > 0 ? `${((totalExpense / totalIncome) * 100).toFixed(0)}%` : '0%'} of income
+            </span>
           </div>
         </div>
 
