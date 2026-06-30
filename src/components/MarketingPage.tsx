@@ -765,14 +765,14 @@ export default function MarketingPage({ onNavigate, btcPrice, ethPrice }: Market
                  <p className="text-lg md:text-xl text-gray-400 dark:text-gray-500 font-medium max-w-xl mx-auto px-4">With this platform, you can access your account anywhere, anytime for balance and so much more.</p>
                  <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
                     <button className="h-14 md:h-16 px-8 bg-black dark:bg-primary text-white rounded-full flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-xl active-press group w-full sm:w-auto">
-                       <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" className="w-5 h-5 invert" />
+                       <img src="https://developer.apple.com/assets/elements/icons/apple/apple-96x96.png" alt="Apple" className="w-5 h-5 invert" onError={(e) => { (e.target as HTMLImageElement).src = '/apple-logo.svg'; }} />
                        <div className="text-left">
                           <p className="text-[7px] md:text-[8px] font-bold uppercase opacity-50 leading-none">Download on the</p>
                           <p className="text-[11px] md:text-[12px] font-black uppercase tracking-widest leading-none">App Store</p>
                        </div>
                     </button>
                     <button className="h-14 md:h-16 px-8 bg-black dark:bg-primary text-white rounded-full flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-xl active-press group w-full sm:w-auto">
-                       <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google" className="w-5 h-5" />
+                       <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google" className="w-5 h-5" onError={(e) => { (e.target as HTMLImageElement).src = '/google-play.svg'; }} />
                        <div className="text-left">
                           <p className="text-[7px] md:text-[8px] font-bold uppercase opacity-50 leading-none">Get it on</p>
                           <p className="text-[11px] md:text-[12px] font-black uppercase tracking-widest label-none leading-none">Google Play</p>

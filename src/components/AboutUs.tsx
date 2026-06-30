@@ -131,14 +131,14 @@ export default function AboutUs() {
             <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-white leading-tight">Ready to join the <br /><span className="text-primary italic">next generation?</span></h2>
             <div className="flex flex-col sm:flex-row gap-6 justify-center">
                 <button className="h-20 px-10 bg-white text-[#0b0e14] rounded-2xl flex items-center gap-5 hover:scale-105 transition-all shadow-2xl active-press group/btn">
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" className="w-8 h-8 group-hover/btn:scale-110 transition-transform" />
+                   <img src="https://developer.apple.com/assets/elements/icons/apple/apple-96x96.png" alt="Apple" className="w-8 h-8 group-hover/btn:scale-110 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = '/apple-logo.svg'; }} />
                    <div className="text-left">
                       <p className="text-[10px] font-bold uppercase opacity-50">App Store</p>
                       <p className="text-lg font-black uppercase tracking-wider">Download Now</p>
                    </div>
                 </button>
                 <button className="h-20 px-10 bg-[#1e232b] text-white rounded-2xl flex items-center gap-5 hover:scale-105 transition-all shadow-2xl active-press group/btn border border-white/5">
-                   <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google" className="w-8 h-8 group-hover/btn:rotate-12 transition-transform" />
+                   <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg" alt="Google" className="w-8 h-8 group-hover/btn:rotate-12 transition-transform" onError={(e) => { (e.target as HTMLImageElement).src = '/google-play.svg'; }} />
                    <div className="text-left">
                       <p className="text-[10px] font-bold uppercase opacity-50">Google Play</p>
                       <p className="text-lg font-black uppercase tracking-wider">Get it on</p>

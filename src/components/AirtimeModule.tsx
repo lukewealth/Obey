@@ -78,6 +78,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#FFCC00]",
       textColor: "text-black",
       logoChar: "M",
+      logoUrl: "https://nigerialogos.com/logos/mtn.svg",
       paymentCode: "10101",
       symbolColor: "#FFCC00"
     },
@@ -87,6 +88,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#ED1C24]",
       textColor: "text-white",
       logoChar: "A",
+      logoUrl: "https://nigerialogos.com/logos/airtel.svg",
       paymentCode: "10201",
       symbolColor: "#ED1C24"
     },
@@ -96,6 +98,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#00A651]",
       textColor: "text-white",
       logoChar: "G",
+      logoUrl: "https://nigerialogos.com/logos/glo.svg",
       paymentCode: "10301",
       symbolColor: "#00A651"
     },
@@ -105,6 +108,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
       color: "bg-[#006B3F]",
       textColor: "text-white",
       logoChar: "9",
+      logoUrl: "https://nigerialogos.com/logos/9mobile.svg",
       paymentCode: "10401",
       symbolColor: "#006B3F"
     },
@@ -132,7 +136,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "netflix",
       name: "Netflix",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
+      logoUrl: "https://images.ctfassets.net/y2ske730sjqp/6BHnPhR9RRNm8kYKwQQ8W8/7c5d7e5f5f5f5f5f5f5f5f5f5f5f5f5f/Netflix_Logo.png",
       color: "bg-[#E50914]",
       plans: [
         { id: "nf1", name: "Mobile", price: 1200, description: "1 device, 480p", duration: "Monthly" },
@@ -144,7 +148,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "spotify",
       name: "Spotify",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg",
+      logoUrl: "https://storage.googleapis.com/pr-newsroom-wp/1/2023/09/Spotify_Full_Logo_RGB_Green.png",
       color: "bg-[#1DB954]",
       plans: [
         { id: "sp1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
@@ -155,7 +159,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "apple",
       name: "Apple Music",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
+      logoUrl: "https://developer.apple.com/assets/elements/icons/apple-music/apple-music-96x96.png",
       color: "bg-[#FA243C]",
       plans: [
         { id: "am1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
@@ -166,7 +170,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "youtube",
       name: "YouTube Premium",
-      logoUrl: "https://upload.wikimedia.org/wikipedia/commons/7/79/YouTube_social_red_square_%282017%29.svg",
+      logoUrl: "https://www.gstatic.com/youtube/src/web/htdocs/img/branding/YouTube_Logo_2024.svg",
       color: "bg-[#FF0000]",
       plans: [
         { id: "yt1", name: "Individual", price: 1200, description: "1 account", duration: "Monthly", recommended: true },
@@ -177,6 +181,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "showmax",
       name: "Showmax",
+      logoUrl: "https://nigerialogos.com/logos/showmax.svg",
       color: "bg-[#000000]",
       plans: [
         { id: "sm1", name: "Mobile", price: 1200, description: "1 device", duration: "Monthly", recommended: true },
@@ -186,6 +191,7 @@ export default function AirtimeModule({ profile, onPurchase }: AirtimeModuleProp
     {
       id: "dstv",
       name: "DSTV",
+      logoUrl: "https://nigerialogos.com/logos/dstv.svg",
       color: "bg-[#003DA5]",
       plans: [
         { id: "ds1", name: "Padi", price: 2500, description: "Local channels", duration: "Monthly" },
