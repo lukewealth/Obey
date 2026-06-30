@@ -65,6 +65,8 @@ export default function PaymentScheduleChanneler({
   const [showAddModal, setShowAddModal] = useState(false);
   const [contextMenu, setContextMenu] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showRescheduleNotification, setShowRescheduleNotification] = useState(true);
+  const [rescheduleTarget, setRescheduleTarget] = useState<string | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -175,7 +177,7 @@ export default function PaymentScheduleChanneler({
                 </p>
               </div>
               <button
-                onClick={() => {}}
+                onClick={() => setShowRescheduleNotification(false)}
                 className="text-amber-400 hover:text-amber-600 transition-colors"
               >
                 <X size={16} />
@@ -442,7 +444,7 @@ export default function PaymentScheduleChanneler({
                                 Mark Paid
                               </button>
                               <button
-                                onClick={() => {}}
+                                onClick={() => setRescheduleTarget(payment.id)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-medium hover:bg-amber-200 dark:hover:bg-amber-500/30 transition-colors"
                               >
                                 <RefreshCw size={12} />
@@ -461,7 +463,7 @@ export default function PaymentScheduleChanneler({
                           {isFailed && (
                             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100 dark:border-white/5">
                               <button
-                                onClick={() => {}}
+                                onClick={() => onComplete(payment.id)}
                                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
                               >
                                 <RefreshCw size={12} />

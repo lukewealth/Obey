@@ -37,6 +37,37 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
 
   const totalVolume = filteredTx.reduce((acc, tx) => acc + tx.amount, 0);
 
+  // Export to CSV
+  const exportToCSV = () => {
+    const headers = ['Date', 'Time', 'Title', 'Category', 'Type', 'Amount', 'Status', 'Reference'];
+    const rows = filteredTx.map(tx => [
+      tx.date,
+      tx.time,
+      tx.title,
+      tx.category,
+      tx.type,
+      tx.amount.toString(),
+      tx.status,
+      tx.id
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
+
+  // Export to PDF (simplified - opens print dialog)
+  const exportToPDF = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-8 md:space-y-12 pb-24 px-1 md:px-0">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8">
@@ -258,10 +289,10 @@ export default function TransactionHistory({ transactions }: TransactionHistoryP
                <h4 className="text-lg font-black text-gray-900 uppercase italic tracking-tighter">Export Node Data</h4>
                <p className="text-xs text-gray-400 font-medium leading-relaxed">Generate high-fidelity forensic reports for tax and institutional auditing.</p>
             </div>
-            <div className="grid grid-cols-2 gap-4">
-               <button className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press"><FileSpreadsheet size={16} /> CSV</button>
-               <button className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press"><FileText size={16} /> PDF</button>
-            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <button onClick={exportToCSV} className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press hover:bg-gray-100 transition-colors"><FileSpreadsheet size={16} /> CSV</button>
+                <button onClick={exportToPDF} className="h-14 bg-gray-50 text-gray-700 border border-gray-100 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 active-press hover:bg-gray-100 transition-colors"><FileText size={16} /> PDF</button>
+             </div>
             <button className="h-14 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-primary/20 active-press">Schedule Auto-Export</button>
          </div>
 
