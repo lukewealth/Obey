@@ -20,6 +20,7 @@ import rewardsRoutes from './routes/rewards';
 import kycRoutes from './routes/kyc';
 import sessionRoutes from './routes/session';
 import notificationRoutes from './routes/notifications';
+import notificationPrefRoutes from './routes/notification_prefs';
 import scheduledPaymentRoutes from './routes/scheduled_payments';
 import bankRoutes from './routes/banks';
 import { connectDB, prewarmDB } from './db';
@@ -119,6 +120,7 @@ router.use('/rewards', rewardsRoutes);
 router.use('/kyc', kycRoutes);
 router.use('/session', sessionRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/notification-prefs', notificationPrefRoutes);
 router.use('/scheduled-payments', scheduledPaymentRoutes);
 router.use('/banks', bankRoutes);
 

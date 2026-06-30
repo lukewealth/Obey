@@ -9,6 +9,7 @@ import {
   CheckIcon
 } from "@heroicons/react/24/outline";
 import { useNotification } from "./NotificationSystem";
+import api from "../services/api";
 
 interface NotificationSettingsProps {
   userId?: string;
@@ -42,28 +43,50 @@ export default function NotificationSettings({ userId }: NotificationSettingsPro
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    // Load preferences from localStorage
-    const saved = localStorage.getItem(`notification_prefs_${userId}`);
-    if (saved) {
-      try {
-        setPreferences(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to parse notification preferences", e);
+    // Load preferences from backend first, fallback to localStorage
+    const loadPreferences = async () => {
+      if (userId) {
+        try {
+          const response = await api.get(`/notification-prefs/${userId}`);
+          if (response.data.success && response.data.preferences) {
+            setPreferences(response.data.preferences);
+            // Also save to localStorage as cache
+            localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(response.data.preferences));
+            return;
+          }
+        } catch (e) {
+          console.warn("Failed to load preferences from backend, using localStorage");
+        }
       }
-    }
+      
+      // Fallback to localStorage
+      const saved = localStorage.getItem(`notification_prefs_${userId}`);
+      if (saved) {
+        try {
+          setPreferences(JSON.parse(saved));
+        } catch (e) {
+          console.error("Failed to parse notification preferences", e);
+        }
+      }
+    };
+    
+    loadPreferences();
   }, [userId]);
 
   const savePreferences = async (newPrefs: NotificationPreferences) => {
     setSaving(true);
     try {
-      // Save to localStorage
+      // Save to localStorage as cache
       localStorage.setItem(`notification_prefs_${userId}`, JSON.stringify(newPrefs));
       
-      // TODO: Save to backend
-      // await api.post('/user/notification-preferences', newPrefs);
+      // Save to backend
+      if (userId) {
+        await api.post(`/notification-prefs/${userId}`, newPrefs);
+      }
       
       notify("success", "Settings Saved", "Your notification preferences have been updated.");
     } catch (error) {
+      console.error("Failed to save preferences:", error);
       notify("error", "Save Failed", "Could not save notification preferences.");
     } finally {
       setSaving(false);
